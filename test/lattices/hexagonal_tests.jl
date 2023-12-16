@@ -158,7 +158,45 @@ end
     @test lattice_system(lattice_constants) == Hexagonal
 end
 
-# TODO
+@testset "standardize()" begin
+    # --- Tests
+
+    # ------ Hexagonal lattices have no lattice constants conventions for PRIMITIVE
+    #        centering
+
+    lattice_constants = HexagonalLatticeConstants(1.0, 2.0)
+
+    standardized_lattice_constants, standardized_centering = standardize(
+        lattice_constants, XtallographyUtils.PRIMITIVE
+    )
+
+    expected_lattice_constants = lattice_constants
+    @test standardized_lattice_constants ≈ expected_lattice_constants
+
+    @test standardized_centering == XtallographyUtils.PRIMITIVE
+
+    # ------ Invalid centerings
+
+    for centering in
+        (XtallographyUtils.BODY, XtallographyUtils.FACE, XtallographyUtils.BASE)
+        local error = nothing
+        local error_message = ""
+        try
+            standardize(lattice_constants, centering)
+        catch error
+            bt = catch_backtrace()
+            error_message = sprint(showerror, error, bt)
+        end
+
+        @test error isa ArgumentError
+
+        expected_error =
+            "ArgumentError: " *
+            "Invalid Bravais lattice: (lattice_system=Hexagonal, centering=$centering)"
+
+        @test startswith(error_message, expected_error)
+    end
+end
 
 # ------ Unit cell computations
 
@@ -211,6 +249,62 @@ end
         2 * norm(cross(basis_a, basis_b)) +
           2 * norm(cross(basis_b, basis_c)) +
           2 * norm(cross(basis_c, basis_a))
+end
+
+@testset "reduced_cell()" begin
+    # --- Preparations
+
+    a = 2
+    c = 5
+    lattice_constants = HexagonalLatticeConstants(a, c)
+    basis_a, basis_b, basis_c = basis(lattice_constants)
+
+    # --- Exercise functionality and check results
+
+    # primitive unit cell defined by [basis_a, basis_b, basis_c]
+    unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+
+    expected_reduced_cell = reduced_cell(
+        UnitCell(
+            LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
+            XtallographyUtils.PRIMITIVE,
+        ),
+    )
+
+    reduced_cell_ = reduced_cell(unit_cell)
+    @test reduced_cell_.lattice_constants isa HexagonalLatticeConstants
+    @test volume(reduced_cell_) ≈ volume(unit_cell)
+    @test reduced_cell_ ≈ expected_reduced_cell
+
+    # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c],
+    # β ≈ π / 3
+    unit_cell = UnitCell(
+        LatticeConstants(basis_a + basis_b, basis_b, basis_c), XtallographyUtils.PRIMITIVE
+    )
+
+    expected_reduced_cell = reduced_cell(
+        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    )
+
+    reduced_cell_ = reduced_cell(unit_cell)
+    @test reduced_cell_.lattice_constants isa HexagonalLatticeConstants
+    @test volume(reduced_cell_) ≈ volume(unit_cell)
+    @test reduced_cell_ ≈ expected_reduced_cell
+
+    # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c],
+    # β ≈ 2π / 3
+    unit_cell = UnitCell(
+        LatticeConstants(basis_a - basis_b, basis_b, basis_c), XtallographyUtils.PRIMITIVE
+    )
+
+    expected_reduced_cell = reduced_cell(
+        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    )
+
+    reduced_cell_ = reduced_cell(unit_cell)
+    @test reduced_cell_.lattice_constants isa HexagonalLatticeConstants
+    @test volume(reduced_cell_) ≈ volume(unit_cell)
+    @test reduced_cell_ ≈ expected_reduced_cell
 end
 
 @testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin

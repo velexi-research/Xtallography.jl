@@ -172,7 +172,43 @@ end
     @test lattice_system(lattice_constants) == Rhombohedral
 end
 
-# TODO
+@testset "standardize()" begin
+    # --- Tests
+
+    # ------ Rhombohedral lattices have no lattice constants conventions for PRIMTIIVE
+    #        centering
+
+    lattice_constants = RhombohedralLatticeConstants(1.0, 2π / 5)
+
+    standardized_lattice_constants, standardized_centering = standardize(
+        lattice_constants, XtallographyUtils.PRIMITIVE
+    )
+
+    expected_lattice_constants = lattice_constants
+    @test standardized_lattice_constants ≈ expected_lattice_constants
+
+    # ------ Invalid centering
+
+    for centering in
+        (XtallographyUtils.BODY, XtallographyUtils.FACE, XtallographyUtils.BASE)
+        local error = nothing
+        local error_message = ""
+        try
+            standardize(lattice_constants, centering)
+        catch error
+            bt = catch_backtrace()
+            error_message = sprint(showerror, error, bt)
+        end
+
+        @test error isa ArgumentError
+
+        expected_error =
+            "ArgumentError: " *
+            "Invalid Bravais lattice: (lattice_system=Rhombohedral, centering=$centering)"
+
+        @test startswith(error_message, expected_error)
+    end
+end
 
 # ------ Unit cell computations
 
@@ -229,6 +265,29 @@ end
         2 * norm(cross(basis_a, basis_b)) +
           2 * norm(cross(basis_b, basis_c)) +
           2 * norm(cross(basis_c, basis_a))
+end
+
+@testset "reduced_cell()" begin
+    # --- Preparations
+
+    a = 2
+    α = 2π / 5
+    lattice_constants = RhombohedralLatticeConstants(a, α)
+    basis_a, basis_b, basis_c = basis(lattice_constants)
+
+    # --- Exercise functionality and check results
+
+    # primitive unit cell
+    unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+
+    expected_reduced_cell = reduced_cell(
+        UnitCell(LatticeConstants(basis_a, basis_b, basis_c), XtallographyUtils.PRIMITIVE)
+    )
+
+    reduced_cell_ = reduced_cell(unit_cell)
+    @test reduced_cell_.lattice_constants isa RhombohedralLatticeConstants
+    @test volume(reduced_cell_) ≈ volume(unit_cell)
+    @test reduced_cell_ ≈ expected_reduced_cell
 end
 
 @testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin

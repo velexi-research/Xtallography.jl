@@ -116,6 +116,41 @@ end
     @test lattice_system(lattice_constants) == Cubic
 end
 
+@testset "standardize()" begin
+    # --- Tests
+
+    # ------ Cubic lattices have no lattice constants conventions for PRIMITIVE, BODY, and
+    #        FACE centerings
+
+    lattice_constants = CubicLatticeConstants(1.0)
+
+    @test standardize(lattice_constants, XtallographyUtils.PRIMITIVE) ==
+        (lattice_constants, XtallographyUtils.PRIMITIVE)
+    @test standardize(lattice_constants, XtallographyUtils.BODY) ==
+        (lattice_constants, XtallographyUtils.BODY)
+    @test standardize(lattice_constants, XtallographyUtils.FACE) ==
+        (lattice_constants, XtallographyUtils.FACE)
+
+    # ------ Invalid centering
+
+    local error = nothing
+    local error_message = ""
+    try
+        standardize(lattice_constants, XtallographyUtils.BASE)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa ArgumentError
+
+    expected_error =
+        "ArgumentError: " *
+        "Invalid Bravais lattice: (lattice_system=Cubic, centering=BASE)"
+
+    @test startswith(error_message, expected_error)
+end
+
 # ------ Unit cell computations
 
 @testset "basis()" begin
@@ -153,6 +188,66 @@ end
     # --- Exercise functionality and check results
 
     @test surface_area(lattice_constants) ≈ 6 * lattice_constants.a^2
+end
+
+@testset "reduced_cell()" begin
+    # --- Preparations
+
+    a = 5
+    lattice_constants = CubicLatticeConstants(a)
+    basis_a, basis_b, basis_c = basis(lattice_constants)
+
+    # --- Exercise functionality and check results
+
+    # primitive unit cell
+    unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+
+    expected_reduced_cell = reduced_cell(
+        UnitCell(
+            LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
+            XtallographyUtils.PRIMITIVE,
+        ),
+    )
+
+    reduced_cell_ = reduced_cell(unit_cell)
+    @test reduced_cell_.lattice_constants isa CubicLatticeConstants
+    @test volume(reduced_cell_) ≈ volume(unit_cell)
+    @test reduced_cell_ ≈ expected_reduced_cell
+
+    # body-centered unit cell
+    unit_cell = UnitCell(lattice_constants, XtallographyUtils.BODY)
+
+    expected_reduced_cell = reduced_cell(
+        UnitCell(
+            LatticeConstants(basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c)),
+            XtallographyUtils.PRIMITIVE,
+        ),
+    )
+
+    reduced_cell_ = reduced_cell(unit_cell)
+    @test reduced_cell_.lattice_constants isa RhombohedralLatticeConstants
+    @test volume(reduced_cell_) ≈ 0.5 * volume(unit_cell)
+    @test reduced_cell_ ≈ expected_reduced_cell
+
+    # face-centered unit cell
+    unit_cell = UnitCell(lattice_constants, XtallographyUtils.FACE)
+
+    expected_reduced_cell = reduced_cell(
+        UnitCell(
+            LatticeConstants(
+                0.5 * (basis_a + basis_b),
+                0.5 * (basis_b - basis_c),
+                0.5 * (basis_b + basis_c);
+                identify_lattice_system=false,
+            ),
+            XtallographyUtils.PRIMITIVE,
+        ),
+    )
+
+    reduced_cell_ = reduced_cell(unit_cell)
+    @test reduced_cell_.lattice_constants isa TriclinicLatticeConstants
+    @test volume(reduced_cell_) ≈ 0.25 * volume(unit_cell)
+    @test reduced_cell_ ≈ expected_reduced_cell
 end
 
 @testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin
