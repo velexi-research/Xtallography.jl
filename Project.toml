@@ -1,0 +1,13 @@
+name = "XtallographyUtils"
+uuid = "4f49dcd8-3c92-4c49-9c92-5589c1fd49ac"
+authors = ["Kevin Chu <kevin@velexi.com> and contributors"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
