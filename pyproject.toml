@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "XtallographyUtils"
 version = "0.1.0"
-description = ""
+description = "Library of utility functions for analysis of 3D crystals."
 license = "Apache-2.0"
 readme = "README.md"
 authors = ["Kevin T. Chu <kevin@velexi.com>"]
