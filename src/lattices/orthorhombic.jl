@@ -175,12 +175,12 @@ function iucr_conventional_cell(::Orthorhombic, unit_cell::UnitCell)
         if a ≈ b
             @debug "oP --> tP"
             return iucr_conventional_cell(
-                UnitCell(TetragonalLatticeConstants(a, c), PXRD.PRIMITIVE)
+                UnitCell(TetragonalLatticeConstants(a, c), PRIMITIVE)
             )
         elseif b ≈ c
             @debug "oP --> tP"
             return iucr_conventional_cell(
-                UnitCell(TetragonalLatticeConstants(c, a), PXRD.PRIMITIVE)
+                UnitCell(TetragonalLatticeConstants(c, a), PRIMITIVE)
             )
         end
 
@@ -188,14 +188,10 @@ function iucr_conventional_cell(::Orthorhombic, unit_cell::UnitCell)
         # Tetragonal, body-centered
         if a ≈ b
             @debug "oI --> tI"
-            return iucr_conventional_cell(
-                UnitCell(TetragonalLatticeConstants(a, c), PXRD.BODY)
-            )
+            return iucr_conventional_cell(UnitCell(TetragonalLatticeConstants(a, c), BODY))
         elseif b ≈ c
             @debug "oI --> tI"
-            return iucr_conventional_cell(
-                UnitCell(TetragonalLatticeConstants(c, a), PXRD.BODY)
-            )
+            return iucr_conventional_cell(UnitCell(TetragonalLatticeConstants(c, a), BODY))
         end
 
     elseif centering == FACE
@@ -203,12 +199,12 @@ function iucr_conventional_cell(::Orthorhombic, unit_cell::UnitCell)
         if a ≈ b
             @debug "oF --> tI"
             return iucr_conventional_cell(
-                UnitCell(TetragonalLatticeConstants(a * SIN_PI_OVER_FOUR, c), PXRD.BODY)
+                UnitCell(TetragonalLatticeConstants(a * SIN_PI_OVER_FOUR, c), BODY)
             )
         elseif b ≈ c
             @debug "oF --> tI"
             return iucr_conventional_cell(
-                UnitCell(TetragonalLatticeConstants(c * SIN_PI_OVER_FOUR, a), PXRD.BODY)
+                UnitCell(TetragonalLatticeConstants(c * SIN_PI_OVER_FOUR, a), BODY)
             )
         end
 
@@ -217,16 +213,14 @@ function iucr_conventional_cell(::Orthorhombic, unit_cell::UnitCell)
             # Tetragonal, primitive
             @debug "oC --> tP"
             return iucr_conventional_cell(
-                UnitCell(
-                    TetragonalLatticeConstants(a * SIN_PI_OVER_FOUR, c), PXRD.PRIMITIVE
-                ),
+                UnitCell(TetragonalLatticeConstants(a * SIN_PI_OVER_FOUR, c), PRIMITIVE)
             )
 
         elseif b ≈ 2 * a * SIN_PI_OVER_THREE
             # Hexagonal, primitive
             @debug "oC --> hP"
             return iucr_conventional_cell(
-                UnitCell(HexagonalLatticeConstants(a, c), PXRD.PRIMITIVE)
+                UnitCell(HexagonalLatticeConstants(a, c), PRIMITIVE)
             )
         end
     end
