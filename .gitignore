@@ -1,3 +1,27 @@
-/Manifest.toml
-/docs/Manifest.toml
+# --- Julia
+
+# Manifest
+Manifest.toml
+
+# Documentation
 /docs/build/
+
+# Coverage.jl
+*.jl.*.cov
+*.jl.*.mem
+
+# --- GitHub
+
+.github/secrets
+
+# --- Miscellaneous
+
+# direnv
+.direnv
+.envrc
+
+# vim
+.*.swp
+
+# macOS
+.DS_Store*

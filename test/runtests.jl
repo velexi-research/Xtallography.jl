@@ -1,6 +1,18 @@
-using XtallographyUtils
+"""
+Unit tests for XtallographyUtils package.
+"""
+
+# --- Imports
+
+# Standard library
 using Test
 
-@testset "XtallographyUtils.jl" begin
-    # Write your tests here.
-end
+# External packages
+using TestTools: jltest
+
+# XtallographyUtils
+using XtallographyUtils
+
+# --- Run tests
+
+jltest.run_tests(@__DIR__)
