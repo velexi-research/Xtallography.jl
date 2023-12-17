@@ -2686,7 +2686,7 @@ function convert_to_mS_case_2a(lattice_constants::TriclinicLatticeConstants)
         c_dot_a = dot(basis_c, basis_a)
 
         if 2 * a_dot_b ≈ a_dot_a &&
-            2 * abs(b_dot_c + a_dot_b - b_dot_b - 0.5 * a_dot_a) ≈ abs(c_dot_a - a_dot_b)
+            2 * abs(b_dot_c - b_dot_b - 0.5 * a_dot_a + a_dot_b) ≈ abs(c_dot_a - a_dot_b)
             # Compute m_basis_a
             m_basis_a = basis_a
 
@@ -2743,7 +2743,7 @@ function convert_to_mS_case_2b(lattice_constants::TriclinicLatticeConstants)
         c_dot_a = dot(basis_c, basis_a)
 
         if 2 * a_dot_b ≈ a_dot_a &&
-            2 * abs(b_dot_c - a_dot_b + b_dot_b) ≈ abs(c_dot_a - a_dot_b)
+            2 * abs(b_dot_c + b_dot_b - a_dot_b) ≈ abs(c_dot_a - a_dot_b)
             # Compute m_basis_a
             m_basis_a = basis_a
 
@@ -2800,7 +2800,7 @@ function convert_to_mS_case_2c(lattice_constants::TriclinicLatticeConstants)
         c_dot_a = dot(basis_c, basis_a)
 
         if 2 * a_dot_b ≈ -a_dot_a &&
-            2 * abs(b_dot_c - a_dot_b - b_dot_b - 0.5 * a_dot_a) ≈ abs(c_dot_a - a_dot_b)
+            2 * abs(b_dot_c - b_dot_b - 0.5 * a_dot_a - a_dot_b) ≈ abs(c_dot_a - a_dot_b)
 
             # Compute m_basis_a
             m_basis_a = basis_a
@@ -2858,7 +2858,7 @@ function convert_to_mS_case_2d(lattice_constants::TriclinicLatticeConstants)
         c_dot_a = dot(basis_c, basis_a)
 
         if 2 * a_dot_b ≈ -a_dot_a &&
-            2 * abs(b_dot_c + a_dot_b + b_dot_b) ≈ abs(c_dot_a - a_dot_b)
+            2 * abs(b_dot_c + b_dot_b + a_dot_b) ≈ abs(c_dot_a - a_dot_b)
             # Compute m_basis_a
             m_basis_a = basis_a
 
