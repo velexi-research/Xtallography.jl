@@ -40,8 +40,6 @@ using XtallographyUtils
 
 # --- Tests
 
-# ------ iucr_conventional_cell()
-
 @testset "iucr_conventional_cell(): limiting cases" begin
     # Note: this test set only tests basic functionality. Comprehensive coverage of
     #       different cases for triclinic bases is covered in the convert_to_mP()
@@ -1287,9 +1285,13 @@ end
     end
 end
 
-@testset "convert_to_mS_case_2a(): only m_a in aP basis, |m_a| < |m_c|" begin
+@testset "convert_to_mS_case_2a(): only m_a in aP basis" begin
+    # Case 2a:
+    # * the sign of the coefficient of m_basis_a in basis_b is positive
+    # * the signs of the coefficients of m_basis_b in basis_b and basis_c are the same
     println("convert_to_mS_case_2a()")
-    # --- Preparations
+
+    # --- Tests: |m_a| < |m_c|
 
     # Construct basis for monoclinic unit cell
     m_a = 1.0
@@ -1303,13 +1305,10 @@ end
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
 
-    # --- Tests
-
-    # Test all cases for base-centered basis vector
     basis_a = m_basis_a
-    for signs in Iterators.product((-1, 1), (-1, 1))
-        basis_b = 0.5 * (signs[1] * m_basis_a + signs[1] * m_basis_b)
-        basis_c = 0.5 * (signs[1] * m_basis_a + signs[1] * m_basis_b) + signs[2] * m_basis_c
+    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
+        basis_b = 0.5 * (m_basis_a + signs[2] * m_basis_b)
+        basis_c = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b) + signs[3] * m_basis_c
 
         # Check that basis vectors are linearly independent
         if !is_basis(basis_a, basis_b, basis_c)
@@ -1320,11 +1319,8 @@ end
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
-end
 
-@testset "convert_to_mS_case_2a(): only m_a in aP basis, |m_a| > |m_c|" begin
-    println("convert_to_mS_case_2a()")
-    # --- Preparations
+    # --- Tests: |m_a| > |m_c|
 
     # Construct basis for monoclinic unit cell
     m_a = 3.0
@@ -1332,17 +1328,16 @@ end
     m_c = 1.0
     m_β = 3π / 5
 
-    expected_monoclinic_lattice_constants = MonoclinicLatticeConstants(m_a, m_b, m_c, m_β)
+    expected_monoclinic_lattice_constants, _ = standardize(
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), XtallographyUtils.BASE
+    )
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
 
-    # --- Tests
-
-    # Test all cases for base-centered basis vector
     basis_a = m_basis_a
-    for signs in Iterators.product((-1, 1), (-1, 1))
-        basis_b = 0.5 * (signs[1] * m_basis_a + signs[1] * m_basis_b)
-        basis_c = 0.5 * (signs[1] * m_basis_a + signs[1] * m_basis_b) + signs[2] * m_basis_c
+    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
+        basis_b = 0.5 * (m_basis_a + signs[2] * m_basis_b)
+        basis_c = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b) + signs[3] * m_basis_c
 
         # Check that basis vectors are linearly independent
         if !is_basis(basis_a, basis_b, basis_c)
@@ -1355,9 +1350,13 @@ end
     end
 end
 
-@testset "convert_to_mS_case_2b(): only m_a in aP basis, |m_a| < |m_c|" begin
+@testset "convert_to_mS_case_2b(): only m_a in aP basis" begin
+    # Case 2b:
+    # * the sign of the coefficient of m_basis_a in basis_b is positive
+    # * the signs of the coefficients of m_basis_b in basis_b and basis_c are opposite
     println("convert_to_mS_case_2b()")
-    # --- Preparations
+
+    # --- Tests: |m_a| < |m_c|
 
     # Construct basis for monoclinic unit cell
     m_a = 1.0
@@ -1371,13 +1370,39 @@ end
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
 
-    # --- Tests
-
-    # Test all cases for base-centered basis vector
     basis_a = m_basis_a
-    for signs in Iterators.product((-1, 1), (-1, 1))
-        basis_b = 0.5 * (signs[1] * m_basis_a - signs[2] * m_basis_b)
-        basis_c = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b) + signs[1] * m_basis_c
+    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
+        basis_b = 0.5 * (m_basis_a + signs[2] * m_basis_b)
+        basis_c = 0.5 * (signs[1] * m_basis_a - signs[2] * m_basis_b) + signs[3] * m_basis_c
+
+        # Check that basis vectors are linearly independent
+        if !is_basis(basis_a, basis_b, basis_c)
+            continue
+        end
+
+        convert_to_mS_test_all_triclinic_basis_permutations(
+            basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
+        )
+    end
+
+    # --- Tests: |m_a| > |m_c|
+
+    # Construct basis for monoclinic unit cell
+    m_a = 3.0
+    m_b = 2.0
+    m_c = 1.0
+    m_β = 3π / 5
+
+    expected_monoclinic_lattice_constants, _ = standardize(
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), XtallographyUtils.BASE
+    )
+
+    m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
+
+    basis_a = m_basis_a
+    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
+        basis_b = 0.5 * (m_basis_a + signs[2] * m_basis_b)
+        basis_c = 0.5 * (signs[1] * m_basis_a - signs[2] * m_basis_b) + signs[3] * m_basis_c
 
         # Check that basis vectors are linearly independent
         if !is_basis(basis_a, basis_b, basis_c)
@@ -1390,9 +1415,42 @@ end
     end
 end
 
-@testset "convert_to_mS_case_2b(): only m_a in aP basis, |m_a| > |m_c|" begin
-    println("convert_to_mS_case_2b()")
-    # --- Preparations
+@testset "convert_to_mS_case_2c(): only m_a in aP basis" begin
+    # Case 2c:
+    # * the sign of the coefficient of m_basis_a in basis_b is negative
+    # * the signs of the coefficients of m_basis_b in basis_b and basis_c are the same
+    println("convert_to_mS_case_2c()")
+
+    # --- Tests: |m_a| < |m_c|
+
+    # Construct basis for monoclinic unit cell
+    m_a = 1.0
+    m_b = 2.0
+    m_c = 3.0
+    m_β = 3π / 5
+
+    expected_monoclinic_lattice_constants, _ = standardize(
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), XtallographyUtils.BASE
+    )
+
+    m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
+
+    basis_a = m_basis_a
+    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
+        basis_b = 0.5 * (-m_basis_a + signs[2] * m_basis_b)
+        basis_c = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b) + signs[3] * m_basis_c
+
+        # Check that basis vectors are linearly independent
+        if !is_basis(basis_a, basis_b, basis_c)
+            continue
+        end
+
+        convert_to_mS_test_all_triclinic_basis_permutations(
+            basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
+        )
+    end
+
+    # --- Tests: |m_a| > |m_c|
 
     # Construct basis for monoclinic unit cell
     m_a = 3.0
@@ -1400,17 +1458,81 @@ end
     m_c = 1.0
     m_β = 3π / 5
 
-    expected_monoclinic_lattice_constants = MonoclinicLatticeConstants(m_a, m_b, m_c, m_β)
+    expected_monoclinic_lattice_constants, _ = standardize(
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), XtallographyUtils.BASE
+    )
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
 
-    # --- Tests
-
-    # Test all cases for base-centered basis vector
     basis_a = m_basis_a
-    for signs in Iterators.product((-1, 1), (-1, 1))
-        basis_b = 0.5 * (signs[1] * m_basis_a - signs[2] * m_basis_b)
-        basis_c = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b) + signs[1] * m_basis_c
+    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
+        basis_b = 0.5 * (-m_basis_a + signs[2] * m_basis_b)
+        basis_c = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b) + signs[3] * m_basis_c
+
+        # Check that basis vectors are linearly independent
+        if !is_basis(basis_a, basis_b, basis_c)
+            continue
+        end
+
+        convert_to_mS_test_all_triclinic_basis_permutations(
+            basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
+        )
+    end
+end
+
+@testset "convert_to_mS_case_2d(): only m_a in aP basis" begin
+    # Case 2d:
+    # * the sign of the coefficient of m_basis_a in basis_b is negative
+    # * the signs of the coefficients of m_basis_b in basis_b and basis_c are opposite
+    println("convert_to_mS_case_2d()")
+
+    # --- Tests: |m_a| < |m_c|
+
+    # Construct basis for monoclinic unit cell
+    m_a = 1.0
+    m_b = 2.0
+    m_c = 3.0
+    m_β = 3π / 5
+
+    expected_monoclinic_lattice_constants, _ = standardize(
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), XtallographyUtils.BASE
+    )
+
+    m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
+
+    basis_a = m_basis_a
+    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
+        basis_b = 0.5 * (-m_basis_a + signs[2] * m_basis_b)
+        basis_c = 0.5 * (signs[1] * m_basis_a - signs[2] * m_basis_b) + signs[3] * m_basis_c
+
+        # Check that basis vectors are linearly independent
+        if !is_basis(basis_a, basis_b, basis_c)
+            continue
+        end
+
+        convert_to_mS_test_all_triclinic_basis_permutations(
+            basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
+        )
+    end
+
+    # --- Tests: |m_a| > |m_c|
+
+    # Construct basis for monoclinic unit cell
+    m_a = 3.0
+    m_b = 2.0
+    m_c = 1.0
+    m_β = 3π / 5
+
+    expected_monoclinic_lattice_constants, _ = standardize(
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), XtallographyUtils.BASE
+    )
+
+    m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
+
+    basis_a = m_basis_a
+    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
+        basis_b = 0.5 * (-m_basis_a + signs[2] * m_basis_b)
+        basis_c = 0.5 * (signs[1] * m_basis_a - signs[2] * m_basis_b) + signs[3] * m_basis_c
 
         # Check that basis vectors are linearly independent
         if !is_basis(basis_a, basis_b, basis_c)
