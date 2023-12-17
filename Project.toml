@@ -6,9 +6,13 @@ version = "0.1.0"
 [deps]
 AngleBetweenVectors = "ec570357-d46e-52ed-9726-18773498274d"
 Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [compat]
+AngleBetweenVectors = "0.3"
+Combinatorics = "1"
 julia = "1.7"
 
 [extras]

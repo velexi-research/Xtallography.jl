@@ -13,20 +13,21 @@
 #   limitations under the License.
 
 """
-Unit tests for XtallographyUtils package.
+Constants used throughout the PXRD module 
 """
+# --- Exports
 
-# --- Imports
+# Constants
+export ALMOST_ZERO
 
-# Standard library
-using Test
+# --- Constants
 
-# External packages
-using TestTools: jltest
+# Numerical comparison constants
+const ALMOST_ZERO = 1e-9
 
-# XtallographyUtils
-using XtallographyUtils
+const COS_APPROX_ZERO = 1e-9
 
-# --- Run tests
-
-jltest.run_tests(@__DIR__)
+# Common trigonometric computations
+const SIN_PI_OVER_THREE = sqrt(3) / 2
+const SIN_PI_OVER_FOUR = 1 / sqrt(2)
+const ACOS_MINUS_ONE_THIRD = acos(-1 / 3)
