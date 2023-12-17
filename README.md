@@ -1,4 +1,4 @@
-XtallographyUtils.jl
+Xtallography Utilities
 ===============================================================================
 
 [----------------------------- BADGES: BEGIN -----------------------------]: #
@@ -17,7 +17,7 @@ XtallographyUtils.jl
     <td>
       <a href="https://github.com/velexi-research/XtallographyUtils.jl/actions/workflows/CI.yml"><img style="vertical-align: bottom;" src="https://github.com/velexi-research/XtallographyUtils.jl/actions/workflows/CI.yml/badge.svg"/></a>
       <a href="https://codecov.io/gh/velexi-research/XtallographyUtils.jl">
-        <img style="vertical-align: bottom;" src="https://codecov.io/gh/velexi-research/XtallographyUtils.jl/branch/main/graph/badge.svg"/></a>
+        <img style="vertical-align: bottom;" src="https://codecov.io/gh/velexi-research/XtallographyUtils.jl/graph/badge.svg?token=BZKPGII992"/></a>
     </td>
   </tr>
 
@@ -36,7 +36,7 @@ XtallographyUtils.jl
 
 A brief description of the package.
 
-The XtallographyUtils.jl package features:
+The Xtallography Utilities package features:
 
 * a list of the core features of the package.
 
@@ -92,9 +92,9 @@ A more detailed description of the package.
 
   * _Only needed once_. This step only needs to be performed once per Julia installation.
 
-  * _XtallographyUtils is registered with a local Julia package registry_.
+  * _Xtallography Utilities is registered with a local Julia package registry_.
     The XYZ registry needs to be added to your Julia installation because
-    XtallographyUtils is currently registered with XYZ Julia package
+    Xtallography Utilities is currently registered with XYZ Julia package
     registry (not the General Julia package registry).
 -->
 
