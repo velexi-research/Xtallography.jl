@@ -73,7 +73,7 @@ function isapprox(
 end
 
 function lattice_system(::HexagonalLatticeConstants)
-    return Hexagonal
+    return Hexagonal()
 end
 
 # ------ Unit cell computations

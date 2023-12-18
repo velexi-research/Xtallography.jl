@@ -113,7 +113,7 @@ end
     # --- Tests
 
     lattice_constants = CubicLatticeConstants(1)
-    @test lattice_system(lattice_constants) == Cubic
+    @test lattice_system(lattice_constants) === Cubic()
 end
 
 @testset "standardize()" begin
@@ -145,8 +145,7 @@ end
 
     expected_error =
         "ArgumentError: " *
-        "Invalid Bravais lattice: " *
-        "(lattice_system=Cubic, centering=XtallographyUtils.BaseCentered())"
+        "Invalid Bravais lattice: (lattice_system=Cubic, centering=BaseCentered)"
 
     @test startswith(error_message, expected_error)
 end

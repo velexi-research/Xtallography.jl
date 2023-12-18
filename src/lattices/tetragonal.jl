@@ -80,7 +80,7 @@ function isapprox(
 end
 
 function lattice_system(::TetragonalLatticeConstants)
-    return Tetragonal
+    return Tetragonal()
 end
 
 # ------ Unit cell computations

@@ -154,7 +154,7 @@ end
     # --- Tests
 
     lattice_constants = TetragonalLatticeConstants(1, 2)
-    @test lattice_system(lattice_constants) == Tetragonal
+    @test lattice_system(lattice_constants) === Tetragonal()
 end
 
 @testset "standardize()" begin
@@ -189,11 +189,11 @@ end
 
     # ------ Invalid centerings
 
-    for centering in (FaceCentered(), BaseCentered())
+    for centering in (FaceCentered, BaseCentered)
         local error = nothing
         local error_message = ""
         try
-            standardize(lattice_constants, centering)
+            standardize(lattice_constants, centering())
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -203,7 +203,8 @@ end
 
         expected_error =
             "ArgumentError: " *
-            "Invalid Bravais lattice: (lattice_system=Tetragonal, centering=$centering)"
+            "Invalid Bravais lattice: " *
+            "(lattice_system=Tetragonal, centering=$(nameof(centering)))"
 
         @test startswith(error_message, expected_error)
     end

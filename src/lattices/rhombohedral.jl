@@ -90,7 +90,7 @@ function isapprox(
 end
 
 function lattice_system(::RhombohedralLatticeConstants)
-    return Rhombohedral
+    return Rhombohedral()
 end
 
 # ------ Unit cell computations

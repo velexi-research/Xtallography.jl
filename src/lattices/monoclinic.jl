@@ -104,7 +104,7 @@ function isapprox(
 end
 
 function lattice_system(::MonoclinicLatticeConstants)
-    return Monoclinic
+    return Monoclinic()
 end
 
 function standardize(lattice_constants::MonoclinicLatticeConstants, centering::Centering)

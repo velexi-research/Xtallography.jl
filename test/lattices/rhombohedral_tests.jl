@@ -169,7 +169,7 @@ end
     # --- Tests
 
     lattice_constants = RhombohedralLatticeConstants(1, π / 5)
-    @test lattice_system(lattice_constants) == Rhombohedral
+    @test lattice_system(lattice_constants) === Rhombohedral()
 end
 
 @testset "standardize()" begin
@@ -189,11 +189,11 @@ end
 
     # ------ Invalid centering
 
-    for centering in (BodyCentered(), FaceCentered(), BaseCentered())
+    for centering in (BodyCentered, FaceCentered, BaseCentered)
         local error = nothing
         local error_message = ""
         try
-            standardize(lattice_constants, centering)
+            standardize(lattice_constants, centering())
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -203,7 +203,8 @@ end
 
         expected_error =
             "ArgumentError: " *
-            "Invalid Bravais lattice: (lattice_system=Rhombohedral, centering=$centering)"
+            "Invalid Bravais lattice: " *
+            "(lattice_system=Rhombohedral, centering=$(nameof(centering)))"
 
         @test startswith(error_message, expected_error)
     end

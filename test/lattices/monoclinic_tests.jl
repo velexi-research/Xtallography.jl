@@ -245,7 +245,7 @@ end
     # --- Tests
 
     lattice_constants = MonoclinicLatticeConstants(1, 2, 3, π / 5)
-    @test lattice_system(lattice_constants) == Monoclinic
+    @test lattice_system(lattice_constants) === Monoclinic()
 end
 
 @testset "standardize()" begin
@@ -458,11 +458,11 @@ end
     # ------ Invalid centering
 
     # centering = face-centered
-    centering = FaceCentered()
+    centering = FaceCentered
     local error = nothing
     local error_message = ""
     try
-        standardize(lattice_constants, centering)
+        standardize(lattice_constants, centering())
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -472,7 +472,8 @@ end
 
     expected_error =
         "ArgumentError: " *
-        "Invalid Bravais lattice: (lattice_system=Monoclinic, centering=$centering)"
+        "Invalid Bravais lattice: " *
+        "(lattice_system=Monoclinic, centering=$(nameof(centering)))"
 
     @test startswith(error_message, expected_error)
 end

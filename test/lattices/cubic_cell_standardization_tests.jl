@@ -56,8 +56,7 @@ using XtallographyUtils
 
     expected_error =
         "ArgumentError: " *
-        "Invalid Bravais lattice: " *
-        "(lattice_system=Cubic, centering=XtallographyUtils.BaseCentered())"
+        "Invalid Bravais lattice: (lattice_system=Cubic, centering=BaseCentered)"
 
     @test startswith(error_message, expected_error)
 end

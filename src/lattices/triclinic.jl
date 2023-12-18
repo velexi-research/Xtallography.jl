@@ -127,7 +127,7 @@ function isapprox(
 end
 
 function lattice_system(::TriclinicLatticeConstants)
-    return Triclinic
+    return Triclinic()
 end
 
 function standardize(lattice_constants::TriclinicLatticeConstants, centering::Centering)

@@ -155,7 +155,7 @@ end
     # --- Tests
 
     lattice_constants = HexagonalLatticeConstants(1, 2)
-    @test lattice_system(lattice_constants) == Hexagonal
+    @test lattice_system(lattice_constants) === Hexagonal()
 end
 
 @testset "standardize()" begin
@@ -177,11 +177,11 @@ end
 
     # ------ Invalid centerings
 
-    for centering in (BodyCentered(), FaceCentered(), BaseCentered())
+    for centering in (BodyCentered, FaceCentered, BaseCentered)
         local error = nothing
         local error_message = ""
         try
-            standardize(lattice_constants, centering)
+            standardize(lattice_constants, centering())
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -191,7 +191,8 @@ end
 
         expected_error =
             "ArgumentError: " *
-            "Invalid Bravais lattice: (lattice_system=Hexagonal, centering=$centering)"
+            "Invalid Bravais lattice: " *
+            "(lattice_system=Hexagonal, centering=$(nameof(centering)))"
 
         @test startswith(error_message, expected_error)
     end

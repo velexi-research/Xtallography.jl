@@ -190,7 +190,7 @@ end
     # --- Tests
 
     lattice_constants = OrthorhombicLatticeConstants(1, 2, 3)
-    @test lattice_system(lattice_constants) == Orthorhombic
+    @test lattice_system(lattice_constants) === Orthorhombic()
 end
 
 @testset "standardize(): primitive, body-centered, face-centered" begin

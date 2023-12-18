@@ -155,11 +155,11 @@ end
 
     # --- Tests
 
-    for centering in (FaceCentered(), BaseCentered())
+    for centering in (FaceCentered, BaseCentered)
         local error = nothing
         local error_message = ""
         try
-            conventional_cell(UnitCell(lattice_constants, centering))
+            conventional_cell(UnitCell(lattice_constants, centering()))
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -169,7 +169,8 @@ end
 
         expected_error =
             "ArgumentError: " *
-            "Invalid Bravais lattice: (lattice_system=Tetragonal, centering=$centering)"
+            "Invalid Bravais lattice: " *
+            "(lattice_system=Tetragonal, centering=$(nameof(centering)))"
 
         @test startswith(error_message, expected_error)
     end

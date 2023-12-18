@@ -328,8 +328,8 @@ function standardize_arg_checks(lattice_constants::LatticeConstants, centering::
         throw(
             ArgumentError(
                 "Invalid Bravais lattice: " *
-                "(lattice_system=$(nameof(lattice_system(lattice_constants))), " *
-                "centering=$centering)",
+                "(lattice_system=$(nameof(typeof(lattice_system(lattice_constants)))), " *
+                "centering=$(nameof(typeof(centering))))",
             ),
         )
     end
@@ -449,15 +449,15 @@ function conventional_cell(unit_cell::UnitCell)
     lattice_system_ = lattice_system(unit_cell.lattice_constants)
 
     # TODO
-    if lattice_system_ == Triclinic
+    if lattice_system_ === Triclinic()
         return conventional_cell(Triclinic(), unit_cell)
-    elseif lattice_system_ == Monoclinic
+    elseif lattice_system_ === Monoclinic()
         return conventional_cell(Monoclinic(), unit_cell)
-    elseif lattice_system_ == Orthorhombic
+    elseif lattice_system_ === Orthorhombic()
         return conventional_cell(Orthorhombic(), unit_cell)
-    elseif lattice_system_ == Tetragonal
+    elseif lattice_system_ === Tetragonal()
         return conventional_cell(Tetragonal(), unit_cell)
-    elseif lattice_system_ == Rhombohedral
+    elseif lattice_system_ === Rhombohedral()
         return conventional_cell(Rhombohedral(), unit_cell)
     end
 
@@ -473,8 +473,9 @@ function conventional_cell_arg_checks(unit_cell::UnitCell)
         throw(
             ArgumentError(
                 "Invalid Bravais lattice: " *
-                "(lattice_system=$(nameof(lattice_system(unit_cell.lattice_constants))), " *
-                "centering=$(unit_cell.centering))",
+                "(lattice_system=" *
+                "$(nameof(typeof(lattice_system(unit_cell.lattice_constants)))), " *
+                "centering=$(nameof(typeof(unit_cell.centering))))",
             ),
         )
     end

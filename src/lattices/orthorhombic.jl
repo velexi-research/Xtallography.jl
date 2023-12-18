@@ -89,7 +89,7 @@ function isapprox(
 end
 
 function lattice_system(::OrthorhombicLatticeConstants)
-    return Orthorhombic
+    return Orthorhombic()
 end
 
 function standardize(lattice_constants::OrthorhombicLatticeConstants, centering::Centering)
