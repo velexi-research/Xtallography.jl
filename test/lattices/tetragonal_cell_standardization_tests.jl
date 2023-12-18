@@ -26,7 +26,7 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "iucr_conventional_cell(): limiting cases, centering = PRIMITIVE" begin
+@testset "conventional_cell(): limiting cases, centering = primitive" begin
     # --- Tests
 
     # ------ a = b = c
@@ -34,27 +34,23 @@ using XtallographyUtils
     a = 5.0
     c = a
     lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
 
     @test iucr_unit_cell.lattice_constants ≈ CubicLatticeConstants(a)
-    @test iucr_unit_cell.centering == XtallographyUtils.PRIMITIVE
+    @test iucr_unit_cell.centering == Primitive()
 
     # ------ tetragonal unit cell is not equivalent to a cubic unit cell
 
     a = 5.0
     c = 10.0
     lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
 
     @test iucr_unit_cell.lattice_constants ≈ lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.PRIMITIVE
+    @test iucr_unit_cell.centering == Primitive()
 end
 
-@testset "iucr_conventional_cell(): limiting cases, centering = BODY" begin
+@testset "conventional_cell(): limiting cases, centering = body" begin
     # --- Tests
 
     # ------ a = b = c
@@ -62,39 +58,33 @@ end
     a = 5.0
     c = a
     lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     @test iucr_unit_cell.lattice_constants ≈ CubicLatticeConstants(a)
-    @test iucr_unit_cell.centering == XtallographyUtils.BODY
+    @test iucr_unit_cell.centering == BodyCentered()
 
     # ------ c = a √2
 
     a = 5.0
     c = a * sqrt(2)
     lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     @test iucr_unit_cell.lattice_constants ≈ CubicLatticeConstants(c)
-    @test iucr_unit_cell.centering == XtallographyUtils.FACE
+    @test iucr_unit_cell.centering == FaceCentered()
 
     # ------ tetragonal unit cell is not equivalent to a cubic unit cell
 
     a = 5.0
     c = 10.0
     lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     @test iucr_unit_cell.lattice_constants ≈ lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.BODY
+    @test iucr_unit_cell.centering == BodyCentered()
 end
 
-@testset "iucr_conventional_cell(): chain of limiting cases" begin
+@testset "conventional_cell(): chain of limiting cases" begin
     # --- Preparations
 
     a = 5
@@ -108,15 +98,13 @@ end
 
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = standardize(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    expected_unit_cell = standardize(UnitCell(lattice_constants, Primitive()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
     @info "chain of limiting cases: aP --> mP --> oP --> tP"
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ primitive unit cell: aP --> mP --> oC --> tI
 
@@ -131,13 +119,13 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, XtallographyUtils.BODY))
+    expected_unit_cell = standardize(UnitCell(lattice_constants, BodyCentered()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
     @info "chain of limiting cases: aP --> mI --> oI --> tI"
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ body-centered unit cell: aP --> mI --> oF --> tI"
 
@@ -148,16 +136,16 @@ end
             0.5 * (basis_a + basis_b - basis_c);
             identify_lattice_system=false,
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, XtallographyUtils.BODY))
+    expected_unit_cell = standardize(UnitCell(lattice_constants, BodyCentered()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
     @info "chain of limiting cases: aP --> mI --> oF --> tI"
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end
 
-@testset "iucr_conventional_cell(): invalid arguments" begin
+@testset "conventional_cell(): invalid arguments" begin
     # --- Preparations
 
     # Construct lattice constants for tetragonal unit cell
@@ -167,11 +155,11 @@ end
 
     # --- Tests
 
-    for centering in (XtallographyUtils.FACE, XtallographyUtils.BASE)
+    for centering in (FaceCentered(), BaseCentered())
         local error = nothing
         local error_message = ""
         try
-            iucr_conventional_cell(UnitCell(lattice_constants, centering))
+            conventional_cell(UnitCell(lattice_constants, centering))
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)

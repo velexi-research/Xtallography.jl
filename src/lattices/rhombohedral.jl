@@ -137,10 +137,10 @@ end
 
 # TODO
 
-function iucr_conventional_cell(::Rhombohedral, unit_cell::UnitCell)
+function conventional_cell(::Rhombohedral, unit_cell::UnitCell)
     # --- Check arguments
 
-    iucr_conventional_cell_arg_checks(unit_cell)
+    conventional_cell_arg_checks(unit_cell)
 
     # --- Preparations
 
@@ -154,17 +154,17 @@ function iucr_conventional_cell(::Rhombohedral, unit_cell::UnitCell)
     if α ≈ π / 3
         # cubic, face-centered, edge length `a` / sin(π/4)
         @debug "hR --> cF"
-        return UnitCell(CubicLatticeConstants(a / SIN_PI_OVER_FOUR), FACE)
+        return UnitCell(CubicLatticeConstants(a / SIN_PI_OVER_FOUR), FaceCentered())
 
     elseif α ≈ π / 2
         # cubic, primitive, edge length `a`
         @debug "hR --> cP"
-        return UnitCell(CubicLatticeConstants(a), PRIMITIVE)
+        return UnitCell(CubicLatticeConstants(a), Primitive())
 
     elseif α ≈ ACOS_MINUS_ONE_THIRD
         # cubic, body-centered, edge length `a` / sin(π/3)
         @debug "hR --> cI"
-        return UnitCell(CubicLatticeConstants(a / SIN_PI_OVER_THREE), BODY)
+        return UnitCell(CubicLatticeConstants(a / SIN_PI_OVER_THREE), BodyCentered())
     end
 
     # Not a limiting case, so return unit cell with original lattice constants

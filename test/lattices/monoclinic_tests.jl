@@ -259,25 +259,25 @@ end
     β = 1.1 * π / 2
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
-    # centering = PRIMITIVE
+    # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
-    # centering = BODY
+    # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BODY
+        lattice_constants, BodyCentered()
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BODY
+    @test standardized_centering == BodyCentered()
 
     # ------ β ∉ [π/2, π]
 
@@ -287,25 +287,25 @@ end
     β = π - 1.1 * π / 2
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
-    # centering = PRIMITIVE
+    # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, c, π - β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
-    # centering = BODY
+    # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BODY
+        lattice_constants, BodyCentered()
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, c, π - β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BODY
+    @test standardized_centering == BodyCentered()
 
     # ------ a > c
 
@@ -315,25 +315,25 @@ end
     β = 1.1 * π / 2
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
-    # centering = PRIMITIVE
+    # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(c, b, a, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
-    # centering = BODY
+    # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BODY
+        lattice_constants, BodyCentered()
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(c, b, a, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BODY
+    @test standardized_centering == BodyCentered()
 
     # ------ base-centered unit cell, a < c
 
@@ -344,7 +344,7 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BASE
+        lattice_constants, BaseCentered()
     )
 
     a_body = sqrt(a^2 + c^2 + 2 * a * c * cos(β))
@@ -352,7 +352,7 @@ end
     expected_lattice_constants = MonoclinicLatticeConstants(c, b, a_body, β_body)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BODY
+    @test standardized_centering == BodyCentered()
 
     # ------ base-centered unit cell, a > c
 
@@ -363,7 +363,7 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BASE
+        lattice_constants, BaseCentered()
     )
 
     a_body = sqrt(a^2 + c^2 + 2 * a * c * cos(β))
@@ -371,7 +371,7 @@ end
     expected_lattice_constants = MonoclinicLatticeConstants(c, b, a_body, β_body)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BODY
+    @test standardized_centering == BodyCentered()
 
     # ------ unit cell requires single reduction in plane normal to b-axis
 
@@ -380,7 +380,7 @@ end
     c_ref = 8
     β_ref = 2π / 3
 
-    # centering = PRIMITIVE
+    # centering = primitive
     a = a_ref
     b = b_ref
     c = c_ref
@@ -388,7 +388,7 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_c = sqrt(a^2 + c^2 + 2 * a * c * cos(β))
@@ -396,9 +396,9 @@ end
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, expected_c, expected_β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
-    # centering = BODY
+    # centering = body-centered
     a = a_ref
     b = b_ref
     c = sqrt((2 * a_ref)^2 + c_ref^2 + 2 * (2 * a_ref) * c_ref * cos(β_ref))
@@ -406,13 +406,13 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BODY
+        lattice_constants, BodyCentered()
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a_ref, b_ref, c_ref, β_ref)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BODY
+    @test standardized_centering == BodyCentered()
 
     # ------ unit cell requires multiple reductions in plane normal to b-axis
 
@@ -421,7 +421,7 @@ end
     c_ref = 8
     β_ref = 2π / 3
 
-    # centering = PRIMITIVE
+    # centering = primitive
     a = a_ref
     b = b_ref
     c = sqrt((5 * a_ref)^2 + c_ref^2 + 2 * (5 * a_ref) * c_ref * cos(β_ref))
@@ -429,7 +429,7 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_c = sqrt(a_ref^2 + c_ref^2 + 2 * a_ref * c_ref * cos(β_ref))
@@ -437,9 +437,9 @@ end
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, expected_c, expected_β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
-    # centering = BODY
+    # centering = body-centered
     a = a_ref
     b = b_ref
     c = sqrt((5 * a_ref)^2 + c_ref^2 + 2 * (5 * a_ref) * c_ref * cos(β_ref))
@@ -447,18 +447,18 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BODY
+        lattice_constants, BodyCentered()
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, expected_c, expected_β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BODY
+    @test standardized_centering == BodyCentered()
 
     # ------ Invalid centering
 
-    # centering = FACE
-    centering = XtallographyUtils.FACE
+    # centering = face-centered
+    centering = FaceCentered()
     local error = nothing
     local error_message = ""
     try
@@ -582,7 +582,7 @@ end
     c = 10
     β = 3π / 5
     body_centered_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(a, b, c, β), XtallographyUtils.BODY
+        MonoclinicLatticeConstants(a, b, c, β), BodyCentered()
     )
 
     # --- Exercise functionality and check results
@@ -602,10 +602,10 @@ end
 
     # Check conversion back to body-centering via standardize()
     standardized_lattice_constants, standardized_centering = standardize(
-        base_centered_lattice_constants, XtallographyUtils.BASE
+        base_centered_lattice_constants, BaseCentered()
     )
     @test standardized_lattice_constants ≈ body_centered_lattice_constants
-    @test standardized_centering == XtallographyUtils.BODY
+    @test standardized_centering == BodyCentered()
 end
 
 @testset "reduced_cell()" begin
@@ -621,11 +621,9 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell defined by [basis_a, basis_b, basis_c]
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    unit_cell = UnitCell(lattice_constants, Primitive())
 
-    expected_reduced_cell = reduced_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa MonoclinicLatticeConstants
@@ -633,13 +631,9 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c]
-    unit_cell = UnitCell(
-        LatticeConstants(basis_a + basis_c, basis_b, basis_c), XtallographyUtils.PRIMITIVE
-    )
+    unit_cell = UnitCell(LatticeConstants(basis_a + basis_c, basis_b, basis_c), Primitive())
 
-    expected_reduced_cell = reduced_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa MonoclinicLatticeConstants
@@ -647,12 +641,12 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # body-centered unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.BODY)
+    unit_cell = UnitCell(lattice_constants, BodyCentered())
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c)),
-            XtallographyUtils.PRIMITIVE,
+            Primitive(),
         ),
     )
 
@@ -662,13 +656,10 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # base-centered unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.BASE)
+    unit_cell = UnitCell(lattice_constants, BaseCentered())
 
     expected_reduced_cell = reduced_cell(
-        UnitCell(
-            LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c),
-            XtallographyUtils.PRIMITIVE,
-        ),
+        UnitCell(LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c), Primitive())
     )
 
     reduced_cell_ = reduced_cell(unit_cell)
@@ -677,7 +668,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # equivalent body-centered and base-centered monoclinic unit cells
-    base_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.BASE)
+    base_centered_unit_cell = UnitCell(lattice_constants, BaseCentered())
     body_centered_basis_a = basis_a + basis_c
     body_centered_basis_b = basis_b
     body_centered_basis_c = basis_c
@@ -691,7 +682,7 @@ end
                 norm(body_centered_basis_a) / norm(body_centered_basis_c),
             ),
         ),
-        XtallographyUtils.BODY,
+        BodyCentered(),
     )
 
     @test base_centered_unit_cell.lattice_constants isa MonoclinicLatticeConstants
@@ -700,7 +691,7 @@ end
     @test reduced_cell(base_centered_unit_cell) ≈ reduced_cell(body_centered_unit_cell)
 
     # face-centered unit cell (equivalent to smaller body-centered unit cell)
-    face_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.FACE)
+    face_centered_unit_cell = UnitCell(lattice_constants, FaceCentered())
     body_centered_basis_a = 0.5 * (basis_a + basis_c)
     body_centered_basis_b = basis_b
     body_centered_basis_c = 0.5 * (basis_a - basis_c)
@@ -714,7 +705,7 @@ end
                 norm(body_centered_basis_a) / norm(body_centered_basis_c),
             ),
         ),
-        XtallographyUtils.BODY,
+        BodyCentered(),
     )
 
     reduced_face_centered_unit_cell = reduced_cell(face_centered_unit_cell)
@@ -741,15 +732,15 @@ end
     # --- Tests
 
     # equivalent monoclinic and triclinic unit cells
-    monoclinic_unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    monoclinic_unit_cell = UnitCell(lattice_constants, Primitive())
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(monoclinic_unit_cell, triclinic_unit_cell)
 
     # body-centered unit cell
-    body_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.BODY)
+    body_centered_unit_cell = UnitCell(lattice_constants, BodyCentered())
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             basis_a,
@@ -757,17 +748,15 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 
     # equivalent base-centered and body-centered monoclinic unit cells
-    base_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.BASE)
+    base_centered_unit_cell = UnitCell(lattice_constants, BaseCentered())
     body_centered_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a + basis_c, basis_b, basis_c; centering=XtallographyUtils.BODY
-        ),
-        XtallographyUtils.BODY,
+        LatticeConstants(basis_a + basis_c, basis_b, basis_c; centering=BodyCentered()),
+        BodyCentered(),
     )
     @test is_equivalent_unit_cell(base_centered_unit_cell, body_centered_unit_cell)
 end

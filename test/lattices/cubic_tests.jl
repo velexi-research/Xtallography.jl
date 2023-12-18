@@ -119,24 +119,23 @@ end
 @testset "standardize()" begin
     # --- Tests
 
-    # ------ Cubic lattices have no lattice constants conventions for PRIMITIVE, BODY, and
-    #        FACE centerings
+    # ------ Cubic lattices have no lattice constants conventions for primitive, body, and
+    #        face centerings
 
     lattice_constants = CubicLatticeConstants(1.0)
 
-    @test standardize(lattice_constants, XtallographyUtils.PRIMITIVE) ==
-        (lattice_constants, XtallographyUtils.PRIMITIVE)
-    @test standardize(lattice_constants, XtallographyUtils.BODY) ==
-        (lattice_constants, XtallographyUtils.BODY)
-    @test standardize(lattice_constants, XtallographyUtils.FACE) ==
-        (lattice_constants, XtallographyUtils.FACE)
+    @test standardize(lattice_constants, Primitive()) == (lattice_constants, Primitive())
+    @test standardize(lattice_constants, BodyCentered()) ==
+        (lattice_constants, BodyCentered())
+    @test standardize(lattice_constants, FaceCentered()) ==
+        (lattice_constants, FaceCentered())
 
     # ------ Invalid centering
 
     local error = nothing
     local error_message = ""
     try
-        standardize(lattice_constants, XtallographyUtils.BASE)
+        standardize(lattice_constants, BaseCentered())
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -146,7 +145,8 @@ end
 
     expected_error =
         "ArgumentError: " *
-        "Invalid Bravais lattice: (lattice_system=Cubic, centering=BASE)"
+        "Invalid Bravais lattice: " *
+        "(lattice_system=Cubic, centering=XtallographyUtils.BaseCentered())"
 
     @test startswith(error_message, expected_error)
 end
@@ -200,12 +200,12 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    unit_cell = UnitCell(lattice_constants, Primitive())
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-            XtallographyUtils.PRIMITIVE,
+            Primitive(),
         ),
     )
 
@@ -215,12 +215,12 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # body-centered unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.BODY)
+    unit_cell = UnitCell(lattice_constants, BodyCentered())
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c)),
-            XtallographyUtils.PRIMITIVE,
+            Primitive(),
         ),
     )
 
@@ -230,7 +230,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # face-centered unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.FACE)
+    unit_cell = UnitCell(lattice_constants, FaceCentered())
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
@@ -240,7 +240,7 @@ end
                 0.5 * (basis_b + basis_c);
                 identify_lattice_system=false,
             ),
-            XtallographyUtils.PRIMITIVE,
+            Primitive(),
         ),
     )
 
@@ -260,28 +260,27 @@ end
     # --- Tests
 
     # equivalent cubic and triclinic unit cells
-    cubic_unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    cubic_unit_cell = UnitCell(lattice_constants, Primitive())
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(cubic_unit_cell, triclinic_unit_cell)
 
     # equivalent body-centered unit cell and primitive rhombohedral unit cell
-    body_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.BODY)
+    body_centered_unit_cell = UnitCell(lattice_constants, BodyCentered())
     primitive_unit_cell = UnitCell(
-        LatticeConstants(basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c)),
-        XtallographyUtils.PRIMITIVE,
+        LatticeConstants(basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c)), Primitive()
     )
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 
     # equivalent face-centered unit cell and primitive triclinic unit cell
-    face_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.FACE)
+    face_centered_unit_cell = UnitCell(lattice_constants, FaceCentered())
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             0.5 * (basis_a + basis_b), 0.5 * (basis_b - basis_c), 0.5 * (basis_b + basis_c)
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(face_centered_unit_cell, primitive_unit_cell)
 end

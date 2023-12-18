@@ -124,9 +124,9 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
 
     # --- Handle base-centering as a special case
 
-    if centering == BASE
+    if centering == BaseCentered()
         # Convert to a body-centered unit cell and standardize
-        return standardize(convert_to_body_centering(lattice_constants), BODY)
+        return standardize(convert_to_body_centering(lattice_constants), BodyCentered())
     end
 
     # --- Preparations
@@ -157,7 +157,7 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
     #     conventions for a, c, and β are satisfied.
 
     # Perform reduction
-    if centering == PRIMITIVE
+    if centering == Primitive()
         while -2 * c * cos(β) >= a
 
             # Attempt to compute equivalent lattice constants with smaller value of c.
@@ -178,7 +178,7 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
                 end
             end
         end
-    elseif centering == BODY
+    elseif centering == BodyCentered()
         while -c * cos(β) >= a
 
             # Attempt to compute equivalent lattice constants with smaller value of c.
@@ -244,10 +244,10 @@ function surface_area(lattice_constants::MonoclinicLatticeConstants)
     return 2 * (a * b + b * c + c * a * sin(lattice_constants.β))
 end
 
-function iucr_conventional_cell(::Monoclinic, unit_cell::UnitCell)
+function conventional_cell(::Monoclinic, unit_cell::UnitCell)
     # --- Check arguments
 
-    iucr_conventional_cell_arg_checks(unit_cell)
+    conventional_cell_arg_checks(unit_cell)
 
     # --- Preparations
 
@@ -269,54 +269,54 @@ function iucr_conventional_cell(::Monoclinic, unit_cell::UnitCell)
     # --- Compute IUCr conventional cell
 
     # Check limiting cases
-    if centering == PRIMITIVE
+    if centering == Primitive()
         if β ≈ π / 2
             # Orthorhombic, primitive
             @debug "mP --> oP"
-            return iucr_conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(a, b, c), PRIMITIVE)
+            return conventional_cell(
+                UnitCell(OrthorhombicLatticeConstants(a, b, c), Primitive())
             )
 
         elseif a ≈ -2 * c * cos(β)
             # Orthorhombic, C-centered
             @debug "mP --> oC"
-            return iucr_conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(a, 2 * c * sin(β), b), BASE)
+            return conventional_cell(
+                UnitCell(OrthorhombicLatticeConstants(a, 2 * c * sin(β), b), BaseCentered())
             )
 
         elseif a ≈ c
             # Orthorhombic, C-centered
             @debug "mP --> oC"
-            return iucr_conventional_cell(
+            return conventional_cell(
                 UnitCell(
                     OrthorhombicLatticeConstants(2 * c * cos(β / 2), 2 * c * sin(β / 2), b),
-                    BASE,
+                    BaseCentered(),
                 ),
             )
         end
 
-    elseif centering == BODY
+    elseif centering == BodyCentered()
         if β ≈ π / 2
             # Orthorhombic, body-centered
             @debug "mI --> oI"
-            return iucr_conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(a, b, c), BODY)
+            return conventional_cell(
+                UnitCell(OrthorhombicLatticeConstants(a, b, c), BodyCentered())
             )
 
         elseif a ≈ -c * cos(β)
             # Orthorhombic, C-centered
             @debug "mI --> oC"
-            return iucr_conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(b, c * sin(β), a), BASE)
+            return conventional_cell(
+                UnitCell(OrthorhombicLatticeConstants(b, c * sin(β), a), BaseCentered())
             )
 
         elseif a ≈ c
             # Orthorhombic, face-centered
             @debug "mI --> oF"
-            return iucr_conventional_cell(
+            return conventional_cell(
                 UnitCell(
                     OrthorhombicLatticeConstants(2 * a * cos(β / 2), 2 * a * sin(β / 2), b),
-                    FACE,
+                    FaceCentered(),
                 ),
             )
 
@@ -324,32 +324,32 @@ function iucr_conventional_cell(::Monoclinic, unit_cell::UnitCell)
             # Rhomohedral, primitive: α < π/3
             @debug "mI --> hR"
             α = acos(1 - 0.5 * b^2 / a^2)
-            return iucr_conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(a, α), PRIMITIVE)
+            return conventional_cell(
+                UnitCell(RhombohedralLatticeConstants(a, α), Primitive())
             )
 
         elseif a^2 + b^2 ≈ c^2 && b^2 + a * c * cos(β) ≈ a^2
             # Rhomohedral, primitive: π/3 < α < π/2
             @debug "mI --> hR"
             α = acos(1 - 0.5 * b^2 / a^2)
-            return iucr_conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(a, α), PRIMITIVE)
+            return conventional_cell(
+                UnitCell(RhombohedralLatticeConstants(a, α), Primitive())
             )
 
         elseif c^2 + 3 * b^2 ≈ 9 * a^2 && c ≈ -3 * a * cos(β)
             # Rhomohedral, primitive: π/2 < α < acos(-1/3)
             @debug "mI --> hR"
             α = acos((c^2 / a^2 - 3) / 6)
-            return iucr_conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(a, α), PRIMITIVE)
+            return conventional_cell(
+                UnitCell(RhombohedralLatticeConstants(a, α), Primitive())
             )
 
         elseif a^2 + 3 * b^2 ≈ 9 * c^2 && a ≈ -3 * c * cos(β)
             # Rhomohedral, primitive: acos(-1/3) < α
             @debug "mI --> hR"
             α = acos((a^2 / c^2 - 3) / 6)
-            return iucr_conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(c, α), PRIMITIVE)
+            return conventional_cell(
+                UnitCell(RhombohedralLatticeConstants(c, α), Primitive())
             )
         end
     end

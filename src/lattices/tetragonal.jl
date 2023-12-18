@@ -112,10 +112,10 @@ function surface_area(lattice_constants::TetragonalLatticeConstants)
     return 2 * lattice_constants.a^2 + 4 * lattice_constants.a * lattice_constants.c
 end
 
-function iucr_conventional_cell(::Tetragonal, unit_cell::UnitCell)
+function conventional_cell(::Tetragonal, unit_cell::UnitCell)
     # --- Check arguments
 
-    iucr_conventional_cell_arg_checks(unit_cell)
+    conventional_cell_arg_checks(unit_cell)
 
     # --- Preparations
 
@@ -128,23 +128,23 @@ function iucr_conventional_cell(::Tetragonal, unit_cell::UnitCell)
     # --- Compute IUCr conventional cell
 
     # Check limiting cases
-    if centering == PRIMITIVE
+    if centering == Primitive()
         if a ≈ c
             # cubic, primitive, edge length `a`
             @debug "tP --> cP"
-            return iucr_conventional_cell(UnitCell(CubicLatticeConstants(a), PRIMITIVE))
+            return conventional_cell(UnitCell(CubicLatticeConstants(a), Primitive()))
         end
 
-    elseif centering == BODY
+    elseif centering == BodyCentered()
         if a ≈ c
             # cubic, body-centered, edge length `a`
             @debug "tI --> cI"
-            return iucr_conventional_cell(UnitCell(CubicLatticeConstants(a), BODY))
+            return conventional_cell(UnitCell(CubicLatticeConstants(a), BodyCentered()))
 
         elseif c * SIN_PI_OVER_FOUR ≈ a
             # cubic, face-centered, edge length `c`
             @debug "tI --> cF"
-            return iucr_conventional_cell(UnitCell(CubicLatticeConstants(c), FACE))
+            return conventional_cell(UnitCell(CubicLatticeConstants(c), FaceCentered()))
         end
     end
 

@@ -26,18 +26,17 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "iucr_conventional_cell(): limiting cases" begin
+@testset "conventional_cell(): limiting cases" begin
     # --- Tests
 
-    # ------ Cubic lattices have no limiting cases for PRIMITIVE, BODY, and FACE centerings
+    # ------ Cubic lattices have no limiting cases for primitive, body, and face centerings
 
     lattice_constants = CubicLatticeConstants(1.0)
 
-    for centering in
-        (XtallographyUtils.PRIMITIVE, XtallographyUtils.BODY, XtallographyUtils.FACE)
+    for centering in (Primitive(), BodyCentered(), FaceCentered())
         unit_cell = UnitCell(lattice_constants, centering)
 
-        iucr_unit_cell = iucr_conventional_cell(unit_cell)
+        iucr_unit_cell = conventional_cell(unit_cell)
 
         @test iucr_unit_cell == unit_cell
     end
@@ -47,7 +46,7 @@ using XtallographyUtils
     local error = nothing
     local error_message = ""
     try
-        iucr_conventional_cell(UnitCell(lattice_constants, XtallographyUtils.BASE))
+        conventional_cell(UnitCell(lattice_constants, BaseCentered()))
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -57,12 +56,13 @@ using XtallographyUtils
 
     expected_error =
         "ArgumentError: " *
-        "Invalid Bravais lattice: (lattice_system=Cubic, centering=BASE)"
+        "Invalid Bravais lattice: " *
+        "(lattice_system=Cubic, centering=XtallographyUtils.BaseCentered())"
 
     @test startswith(error_message, expected_error)
 end
 
-@testset "iucr_conventional_cell(): chain of limiting cases" begin
+@testset "conventional_cell(): chain of limiting cases" begin
     # --- Preparations
 
     a = 5
@@ -75,13 +75,13 @@ end
 
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    expected_unit_cell = UnitCell(lattice_constants, Primitive())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @info "aP --> mP --> oP --> tP --> cP"
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ body-centered unit cell: aP --> mI --> oI --> tI --> cI
 
@@ -92,13 +92,13 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = UnitCell(lattice_constants, XtallographyUtils.BODY)
+    expected_unit_cell = UnitCell(lattice_constants, BodyCentered())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @info "aP --> mI --> oI --> tI --> cI"
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ face-centered unit cell: aP --> mI --> oI --> tI --> cF
 
@@ -109,11 +109,11 @@ end
             0.5 * (basis_a + basis_c);
             identify_lattice_system=false,
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = UnitCell(lattice_constants, XtallographyUtils.FACE)
+    expected_unit_cell = UnitCell(lattice_constants, FaceCentered())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @info "aP --> mI --> oI --> tI --> cF"
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end

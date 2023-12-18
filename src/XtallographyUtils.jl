@@ -26,7 +26,8 @@ const VERSION = TOML.parsefile(joinpath(pkgdir(@__MODULE__), "Project.toml"))["v
 
 include("constants.jl")
 include("math.jl")
-include("lattices.jl")
+include("lattice.jl")
+include("unit_cell.jl")
 
 # --- Lattice-specific types and methods
 
@@ -42,21 +43,21 @@ include("lattices/cubic.jl")
 
 # Lattice Types
 const BRAVAIS_LATTICES = [
-    (lattice=Triclinic, centering=PRIMITIVE),
-    (lattice=Monoclinic, centering=PRIMITIVE),
-    (lattice=Monoclinic, centering=BODY),
-    (lattice=Monoclinic, centering=BASE),
-    (lattice=Orthorhombic, centering=PRIMITIVE),
-    (lattice=Orthorhombic, centering=BODY),
-    (lattice=Orthorhombic, centering=FACE),
-    (lattice=Orthorhombic, centering=BASE),
-    (lattice=Tetragonal, centering=PRIMITIVE),
-    (lattice=Tetragonal, centering=BODY),
-    (lattice=Rhombohedral, centering=PRIMITIVE),
-    (lattice=Hexagonal, centering=PRIMITIVE),
-    (lattice=Cubic, centering=PRIMITIVE),
-    (lattice=Cubic, centering=BODY),
-    (lattice=Cubic, centering=FACE),
+    (lattice=Triclinic, centering=Primitive()),
+    (lattice=Monoclinic, centering=Primitive()),
+    (lattice=Monoclinic, centering=BodyCentered()),
+    (lattice=Monoclinic, centering=BaseCentered()),
+    (lattice=Orthorhombic, centering=Primitive()),
+    (lattice=Orthorhombic, centering=BodyCentered()),
+    (lattice=Orthorhombic, centering=FaceCentered()),
+    (lattice=Orthorhombic, centering=BaseCentered()),
+    (lattice=Tetragonal, centering=Primitive()),
+    (lattice=Tetragonal, centering=BodyCentered()),
+    (lattice=Rhombohedral, centering=Primitive()),
+    (lattice=Hexagonal, centering=Primitive()),
+    (lattice=Cubic, centering=Primitive()),
+    (lattice=Cubic, centering=BodyCentered()),
+    (lattice=Cubic, centering=FaceCentered()),
 ]
 
 end  # End of XtallographyUtils module

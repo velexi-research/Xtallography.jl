@@ -161,24 +161,23 @@ end
 @testset "standardize()" begin
     # --- Tests
 
-    # ------ Hexagonal lattices have no lattice constants conventions for PRIMITIVE
+    # ------ Hexagonal lattices have no lattice constants conventions for primitive
     #        centering
 
     lattice_constants = HexagonalLatticeConstants(1.0, 2.0)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = lattice_constants
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ Invalid centerings
 
-    for centering in
-        (XtallographyUtils.BODY, XtallographyUtils.FACE, XtallographyUtils.BASE)
+    for centering in (BodyCentered(), FaceCentered(), BaseCentered())
         local error = nothing
         local error_message = ""
         try
@@ -262,12 +261,12 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell defined by [basis_a, basis_b, basis_c]
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    unit_cell = UnitCell(lattice_constants, Primitive())
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-            XtallographyUtils.PRIMITIVE,
+            Primitive(),
         ),
     )
 
@@ -278,13 +277,9 @@ end
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ π / 3
-    unit_cell = UnitCell(
-        LatticeConstants(basis_a + basis_b, basis_b, basis_c), XtallographyUtils.PRIMITIVE
-    )
+    unit_cell = UnitCell(LatticeConstants(basis_a + basis_b, basis_b, basis_c), Primitive())
 
-    expected_reduced_cell = reduced_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa HexagonalLatticeConstants
@@ -293,13 +288,9 @@ end
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ 2π / 3
-    unit_cell = UnitCell(
-        LatticeConstants(basis_a - basis_b, basis_b, basis_c), XtallographyUtils.PRIMITIVE
-    )
+    unit_cell = UnitCell(LatticeConstants(basis_a - basis_b, basis_b, basis_c), Primitive())
 
-    expected_reduced_cell = reduced_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa HexagonalLatticeConstants
@@ -318,26 +309,26 @@ end
     # --- Exercise functionality and check results
 
     # equivalent hexagonal and triclinic unit cells
-    hexagonal_unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    hexagonal_unit_cell = UnitCell(lattice_constants, Primitive())
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(hexagonal_unit_cell, triclinic_unit_cell)
 
     # equivalent unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ π / 3
-    unit_cell_ref = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    unit_cell_ref = UnitCell(lattice_constants, Primitive())
     unit_cell_test = UnitCell(
-        LatticeConstants(basis_a + basis_b, basis_b, basis_c), XtallographyUtils.PRIMITIVE
+        LatticeConstants(basis_a + basis_b, basis_b, basis_c), Primitive()
     )
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 
     # equivalent unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ 2π / 3
-    unit_cell_ref = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    unit_cell_ref = UnitCell(lattice_constants, Primitive())
     unit_cell_test = UnitCell(
-        LatticeConstants(basis_a - basis_b, basis_b, basis_c), XtallographyUtils.PRIMITIVE
+        LatticeConstants(basis_a - basis_b, basis_b, basis_c), Primitive()
     )
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 end

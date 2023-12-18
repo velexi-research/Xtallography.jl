@@ -35,7 +35,7 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "iucr_conventional_cell(): limiting cases" begin
+@testset "conventional_cell(): limiting cases" begin
     # --- Preparations
 
     # Construct basis for cubic unit cell
@@ -54,7 +54,7 @@ using XtallographyUtils
     basis_b = 0.5 * (c_basis_a + c_basis_c)
     basis_c = 0.5 * (c_basis_a + c_basis_b)
     lattice_constants, _ = standardize(
-        LatticeConstants(basis_a, basis_b, basis_c), XtallographyUtils.PRIMITIVE
+        LatticeConstants(basis_a, basis_b, basis_c), Primitive()
     )
 
     # Check test conditions
@@ -62,13 +62,11 @@ using XtallographyUtils
     @test lattice_constants.α ≈ π / 3
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈ CubicLatticeConstants(c_a)
-    @test iucr_unit_cell.centering == XtallographyUtils.FACE
+    @test iucr_unit_cell.centering == FaceCentered()
 
     # ------ α = π/2
 
@@ -80,13 +78,11 @@ using XtallographyUtils
     @test lattice_constants.α ≈ π / 2
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈ expected_cubic_lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.PRIMITIVE
+    @test iucr_unit_cell.centering == Primitive()
 
     # ------ α = acos(-1/3)
 
@@ -95,7 +91,7 @@ using XtallographyUtils
     basis_b = 0.5 * (c_basis_a - c_basis_b + c_basis_c)
     basis_c = 0.5 * (c_basis_a + c_basis_b - c_basis_c)
     lattice_constants, _ = standardize(
-        LatticeConstants(basis_a, basis_b, basis_c), XtallographyUtils.PRIMITIVE
+        LatticeConstants(basis_a, basis_b, basis_c), Primitive()
     )
 
     # Check test conditions
@@ -103,13 +99,11 @@ using XtallographyUtils
     @test lattice_constants.α ≈ acos(-1 / 3)
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈ expected_cubic_lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.BODY
+    @test iucr_unit_cell.centering == BodyCentered()
 
     # ------ rhombohedral unit cell is not equivalent to an cubic unit cell
 
@@ -119,16 +113,14 @@ using XtallographyUtils
     lattice_constants = RhombohedralLatticeConstants(a, α)
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈ lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.PRIMITIVE
+    @test iucr_unit_cell.centering == Primitive()
 end
 
-@testset "iucr_conventional_cell(): invalid arguments" begin
+@testset "conventional_cell(): invalid arguments" begin
     # --- Preparations
 
     # Construct lattice constants for rhombohedral unit cell
@@ -138,12 +130,11 @@ end
 
     # --- Tests
 
-    for centering in
-        (XtallographyUtils.BODY, XtallographyUtils.FACE, XtallographyUtils.BASE)
+    for centering in (BodyCentered(), FaceCentered(), BaseCentered())
         local error = nothing
         local error_message = ""
         try
-            iucr_conventional_cell(UnitCell(lattice_constants, centering))
+            conventional_cell(UnitCell(lattice_constants, centering))
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -159,7 +150,7 @@ end
     end
 end
 
-@testset "iucr_conventional_cell(): chain of limiting cases" begin
+@testset "conventional_cell(): chain of limiting cases" begin
     # --- Exercise functionality and check results
 
     # primitive unit cell
@@ -169,10 +160,10 @@ end
     basis_a, basis_b, basis_c = basis(lattice_constants)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    expected_unit_cell = UnitCell(lattice_constants, Primitive())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa RhombohedralLatticeConstants
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end
