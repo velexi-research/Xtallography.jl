@@ -22,6 +22,9 @@ export LatticeSystem
 export Triclinic, Monoclinic, Orthorhombic, Hexagonal, Rhombohedral, Tetragonal, Cubic
 export Centering, Primitive, BaseCentered, BodyCentered, FaceCentered
 
+# Constants
+export BRAVAIS_LATTICES
+
 # Functions
 export is_bravais_lattice
 
@@ -160,7 +163,7 @@ struct FaceCentered <: Centering end
 # --- Constants
 
 # Lattice Types
-const BRAVAIS_LATTICES = [
+const BRAVAIS_LATTICES = (
     (lattice_system=Triclinic(), centering=Primitive()),
     (lattice_system=Monoclinic(), centering=Primitive()),
     (lattice_system=Monoclinic(), centering=BodyCentered()),
@@ -176,7 +179,7 @@ const BRAVAIS_LATTICES = [
     (lattice_system=Cubic(), centering=Primitive()),
     (lattice_system=Cubic(), centering=BodyCentered()),
     (lattice_system=Cubic(), centering=FaceCentered()),
-]
+)
 
 # --- Functions/Methods
 

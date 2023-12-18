@@ -47,6 +47,13 @@ end
     end
 end
 
+# ------ Constnats
+
+@testset "BRAVAIS_LATTICES" begin
+    @test BRAVAIS_LATTICES isa Tuple
+    @test length(BRAVAIS_LATTICES) == 15
+end
+
 # ------ Methods
 
 @testset "is_bravais_lattice(::LatticeSystem, ::Centering)" begin
