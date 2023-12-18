@@ -13,14 +13,26 @@
 #   limitations under the License.
 
 """
-Math utility functions
+Math utility functions and constants
 """
 # --- Exports
 
 # Functions
 export is_basis, volume, surface_area
 
+# --- Constants
+
+# Numerical comparison constants
+const ALMOST_ZERO = 1e-9
+const COS_APPROX_ZERO = 1e-9
 const LINEAR_INDEPENDENCE_ZERO = 1e-9
+
+# Common trigonometric computations
+const SIN_PI_OVER_THREE = sqrt(3) / 2
+const SIN_PI_OVER_FOUR = 1 / sqrt(2)
+const ACOS_MINUS_ONE_THIRD = acos(-1 / 3)
+
+# --- Functions/Methods
 
 """
     is_basis(

@@ -24,7 +24,6 @@ const VERSION = TOML.parsefile(joinpath(pkgdir(@__MODULE__), "Project.toml"))["v
 
 # --- Core types and methods
 
-include("constants.jl")
 include("math.jl")
 include("lattice.jl")
 include("unit_cell.jl")
