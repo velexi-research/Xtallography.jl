@@ -26,28 +26,25 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "iucr_conventional_cell(): limiting cases" begin
+@testset "conventional_cell(): limiting cases" begin
     # --- Tests
 
-    # ------ Hexagonal lattices have no limiting cases for PRIMITIVE centering
+    # ------ Hexagonal lattices have no limiting cases for primitive centering
 
     lattice_constants = HexagonalLatticeConstants(1.0, 2.0)
 
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
 
     @test iucr_unit_cell.lattice_constants == lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.PRIMITIVE
+    @test iucr_unit_cell.centering == Primitive()
 
     # ------ Invalid centerings
 
-    for centering in
-        (XtallographyUtils.BODY, XtallographyUtils.FACE, XtallographyUtils.BASE)
+    for centering in (BodyCentered, FaceCentered, BaseCentered)
         local error = nothing
         local error_message = ""
         try
-            iucr_conventional_cell(UnitCell(lattice_constants, centering))
+            conventional_cell(UnitCell(lattice_constants, centering()))
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -57,13 +54,14 @@ using XtallographyUtils
 
         expected_error =
             "ArgumentError: " *
-            "Invalid Bravais lattice: (lattice_system=Hexagonal, centering=$centering)"
+            "Invalid Bravais lattice: " *
+            "(lattice_system=Hexagonal, centering=$(nameof(centering)))"
 
         @test startswith(error_message, expected_error)
     end
 end
 
-@testset "iucr_conventional_cell(): chain of limiting cases" begin
+@testset "conventional_cell(): chain of limiting cases" begin
     # --- Exercise functionality and check results
 
     # ------ primitive unit cell: aP --> mP --> oC --> hP
@@ -76,13 +74,13 @@ end
     basis_a, basis_b, basis_c = basis(lattice_constants)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    expected_unit_cell = UnitCell(lattice_constants, Primitive())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa HexagonalLatticeConstants
     @info "aP --> mP --> oS --> hP"
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ primitive unit cell: aP --> mP --> oC --> hP
     #
@@ -94,13 +92,13 @@ end
     basis_a, basis_b, basis_c = basis(lattice_constants)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    expected_unit_cell = UnitCell(lattice_constants, Primitive())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa HexagonalLatticeConstants
     @info "aP --> mP --> oS --> hP"
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ primitive unit cell: aP --> mI --> oC --> hP
 

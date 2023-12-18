@@ -18,44 +18,16 @@ Types and functions that support lattice computations
 # --- Exports
 
 # Types
-export LatticeSystem, Centering
 export LatticeConstants
 export UnitCell
 
 # Functions
 export isapprox, lattice_system, standardize
-export isempty, resize
-export is_bravais_lattice
 export basis, volume, surface_area
-export iucr_conventional_cell, reduced_cell
+export conventional_cell, reduced_cell
 export is_supercell, is_equivalent_unit_cell
-export generate_hkl_indices
 
 # --- Types
-
-"""
-    LatticeSystem
-
-Supertype for the seven lattice systems in 3D
-
-Subtypes
-========
-[`Triclinic`](@ref), [`Monoclinic`](@ref), [`Orthorhombic`](@ref), [`Tetragonal`](@ref),
-[`Rhombohedral`](@ref), [`Hexagonal`](@ref), [`Cubic`](@ref)
-"""
-abstract type LatticeSystem end
-
-""" 
-    Centering
-    
-Enumerated type representing the four lattice centerings in 3D
-"""
-@enum Centering begin
-    PRIMITIVE
-    BODY
-    FACE
-    BASE
-end
 
 """
     LatticeConstants
@@ -79,7 +51,7 @@ using LinearAlgebra: norm, cross, dot
         basis_b::Vector{<:Real},
         basis_c::Vector{<:Real};
         identify_lattice_system=true,
-        centering=PRIMITIVE
+        centering=Primitive()
     ) -> LatticeConstants
 
 Construct a LatticeConstants object from a set of basis vectors.
@@ -101,7 +73,7 @@ function LatticeConstants(
     basis_b::Vector{<:Real},
     basis_c::Vector{<:Real};
     identify_lattice_system=true,
-    centering=PRIMITIVE,
+    centering=Primitive(),
 )
     # Convert basis vectors to Vector{AbstractFloat}
     basis_a = convert(Vector{Float64}, basis_a)
@@ -219,6 +191,14 @@ end
 
 # --- Functions/Methods
 
+# ------ lattice methods
+
+function is_bravais_lattice(unit_cell::UnitCell)
+    return is_bravais_lattice(
+        lattice_system(unit_cell.lattice_constants), unit_cell.centering
+    )
+end
+
 # ------ LatticeConstants functions
 
 import Base.isapprox
@@ -251,7 +231,7 @@ Standardize the lattice constants and centering for `unit_cell`.
 
     This function _only_ enforces lattice constant constraints. It _does not modify_ the
     Bravais lattice type. To find an equivalent Bravais lattice with higher symmetry (if
-    one exists), use `iucr_conventional_cell()`.
+    one exists), use `conventional_cell()`.
 
 !!! note
 
@@ -334,10 +314,10 @@ TODO
 function standardize(lattice_constants::LatticeConstants)
     # --- Check arguments
 
-    standardize_arg_checks(lattice_constants, PRIMITIVE)
+    standardize_arg_checks(lattice_constants, Primitive())
 
     # Return standardized lattice constants for primitive unit cell
-    standardized_lattice_constants, _ = standardize(lattice_constants, PRIMITIVE)
+    standardized_lattice_constants, _ = standardize(lattice_constants, Primitive())
     return standardized_lattice_constants
 end
 
@@ -348,8 +328,8 @@ function standardize_arg_checks(lattice_constants::LatticeConstants, centering::
         throw(
             ArgumentError(
                 "Invalid Bravais lattice: " *
-                "(lattice_system=$(nameof(lattice_system(lattice_constants))), " *
-                "centering=$centering)",
+                "(lattice_system=$(nameof(typeof(lattice_system(lattice_constants)))), " *
+                "centering=$(nameof(typeof(centering))))",
             ),
         )
     end
@@ -357,64 +337,13 @@ end
 
 # ------ UnitCell functions
 
+using LinearAlgebra: dot
+using Combinatorics: combinations
+
 function isapprox(x::UnitCell, y::UnitCell; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps())
     return (
         x.centering == y.centering &&
         isapprox(x.lattice_constants, y.lattice_constants; atol=atol, rtol=rtol)
-    )
-end
-
-# ------ Unit cell computations
-
-using LinearAlgebra: dot
-using Combinatorics: combinations
-
-"""
-    is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering) -> Bool
-
-    is_bravais_lattice(lattice_system::Type{<:LatticeSystem}, centering::Centering) -> Bool
-
-    is_bravais_lattice(unit_cell::UnitCell) -> Bool
-
-Determine if the unit cell defined by `unit_cell` or `lattice_system` and `centering` is
-a valid Bravais lattice type.
-
-Return values
-=============
-- `true` if `lattice_system` and `centering` define a valid Bravais lattice type; `false`
-  otherwise
-
-Examples
-========
-TODO
-"""
-function is_bravais_lattice(lattice_system_::LatticeSystem, centering::Centering)
-    if lattice_system_ == Cubic() && centering in (PRIMITIVE, BODY, FACE)
-        return true
-    elseif lattice_system_ == Tetragonal() && centering in (PRIMITIVE, BODY)
-        return true
-    elseif lattice_system_ == Orthorhombic() && centering in (PRIMITIVE, BODY, FACE, BASE)
-        return true
-    elseif lattice_system_ == Hexagonal() && centering == PRIMITIVE
-        return true
-    elseif lattice_system_ == Rhombohedral() && centering == PRIMITIVE
-        return true
-    elseif lattice_system_ == Monoclinic() && centering in (PRIMITIVE, BODY, BASE)
-        return true
-    elseif lattice_system_ == Triclinic() && centering == PRIMITIVE
-        return true
-    end
-
-    return false
-end
-
-function is_bravais_lattice(lattice_system_::Type{<:LatticeSystem}, centering::Centering)
-    return is_bravais_lattice(lattice_system_(), centering)
-end
-
-function is_bravais_lattice(unit_cell::UnitCell)
-    return is_bravais_lattice(
-        lattice_system(unit_cell.lattice_constants), unit_cell.centering
     )
 end
 
@@ -496,7 +425,7 @@ function surface_area(unit_cell::UnitCell)
 end
 
 """
-    iucr_conventional_cell(unit_cell::UnitCell) -> UnitCell
+    conventional_cell(unit_cell::UnitCell) -> UnitCell
 
 Return the IUCr conventional cell that is equivalent to `unit_cell`.
 
@@ -508,10 +437,10 @@ Examples
 ========
 TODO
 """
-function iucr_conventional_cell(unit_cell::UnitCell)
+function conventional_cell(unit_cell::UnitCell)
     # --- Check arguments
 
-    iucr_conventional_cell_arg_checks(unit_cell)
+    conventional_cell_arg_checks(unit_cell)
 
     # --- Compute IUCr conventional cells for lattice systems with limiting cases that
     #     change the Bravais lattice type
@@ -520,16 +449,16 @@ function iucr_conventional_cell(unit_cell::UnitCell)
     lattice_system_ = lattice_system(unit_cell.lattice_constants)
 
     # TODO
-    if lattice_system_ == Triclinic
-        return iucr_conventional_cell(Triclinic(), unit_cell)
-    elseif lattice_system_ == Monoclinic
-        return iucr_conventional_cell(Monoclinic(), unit_cell)
-    elseif lattice_system_ == Orthorhombic
-        return iucr_conventional_cell(Orthorhombic(), unit_cell)
-    elseif lattice_system_ == Tetragonal
-        return iucr_conventional_cell(Tetragonal(), unit_cell)
-    elseif lattice_system_ == Rhombohedral
-        return iucr_conventional_cell(Rhombohedral(), unit_cell)
+    if lattice_system_ === Triclinic()
+        return conventional_cell(Triclinic(), unit_cell)
+    elseif lattice_system_ === Monoclinic()
+        return conventional_cell(Monoclinic(), unit_cell)
+    elseif lattice_system_ === Orthorhombic()
+        return conventional_cell(Orthorhombic(), unit_cell)
+    elseif lattice_system_ === Tetragonal()
+        return conventional_cell(Tetragonal(), unit_cell)
+    elseif lattice_system_ === Rhombohedral()
+        return conventional_cell(Rhombohedral(), unit_cell)
     end
 
     # --- By default, the unit cell is unchanged
@@ -537,15 +466,16 @@ function iucr_conventional_cell(unit_cell::UnitCell)
     return unit_cell
 end
 
-function iucr_conventional_cell_arg_checks(unit_cell::UnitCell)
+function conventional_cell_arg_checks(unit_cell::UnitCell)
     # --- Check arguments
 
     if !is_bravais_lattice(lattice_system(unit_cell.lattice_constants), unit_cell.centering)
         throw(
             ArgumentError(
                 "Invalid Bravais lattice: " *
-                "(lattice_system=$(nameof(lattice_system(unit_cell.lattice_constants))), " *
-                "centering=$(unit_cell.centering))",
+                "(lattice_system=" *
+                "$(nameof(typeof(lattice_system(unit_cell.lattice_constants)))), " *
+                "centering=$(nameof(typeof(unit_cell.centering))))",
             ),
         )
     end
@@ -572,19 +502,19 @@ function reduced_cell(unit_cell::UnitCell)
     basis_a, basis_b, basis_c = basis(unit_cell.lattice_constants)
 
     # Construct primitive cell basis for centering
-    if unit_cell.centering == BODY
+    if unit_cell.centering == BaseCentered()
+        basis_a = 0.5 * (basis_a + basis_b)
+
+    elseif unit_cell.centering == BodyCentered()
         basis_c = 0.5 * (basis_a + basis_b + basis_c)
 
-    elseif unit_cell.centering == FACE
+    elseif unit_cell.centering == FaceCentered()
         basis_a_primitive = 0.5 * (basis_a + basis_b)
         basis_b_primitive = 0.5 * (basis_a - basis_b)
         basis_c_primitive = 0.5 * (basis_a + basis_c)
         basis_a = basis_a_primitive
         basis_b = basis_b_primitive
         basis_c = basis_c_primitive
-
-    elseif unit_cell.centering == BASE
-        basis_a = 0.5 * (basis_a + basis_b)
     end
 
     # Initialize working basis set
@@ -844,7 +774,7 @@ function reduced_cell(unit_cell::UnitCell)
 
     return UnitCell(
         standardize(LatticeConstants(reduced_basis_a, reduced_basis_b, reduced_basis_c)),
-        PRIMITIVE,
+        Primitive(),
     )
 end
 
@@ -915,8 +845,8 @@ function is_equivalent_unit_cell(
 )
     # Compare primitive unit cells
     return is_equivalent_unit_cell(
-        UnitCell(lattice_constants_test, PRIMITIVE),
-        UnitCell(lattice_constants_ref, PRIMITIVE);
+        UnitCell(lattice_constants_test, Primitive()),
+        UnitCell(lattice_constants_ref, Primitive());
         tol=tol,
     )
 end
@@ -953,105 +883,3 @@ Examples
 TODO
 """
 function is_supercell end
-
-# ------ Miller index computations
-
-"""
-    generate_hkl_indices(
-        max_indices::Tuple{Integer,Integer,Integer};
-        positive_only::Bool=false
-    ) -> Vector{Tuple{Int64, Int64, Int64}}
-
-    generate_hkl_indices(
-        max_index::Integer;
-        positive_only::Bool=false
-    ) -> Vector{Tuple{Int64, Int64, Int64}}
-
-Generate Miller indices with components having absolute value no greater than the
-components of `max_indices` (component-wise) or the value of `max_index`.
-
-Keyword Arguments
-=================
-- `positive_only`: when `positive_only` is `true`, only Miller indices with positive
-  components are generated
-
-Return values
-=============
-- list of Miller indices (in lexicographic order)
-
-Examples
-========
-```jldoctest
-julia> generate_hkl_indices((1, 1, 1))
-3-element Vector{Tuple{Int64, Int64, Int64}}:
- (-1, -1, -1)
- (-1, -1, 0)
- (-1, -1, 1)
- (-1, 0, -1)
- (-1, 0, 0)
- (-1, 0, 1)
- (-1, 1, -1)
- (-1, 1, 0)
- (-1, 1, 1)
- (0, -1, -1)
- (0, -1, 0)
- (0, -1, 1)
- (0, 0, -1)
- (0, 0, 0)
- (0, 0, 1)
- (0, 1, -1)
- (0, 1, 0)
- (0, 1, 1)
- (1, -1, -1)
- (1, -1, 0)
- (1, -1, 1)
- (1, 0, -1)
- (1, 0, 0)
- (1, 0, 1)
- (1, 1, -1)
- (1, 1, 0)
- (1, 1, 1)
-"""
-function generate_hkl_indices(
-    max_indices::Tuple{Integer,Integer,Integer}; positive_only::Bool=false
-)
-    # --- Check arguments
-
-    if any(max_indices .<= 0)
-        throw(ArgumentError("All components of `max_indices` must be positive."))
-    end
-
-    # --- Generate Miller indices
-
-    if positive_only
-        h = 0:max_indices[1]
-        k = 0:max_indices[2]
-        l = 0:max_indices[3]
-    else
-        h = (-max_indices[1]):max_indices[1]
-        k = (-max_indices[2]):max_indices[2]
-        l = (-max_indices[3]):max_indices[3]
-    end
-
-    lattice = collect(Iterators.product(h, k, l))
-    lattice = reshape(lattice, length(lattice))
-
-    # Remove (0, 0, 0)
-    filter!(!=((0, 0, 0)), lattice)
-
-    return lattice
-end
-
-function generate_hkl_indices(max_index::Integer; positive_only::Bool=false)
-    # --- Check arguments
-
-    if max_index <= 0
-        throw(ArgumentError("`max_index` must be positive."))
-    end
-
-    # --- Generate Miller indices
-
-    return generate_hkl_indices(
-        (max_index, max_index, max_index); positive_only=positive_only
-    )
-end

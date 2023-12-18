@@ -17,19 +17,9 @@ Functions that support computations specific to hexagonal lattices
 # --- Exports
 
 # Types
-export Hexagonal
 export HexagonalLatticeConstants
 
 # --- Types
-
-"""
-    Hexagonal
-
-Type representing the hexagonal lattice system
-
-Supertype: [`LatticeSystem`](@ref)
-"""
-struct Hexagonal <: LatticeSystem end
 
 """
     HexagonalLatticeConstants
@@ -83,7 +73,7 @@ function isapprox(
 end
 
 function lattice_system(::HexagonalLatticeConstants)
-    return Hexagonal
+    return Hexagonal()
 end
 
 # ------ Unit cell computations

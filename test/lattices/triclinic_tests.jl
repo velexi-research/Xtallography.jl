@@ -361,7 +361,7 @@ end
     # --- Tests
 
     lattice_constants = TriclinicLatticeConstants(1, 2, 3, π / 5, 2π / 5, 3π / 5)
-    @test lattice_system(lattice_constants) == Triclinic
+    @test lattice_system(lattice_constants) === Triclinic()
 end
 
 @testset "standardize(): Type I cell" begin
@@ -380,13 +380,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ edge lengths not sorted
 
@@ -401,13 +401,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, c, b, α, γ, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ origin not at "homogeneous corner"
 
@@ -422,13 +422,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, α, π - β, π - γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ edge lengths not sorted and origin not at "homogeneous corner"
 
@@ -443,13 +443,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(b, c, a, π - β, π - γ, α)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ a ≈ b ≈ c
 
@@ -462,13 +462,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, α, π - β, π - γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ a ≈ b (after sorting a, b, c)
 
@@ -482,13 +482,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, π - β, α, π - γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ b ≈ c (after sorting a, b, c)
 
@@ -502,13 +502,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(c, a, b, γ, π - α, π - β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 end
 
 @testset "standardize(): Type II cell" begin
@@ -527,13 +527,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = lattice_constants
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ edge lengths not sorted
 
@@ -548,13 +548,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, c, b, α, γ, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ origin not at "homogeneous corner"
 
@@ -569,13 +569,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, π - α, π - β, γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ edge lengths not sorted and origin not at "homogeneous corner"
 
@@ -590,13 +590,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(b, c, a, π - β, γ, π - α)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ a ≈ b ≈ c
 
@@ -609,13 +609,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, π - α, β, π - γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ a ≈ b (after sorting a, b, c)
 
@@ -629,13 +629,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, π - β, α, π - γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
     # ------ b ≈ c (after sorting a, b, c)
 
@@ -649,13 +649,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(c, a, b, π - γ, π - β, α)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 end
 
 @testset "standardize(): invalid arguments" begin
@@ -665,12 +665,11 @@ end
 
     # --- Tests
 
-    for centering in
-        (XtallographyUtils.BODY, XtallographyUtils.FACE, XtallographyUtils.BASE)
+    for centering in (BodyCentered, FaceCentered, BaseCentered)
         local error = nothing
         local error_message = ""
         try
-            standardize(lattice_constants, centering)
+            standardize(lattice_constants, centering())
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -680,7 +679,8 @@ end
 
         expected_error =
             "ArgumentError: " *
-            "Invalid Bravais lattice: (lattice_system=Triclinic, centering=$centering)"
+            "Invalid Bravais lattice: " *
+            "(lattice_system=Triclinic, centering=$(nameof(centering)))"
 
         @test startswith(error_message, expected_error)
     end
@@ -779,11 +779,9 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell defined by [basis_a, basis_b, basis_c]
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    unit_cell = UnitCell(lattice_constants, Primitive())
 
-    expected_reduced_cell = reduced_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa TriclinicLatticeConstants
@@ -792,13 +790,10 @@ end
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c]
     unit_cell = UnitCell(
-        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c),
-        XtallographyUtils.PRIMITIVE,
+        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c), Primitive()
     )
 
-    expected_reduced_cell = reduced_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa TriclinicLatticeConstants
@@ -816,10 +811,10 @@ end
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
     basis_a, basis_b, basis_c = basis(lattice_constants)
     unit_cell = UnitCell(
-        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c), XtallographyUtils.PRIMITIVE
+        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c), Primitive()
     )
 
-    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE))
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
 
     reduced_cell_ = reduced_cell(unit_cell)
     =#
@@ -840,23 +835,22 @@ end
     # --- Tests
 
     # identical triclinic unit cells
-    unit_cell_ref = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    unit_cell_ref = UnitCell(lattice_constants, Primitive())
     unit_cell_test = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c]
-    unit_cell_ref = reduced_cell(UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE))
+    unit_cell_ref = reduced_cell(UnitCell(lattice_constants, Primitive()))
     unit_cell_test = UnitCell(
-        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c),
-        XtallographyUtils.PRIMITIVE,
+        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c), Primitive()
     )
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 
     # body-centered unit cell
-    body_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.BODY)
+    body_centered_unit_cell = UnitCell(lattice_constants, BodyCentered())
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             basis_a,
@@ -864,7 +858,7 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 end

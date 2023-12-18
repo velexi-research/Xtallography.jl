@@ -39,7 +39,7 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "iucr_conventional_cell(): limiting cases, centering = PRIMITIVE" begin
+@testset "conventional_cell(): limiting cases, centering = primitive" begin
     # --- Preparations
 
     # Construct basis for orthorhombic unit cell
@@ -63,13 +63,11 @@ using XtallographyUtils
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈ OrthorhombicLatticeConstants(o_a, o_b, o_c)
-    @test iucr_unit_cell.centering == XtallographyUtils.PRIMITIVE
+    @test iucr_unit_cell.centering == Primitive()
 
     # ------ a = -2 * c * cos(β)
 
@@ -78,7 +76,7 @@ using XtallographyUtils
     basis_b = 0.5 * (o_basis_a + o_basis_b)
     basis_c = o_basis_c
     lattice_constants, _ = standardize(
-        LatticeConstants(basis_a, basis_b, basis_c), XtallographyUtils.PRIMITIVE
+        LatticeConstants(basis_a, basis_b, basis_c), Primitive()
     )
 
     # Check test conditions
@@ -86,16 +84,14 @@ using XtallographyUtils
     @test lattice_constants.a ≈ -2 * lattice_constants.c * cos(lattice_constants.β)
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
 
     # Check results
     standardized_lattice_constants, _ = standardize(
-        expected_orthorhombic_lattice_constants, XtallographyUtils.BASE
+        expected_orthorhombic_lattice_constants, BaseCentered()
     )
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.BASE
+    @test iucr_unit_cell.centering == BaseCentered()
 
     # ------ a = c, basis_b = o_basis_c
 
@@ -115,16 +111,14 @@ using XtallographyUtils
     @test lattice_constants.a ≈ lattice_constants.c
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
 
     # Check results
     standardized_lattice_constants, _ = standardize(
-        expected_orthorhombic_lattice_constants, XtallographyUtils.BASE
+        expected_orthorhombic_lattice_constants, BaseCentered()
     )
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.BASE
+    @test iucr_unit_cell.centering == BaseCentered()
 
     # ------ monoclinic unit cell is not equivalent to an orthorhombic unit cell
 
@@ -136,19 +130,15 @@ using XtallographyUtils
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
 
     # Check results
-    standardized_lattice_constants, _ = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
-    )
+    standardized_lattice_constants, _ = standardize(lattice_constants, Primitive())
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.PRIMITIVE
+    @test iucr_unit_cell.centering == Primitive()
 end
 
-@testset "iucr_conventional_cell(): limiting cases, centering = BODY, orthorhombic limits" begin
+@testset "conventional_cell(): limiting cases, centering = body, orthorhombic limits" begin
     # --- Preparations
 
     # Construct basis for orthorhombic unit cell
@@ -172,13 +162,11 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈ OrthorhombicLatticeConstants(a, b, c)
-    @test iucr_unit_cell.centering == XtallographyUtils.BODY
+    @test iucr_unit_cell.centering == BodyCentered()
 
     # ------ a = -c cos(β), basis_b = o_basis_a
 
@@ -198,16 +186,14 @@ end
     @test lattice_constants.a ≈ -lattice_constants.c * cos(lattice_constants.β)
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     # Check results
     standardized_lattice_constants, _ = standardize(
-        expected_orthorhombic_lattice_constants, XtallographyUtils.BASE
+        expected_orthorhombic_lattice_constants, BaseCentered()
     )
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.BASE
+    @test iucr_unit_cell.centering == BaseCentered()
 
     # ------ a = -c cos(β), basis_b = o_basis_b
 
@@ -227,16 +213,14 @@ end
     @test lattice_constants.a ≈ -lattice_constants.c * cos(lattice_constants.β)
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     # Check results
     standardized_lattice_constants, _ = standardize(
-        expected_orthorhombic_lattice_constants, XtallographyUtils.BASE
+        expected_orthorhombic_lattice_constants, BaseCentered()
     )
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.BASE
+    @test iucr_unit_cell.centering == BaseCentered()
 
     # ------ a = c
 
@@ -256,19 +240,17 @@ end
     @test lattice_constants.a ≈ lattice_constants.c
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     # Check results
     standardized_lattice_constants, _ = standardize(
-        expected_orthorhombic_lattice_constants, XtallographyUtils.FACE
+        expected_orthorhombic_lattice_constants, FaceCentered()
     )
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.FACE
+    @test iucr_unit_cell.centering == FaceCentered()
 end
 
-@testset "iucr_conventional_cell(): limiting cases, centering = BODY, rhombohedral limit cases" begin
+@testset "conventional_cell(): limiting cases, centering = body, rhombohedral limit cases" begin
     # --- Tests
 
     # ------ r_α < π/3: a^2 + b^2 = c^2, a^2 + a c cos(β) = b^2
@@ -300,14 +282,12 @@ end
         lattice_constants.b^2
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈
         standardize(expected_rhombohedral_lattice_constants)
-    @test iucr_unit_cell.centering == XtallographyUtils.PRIMITIVE
+    @test iucr_unit_cell.centering == Primitive()
 
     # ------ π/3 < r_α < π/2: a^2 + b^2 = c^2, b^2 + a c cos(β) = a^2
 
@@ -338,14 +318,12 @@ end
         lattice_constants.a^2
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈
         standardize(expected_rhombohedral_lattice_constants)
-    @test iucr_unit_cell.centering == XtallographyUtils.PRIMITIVE
+    @test iucr_unit_cell.centering == Primitive()
 
     # ------ π/2 < r_α < acos(-1/3):  a^2 + b^2 = c^2, b^2 + a c cos(β) = a^2
 
@@ -374,14 +352,12 @@ end
     @test lattice_constants.c ≈ -3 * lattice_constants.a * cos(lattice_constants.β)
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈
         standardize(expected_rhombohedral_lattice_constants)
-    @test iucr_unit_cell.centering == XtallographyUtils.PRIMITIVE
+    @test iucr_unit_cell.centering == Primitive()
 
     # ------ r_α > acos(-1/3): a^2 + 3 b^2 = 9 c^2, a = -3 c cos(β)
 
@@ -410,17 +386,15 @@ end
     @test lattice_constants.a ≈ -3 * lattice_constants.c * cos(lattice_constants.β)
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈
         standardize(expected_rhombohedral_lattice_constants)
-    @test iucr_unit_cell.centering == XtallographyUtils.PRIMITIVE
+    @test iucr_unit_cell.centering == Primitive()
 end
 
-@testset "iucr_conventional_cell(): limiting cases, centering = BODY, non-limit cases" begin
+@testset "conventional_cell(): limiting cases, centering = body, non-limit cases" begin
     # --- Preparations
 
     # Construct basis for orthorhombic unit cell
@@ -452,19 +426,17 @@ end
     @test lattice_constants isa MonoclinicLatticeConstants
 
     # Exercise functionality
-    iucr_unit_cell = iucr_conventional_cell(
-        UnitCell(lattice_constants, XtallographyUtils.BODY)
-    )
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
 
     # Check results
     expected_lattice_constants = MonoclinicLatticeConstants(a_ref, b_ref, c_ref, β_ref)
 
     @test iucr_unit_cell.lattice_constants isa MonoclinicLatticeConstants
     @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering == XtallographyUtils.BODY
+    @test iucr_unit_cell.centering == BodyCentered()
 end
 
-@testset "iucr_conventional_cell(): invalid arguments" begin
+@testset "conventional_cell(): invalid arguments" begin
     # --- Preparations
 
     # Construct lattice constants for monoclinic unit cell
@@ -476,12 +448,12 @@ end
 
     # --- Tests
 
-    # centering = FACE
-    centering = XtallographyUtils.FACE
+    # centering = face-centered
+    centering = FaceCentered
     local error = nothing
     local error_message = ""
     try
-        iucr_conventional_cell(UnitCell(lattice_constants, centering))
+        conventional_cell(UnitCell(lattice_constants, centering()))
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -491,12 +463,13 @@ end
 
     expected_error =
         "ArgumentError: " *
-        "Invalid Bravais lattice: (lattice_system=Monoclinic, centering=$centering)"
+        "Invalid Bravais lattice: " *
+        "(lattice_system=Monoclinic, centering=$(nameof(centering)))"
 
     @test startswith(error_message, expected_error)
 end
 
-@testset "iucr_conventional_cell(): chain of limiting cases" begin
+@testset "conventional_cell(): chain of limiting cases" begin
     # --- Preparations
 
     a = 5
@@ -512,14 +485,12 @@ end
     # primitive unit cell: aP --> mP
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = standardize(
-        UnitCell(m_lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    expected_unit_cell = standardize(UnitCell(m_lattice_constants, Primitive()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # body-centered unit cell: aP --> mI
     #
@@ -531,12 +502,12 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = standardize(UnitCell(m_lattice_constants, XtallographyUtils.BODY))
+    expected_unit_cell = standardize(UnitCell(m_lattice_constants, BodyCentered()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # body-centered unit cell: aP --> mI
     #
@@ -548,12 +519,12 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = standardize(UnitCell(m_lattice_constants, XtallographyUtils.BODY))
+    expected_unit_cell = standardize(UnitCell(m_lattice_constants, BodyCentered()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # base-centered unit cell: aP --> mS
     #
@@ -562,12 +533,12 @@ end
         LatticeConstants(
             basis_a, 0.5 * (basis_a + basis_b), basis_c; identify_lattice_system=false
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = standardize(UnitCell(m_lattice_constants, XtallographyUtils.BASE))
+    expected_unit_cell = standardize(UnitCell(m_lattice_constants, BaseCentered()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # base-centered unit cell: aP --> mS
     #
@@ -579,10 +550,10 @@ end
             0.5 * (basis_a + basis_b) + basis_c;
             identify_lattice_system=false,
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
-    expected_unit_cell = standardize(UnitCell(m_lattice_constants, XtallographyUtils.BASE))
+    expected_unit_cell = standardize(UnitCell(m_lattice_constants, BaseCentered()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
-    @test iucr_conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end

@@ -190,7 +190,7 @@ end
     # --- Tests
 
     lattice_constants = OrthorhombicLatticeConstants(1, 2, 3)
-    @test lattice_system(lattice_constants) == Orthorhombic
+    @test lattice_system(lattice_constants) === Orthorhombic()
 end
 
 @testset "standardize(): primitive, body-centered, face-centered" begin
@@ -203,35 +203,35 @@ end
     c = 10.0
     lattice_constants = OrthorhombicLatticeConstants(a, b, c)
 
-    # centering == PRIMITIVE
+    # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, b, c)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
-    # centering == BODY
+    # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BODY
+        lattice_constants, BodyCentered()
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, b, c)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BODY
+    @test standardized_centering == BodyCentered()
 
-    # centering == FACE
+    # centering = face-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.FACE
+        lattice_constants, FaceCentered()
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, b, c)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.FACE
+    @test standardized_centering == FaceCentered()
 
     # ------ lattice constants not sorted
 
@@ -240,35 +240,35 @@ end
     c = 5.0
     lattice_constants = OrthorhombicLatticeConstants(a, b, c)
 
-    # centering == PRIMITIVE
+    # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, c, b)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
-    # centering == BODY
+    # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BODY
+        lattice_constants, BodyCentered()
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, c, b)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BODY
+    @test standardized_centering == BodyCentered()
 
-    # centering == FACE
+    # centering = face-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.FACE
+        lattice_constants, FaceCentered()
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, c, b)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.FACE
+    @test standardized_centering == FaceCentered()
 end
 
 @testset "standardize(): base-centered" begin
@@ -282,13 +282,13 @@ end
     lattice_constants = OrthorhombicLatticeConstants(a, b, c)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BASE
+        lattice_constants, BaseCentered()
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, b, c)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BASE
+    @test standardized_centering == BaseCentered()
 
     # ------ lattice constants not sorted
 
@@ -298,13 +298,13 @@ end
     lattice_constants = OrthorhombicLatticeConstants(a, b, c)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BASE
+        lattice_constants, BaseCentered()
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(b, a, c)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BASE
+    @test standardized_centering == BaseCentered()
 end
 
 # ------ Unit cell computations
@@ -366,11 +366,9 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    unit_cell = UnitCell(lattice_constants, Primitive())
 
-    expected_reduced_cell = reduced_cell(
-        UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
-    )
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa OrthorhombicLatticeConstants
@@ -378,12 +376,12 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # body-centered unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.BODY)
+    unit_cell = UnitCell(lattice_constants, BodyCentered())
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c)),
-            XtallographyUtils.PRIMITIVE,
+            Primitive(),
         ),
     )
 
@@ -393,7 +391,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # face-centered unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.FACE)
+    unit_cell = UnitCell(lattice_constants, FaceCentered())
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
@@ -402,7 +400,7 @@ end
                 0.5 * (basis_a - basis_b),
                 0.5 * (basis_b + basis_c),
             ),
-            XtallographyUtils.PRIMITIVE,
+            Primitive(),
         ),
     )
 
@@ -412,13 +410,10 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # base-centered unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.BASE)
+    unit_cell = UnitCell(lattice_constants, BaseCentered())
 
     expected_reduced_cell = reduced_cell(
-        UnitCell(
-            LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c),
-            XtallographyUtils.PRIMITIVE,
-        ),
+        UnitCell(LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c), Primitive())
     )
 
     reduced_cell_ = reduced_cell(unit_cell)
@@ -439,15 +434,15 @@ end
     # --- Exercise functionality and check results
 
     # equivalent orthorhombic and triclinic unit cells
-    orthorhombic_unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    orthorhombic_unit_cell = UnitCell(lattice_constants, Primitive())
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(orthorhombic_unit_cell, triclinic_unit_cell)
 
     # body-centered unit cell
-    body_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.BODY)
+    body_centered_unit_cell = UnitCell(lattice_constants, BodyCentered())
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             basis_a,
@@ -455,25 +450,24 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 
     # face-centered unit cell
-    face_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.FACE)
+    face_centered_unit_cell = UnitCell(lattice_constants, FaceCentered())
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             0.5 * (basis_a + basis_b), 0.5 * (basis_a - basis_b), 0.5 * (basis_b + basis_c)
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(face_centered_unit_cell, primitive_unit_cell)
 
     # base-centered unit cell
-    base_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.BASE)
+    base_centered_unit_cell = UnitCell(lattice_constants, BaseCentered())
     primitive_unit_cell = UnitCell(
-        LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c),
-        XtallographyUtils.PRIMITIVE,
+        LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c), Primitive()
     )
     @test is_equivalent_unit_cell(base_centered_unit_cell, primitive_unit_cell)
 end

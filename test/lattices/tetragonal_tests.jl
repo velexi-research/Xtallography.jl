@@ -154,46 +154,46 @@ end
     # --- Tests
 
     lattice_constants = TetragonalLatticeConstants(1, 2)
-    @test lattice_system(lattice_constants) == Tetragonal
+    @test lattice_system(lattice_constants) === Tetragonal()
 end
 
 @testset "standardize()" begin
     # --- Tests
 
-    # ------ Tetragonal lattices have no lattice constants conventions for PRIMITIVE and
-    #        BODY centerings
+    # ------ Tetragonal lattices have no lattice constants conventions for primitive and
+    #        body centerings
 
     a = 1.0
     c = 10.0
     lattice_constants = TetragonalLatticeConstants(a, c)
 
-    # centering == PRIMITIVE
+    # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = lattice_constants
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.PRIMITIVE
+    @test standardized_centering == Primitive()
 
-    # centering == BODY
+    # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.BODY
+        lattice_constants, BodyCentered()
     )
 
     expected_lattice_constants = lattice_constants
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == XtallographyUtils.BODY
+    @test standardized_centering == BodyCentered()
 
     # ------ Invalid centerings
 
-    for centering in (XtallographyUtils.FACE, XtallographyUtils.BASE)
+    for centering in (FaceCentered, BaseCentered)
         local error = nothing
         local error_message = ""
         try
-            standardize(lattice_constants, centering)
+            standardize(lattice_constants, centering())
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -203,7 +203,8 @@ end
 
         expected_error =
             "ArgumentError: " *
-            "Invalid Bravais lattice: (lattice_system=Tetragonal, centering=$centering)"
+            "Invalid Bravais lattice: " *
+            "(lattice_system=Tetragonal, centering=$(nameof(centering)))"
 
         @test startswith(error_message, expected_error)
     end
@@ -261,12 +262,12 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    unit_cell = UnitCell(lattice_constants, Primitive())
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-            XtallographyUtils.PRIMITIVE,
+            Primitive(),
         ),
     )
 
@@ -276,7 +277,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # body-centered unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.BODY)
+    unit_cell = UnitCell(lattice_constants, BodyCentered())
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
@@ -286,7 +287,7 @@ end
                 0.5 * (basis_a + basis_b + basis_c);
                 identify_lattice_system=false,
             ),
-            XtallographyUtils.PRIMITIVE,
+            Primitive(),
         ),
     )
 
@@ -296,10 +297,10 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # face-centered unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.FACE)
+    unit_cell = UnitCell(lattice_constants, FaceCentered())
 
     expected_reduced_cell = reduced_cell(
-        UnitCell(TetragonalLatticeConstants(a / sqrt(2), c), XtallographyUtils.BODY)
+        UnitCell(TetragonalLatticeConstants(a / sqrt(2), c), BodyCentered())
     )
 
     reduced_cell_ = reduced_cell(unit_cell)
@@ -319,15 +320,15 @@ end
     # --- Exercise functionality and check results
 
     # equivalent tetragonal and triclinic unit cells
-    tetragonal_unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    tetragonal_unit_cell = UnitCell(lattice_constants, Primitive())
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(tetragonal_unit_cell, triclinic_unit_cell)
 
     # body-centered unit cell
-    body_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.BODY)
+    body_centered_unit_cell = UnitCell(lattice_constants, BodyCentered())
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             basis_a,
@@ -335,14 +336,14 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 
     # face-centered unit cell
-    face_centered_unit_cell = UnitCell(lattice_constants, XtallographyUtils.FACE)
+    face_centered_unit_cell = UnitCell(lattice_constants, FaceCentered())
     primitive_unit_cell = UnitCell(
-        TetragonalLatticeConstants(a / sqrt(2), c), XtallographyUtils.BODY
+        TetragonalLatticeConstants(a / sqrt(2), c), BodyCentered()
     )
     @test is_equivalent_unit_cell(face_centered_unit_cell, primitive_unit_cell)
 end

@@ -169,19 +169,19 @@ end
     # --- Tests
 
     lattice_constants = RhombohedralLatticeConstants(1, π / 5)
-    @test lattice_system(lattice_constants) == Rhombohedral
+    @test lattice_system(lattice_constants) === Rhombohedral()
 end
 
 @testset "standardize()" begin
     # --- Tests
 
-    # ------ Rhombohedral lattices have no lattice constants conventions for PRIMTIIVE
+    # ------ Rhombohedral lattices have no lattice constants conventions for primitive
     #        centering
 
     lattice_constants = RhombohedralLatticeConstants(1.0, 2π / 5)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, XtallographyUtils.PRIMITIVE
+        lattice_constants, Primitive()
     )
 
     expected_lattice_constants = lattice_constants
@@ -189,12 +189,11 @@ end
 
     # ------ Invalid centering
 
-    for centering in
-        (XtallographyUtils.BODY, XtallographyUtils.FACE, XtallographyUtils.BASE)
+    for centering in (BodyCentered, FaceCentered, BaseCentered)
         local error = nothing
         local error_message = ""
         try
-            standardize(lattice_constants, centering)
+            standardize(lattice_constants, centering())
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -204,7 +203,8 @@ end
 
         expected_error =
             "ArgumentError: " *
-            "Invalid Bravais lattice: (lattice_system=Rhombohedral, centering=$centering)"
+            "Invalid Bravais lattice: " *
+            "(lattice_system=Rhombohedral, centering=$(nameof(centering)))"
 
         @test startswith(error_message, expected_error)
     end
@@ -278,10 +278,10 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell
-    unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    unit_cell = UnitCell(lattice_constants, Primitive())
 
     expected_reduced_cell = reduced_cell(
-        UnitCell(LatticeConstants(basis_a, basis_b, basis_c), XtallographyUtils.PRIMITIVE)
+        UnitCell(LatticeConstants(basis_a, basis_b, basis_c), Primitive())
     )
 
     reduced_cell_ = reduced_cell(unit_cell)
@@ -301,10 +301,10 @@ end
     # --- Exercise functionality and check results
 
     # equivalent rhombohedral and triclinic unit cells
-    rhombohedral_unit_cell = UnitCell(lattice_constants, XtallographyUtils.PRIMITIVE)
+    rhombohedral_unit_cell = UnitCell(lattice_constants, Primitive())
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        XtallographyUtils.PRIMITIVE,
+        Primitive(),
     )
     @test is_equivalent_unit_cell(rhombohedral_unit_cell, triclinic_unit_cell)
 end

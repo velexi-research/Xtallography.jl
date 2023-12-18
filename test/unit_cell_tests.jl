@@ -31,15 +31,6 @@ using XtallographyUtils
 
 # ------ Types
 
-@testset "LatticeSystem Subtypes" begin
-    expected_types = [
-        Triclinic, Monoclinic, Orthorhombic, Tetragonal, Rhombohedral, Hexagonal, Cubic
-    ]
-    for type in expected_types
-        @test type <: LatticeSystem
-    end
-end
-
 @testset "LatticeConstants Subtypes" begin
     expected_types = [
         TriclinicLatticeConstants,
@@ -74,7 +65,7 @@ function test_basis_rotations_and_permutations(
 
     for rotation in rotations
         # Generate bases to check
-        if centering == XtallographyUtils.BASE
+        if centering == BaseCentered()
             # Do not permute basis vectors for base-centering
             bases_to_test = ([basis_a, basis_b, basis_c],)
         else
@@ -123,8 +114,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in
-        (XtallographyUtils.PRIMITIVE, XtallographyUtils.BODY, XtallographyUtils.FACE)
+    for centering in (Primitive(), BodyCentered(), FaceCentered())
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -161,7 +151,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (XtallographyUtils.PRIMITIVE, XtallographyUtils.BODY)
+    for centering in (Primitive(), BodyCentered())
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -189,7 +179,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (XtallographyUtils.PRIMITIVE, XtallographyUtils.BODY)
+    for centering in (Primitive(), BodyCentered())
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -223,10 +213,9 @@ end
         rotations, expected_lattice_constants, basis_a, basis_b, basis_c
     )
 
-    # centering = PRIMITIVE, BODY or FACE
+    # centering = primitive, body-centered, or face-centered
     expected_lattice_constants = OrthorhombicLatticeConstants(a, b, c)
-    for centering in
-        (XtallographyUtils.PRIMITIVE, XtallographyUtils.BODY, XtallographyUtils.FACE)
+    for centering in (Primitive(), BodyCentered(), FaceCentered())
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -237,7 +226,7 @@ end
         )
     end
 
-    # centering = BASE, a, b < c
+    # centering = base-centered; a, b < c
     a = 5
     b = 8
     c = 10
@@ -254,10 +243,10 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=XtallographyUtils.BASE,
+        centering=BaseCentered(),
     )
 
-    # centering = BASE, a < c < b
+    # centering = base-centered; a < c < b
     a = 5
     b = 10
     c = 8
@@ -273,10 +262,10 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=XtallographyUtils.BASE,
+        centering=BaseCentered(),
     )
 
-    # centering = BASE, b < c < a
+    # centering = base-centered; b < c < a
     a = 10
     b = 5
     c = 8
@@ -292,7 +281,7 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=XtallographyUtils.BASE,
+        centering=BaseCentered(),
     )
 end
 
@@ -323,7 +312,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (XtallographyUtils.PRIMITIVE,)
+    for centering in (Primitive(),)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -360,7 +349,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (XtallographyUtils.PRIMITIVE,)
+    for centering in (Primitive(),)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -388,7 +377,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (XtallographyUtils.PRIMITIVE,)
+    for centering in (Primitive(),)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -416,7 +405,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (XtallographyUtils.PRIMITIVE,)
+    for centering in (Primitive(),)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -444,7 +433,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (XtallographyUtils.PRIMITIVE,)
+    for centering in (Primitive(),)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -479,7 +468,7 @@ end
         rotations, expected_lattice_constants, basis_a, basis_b, basis_c
     )
 
-    # centering = PRIMITIVE
+    # centering = primitive
     expected_lattice_constants = standardize(MonoclinicLatticeConstants(a, b, c, β))
     test_basis_rotations_and_permutations(
         rotations,
@@ -487,12 +476,12 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=XtallographyUtils.PRIMITIVE,
+        centering=Primitive(),
     )
 
-    # centering = BODY
+    # centering = body-centered
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(a, b, c, β), XtallographyUtils.BODY
+        MonoclinicLatticeConstants(a, b, c, β), BodyCentered()
     )
     test_basis_rotations_and_permutations(
         rotations,
@@ -500,12 +489,12 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=XtallographyUtils.BODY,
+        centering=BodyCentered(),
     )
 
-    # centering = BASE
+    # centering = base-centered
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(a, b, c, β), XtallographyUtils.BASE
+        MonoclinicLatticeConstants(a, b, c, β), BaseCentered()
     )
     test_basis_rotations_and_permutations(
         rotations,
@@ -513,7 +502,7 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=XtallographyUtils.BASE,
+        centering=BaseCentered(),
     )
 end
 
@@ -555,7 +544,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (XtallographyUtils.PRIMITIVE,)
+    for centering in (Primitive(),)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -589,7 +578,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (XtallographyUtils.PRIMITIVE,)
+    for centering in (Primitive(),)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -627,8 +616,7 @@ end
 
     lattice_constants = CubicLatticeConstants(1)
 
-    for centering in
-        (XtallographyUtils.PRIMITIVE, XtallographyUtils.BODY, XtallographyUtils.FACE)
+    for centering in (Primitive(), BodyCentered(), FaceCentered())
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -639,7 +627,7 @@ end
 
     lattice_constants = TetragonalLatticeConstants(1, 2)
 
-    for centering in (XtallographyUtils.PRIMITIVE, XtallographyUtils.BODY)
+    for centering in (Primitive(), BodyCentered())
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -650,12 +638,7 @@ end
 
     lattice_constants = OrthorhombicLatticeConstants(1, 2, 3)
 
-    for centering in (
-        XtallographyUtils.PRIMITIVE,
-        XtallographyUtils.BODY,
-        XtallographyUtils.FACE,
-        XtallographyUtils.BASE,
-    )
+    for centering in (Primitive(), BodyCentered(), FaceCentered(), BaseCentered())
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -666,7 +649,7 @@ end
 
     lattice_constants = HexagonalLatticeConstants(1, 2)
 
-    for centering in (XtallographyUtils.PRIMITIVE,)
+    for centering in (Primitive(),)
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -677,7 +660,7 @@ end
 
     lattice_constants = RhombohedralLatticeConstants(1, π / 3)
 
-    for centering in (XtallographyUtils.PRIMITIVE,)
+    for centering in (Primitive(),)
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -688,8 +671,7 @@ end
 
     lattice_constants = MonoclinicLatticeConstants(1, 2, 3, 3π / 5)
 
-    for centering in
-        (XtallographyUtils.PRIMITIVE, XtallographyUtils.BODY, XtallographyUtils.BASE)
+    for centering in (Primitive(), BodyCentered(), BaseCentered())
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -700,7 +682,7 @@ end
 
     lattice_constants = TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5)
 
-    for centering in (XtallographyUtils.PRIMITIVE,)
+    for centering in (Primitive(),)
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -708,7 +690,83 @@ end
     end
 end
 
-# ------ LatticeConstants functions
+# ------ lattice methods
+
+@testset "is_bravais_lattice(::UnitCell)" begin
+    # --- Tests
+
+    # Cubic
+    @test is_bravais_lattice(UnitCell(CubicLatticeConstants(1), Primitive()))
+    @test is_bravais_lattice(UnitCell(CubicLatticeConstants(1), BodyCentered()))
+    @test is_bravais_lattice(UnitCell(CubicLatticeConstants(1), FaceCentered()))
+    @test !is_bravais_lattice(UnitCell(CubicLatticeConstants(1), BaseCentered()))
+
+    # Tetragonal
+    @test is_bravais_lattice(UnitCell(TetragonalLatticeConstants(1, 2), Primitive()))
+    @test is_bravais_lattice(UnitCell(TetragonalLatticeConstants(1, 2), BodyCentered()))
+    @test !is_bravais_lattice(UnitCell(TetragonalLatticeConstants(1, 2), FaceCentered()))
+    @test !is_bravais_lattice(UnitCell(TetragonalLatticeConstants(1, 2), BaseCentered()))
+
+    # Orthorhombic
+    @test is_bravais_lattice(UnitCell(OrthorhombicLatticeConstants(1, 2, 3), Primitive()))
+    @test is_bravais_lattice(
+        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), BodyCentered())
+    )
+    @test is_bravais_lattice(
+        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), FaceCentered())
+    )
+    @test is_bravais_lattice(
+        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), BaseCentered())
+    )
+
+    # Hexagonal
+    @test is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), Primitive()))
+    @test !is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), BodyCentered()))
+    @test !is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), FaceCentered()))
+    @test !is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), BaseCentered()))
+
+    # Rhombohedral
+    @test is_bravais_lattice(UnitCell(RhombohedralLatticeConstants(1, π / 3), Primitive()))
+    @test !is_bravais_lattice(
+        UnitCell(RhombohedralLatticeConstants(1, π / 3), BodyCentered())
+    )
+    @test !is_bravais_lattice(
+        UnitCell(RhombohedralLatticeConstants(1, π / 3), FaceCentered())
+    )
+    @test !is_bravais_lattice(
+        UnitCell(RhombohedralLatticeConstants(1, π / 3), BaseCentered())
+    )
+
+    # Monoclinic
+    @test is_bravais_lattice(
+        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), Primitive())
+    )
+    @test is_bravais_lattice(
+        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), BodyCentered())
+    )
+    @test !is_bravais_lattice(
+        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), FaceCentered())
+    )
+    @test is_bravais_lattice(
+        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), BaseCentered())
+    )
+
+    # Triclinic
+    @test is_bravais_lattice(
+        UnitCell(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), Primitive())
+    )
+    @test !is_bravais_lattice(
+        UnitCell(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), BodyCentered())
+    )
+    @test !is_bravais_lattice(
+        UnitCell(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), FaceCentered())
+    )
+    @test !is_bravais_lattice(
+        UnitCell(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), BaseCentered())
+    )
+end
+
+# ------ LatticeConstants methods
 
 @testset "isapprox(::LatticeConstants): comparison between different types" begin
     # --- Tests
@@ -729,13 +787,11 @@ end
 
     # Check sequence of method calls works
     unit_cell = UnitCell(
-        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5),
-        XtallographyUtils.PRIMITIVE,
+        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), Primitive()
     )
     standardized_unit_cell = standardize(unit_cell)
     expected_standardized_unit_cell = UnitCell(
-        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 2π / 5, π / 5),
-        XtallographyUtils.PRIMITIVE,
+        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 2π / 5, π / 5), Primitive()
     )
     @test standardized_unit_cell ≈ expected_standardized_unit_cell
 end
@@ -746,236 +802,33 @@ end
     # Check that no centering is returned
     lattice_constants = TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5)
     expected_standardized_lattice_constants, _ = standardize(
-        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5),
-        XtallographyUtils.PRIMITIVE,
+        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), Primitive()
     )
 
     @test standardize(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5)) ≈
         expected_standardized_lattice_constants
 end
 
-# ------ UnitConstants functions
+# ------ UnitCell methods
 
 @testset "isapprox(::UnitCell)" begin
     # --- Preparations
 
-    x = UnitCell(CubicLatticeConstants(1), XtallographyUtils.PRIMITIVE)
+    x = UnitCell(CubicLatticeConstants(1), Primitive())
 
     # --- Exercise functionality and check results
 
     # x.centering != y.centering
-    y = UnitCell(CubicLatticeConstants(1), XtallographyUtils.BODY)
+    y = UnitCell(CubicLatticeConstants(1), BodyCentered())
     @test x ≉ y
 
     # x.lattice_constants ≈ (x.lattice_constants + delta)
-    y = UnitCell(CubicLatticeConstants(1 + 1e-8), XtallographyUtils.PRIMITIVE)
+    y = UnitCell(CubicLatticeConstants(1 + 1e-8), Primitive())
     @test x ≈ y
 
     # x.lattice_constants ≉ y.lattice_constants
-    y = UnitCell(CubicLatticeConstants(2), XtallographyUtils.PRIMITIVE)
+    y = UnitCell(CubicLatticeConstants(2), Primitive())
     @test x ≉ y
-end
-
-# ------ Unit cell computations
-
-@testset "is_bravais_lattice(::UnitCell)" begin
-    # --- Tests
-
-    # Cubic
-    @test is_bravais_lattice(
-        UnitCell(CubicLatticeConstants(1), XtallographyUtils.PRIMITIVE)
-    )
-    @test is_bravais_lattice(UnitCell(CubicLatticeConstants(1), XtallographyUtils.BODY))
-    @test is_bravais_lattice(UnitCell(CubicLatticeConstants(1), XtallographyUtils.FACE))
-    @test !is_bravais_lattice(UnitCell(CubicLatticeConstants(1), XtallographyUtils.BASE))
-
-    # Tetragonal
-    @test is_bravais_lattice(
-        UnitCell(TetragonalLatticeConstants(1, 2), XtallographyUtils.PRIMITIVE)
-    )
-    @test is_bravais_lattice(
-        UnitCell(TetragonalLatticeConstants(1, 2), XtallographyUtils.BODY)
-    )
-    @test !is_bravais_lattice(
-        UnitCell(TetragonalLatticeConstants(1, 2), XtallographyUtils.FACE)
-    )
-    @test !is_bravais_lattice(
-        UnitCell(TetragonalLatticeConstants(1, 2), XtallographyUtils.BASE)
-    )
-
-    # Orthorhombic
-    @test is_bravais_lattice(
-        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), XtallographyUtils.PRIMITIVE)
-    )
-    @test is_bravais_lattice(
-        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), XtallographyUtils.BODY)
-    )
-    @test is_bravais_lattice(
-        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), XtallographyUtils.FACE)
-    )
-    @test is_bravais_lattice(
-        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), XtallographyUtils.BASE)
-    )
-
-    # Hexagonal
-    @test is_bravais_lattice(
-        UnitCell(HexagonalLatticeConstants(1, 2), XtallographyUtils.PRIMITIVE)
-    )
-    @test !is_bravais_lattice(
-        UnitCell(HexagonalLatticeConstants(1, 2), XtallographyUtils.BODY)
-    )
-    @test !is_bravais_lattice(
-        UnitCell(HexagonalLatticeConstants(1, 2), XtallographyUtils.FACE)
-    )
-    @test !is_bravais_lattice(
-        UnitCell(HexagonalLatticeConstants(1, 2), XtallographyUtils.BASE)
-    )
-
-    # Rhombohedral
-    @test is_bravais_lattice(
-        UnitCell(RhombohedralLatticeConstants(1, π / 3), XtallographyUtils.PRIMITIVE)
-    )
-    @test !is_bravais_lattice(
-        UnitCell(RhombohedralLatticeConstants(1, π / 3), XtallographyUtils.BODY)
-    )
-    @test !is_bravais_lattice(
-        UnitCell(RhombohedralLatticeConstants(1, π / 3), XtallographyUtils.FACE)
-    )
-    @test !is_bravais_lattice(
-        UnitCell(RhombohedralLatticeConstants(1, π / 3), XtallographyUtils.BASE)
-    )
-
-    # Monoclinic
-    @test is_bravais_lattice(
-        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), XtallographyUtils.PRIMITIVE)
-    )
-    @test is_bravais_lattice(
-        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), XtallographyUtils.BODY)
-    )
-    @test !is_bravais_lattice(
-        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), XtallographyUtils.FACE)
-    )
-    @test is_bravais_lattice(
-        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), XtallographyUtils.BASE)
-    )
-
-    # Triclinic
-    @test is_bravais_lattice(
-        UnitCell(
-            TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5),
-            XtallographyUtils.PRIMITIVE,
-        ),
-    )
-    @test !is_bravais_lattice(
-        UnitCell(
-            TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5),
-            XtallographyUtils.BODY,
-        ),
-    )
-    @test !is_bravais_lattice(
-        UnitCell(
-            TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5),
-            XtallographyUtils.FACE,
-        ),
-    )
-    @test !is_bravais_lattice(
-        UnitCell(
-            TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5),
-            XtallographyUtils.BASE,
-        ),
-    )
-end
-
-@testset "is_bravais_lattice(::LatticeSystem, ::Centering)" begin
-    # --- Tests
-
-    # Cubic
-    @test is_bravais_lattice(Cubic(), XtallographyUtils.PRIMITIVE)
-    @test is_bravais_lattice(Cubic(), XtallographyUtils.BODY)
-    @test is_bravais_lattice(Cubic(), XtallographyUtils.FACE)
-    @test !is_bravais_lattice(Cubic(), XtallographyUtils.BASE)
-
-    # Tetragonal
-    @test is_bravais_lattice(Tetragonal(), XtallographyUtils.PRIMITIVE)
-    @test is_bravais_lattice(Tetragonal(), XtallographyUtils.BODY)
-    @test !is_bravais_lattice(Tetragonal(), XtallographyUtils.FACE)
-    @test !is_bravais_lattice(Tetragonal(), XtallographyUtils.BASE)
-
-    # Orthorhombic
-    @test is_bravais_lattice(Orthorhombic(), XtallographyUtils.PRIMITIVE)
-    @test is_bravais_lattice(Orthorhombic(), XtallographyUtils.BODY)
-    @test is_bravais_lattice(Orthorhombic(), XtallographyUtils.FACE)
-    @test is_bravais_lattice(Orthorhombic(), XtallographyUtils.BASE)
-
-    # Hexagonal
-    @test is_bravais_lattice(Hexagonal(), XtallographyUtils.PRIMITIVE)
-    @test !is_bravais_lattice(Hexagonal(), XtallographyUtils.BODY)
-    @test !is_bravais_lattice(Hexagonal(), XtallographyUtils.FACE)
-    @test !is_bravais_lattice(Hexagonal(), XtallographyUtils.BASE)
-
-    # Rhombohedral
-    @test is_bravais_lattice(Rhombohedral(), XtallographyUtils.PRIMITIVE)
-    @test !is_bravais_lattice(Rhombohedral(), XtallographyUtils.BODY)
-    @test !is_bravais_lattice(Rhombohedral(), XtallographyUtils.FACE)
-    @test !is_bravais_lattice(Rhombohedral(), XtallographyUtils.BASE)
-
-    # Monoclinic
-    @test is_bravais_lattice(Monoclinic(), XtallographyUtils.PRIMITIVE)
-    @test is_bravais_lattice(Monoclinic(), XtallographyUtils.BODY)
-    @test !is_bravais_lattice(Monoclinic(), XtallographyUtils.FACE)
-    @test is_bravais_lattice(Monoclinic(), XtallographyUtils.BASE)
-
-    # Triclinic
-    @test is_bravais_lattice(Triclinic(), XtallographyUtils.PRIMITIVE)
-    @test !is_bravais_lattice(Triclinic(), XtallographyUtils.BODY)
-    @test !is_bravais_lattice(Triclinic(), XtallographyUtils.FACE)
-    @test !is_bravais_lattice(Triclinic(), XtallographyUtils.BASE)
-end
-
-@testset "is_bravais_lattice(::Type{<:LatticeSystem}, ::Centering)" begin
-    # --- Tests
-
-    # Cubic
-    @test is_bravais_lattice(Cubic, XtallographyUtils.PRIMITIVE)
-    @test is_bravais_lattice(Cubic, XtallographyUtils.BODY)
-    @test is_bravais_lattice(Cubic, XtallographyUtils.FACE)
-    @test !is_bravais_lattice(Cubic, XtallographyUtils.BASE)
-
-    # Tetragonal
-    @test is_bravais_lattice(Tetragonal, XtallographyUtils.PRIMITIVE)
-    @test is_bravais_lattice(Tetragonal, XtallographyUtils.BODY)
-    @test !is_bravais_lattice(Tetragonal, XtallographyUtils.FACE)
-    @test !is_bravais_lattice(Tetragonal, XtallographyUtils.BASE)
-
-    # Orthorhombic
-    @test is_bravais_lattice(Orthorhombic, XtallographyUtils.PRIMITIVE)
-    @test is_bravais_lattice(Orthorhombic, XtallographyUtils.BODY)
-    @test is_bravais_lattice(Orthorhombic, XtallographyUtils.FACE)
-    @test is_bravais_lattice(Orthorhombic, XtallographyUtils.BASE)
-
-    # Hexagonal
-    @test is_bravais_lattice(Hexagonal, XtallographyUtils.PRIMITIVE)
-    @test !is_bravais_lattice(Hexagonal, XtallographyUtils.BODY)
-    @test !is_bravais_lattice(Hexagonal, XtallographyUtils.FACE)
-    @test !is_bravais_lattice(Hexagonal, XtallographyUtils.BASE)
-
-    # Rhombohedral
-    @test is_bravais_lattice(Rhombohedral, XtallographyUtils.PRIMITIVE)
-    @test !is_bravais_lattice(Rhombohedral, XtallographyUtils.BODY)
-    @test !is_bravais_lattice(Rhombohedral, XtallographyUtils.FACE)
-    @test !is_bravais_lattice(Rhombohedral, XtallographyUtils.BASE)
-
-    # Monoclinic
-    @test is_bravais_lattice(Monoclinic, XtallographyUtils.PRIMITIVE)
-    @test is_bravais_lattice(Monoclinic, XtallographyUtils.BODY)
-    @test !is_bravais_lattice(Monoclinic, XtallographyUtils.FACE)
-    @test is_bravais_lattice(Monoclinic, XtallographyUtils.BASE)
-
-    # Triclinic
-    @test is_bravais_lattice(Triclinic, XtallographyUtils.PRIMITIVE)
-    @test !is_bravais_lattice(Triclinic, XtallographyUtils.BODY)
-    @test !is_bravais_lattice(Triclinic, XtallographyUtils.FACE)
-    @test !is_bravais_lattice(Triclinic, XtallographyUtils.BASE)
 end
 
 @testset "basis(::UnitCell)" begin
@@ -983,7 +836,7 @@ end
 
     a = 2
     c = 5
-    unit_cell = UnitCell(HexagonalLatticeConstants(a, c), XtallographyUtils.PRIMITIVE)
+    unit_cell = UnitCell(HexagonalLatticeConstants(a, c), Primitive())
     basis_a, basis_b, basis_c = basis(unit_cell)
 
     # Check results
@@ -995,22 +848,15 @@ end
 @testset "volume(::UnitCell)" begin
     # --- Tests
 
-    unit_cell = UnitCell(OrthorhombicLatticeConstants(1, 2, 3), XtallographyUtils.PRIMITIVE)
+    unit_cell = UnitCell(OrthorhombicLatticeConstants(1, 2, 3), Primitive())
     @test volume(unit_cell) ≈ 6
 end
 
 @testset "surface_area(::UnitCell)" begin
     # --- Tests
 
-    unit_cell = UnitCell(OrthorhombicLatticeConstants(1, 2, 3), XtallographyUtils.PRIMITIVE)
+    unit_cell = UnitCell(OrthorhombicLatticeConstants(1, 2, 3), Primitive())
     @test surface_area(unit_cell) ≈ 22
-end
-
-@testset "iucr_conventional_cell()" begin
-    # --- Tests
-
-    # TODO: add cases that start from TriclinicLatticeConstants and cascade to all
-    #       possible endpoints
 end
 
 @testset "reduced_cell(): minimum sum of length squared not unique" begin
@@ -1019,7 +865,7 @@ end
     lattice_constants = TriclinicLatticeConstants(
         sqrt(6), sqrt(8), sqrt(8), π / 3, acos(sqrt(3) / 6), acos(sqrt(3) / 4)
     )
-    centering = XtallographyUtils.PRIMITIVE
+    centering = Primitive()
     unit_cell = UnitCell(lattice_constants, centering)
 
     # --- Exercise functionality
@@ -1035,7 +881,7 @@ end
     @test isapprox(reduced_cell_.lattice_constants.α, 104.47 * π / 180; atol=0.0005)
     @test isapprox(reduced_cell_.lattice_constants.β, 106.78 * π / 180; atol=0.0005)
     @test isapprox(reduced_cell_.lattice_constants.γ, 115.66 * π / 180; atol=0.0005)
-    @test reduced_cell_.centering == XtallographyUtils.PRIMITIVE
+    @test reduced_cell_.centering == Primitive()
 end
 
 @testset "is_equivalent_unit_cell(::UnitCell): valid arguments" begin
@@ -1046,11 +892,9 @@ end
     c = 3
     β = 3π / 5
     a = -2 * c * cos(β)
-    unit_cell_ref = UnitCell(
-        MonoclinicLatticeConstants(a, b, c, β), XtallographyUtils.PRIMITIVE
-    )
+    unit_cell_ref = UnitCell(MonoclinicLatticeConstants(a, b, c, β), Primitive())
     unit_cell_test = UnitCell(
-        OrthorhombicLatticeConstants(a, 2 * c * sin(β), b), XtallographyUtils.BASE
+        OrthorhombicLatticeConstants(a, 2 * c * sin(β), b), BaseCentered()
     )
 
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
@@ -1059,11 +903,9 @@ end
     a = 1
     b = 2
     c = 3
-    unit_cell_ref = UnitCell(
-        OrthorhombicLatticeConstants(a, b, c), XtallographyUtils.PRIMITIVE
-    )
+    unit_cell_ref = UnitCell(OrthorhombicLatticeConstants(a, b, c), Primitive())
     unit_cell_test = UnitCell(
-        OrthorhombicLatticeConstants(a + 2, b - 1, c + 5), XtallographyUtils.PRIMITIVE
+        OrthorhombicLatticeConstants(a + 2, b - 1, c + 5), Primitive()
     )
     @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; tol=10)
@@ -1073,10 +915,8 @@ end
     c = 3
     β = 3π / 5
     a = -2 * c * cos(β)
-    unit_cell_ref = UnitCell(
-        MonoclinicLatticeConstants(a, b, c, β), XtallographyUtils.PRIMITIVE
-    )
-    unit_cell_test = UnitCell(CubicLatticeConstants(a), XtallographyUtils.FACE)
+    unit_cell_ref = UnitCell(MonoclinicLatticeConstants(a, b, c, β), Primitive())
+    unit_cell_test = UnitCell(CubicLatticeConstants(a), FaceCentered())
 
     @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 end
@@ -1084,8 +924,8 @@ end
 @testset "is_equivalent_unit_cell(::UnitCell): invalid arguments" begin
     # --- Preparations
 
-    unit_cell_ref = UnitCell(CubicLatticeConstants(1.0), XtallographyUtils.PRIMITIVE)
-    unit_cell_test = UnitCell(CubicLatticeConstants(1.0), XtallographyUtils.PRIMITIVE)
+    unit_cell_ref = UnitCell(CubicLatticeConstants(1.0), Primitive())
+    unit_cell_test = UnitCell(CubicLatticeConstants(1.0), Primitive())
 
     # --- Exercise functionality and check results
 
@@ -1154,10 +994,8 @@ end
     c = 3
     β = 3π / 5
     a = -2 * c * cos(β)
-    lattice_constants_ref = UnitCell(
-        MonoclinicLatticeConstants(a, b, c, β), XtallographyUtils.PRIMITIVE
-    )
-    lattice_constants_test = UnitCell(CubicLatticeConstants(a), XtallographyUtils.FACE)
+    lattice_constants_ref = UnitCell(MonoclinicLatticeConstants(a, b, c, β), Primitive())
+    lattice_constants_test = UnitCell(CubicLatticeConstants(a), FaceCentered())
 
     @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
 end
@@ -1198,143 +1036,5 @@ end
     @test error isa ArgumentError
 
     expected_error = "ArgumentError: `tol` must be positive"
-    @test startswith(error_message, expected_error)
-end
-
-# ------ Miller index computations
-
-@testset "generate_hkl_indices(max_indices::Tuple): valid arguments" begin
-    # --- Exercise functionality and check results
-
-    # max_indices = (3, 3, 3), positive_only = false (default)
-    max_indices = (3, 3, 3)
-    lattice = generate_hkl_indices(max_indices)
-
-    @test length(lattice) == 7^3 - 1
-    @test !((0, 0, 0) in lattice)
-
-    # max_indices = (1, 1, 1), positive_only = false (default)
-    max_indices = (1, 1, 1)
-    lattice = generate_hkl_indices(max_indices)
-
-    @test length(lattice) == 3^3 - 1
-    @test !((0, 0, 0) in lattice)
-
-    expected_lattice = [
-        (-1, -1, -1),
-        (0, -1, -1),
-        (1, -1, -1),
-        (-1, 0, -1),
-        (0, 0, -1),
-        (1, 0, -1),
-        (-1, 1, -1),
-        (0, 1, -1),
-        (1, 1, -1),
-        (-1, -1, 0),
-        (0, -1, 0),
-        (1, -1, 0),
-        (-1, 0, 0),
-        (1, 0, 0),
-        (-1, 1, 0),
-        (0, 1, 0),
-        (1, 1, 0),
-        (-1, -1, 1),
-        (0, -1, 1),
-        (1, -1, 1),
-        (-1, 0, 1),
-        (0, 0, 1),
-        (1, 0, 1),
-        (-1, 1, 1),
-        (0, 1, 1),
-        (1, 1, 1),
-    ]
-    @test lattice == expected_lattice
-
-    # max_indices = (3, 3, 3), positive_only = true
-    max_indices = (3, 3, 3)
-    lattice = generate_hkl_indices(max_indices; positive_only=true)
-
-    @test length(lattice) == 4^3 - 1
-    @test !((0, 0, 0) in lattice)
-
-    for index in lattice
-        @test all(index .>= 0)
-    end
-end
-
-@testset "generate_hkl_indices(max_indices::Tuple): invalid arguments" begin
-    # --- Exercise functionality and check results
-
-    # one component of max_indices = 0
-    max_indices = (0, 1, 1)
-    local error, error_message
-    try
-        generate_hkl_indices(max_indices)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: All components of `max_indices` must be positive"
-    @test startswith(error_message, expected_error)
-
-    # one component of max_indices < 0
-    max_indices = (1, -3, 1)
-    local error, error_message
-    try
-        generate_hkl_indices(max_indices)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: All components of `max_indices` must be positive"
-    @test startswith(error_message, expected_error)
-end
-
-@testset "generate_hkl_indices(max_index::Integer): valid arguments" begin
-    # --- Exercise functionality and check results
-
-    # max_index = 2, positive_only = false (default)
-    max_index = 2
-    lattice = generate_hkl_indices(max_index)
-
-    @test length(lattice) == 5^3 - 1
-    @test !((0, 0, 0) in lattice)
-end
-
-@testset "generate_hkl_indices(max_index::Integer): invalid arguments" begin
-    # --- Exercise functionality and check results
-
-    # max_index = 0
-    local error, error_message
-    try
-        generate_hkl_indices(0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `max_index` must be positive."
-    @test startswith(error_message, expected_error)
-
-    # max_index < 0
-    local error, error_message
-    try
-        generate_hkl_indices(-10)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `max_index` must be positive."
     @test startswith(error_message, expected_error)
 end

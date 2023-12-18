@@ -17,19 +17,9 @@ Functions that support computations specific to cubic lattices
 # --- Exports
 
 # Types
-export Cubic
 export CubicLatticeConstants
 
 # --- Types
-
-"""
-    Cubic
-
-Type representing the cubic lattice system
-
-Supertype: [`LatticeSystem`](@ref)
-"""
-struct Cubic <: LatticeSystem end
 
 """
     CubicLatticeConstants
@@ -77,7 +67,7 @@ function isapprox(
 end
 
 function lattice_system(::CubicLatticeConstants)
-    return Cubic
+    return Cubic()
 end
 
 # ------ Unit cell computations
