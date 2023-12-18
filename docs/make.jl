@@ -16,7 +16,12 @@ makedocs(;
         edit_link="main",
         assets=String[],
     ),
-    pages=["Home" => "index.md"],
+    pages=[
+        "Home" => "index.md",
+        "Types" => "types.md",
+        "Utility Functions" => "utilities.md",
+        "Index" => "docs-index.md",
+    ],
 )
 
 deploydocs(; repo="github.com/velexi-research/XtallographyUtils.jl", devbranch="main")
