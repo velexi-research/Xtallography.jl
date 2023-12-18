@@ -17,19 +17,9 @@ Functions that support computations specific to hexagonal lattices
 # --- Exports
 
 # Types
-export Hexagonal
 export HexagonalLatticeConstants
 
 # --- Types
-
-"""
-    Hexagonal
-
-Type representing the hexagonal lattice system
-
-Supertype: [`LatticeSystem`](@ref)
-"""
-struct Hexagonal <: LatticeSystem end
 
 """
     HexagonalLatticeConstants

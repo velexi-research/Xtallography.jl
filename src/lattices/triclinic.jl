@@ -26,7 +26,6 @@ using Combinatorics: permutations
 # --- Exports
 
 # Types
-export Triclinic
 export TriclinicLatticeConstants
 
 # Functions
@@ -42,15 +41,6 @@ const TRICLINIC_MIN_ANGLE = π / 3
 const TRICLINIC_MAX_ANGLE = 2π / 3
 
 # --- Types
-
-"""
-    Triclinic
-
-Type representing the triclinic lattice system
-
-Supertype: [`LatticeSystem`](@ref)
-"""
-struct Triclinic <: LatticeSystem end
 
 """
     TriclinicLatticeConstants

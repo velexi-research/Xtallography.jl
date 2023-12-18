@@ -22,7 +22,6 @@ using Logging
 # --- Exports
 
 # Types
-export Rhombohedral
 export RhombohedralLatticeConstants
 
 # Functions
@@ -36,15 +35,6 @@ const RHOMBOHEDRAL_MIN_ANGLE = π / 3
 const RHOMBOHEDRAL_MAX_ANGLE = 2π / 3
 
 # --- Types
-
-"""
-    Rhombohedral
-
-Type representing the rhombohedral lattice system
-
-Supertype: [`LatticeSystem`](@ref)
-"""
-struct Rhombohedral <: LatticeSystem end
 
 """
     RhombohedralLatticeConstants

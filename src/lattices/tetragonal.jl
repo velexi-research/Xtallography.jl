@@ -22,21 +22,11 @@ using Logging
 # --- Exports
 
 # Types
-export Tetragonal
 export TetragonalLatticeConstants
 
 # Functions
 
 # --- Types
-
-"""
-    Tetragonal
-
-Type representing the tetragonal lattice system
-
-Supertype: [`LatticeSystem`](@ref)
-"""
-struct Tetragonal <: LatticeSystem end
 
 """
     TetragonalLatticeConstants

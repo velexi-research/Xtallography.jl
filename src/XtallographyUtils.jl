@@ -39,25 +39,4 @@ include("lattices/rhombohedral.jl")
 include("lattices/hexagonal.jl")
 include("lattices/cubic.jl")
 
-# --- Constants
-
-# Lattice Types
-const BRAVAIS_LATTICES = [
-    (lattice=Triclinic, centering=Primitive()),
-    (lattice=Monoclinic, centering=Primitive()),
-    (lattice=Monoclinic, centering=BodyCentered()),
-    (lattice=Monoclinic, centering=BaseCentered()),
-    (lattice=Orthorhombic, centering=Primitive()),
-    (lattice=Orthorhombic, centering=BodyCentered()),
-    (lattice=Orthorhombic, centering=FaceCentered()),
-    (lattice=Orthorhombic, centering=BaseCentered()),
-    (lattice=Tetragonal, centering=Primitive()),
-    (lattice=Tetragonal, centering=BodyCentered()),
-    (lattice=Rhombohedral, centering=Primitive()),
-    (lattice=Hexagonal, centering=Primitive()),
-    (lattice=Cubic, centering=Primitive()),
-    (lattice=Cubic, centering=BodyCentered()),
-    (lattice=Cubic, centering=FaceCentered()),
-]
-
 end  # End of XtallographyUtils module

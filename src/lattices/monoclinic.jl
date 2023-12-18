@@ -22,7 +22,6 @@ using Logging
 # --- Exports
 
 # Types
-export Monoclinic
 export MonoclinicLatticeConstants
 
 # Functions
@@ -37,15 +36,6 @@ const MONOCLINIC_MIN_ANGLE = π / 2
 const MONOCLINIC_MAX_ANGLE = 2π / 3
 
 # --- Types
-
-"""
-    Monoclinic
-
-Type representing the monoclinic lattice system
-
-Supertype: [`LatticeSystem`](@ref)
-"""
-struct Monoclinic <: LatticeSystem end
 
 """
     MonoclinicLatticeConstants

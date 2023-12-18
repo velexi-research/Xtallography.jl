@@ -19,12 +19,15 @@ Types and functions that support lattice computations
 
 # Types
 export LatticeSystem
+export Triclinic, Monoclinic, Orthorhombic, Hexagonal, Rhombohedral, Tetragonal, Cubic
 export Centering, Primitive, BaseCentered, BodyCentered, FaceCentered
 
 # Functions
 export is_bravais_lattice
 
 # --- Types
+
+# ------ Lattice systems
 
 """
     LatticeSystem
@@ -33,10 +36,75 @@ Supertype for the seven lattice systems in 3D
 
 Subtypes
 ========
-[`Triclinic`](@ref), [`Monoclinic`](@ref), [`Orthorhombic`](@ref), [`Tetragonal`](@ref),
-[`Rhombohedral`](@ref), [`Hexagonal`](@ref), [`Cubic`](@ref)
+[`Triclinic`](@ref), [`Monoclinic`](@ref), [`Orthorhombic`](@ref),
+[`Hexagonal`](@ref), [`Rhombohedral`](@ref), [`Tetragonal`](@ref), [`Cubic`](@ref)
 """
 abstract type LatticeSystem end
+
+"""
+    Triclinic
+
+Type representing the triclinic lattice system
+
+Supertype: [`LatticeSystem`](@ref)
+"""
+struct Triclinic <: LatticeSystem end
+
+"""
+    Monoclinic
+
+Type representing the monoclinic lattice system
+
+Supertype: [`LatticeSystem`](@ref)
+"""
+struct Monoclinic <: LatticeSystem end
+
+"""
+    Orthorhombic
+
+Type representing the orthorhombic lattice system
+
+Supertype: [`LatticeSystem`](@ref)
+"""
+struct Orthorhombic <: LatticeSystem end
+
+"""
+    Hexagonal
+
+Type representing the hexagonal lattice system
+
+Supertype: [`LatticeSystem`](@ref)
+"""
+struct Hexagonal <: LatticeSystem end
+
+"""
+    Rhombohedral
+
+Type representing the rhombohedral lattice system
+
+Supertype: [`LatticeSystem`](@ref)
+"""
+struct Rhombohedral <: LatticeSystem end
+
+"""
+    Tetragonal
+
+Type representing the tetragonal lattice system
+
+Supertype: [`LatticeSystem`](@ref)
+"""
+struct Tetragonal <: LatticeSystem end
+
+"""
+    Cubic
+
+Type representing the cubic lattice system
+
+Supertype: [`LatticeSystem`](@ref)
+"""
+struct Cubic <: LatticeSystem end
+
+# ------ Lattice centerings
 
 """
     Centering
@@ -89,6 +157,27 @@ Supertype: [`Centering`](@ref)
 """
 struct FaceCentered <: Centering end
 
+# --- Constants
+
+# Lattice Types
+const BRAVAIS_LATTICES = [
+    (lattice_system=Triclinic(), centering=Primitive()),
+    (lattice_system=Monoclinic(), centering=Primitive()),
+    (lattice_system=Monoclinic(), centering=BodyCentered()),
+    (lattice_system=Monoclinic(), centering=BaseCentered()),
+    (lattice_system=Orthorhombic(), centering=Primitive()),
+    (lattice_system=Orthorhombic(), centering=BodyCentered()),
+    (lattice_system=Orthorhombic(), centering=FaceCentered()),
+    (lattice_system=Orthorhombic(), centering=BaseCentered()),
+    (lattice_system=Tetragonal(), centering=Primitive()),
+    (lattice_system=Tetragonal(), centering=BodyCentered()),
+    (lattice_system=Rhombohedral(), centering=Primitive()),
+    (lattice_system=Hexagonal(), centering=Primitive()),
+    (lattice_system=Cubic(), centering=Primitive()),
+    (lattice_system=Cubic(), centering=BodyCentered()),
+    (lattice_system=Cubic(), centering=FaceCentered()),
+]
+
 # --- Functions/Methods
 
 """
@@ -111,26 +200,7 @@ Examples
 TODO
 """
 function is_bravais_lattice(lattice_system_::LatticeSystem, centering::Centering)
-    if lattice_system_ == Cubic() &&
-        centering in (Primitive(), BodyCentered(), FaceCentered())
-        return true
-    elseif lattice_system_ == Tetragonal() && centering in (Primitive(), BodyCentered())
-        return true
-    elseif lattice_system_ == Orthorhombic() &&
-        centering in (Primitive(), BaseCentered(), BodyCentered(), FaceCentered())
-        return true
-    elseif lattice_system_ == Hexagonal() && centering == Primitive()
-        return true
-    elseif lattice_system_ == Rhombohedral() && centering == Primitive()
-        return true
-    elseif lattice_system_ == Monoclinic() &&
-        centering in (Primitive(), BaseCentered(), BodyCentered())
-        return true
-    elseif lattice_system_ == Triclinic() && centering == Primitive()
-        return true
-    end
-
-    return false
+    return (lattice_system=lattice_system_, centering=centering) in BRAVAIS_LATTICES
 end
 
 function is_bravais_lattice(lattice_system_::Type{<:LatticeSystem}, centering::Centering)

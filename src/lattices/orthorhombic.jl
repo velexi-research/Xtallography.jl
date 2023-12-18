@@ -22,21 +22,11 @@ using Logging
 # --- Exports
 
 # Types
-export Orthorhombic
 export OrthorhombicLatticeConstants
 
 # Functions
 
 # --- Types
-
-"""
-    Orthorhombic
-
-Type representing the orthorhombic lattice system
-
-Supertype: [`LatticeSystem`](@ref)
-"""
-struct Orthorhombic <: LatticeSystem end
 
 """
     OrthorhombicLatticeConstants
