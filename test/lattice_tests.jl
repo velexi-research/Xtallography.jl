@@ -47,7 +47,7 @@ end
     end
 end
 
-# ------ Constnats
+# ------ Constants
 
 @testset "BRAVAIS_LATTICES" begin
     @test BRAVAIS_LATTICES isa Tuple
