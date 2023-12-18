@@ -39,7 +39,8 @@ const ACOS_MINUS_ONE_THIRD = acos(-1 / 3)
         v1::Vector{Real}, v2::Vector{Real}, v3::Vector{Real}
     ) -> Bool
 
-Determine if the vectors `v1`, `v2`, and `v3` are a basis for a three-dimensional lattice.
+Determine if the vectors `v1`, `v2`, and `v3` are a basis for a three-dimensional lattice
+(i.e., `v1`, `v2`, and `v3` are linearly independent).
 
 Return values
 =============
