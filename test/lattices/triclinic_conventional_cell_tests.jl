@@ -18,8 +18,8 @@ Tests for unit cell standardization methods for triclinic lattices
 # --- Imports
 
 # Standard library
-using Test
 using LinearAlgebra: norm, dot
+using Test
 
 # External packages
 using Combinatorics: combinations, permutations
@@ -43,7 +43,7 @@ using XtallographyUtils
 @testset "conventional_cell(): limiting cases" begin
     # Note: this test set only tests basic functionality. Comprehensive coverage of
     #       different cases for triclinic bases is covered in the convert_to_mP()
-    #       convert_to_mI(), and convert_to_mS() test sets.
+    #       convert_to_mI(), and convert_to_mC() test sets.
 
     # --- Tests
 
@@ -124,7 +124,7 @@ end
 
 @testset "conventional_cell(): limiting cases - base-centered" begin
     # Note: this test checks that all base-centered limiting cases are covered by
-    #       convert_to_mI() and convert_to_mS().
+    #       convert_to_mI() and convert_to_mC().
 
     # --- Tests
 
@@ -1107,10 +1107,10 @@ end
     @test startswith(error_message, expected_error)
 end
 
-# ------ convert_to_mS()
+# ------ convert_to_mC()
 
 # Helper functions
-function convert_to_mS_test_all_triclinic_basis_permutations(
+function convert_to_mC_test_all_triclinic_basis_permutations(
     basis_a::Vector{<:Real},
     basis_b::Vector{<:Real},
     basis_c::Vector{<:Real},
@@ -1123,7 +1123,7 @@ function convert_to_mS_test_all_triclinic_basis_permutations(
         expected_monoclinic_lattice_constants, BaseCentered()
     )
 
-    # --- Test convert_to_mS() for each permutation of the basis vectors
+    # --- Test convert_to_mC() for each permutation of the basis vectors
 
     # for permuted_basis in permutations([basis_a, basis_b, basis_c])
     for permuted_basis in ([basis_a, basis_b, basis_c],)
@@ -1143,7 +1143,7 @@ function convert_to_mS_test_all_triclinic_basis_permutations(
         lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
         # Exercise functionality
-        monoclinic_lattice_constants = convert_to_mS(lattice_constants)
+        monoclinic_lattice_constants = convert_to_mC(lattice_constants)
         monoclinic_unit_cell = UnitCell(monoclinic_lattice_constants, BaseCentered())
 
         # Check results
@@ -1151,7 +1151,7 @@ function convert_to_mS_test_all_triclinic_basis_permutations(
     end
 end
 
-@testset "convert_to_mS_case_1a(): {m_a, m_c} in aP basis, |m_a| < |m_c|" begin
+@testset "convert_to_mC_case_1a(): {m_a, m_c} in aP basis, |m_a| < |m_c|" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1172,13 +1172,13 @@ end
     for signs in Iterators.product((-1, 1), (-1, 1))
         basis_b = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b)
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS_case_1a(): {m_a, m_c} in aP basis, |m_a| > |m_c|" begin
+@testset "convert_to_mC_case_1a(): {m_a, m_c} in aP basis, |m_a| > |m_c|" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1199,13 +1199,13 @@ end
     for signs in Iterators.product((-1, 1), (-1, 1))
         basis_b = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b)
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS_case_1b(): {m_a, m_c} in aP basis, |m_a| < |m_c|" begin
+@testset "convert_to_mC_case_1b(): {m_a, m_c} in aP basis, |m_a| < |m_c|" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1226,13 +1226,13 @@ end
     for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
         basis_b = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b) + signs[3] * m_basis_c
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS_case_1b(): {m_a, m_c} in aP basis, |m_a| > |m_c|" begin
+@testset "convert_to_mC_case_1b(): {m_a, m_c} in aP basis, |m_a| > |m_c|" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1253,17 +1253,16 @@ end
     for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
         basis_b = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b) + signs[3] * m_basis_c
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS_case_2a(): only m_a in aP basis" begin
+@testset "convert_to_mC_case_2a(): only m_a in aP basis" begin
     # Case 2a:
     # * the sign of the coefficient of m_basis_a in basis_b is positive
     # * the signs of the coefficients of m_basis_b in basis_b and basis_c are the same
-    println("convert_to_mS_case_2a()")
 
     # --- Tests: |m_a| < |m_c|
 
@@ -1289,7 +1288,7 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
@@ -1318,17 +1317,16 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS_case_2b(): only m_a in aP basis" begin
+@testset "convert_to_mC_case_2b(): only m_a in aP basis" begin
     # Case 2b:
     # * the sign of the coefficient of m_basis_a in basis_b is positive
     # * the signs of the coefficients of m_basis_b in basis_b and basis_c are opposite
-    println("convert_to_mS_case_2b()")
 
     # --- Tests: |m_a| < |m_c|
 
@@ -1354,7 +1352,7 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
@@ -1383,17 +1381,16 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS_case_2c(): only m_a in aP basis" begin
+@testset "convert_to_mC_case_2c(): only m_a in aP basis" begin
     # Case 2c:
     # * the sign of the coefficient of m_basis_a in basis_b is negative
     # * the signs of the coefficients of m_basis_b in basis_b and basis_c are the same
-    println("convert_to_mS_case_2c()")
 
     # --- Tests: |m_a| < |m_c|
 
@@ -1419,7 +1416,7 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
@@ -1448,17 +1445,16 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS_case_2d(): only m_a in aP basis" begin
+@testset "convert_to_mC_case_2d(): only m_a in aP basis" begin
     # Case 2d:
     # * the sign of the coefficient of m_basis_a in basis_b is negative
     # * the signs of the coefficients of m_basis_b in basis_b and basis_c are opposite
-    println("convert_to_mS_case_2d()")
 
     # --- Tests: |m_a| < |m_c|
 
@@ -1484,7 +1480,7 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
@@ -1513,14 +1509,14 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
 #=
-@testset "convert_to_mS(): {m_b, m_c} in aP basis, |m_a| < |m_c|" begin
+@testset "convert_to_mC(): {m_b, m_c} in aP basis, |m_a| < |m_c|" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1541,13 +1537,13 @@ end
     for signs in Iterators.product((-1, 1), (-1, 1))
         basis_a = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b)
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS(): {m_b, m_c} in aP basis, |m_a| > |m_c|" begin
+@testset "convert_to_mC(): {m_b, m_c} in aP basis, |m_a| > |m_c|" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1568,13 +1564,13 @@ end
     for signs in Iterators.product((-1, 1), (-1, 1))
         basis_a = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b)
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS(): only m_c in aP basis, |m_a| < |m_c|" begin
+@testset "convert_to_mC(): only m_c in aP basis, |m_a| < |m_c|" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1602,13 +1598,13 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS(): only m_c in aP basis, |m_a| > |m_c|" begin
+@testset "convert_to_mC(): only m_c in aP basis, |m_a| > |m_c|" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1634,13 +1630,13 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS(): no mS basis vectors in aP basis, |m_a| < |m_c|" begin
+@testset "convert_to_mC(): no mC basis vectors in aP basis, |m_a| < |m_c|" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1668,13 +1664,13 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS(): no mS basis vectors in aP basis, |m_a| > |m_c|" begin
+@testset "convert_to_mC(): no mC basis vectors in aP basis, |m_a| > |m_c|" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1703,13 +1699,13 @@ end
             continue
         end
 
-        convert_to_mS_test_all_triclinic_basis_permutations(
+        convert_to_mC_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
         )
     end
 end
 
-@testset "convert_to_mS(): aP cell not equivalent to a mS cell" begin
+@testset "convert_to_mC(): aP cell not equivalent to a mC cell" begin
     # --- Tests
 
     # triclinic unit cell is not equivalent to a body-centered monoclinic unit cell
@@ -1724,7 +1720,7 @@ end
     local error = nothing
     local error_message = ""
     try
-        convert_to_mS(lattice_constants)
+        convert_to_mC(lattice_constants)
 
     catch error
         bt = catch_backtrace()
