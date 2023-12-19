@@ -137,7 +137,7 @@ end
     @debug "chain of limiting cases: aP --> mI --> oI --> tI"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
-    # ------ body-centered unit cell: aP --> mI --> oF --> tI"
+    # ------ body-centered unit cell: aP --> mI --> oF --> tI
 
     triclinic_unit_cell = UnitCell(
         LatticeConstants(
