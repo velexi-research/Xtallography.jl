@@ -102,5 +102,19 @@ end
 
     # ------ primitive unit cell: aP --> mI --> oC --> hP
 
-    # TODO
+    a = 7
+    c = 5
+    lattice_constants = HexagonalLatticeConstants(a, c)
+    basis_a, basis_b, basis_c = basis(lattice_constants)
+    triclinic_unit_cell = UnitCell(
+        LatticeConstants(
+            basis_a, basis_b, basis_c + basis_a; identify_lattice_system=false
+        ),
+        Primitive(),
+    )
+    expected_unit_cell = UnitCell(lattice_constants, Primitive())
+    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
+    @test expected_unit_cell.lattice_constants isa HexagonalLatticeConstants
+    @debug "chain of limiting cases: aP --> mI --> oC --> hP"
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end
