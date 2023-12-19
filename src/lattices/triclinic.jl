@@ -2032,7 +2032,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = a
             m_b = b
             m_c = sqrt(4 * c_dot_c - b_dot_b)
-            m_β = acos(2 * c_dot_a / m_a / m_c)
+            m_β = acos_(2 * c_dot_a / m_a / m_c)
 
         elseif abs(c_dot_a) ≈ 0.5 * a_dot_a
             # Case: `a` is the unique monoclinic symmetry direction, `b` is basis vector
@@ -2042,7 +2042,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = b
             m_b = a
             m_c = sqrt(4 * c_dot_c - a_dot_a)
-            m_β = acos(2 * b_dot_c / m_a / m_c)
+            m_β = acos_(2 * b_dot_c / m_a / m_c)
         end
 
     elseif abs(b_dot_c) < b * c * COS_APPROX_ZERO
@@ -2056,7 +2056,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = b
             m_b = c
             m_c = sqrt(4 * a_dot_a - c_dot_c)
-            m_β = acos(2 * a_dot_b / m_a / m_c)
+            m_β = acos_(2 * a_dot_b / m_a / m_c)
 
         elseif abs(a_dot_b) ≈ 0.5 * b_dot_b
             # Case: `b` is the unique monoclinic symmetry direction, `c` is basis vector
@@ -2066,7 +2066,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = c
             m_b = b
             m_c = sqrt(4 * a_dot_a - b_dot_b)
-            m_β = acos(2 * c_dot_a / m_a / m_c)
+            m_β = acos_(2 * c_dot_a / m_a / m_c)
         end
 
     elseif abs(c_dot_a) < c * a * COS_APPROX_ZERO
@@ -2080,7 +2080,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = c
             m_b = a
             m_c = sqrt(4 * b_dot_b - a_dot_a)
-            m_β = acos(2 * b_dot_c / m_a / m_c)
+            m_β = acos_(2 * b_dot_c / m_a / m_c)
 
         elseif abs(b_dot_c) ≈ 0.5 * c_dot_c
             # Case: `c` is the unique monoclinic symmetry direction, `a` is basis vector
@@ -2090,7 +2090,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = a
             m_b = c
             m_c = sqrt(4 * b_dot_b - c_dot_c)
-            m_β = acos(2 * a_dot_b / m_a / m_c)
+            m_β = acos_(2 * a_dot_b / m_a / m_c)
         end
     end
 
@@ -2106,7 +2106,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = a
             m_b = sqrt(4 * c_dot_c - a_dot_a)
             m_c = b
-            m_β = acos(a_dot_b / m_a / m_c)
+            m_β = acos_(a_dot_b / m_a / m_c)
 
         else  # abs(a_dot_b) ≈ 2 * abs(c_dot_a)
             # Case: `b` is basis vector on C-face of the monoclinic unit cell
@@ -2115,7 +2115,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = b
             m_b = sqrt(4 * c_dot_c - b_dot_b)
             m_c = a
-            m_β = acos(a_dot_b / m_a / m_c)
+            m_β = acos_(a_dot_b / m_a / m_c)
         end
 
     elseif (abs(b_dot_c) ≈ 2 * abs(a_dot_b) || abs(b_dot_c) ≈ 2 * abs(c_dot_a))
@@ -2128,7 +2128,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = b
             m_b = sqrt(4 * a_dot_a - b_dot_b)
             m_c = c
-            m_β = acos(b_dot_c / m_a / m_c)
+            m_β = acos_(b_dot_c / m_a / m_c)
 
         else  # abs(b_dot_c) ≈ 2 * abs(a_dot_b)
             # Case: `c` is basis vector on C-face of the monoclinic unit cell
@@ -2137,7 +2137,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = c
             m_b = sqrt(4 * a_dot_a - c_dot_c)
             m_c = b
-            m_β = acos(b_dot_c / m_a / m_c)
+            m_β = acos_(b_dot_c / m_a / m_c)
         end
 
     elseif (abs(c_dot_a) ≈ 2 * abs(b_dot_c) || abs(c_dot_a) ≈ 2 * abs(a_dot_b))
@@ -2150,7 +2150,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = c
             m_b = sqrt(4 * b_dot_b - c_dot_c)
             m_c = a
-            m_β = acos(c_dot_a / m_a / m_c)
+            m_β = acos_(c_dot_a / m_a / m_c)
 
         else  # abs(c_dot_a) ≈ 2 * abs(b_dot_c)
             # Case: `a` is basis vector on C-face of the monoclinic unit cell
@@ -2159,7 +2159,7 @@ function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
             m_a = a
             m_b = sqrt(4 * b_dot_b - a_dot_a)
             m_c = c
-            m_β = acos(c_dot_a / m_a / m_c)
+            m_β = acos_(c_dot_a / m_a / m_c)
         end
     end
 
