@@ -18,8 +18,8 @@ Tests for unit cell standardization methods for tetragonal lattices
 # --- Imports
 
 # Standard library
+using Logging
 using Test
-using Logging  # DEBUG
 
 # XtallographyUtils package
 using XtallographyUtils
@@ -103,12 +103,22 @@ end
     expected_unit_cell = standardize(UnitCell(lattice_constants, Primitive()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
-    @info "chain of limiting cases: aP --> mP --> oP --> tP"
+    @debug "chain of limiting cases: aP --> mP --> oP --> tP"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
-    # ------ primitive unit cell: aP --> mP --> oC --> tI
+    # ------ primitive unit cell: aP --> mI --> oC --> tP
 
-    # TODO
+    triclinic_unit_cell = UnitCell(
+        LatticeConstants(
+            basis_a, basis_b + basis_a, basis_c + basis_b; identify_lattice_system=false
+        ),
+        Primitive(),
+    )
+    expected_unit_cell = standardize(UnitCell(lattice_constants, Primitive()))
+    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
+    @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
+    @debug "chain of limiting cases: aP --> mI --> oC --> tP"
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ body-centered unit cell: aP --> mI --> oI --> tI
 
@@ -124,7 +134,7 @@ end
     expected_unit_cell = standardize(UnitCell(lattice_constants, BodyCentered()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
-    @info "chain of limiting cases: aP --> mI --> oI --> tI"
+    @debug "chain of limiting cases: aP --> mI --> oI --> tI"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ body-centered unit cell: aP --> mI --> oF --> tI"
@@ -141,7 +151,7 @@ end
     expected_unit_cell = standardize(UnitCell(lattice_constants, BodyCentered()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
-    @info "chain of limiting cases: aP --> mI --> oF --> tI"
+    @debug "chain of limiting cases: aP --> mI --> oF --> tI"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end
 
