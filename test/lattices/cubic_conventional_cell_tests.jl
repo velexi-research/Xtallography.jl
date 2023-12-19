@@ -18,8 +18,8 @@ Tests for unit cell standardization methods for cubic lattices
 # --- Imports
 
 # Standard library
+using Logging
 using Test
-using Logging  # DEBUG
 
 # XtallographyUtils package
 using XtallographyUtils
@@ -79,7 +79,7 @@ end
     expected_unit_cell = UnitCell(lattice_constants, Primitive())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
-    @info "aP --> mP --> oP --> tP --> cP"
+    @debug "chain of limiting cases: aP --> mP --> oP --> tP --> cP"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ body-centered unit cell: aP --> mI --> oI --> tI --> cI
@@ -96,7 +96,7 @@ end
     expected_unit_cell = UnitCell(lattice_constants, BodyCentered())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
-    @info "aP --> mI --> oI --> tI --> cI"
+    @debug "chain of limiting cases: aP --> mI --> oI --> tI --> cI"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ face-centered unit cell: aP --> mI --> oI --> tI --> cF
@@ -113,6 +113,6 @@ end
     expected_unit_cell = UnitCell(lattice_constants, FaceCentered())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
-    @info "aP --> mI --> oI --> tI --> cF"
+    @debug "chain of limiting cases: aP --> mI --> oI --> tI --> cF"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end

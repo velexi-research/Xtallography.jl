@@ -18,8 +18,8 @@ Tests for unit cell standardization methods for hexagonal lattices
 # --- Imports
 
 # Standard library
-using Test
 using Logging
+using Test
 
 # XtallographyUtils package
 using XtallographyUtils
@@ -79,7 +79,7 @@ end
     expected_unit_cell = UnitCell(lattice_constants, Primitive())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa HexagonalLatticeConstants
-    @info "aP --> mP --> oS --> hP"
+    @debug "chain of limiting cases: aP --> mP --> oC --> hP"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ primitive unit cell: aP --> mP --> oC --> hP
@@ -97,7 +97,7 @@ end
     expected_unit_cell = UnitCell(lattice_constants, Primitive())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa HexagonalLatticeConstants
-    @info "aP --> mP --> oS --> hP"
+    @debug "chain of limiting cases: aP --> mP --> oC --> hP"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ primitive unit cell: aP --> mI --> oC --> hP
