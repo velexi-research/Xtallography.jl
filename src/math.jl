@@ -62,9 +62,9 @@ true
 ```
 """
 function asin_(x::Real; rtol::Real=√eps(1.0))
-    if isapprox(x, 1; rtol=rtol)
+    if x > 1 && isapprox(x, 1; rtol=rtol)
         return π / 2
-    elseif isapprox(x, -1; rtol=rtol)
+    elseif x < -1 && isapprox(x, -1; rtol=rtol)
         return -π / 2
     else
         return asin(x)
@@ -96,9 +96,9 @@ true
 ```
 """
 function acos_(x::Real; rtol::Real=√eps(1.0))
-    if isapprox(x, 1; rtol=rtol)
+    if x > 1 && isapprox(x, 1; rtol=rtol)
         return 0
-    elseif isapprox(x, -1; rtol=rtol)
+    elseif x < -1 && isapprox(x, -1; rtol=rtol)
         return π
     else
         return acos(x)
