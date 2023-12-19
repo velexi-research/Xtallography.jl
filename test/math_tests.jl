@@ -29,6 +29,68 @@ using XtallographyUtils
 
 # --- Tests
 
+# ------ basic mathematical functions
+
+@testset "asin_()" begin
+    # --- Preparations
+
+    delta = eps(1.0)
+
+    # --- Tests
+
+    # x far from endpoints of interval [-1, 1]
+    @test asin_(0.5) == asin(0.5)
+
+    # x < 1, x near 1
+    @test asin_(1 - delta) == asin(1 - delta)
+
+    # x = 1
+    @test asin_(1) == asin(1)
+
+    # x > 1, x near 1
+    @test asin_(1 + delta) == π / 2
+
+    # x > -1, x near -1
+    @test asin_(-1 + delta) == asin(-1 + delta)
+
+    # x = -1
+    @test asin_(-1) == asin(-1)
+
+    # x < -1, x near -1
+    @test asin_(-1 - delta) == -π / 2
+end
+
+@testset "acos_()" begin
+    # --- Preparations
+
+    delta = eps(1.0)
+
+    # --- Tests
+
+    # x far from endpoints of interval [-1, 1]
+    @test acos_(0.5) == acos(0.5)
+
+    # x < 1, x near 1
+    @test acos_(1 - delta) == acos(1 - delta)
+
+    # x = 1
+    @test acos_(1) == acos(1)
+
+    # x > 1, x near 1
+    @test acos_(1 + delta) == 0
+
+    # x > -1, x near -1
+    @test acos_(-1 + delta) == acos(-1 + delta)
+
+    # x = -1
+    @test acos_(-1) == acos(-1)
+
+    # x < -1, x near -1
+    @test acos_(-1 - delta) == π
+end
+
+# ------ linear algebra
+
 @testset "is_basis()" begin
     # --- Tests
 
@@ -72,6 +134,8 @@ using XtallographyUtils
     v3 = 1e-50 * [7, 8, 9]
     @test !is_basis(v1, v2, v3)
 end
+
+# --- geometry
 
 @testset "volume(::Vector,::Vector,::Vector)" begin
     # --- Tests
