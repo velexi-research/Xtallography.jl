@@ -105,7 +105,7 @@ function acos_(x::Real; rtol::Real=√eps(1.0))
     end
 end
 
-# ------ unit cell calculations
+# ------ linear algebra
 
 """
     is_basis(
@@ -125,6 +125,8 @@ TODO
 function is_basis(v1::Vector{<:Real}, v2::Vector{<:Real}, v3::Vector{<:Real})
     return volume(v1, v2, v3) > norm(v1) * norm(v2) * norm(v3) * LINEAR_INDEPENDENCE_ZERO
 end
+
+# ------ geometry
 
 function volume(basis_a::T, basis_b::T, basis_c::T) where {T<:Vector{<:Real}}
     return abs(det(reduce(hcat, [basis_a, basis_b, basis_c])))
