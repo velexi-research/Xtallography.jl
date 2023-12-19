@@ -15,12 +15,14 @@ is_basis
 
 ```@docs
 lattice_system
-standardize
+standardize(::LatticeConstants, ::Centering)
+standardize(::LatticeConstants)
 ```
 -------------------------------------------------------------------------------------------
 ## Unit Cell Function
 
 ```@docs
+standardize(::UnitCell)
 basis
 volume
 surface_area
