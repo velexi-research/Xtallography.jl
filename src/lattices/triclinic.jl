@@ -30,7 +30,7 @@ export TriclinicLatticeConstants
 
 # Functions
 export satisfies_triclinic_angle_constraints, is_triclinic_type_I_cell
-export convert_to_mP, convert_to_mI, convert_to_mS
+export convert_to_mP, convert_to_mI, convert_to_mC
 
 # Constants
 export TRICLINIC_MIN_ANGLE, TRICLINIC_MAX_ANGLE
@@ -361,8 +361,11 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
 
     # Check limiting case: monoclinic, primitive
     try
+        monoclinic_lattice_constants = convert_to_mP(lattice_constants)
+
         @debug "aP --> mP"
-        return conventional_cell(UnitCell(convert_to_mP(lattice_constants), Primitive()))
+        return conventional_cell(UnitCell(monoclinic_lattice_constants, Primitive()))
+
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
@@ -375,8 +378,11 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
 
     # Check limiting case: monoclinic, body-centered
     try
+        monoclinic_lattice_constants = convert_to_mI(lattice_constants)
+
         @debug "aP --> mI"
-        return conventional_cell(UnitCell(convert_to_mI(lattice_constants), BodyCentered()))
+        return conventional_cell(UnitCell(monoclinic_lattice_constants, BodyCentered()))
+
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
@@ -389,12 +395,14 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
 
     # Check limiting case: monoclinic, base-centered
     try
-        @debug "aP --> mS"
-        body_centered_lattice_constants, centering = standardize(
-            convert_to_mS(lattice_constants), BaseCentered()
-        )
+        monoclinic_lattice_constants = convert_to_mC(lattice_constants)
 
+        @debug "aP --> mC"
+        body_centered_lattice_constants, centering = standardize(
+            monoclinic_lattice_constants, BaseCentered()
+        )
         return conventional_cell(UnitCell(body_centered_lattice_constants, BodyCentered()))
+
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
@@ -1836,7 +1844,7 @@ function convert_to_mI_case_5(lattice_constants::TriclinicLatticeConstants)
 end
 
 """
-    convert_to_mS(
+    convert_to_mC(
         lattice_constants::TriclinicLatticeConstants
     ) -> MonoclinicLatticeConstants
 
@@ -1857,7 +1865,7 @@ Exceptions
 Throws an `ErrorException` if the triclinic unit cell defined by `lattice_constants` is not
 equivalent to a base-centered monoclinic unit cell.
 """
-function convert_to_mS(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # This method adopts the following variable conventions.
@@ -1903,8 +1911,8 @@ function convert_to_mS(lattice_constants::TriclinicLatticeConstants)
     # Case: triclinic basis contains m_basis_a and m_basis_c
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_1(lattice_constants)
-        return convert_to_mS_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1(lattice_constants)
+        return convert_to_mC_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
@@ -1923,8 +1931,8 @@ function convert_to_mS(lattice_constants::TriclinicLatticeConstants)
     # Case: triclinic basis contains the m_basis_a
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_2(lattice_constants)
-        return convert_to_mS_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2(lattice_constants)
+        return convert_to_mC_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
@@ -1949,7 +1957,7 @@ function convert_to_mS(lattice_constants::TriclinicLatticeConstants)
     end
 end
 
-function convert_to_mS_basis_to_lattice_constants(
+function convert_to_mC_basis_to_lattice_constants(
     m_basis_a::Vector{<:Real}, m_basis_b::Vector{<:Real}, m_basis_c::Vector{<:Real}
 )
     # Compute monoclinic lattice constants
@@ -1967,7 +1975,7 @@ function convert_to_mS_basis_to_lattice_constants(
 end
 
 #=
-function convert_to_mS_OLD(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_OLD(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # This method adopts the following variable conventions.
@@ -2353,13 +2361,13 @@ function convert_to_mS_OLD(lattice_constants::TriclinicLatticeConstants)
     mI_lattice_constants, _ = standardize(
         MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
     )
-    mS_lattice_constants = convert_to_base_centering(mI_lattice_constants)
+    mC_lattice_constants = convert_to_base_centering(mI_lattice_constants)
 
-    return mS_lattice_constants
+    return mC_lattice_constants
 end
 =#
 
-function convert_to_mS_case_1(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_1(lattice_constants::TriclinicLatticeConstants)
     # --- Preparations
 
     # Initialize monoclinic basis vectors
@@ -2371,7 +2379,7 @@ function convert_to_mS_case_1(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_1a(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1a(lattice_constants)
 
     catch error
         if !(error isa ErrorException) || (
@@ -2385,7 +2393,7 @@ function convert_to_mS_case_1(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_1b(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1b(lattice_constants)
 
     catch error
         if !(error isa ErrorException) || (
@@ -2412,7 +2420,7 @@ function convert_to_mS_case_1(lattice_constants::TriclinicLatticeConstants)
     return m_basis_a, m_basis_b, m_basis_c
 end
 
-function convert_to_mS_case_1a(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_1a(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
@@ -2423,7 +2431,7 @@ function convert_to_mS_case_1a(lattice_constants::TriclinicLatticeConstants)
     #
     #   - triclinic basis contains the m_basis_a and m_basis_c
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
@@ -2474,7 +2482,7 @@ function convert_to_mS_case_1a(lattice_constants::TriclinicLatticeConstants)
     )
 end
 
-function convert_to_mS_case_1b(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_1b(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
@@ -2485,7 +2493,7 @@ function convert_to_mS_case_1b(lattice_constants::TriclinicLatticeConstants)
     #
     #   - triclinic basis contains the m_basis_a and m_basis_c
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
@@ -2564,7 +2572,7 @@ function convert_to_mS_case_1b(lattice_constants::TriclinicLatticeConstants)
     )
 end
 
-function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2(lattice_constants::TriclinicLatticeConstants)
     # --- Preparations
 
     # Initialize monoclinic basis vectors
@@ -2576,8 +2584,7 @@ function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_2a(lattice_constants)
-        println("Convert to mS Case 2a, $m_basis_a, $m_basis_b, $m_basis_c")
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2a(lattice_constants)
 
     catch error
         if !(error isa ErrorException) || (
@@ -2591,8 +2598,7 @@ function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_2b(lattice_constants)
-        println("Convert to mS Case 2b, $m_basis_a, $m_basis_b, $m_basis_c")
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2b(lattice_constants)
 
     catch error
         if !(error isa ErrorException) || (
@@ -2606,8 +2612,7 @@ function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_2c(lattice_constants)
-        println("Convert to mS Case 2c, $m_basis_a, $m_basis_b, $m_basis_c")
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2c(lattice_constants)
 
     catch error
         if !(error isa ErrorException) || (
@@ -2621,8 +2626,7 @@ function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_2d(lattice_constants)
-        println("Convert to mS Case 2d, $m_basis_a, $m_basis_b, $m_basis_c")
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2d(lattice_constants)
 
     catch error
         if !(error isa ErrorException) || (
@@ -2649,7 +2653,7 @@ function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
     return m_basis_a, m_basis_b, m_basis_c
 end
 
-function convert_to_mS_case_2a(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2a(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
@@ -2658,7 +2662,7 @@ function convert_to_mS_case_2a(lattice_constants::TriclinicLatticeConstants)
     #   - the sign of the coefficient of m_basis_a in basis_b is positive and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are the same
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
@@ -2706,7 +2710,7 @@ function convert_to_mS_case_2a(lattice_constants::TriclinicLatticeConstants)
     )
 end
 
-function convert_to_mS_case_2b(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2b(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
@@ -2715,7 +2719,7 @@ function convert_to_mS_case_2b(lattice_constants::TriclinicLatticeConstants)
     #   - the sign of the coefficient of m_basis_a in basis_b is positive and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are opposite
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
@@ -2763,7 +2767,7 @@ function convert_to_mS_case_2b(lattice_constants::TriclinicLatticeConstants)
     )
 end
 
-function convert_to_mS_case_2c(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2c(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
@@ -2772,7 +2776,7 @@ function convert_to_mS_case_2c(lattice_constants::TriclinicLatticeConstants)
     #   - the sign of the coefficient of m_basis_a in basis_b is negative and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are the same
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
@@ -2821,7 +2825,7 @@ function convert_to_mS_case_2c(lattice_constants::TriclinicLatticeConstants)
     )
 end
 
-function convert_to_mS_case_2d(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2d(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
@@ -2830,7 +2834,7 @@ function convert_to_mS_case_2d(lattice_constants::TriclinicLatticeConstants)
     #   - the sign of the coefficient of m_basis_a in basis_b is negative and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are opposite
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
