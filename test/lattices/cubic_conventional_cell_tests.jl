@@ -71,6 +71,9 @@ end
     # --- Exercise functionality and check results
 
     # ------ primitive unit cell: aP --> mP --> oP --> tP --> cP
+    #
+    # Note: presents as the case aP --> mP --> oC --> tP --> cP because the mP --> oP and
+    #       mP --> oC limiting cases are equivalent when β = π / 2 and a = c.
 
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
@@ -79,7 +82,47 @@ end
     expected_unit_cell = UnitCell(lattice_constants, Primitive())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
-    @debug "chain of limiting cases: aP --> mP --> oP --> tP --> cP"
+    @debug "chain of limiting cases: aP --> mP --> oP --> tP --> cP " *
+        "(presents as equivalent chain aP --> mP --> oC --> tP --> cP)"
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+
+    # ------ primitive unit cell: aP --> mP --> oC --> tP --> cP
+
+    triclinic_unit_cell = UnitCell(
+        LatticeConstants(
+            basis_a, basis_a + basis_b, basis_c; identify_lattice_system=false
+        ),
+        Primitive(),
+    )
+    expected_unit_cell = UnitCell(lattice_constants, Primitive())
+    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
+    @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
+    @debug "chain of limiting cases: aP --> mP --> oC --> tP --> cP"
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+
+    # ------ primitive unit cell: aP --> mI --> oC --> tP --> cP
+    #
+    # Note: covers the case aP --> mI --> hR --> cP because the mI --> hR and mI --> oC
+    #       limiting cases are equivalent when
+    #
+    #       - a^2 + b^2 = c^2 and b^2 + a * c * cos(β) = a^2
+    #         (hR: π/3 < α < π/2)
+    #
+    #         or
+    #       - c^2 + 3 * b^2 = 9 * a^2 and c = -3 * a * cos(β)
+    #         (hR: π/2 < α < acos(-1/3)
+
+    triclinic_unit_cell = UnitCell(
+        LatticeConstants(
+            basis_a, basis_b + basis_c, basis_a + basis_c; identify_lattice_system=false
+        ),
+        Primitive(),
+    )
+    expected_unit_cell = UnitCell(lattice_constants, Primitive())
+    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
+    @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
+    @debug "chain of limiting cases: aP --> mI --> oC --> tP --> cP " *
+        "(equivalent to the case aP --> mI --> hR --> cP)"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ body-centered unit cell: aP --> mI --> oI --> tI --> cI
@@ -99,13 +142,41 @@ end
     @debug "chain of limiting cases: aP --> mI --> oI --> tI --> cI"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
+    # ------ body-centered unit cell: aP --> mI --> oF --> tI --> cI
+    #
+    # Note: covers the case aP --> mI --> hR --> cI because the mI --> hR and mI --> oF
+    #       limiting cases are equivalent when
+    #
+    #           c^2 + 3 * b^2 = 9 * a^2 and c = -3 * a * cos(β)
+
+    triclinic_unit_cell = UnitCell(
+        LatticeConstants(
+            0.5 * (basis_a + basis_b - basis_c),
+            0.5 * (basis_a - basis_b + basis_c),
+            0.5 * (-basis_a + basis_b + basis_c);
+            identify_lattice_system=false,
+        ),
+        Primitive(),
+    )
+    expected_unit_cell = UnitCell(lattice_constants, BodyCentered())
+    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
+    @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
+    @debug "chain of limiting cases: aP --> mI --> oF --> tI --> cI " *
+        "(equivalent to the case aP --> mI --> hR --> cI)"
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+
     # ------ face-centered unit cell: aP --> mI --> oI --> tI --> cF
+    #
+    # Note: covers the case aP --> mI --> hR --> cI because the mI --> hR and mI --> oI
+    #       limiting cases are equivalent when
+    #
+    #         a^2 + b^2 = c^2 && a^2 + a * c * cos(β) = b^2
 
     triclinic_unit_cell = UnitCell(
         LatticeConstants(
             0.5 * (basis_a + basis_b),
-            0.5 * (basis_a - basis_b),
-            0.5 * (basis_a + basis_c);
+            0.5 * (basis_b + basis_c),
+            0.5 * (basis_c + basis_a);
             identify_lattice_system=false,
         ),
         Primitive(),
@@ -113,6 +184,28 @@ end
     expected_unit_cell = UnitCell(lattice_constants, FaceCentered())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
-    @debug "chain of limiting cases: aP --> mI --> oI --> tI --> cF"
+    @debug "chain of limiting cases: aP --> mI --> oI --> tI --> cF " *
+        "(equivalent to the case aP --> mI --> hR --> cF)"
+    @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
+
+    # ------ face-centered unit cell: aP --> mI --> oF --> tI --> cF
+    #
+    # Note: presents as the case aP --> mI --> oI --> tI --> cF because the mI --> oF and
+    #       mP --> oI limiting cases are equivalent when β = π / 2 and a = c.
+
+    triclinic_unit_cell = UnitCell(
+        LatticeConstants(
+            basis_a,
+            0.5 * (basis_a + basis_b),
+            0.5 * (basis_b + basis_c);
+            identify_lattice_system=false,
+        ),
+        Primitive(),
+    )
+    expected_unit_cell = UnitCell(lattice_constants, FaceCentered())
+    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
+    @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
+    @debug "chain of limiting cases: aP --> mI --> oF --> tI --> cF " *
+        "(presents as equivalent chain aP --> mI --> oI --> tI --> cF)"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end
