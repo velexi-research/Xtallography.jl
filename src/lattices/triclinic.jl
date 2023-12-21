@@ -499,26 +499,6 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
 
     # --- Preparations
 
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
-
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
-
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
-
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
-
     # Initialize monoclinic basis vectors
     m_basis_a = nothing
     m_basis_b = nothing
@@ -1385,26 +1365,6 @@ function convert_to_mC(lattice_constants::TriclinicLatticeConstants)
     #   the "m_" prefix.
 
     # --- Preparations
-
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
-
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
-
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
-
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
 
     # Initialize monoclinic basis vectors
     m_basis_a = nothing
