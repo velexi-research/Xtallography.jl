@@ -863,8 +863,8 @@ function convert_to_mI_case_2b(lattice_constants::TriclinicLatticeConstants)
     #   - triclinic unit cell basis contains 2 monoclinic unit cell basis vectors and
     #     1 body-centered lattice vector
     #
-    #   - triclinic basis does not contain the unique monoclinic symmetry direction
-    #     m_basis_b
+    #   - triclinic basis contains m_basis_a and m_basis_c (not the unique monoclinic
+    #     symmetry direction m_basis_b)
     #
     #   - basis_b is the vector to body-centered lattice point in monoclinic unit cell
     #
@@ -1546,7 +1546,13 @@ function convert_to_mC_case_1a(lattice_constants::TriclinicLatticeConstants)
     #
     #   - base-centered vector does not include a contribution from m_basis_c
     #
-    #   - triclinic basis contains the m_basis_a and m_basis_c
+    #   - basis_a and basis_c are m_basis_a and m_basis_c, respectively
+    #
+    # - Conditions
+    #
+    #   - 2 * abs(a_dot_b) = a_dot_a
+    #
+    #   - 2 * abs(b_dot_c) = abs(c_dot_a)
     #
     # - This method adopts the same variable conventions as convert_to_mC().
 
@@ -1606,9 +1612,17 @@ function convert_to_mC_case_1b(lattice_constants::TriclinicLatticeConstants)
     #   - triclinic unit cell basis contains m_basis_a, m_basis_c, and 1 base-centered
     #     lattice vector
     #
-    #   - base-centered vector does includes a contribution from m_basis_c
+    #   - base-centered vector include a contribution from m_basis_c
     #
-    #   - triclinic basis contains the m_basis_a and m_basis_c
+    #   - basis_a and basis_c are m_basis_a and m_basis_c, respectively
+    #
+    # - Conditions
+    #
+    #   - abs(a_dot_b - 0.5 * a_dot_a) = abs(c_dot_a) or
+    #     abs(a_dot_b + 0.5 * a_dot_a) = abs(c_dot_a)
+    #
+    #   - 2 * abs(b_dot_c - c_dot_c) = abs(c_dot_a) or
+    #     2 * abs(b_dot_c + c_dot_c) = abs(c_dot_a)
     #
     # - This method adopts the same variable conventions as convert_to_mC().
 
@@ -1783,6 +1797,12 @@ function convert_to_mC_case_2a(lattice_constants::TriclinicLatticeConstants)
     #   - the sign of the coefficient of m_basis_a in basis_b is positive and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are the same
     #
+    # - Conditions
+    #
+    #   - 2 * a_dot_b = a_dot_a
+    #
+    #   - 2 * abs(b_dot_c - b_dot_b - 0.5 * a_dot_a + a_dot_b) = abs(c_dot_a - a_dot_b)
+    #
     # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
@@ -1839,6 +1859,12 @@ function convert_to_mC_case_2b(lattice_constants::TriclinicLatticeConstants)
     #
     #   - the sign of the coefficient of m_basis_a in basis_b is positive and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are opposite
+    #
+    # - Conditions
+    #
+    #   - 2 * a_dot_b = a_dot_a
+    #
+    #   - 2 * abs(b_dot_c + b_dot_b - a_dot_b) = abs(c_dot_a - a_dot_b)
     #
     # - This method adopts the same variable conventions as convert_to_mC().
 
@@ -1897,6 +1923,12 @@ function convert_to_mC_case_2c(lattice_constants::TriclinicLatticeConstants)
     #   - the sign of the coefficient of m_basis_a in basis_b is negative and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are the same
     #
+    # - Conditions
+    #
+    #   - 2 * a_dot_b = -a_dot_a
+    #
+    #   - 2 * abs(b_dot_c - b_dot_b - 0.5 * a_dot_a - a_dot_b) = abs(c_dot_a - a_dot_b)
+    #
     # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
@@ -1954,6 +1986,12 @@ function convert_to_mC_case_2d(lattice_constants::TriclinicLatticeConstants)
     #
     #   - the sign of the coefficient of m_basis_a in basis_b is negative and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are opposite
+    #
+    # - Conditions
+    #
+    #   - 2 * a_dot_b ≈ -a_dot_a
+    #
+    #   - 2 * abs(b_dot_c + b_dot_b + a_dot_b) = abs(c_dot_a - a_dot_b)
     #
     # - This method adopts the same variable conventions as convert_to_mC().
 
