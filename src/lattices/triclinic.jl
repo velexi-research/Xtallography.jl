@@ -1532,9 +1532,8 @@ function convert_to_mC_case_1a(lattice_constants::TriclinicLatticeConstants)
         c_dot_a = dot(basis_c, basis_a)
 
         if 2 * abs(a_dot_b) ≈ a_dot_a && 2 * abs(b_dot_c) ≈ abs(c_dot_a)
-            # --- Case: `a` and `c` are the monoclinic basis vectors in the triclinic basis
-            #     and `a` is m_basis_a
 
+            # Compute monoclinic basis
             m_basis_a = basis_a
 
             if 2 * a_dot_b ≈ a_dot_a
@@ -1782,13 +1781,11 @@ function convert_to_mC_case_2a(lattice_constants::TriclinicLatticeConstants)
 
         if 2 * a_dot_b ≈ a_dot_a &&
             2 * abs(b_dot_c - b_dot_b - 0.5 * a_dot_a + a_dot_b) ≈ abs(c_dot_a - a_dot_b)
-            # Compute m_basis_a
-            m_basis_a = basis_a
 
-            # Compute m_basis_b
+            # Compute monoclinic basis
+            m_basis_a = basis_a
             m_basis_b = 2 * basis_b - basis_a
 
-            # Compute m_basis_c
             if a_dot_b < c_dot_a
                 m_basis_c = basis_b - basis_c
             else
@@ -1845,13 +1842,11 @@ function convert_to_mC_case_2b(lattice_constants::TriclinicLatticeConstants)
 
         if 2 * a_dot_b ≈ a_dot_a &&
             2 * abs(b_dot_c + b_dot_b - a_dot_b) ≈ abs(c_dot_a - a_dot_b)
-            # Compute m_basis_a
-            m_basis_a = basis_a
 
-            # Compute m_basis_b
+            # Compute monoclinic basis
+            m_basis_a = basis_a
             m_basis_b = 2 * basis_b - basis_a
 
-            # Compute m_basis_c
             if a_dot_b < -c_dot_a
                 m_basis_c = basis_b + basis_c
             else
@@ -1909,13 +1904,10 @@ function convert_to_mC_case_2c(lattice_constants::TriclinicLatticeConstants)
         if 2 * a_dot_b ≈ -a_dot_a &&
             2 * abs(b_dot_c - b_dot_b - 0.5 * a_dot_a - a_dot_b) ≈ abs(c_dot_a - a_dot_b)
 
-            # Compute m_basis_a
+            # Compute monoclinic basis
             m_basis_a = basis_a
-
-            # Compute m_basis_b
             m_basis_b = 2 * basis_b + basis_a
 
-            # Compute m_basis_c
             if a_dot_b < c_dot_a
                 m_basis_c = basis_b - basis_c
             else
@@ -1972,13 +1964,11 @@ function convert_to_mC_case_2d(lattice_constants::TriclinicLatticeConstants)
 
         if 2 * a_dot_b ≈ -a_dot_a &&
             2 * abs(b_dot_c + b_dot_b + a_dot_b) ≈ abs(c_dot_a - a_dot_b)
-            # Compute m_basis_a
-            m_basis_a = basis_a
 
-            # Compute m_basis_b
+            # Compute monoclinic basis
+            m_basis_a = basis_a
             m_basis_b = 2 * basis_b + basis_a
 
-            # Compute m_basis_c
             if a_dot_b < -c_dot_a
                 m_basis_c = basis_b + basis_c
             else
