@@ -451,12 +451,12 @@ end
 
     @test standardized_centering == Primitive()
 
-    # ------ a ≈ b ≈ c
+    # ------ a ≈ b ≈ c, only need to swap α and β
 
     a = b = c = 1.0
-    α = 1π / 10
-    β = 8π / 10
-    γ = 7π / 10
+    α = 2π / 10
+    β = 1π / 10
+    γ = 3π / 10
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
     @test is_triclinic_type_I_cell(lattice_constants)
 
@@ -465,7 +465,45 @@ end
         lattice_constants, Primitive()
     )
 
-    expected_lattice_constants = TriclinicLatticeConstants(a, b, c, α, π - β, π - γ)
+    expected_lattice_constants = TriclinicLatticeConstants(a, b, c, β, α, γ)
+    @test standardized_lattice_constants ≈ expected_lattice_constants
+
+    @test standardized_centering == Primitive()
+
+    # ------ a ≈ b ≈ c, only need to swap β and γ
+
+    a = b = c = 1.0
+    α = 1π / 10
+    β = 3π / 10
+    γ = 2π / 10
+    lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
+    @test is_triclinic_type_I_cell(lattice_constants)
+
+    # Exercise functionality and check results
+    standardized_lattice_constants, standardized_centering = standardize(
+        lattice_constants, Primitive()
+    )
+
+    expected_lattice_constants = TriclinicLatticeConstants(a, b, c, α, γ, β)
+    @test standardized_lattice_constants ≈ expected_lattice_constants
+
+    @test standardized_centering == Primitive()
+
+    # ------ a ≈ b ≈ c, only need to reverse order of angles
+
+    a = b = c = 1.0
+    α = 3π / 10
+    β = 2π / 10
+    γ = 1π / 10
+    lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
+    @test is_triclinic_type_I_cell(lattice_constants)
+
+    # Exercise functionality and check results
+    standardized_lattice_constants, standardized_centering = standardize(
+        lattice_constants, Primitive()
+    )
+
+    expected_lattice_constants = TriclinicLatticeConstants(a, b, c, γ, β, α)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
     @test standardized_centering == Primitive()
@@ -598,12 +636,12 @@ end
 
     @test standardized_centering == Primitive()
 
-    # ------ a ≈ b ≈ c
+    # ------ a ≈ b ≈ c, only need to swap α and β
 
     a = b = c = 1.0
-    α = 4π / 10
+    α = 8π / 10
     β = 7π / 10
-    γ = 2π / 10
+    γ = 9π / 10
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
     @test !is_triclinic_type_I_cell(lattice_constants)
 
@@ -612,7 +650,45 @@ end
         lattice_constants, Primitive()
     )
 
-    expected_lattice_constants = TriclinicLatticeConstants(a, b, c, π - α, β, π - γ)
+    expected_lattice_constants = TriclinicLatticeConstants(a, b, c, β, α, γ)
+    @test standardized_lattice_constants ≈ expected_lattice_constants
+
+    @test standardized_centering == Primitive()
+
+    # ------ a ≈ b ≈ c, only need to swap β and γ
+
+    a = b = c = 1.0
+    α = 7π / 10
+    β = 9π / 10
+    γ = 8π / 10
+    lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
+    @test !is_triclinic_type_I_cell(lattice_constants)
+
+    # Exercise functionality and check results
+    standardized_lattice_constants, standardized_centering = standardize(
+        lattice_constants, Primitive()
+    )
+
+    expected_lattice_constants = TriclinicLatticeConstants(a, b, c, α, γ, β)
+    @test standardized_lattice_constants ≈ expected_lattice_constants
+
+    @test standardized_centering == Primitive()
+
+    # ------ a ≈ b ≈ c, only need to reverse order of angles
+
+    a = b = c = 1.0
+    α = 9π / 10
+    β = 8π / 10
+    γ = 7π / 10
+    lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
+    @test !is_triclinic_type_I_cell(lattice_constants)
+
+    # Exercise functionality and check results
+    standardized_lattice_constants, standardized_centering = standardize(
+        lattice_constants, Primitive()
+    )
+
+    expected_lattice_constants = TriclinicLatticeConstants(a, b, c, γ, β, α)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
     @test standardized_centering == Primitive()

@@ -18,6 +18,7 @@ Math utility functions and constants
 # --- Exports
 
 # Functions
+export asin_, acos_
 export is_basis, volume, surface_area
 
 # --- Constants
@@ -33,6 +34,78 @@ const SIN_PI_OVER_FOUR = 1 / sqrt(2)
 const ACOS_MINUS_ONE_THIRD = acos(-1 / 3)
 
 # --- Functions/Methods
+
+# ------ basic mathematical functions
+
+"""
+    asin_(x::Real; rtol::Real) -> Float64
+
+Compute the arcsin of `x` with a tolerance for values of `x` that are slightly outside of
+the mathematical domain [-1, 1].
+
+When the value of `x` is approximately equal to 1, `asin_(x)` returns π / 2; when the value
+of `x` is approximately equal to -1, `asin_(x)` returns -π / 2.
+
+Return values
+=============
+- arcsin of `x`
+
+Examples
+========
+```jldoctest
+julia> asin_(0.5) ≈ π / 6
+true
+julia> asin_(1 + eps(1.0)) == π / 2
+true
+julia> asin_(-1 - eps(1.0)) == -π / 2
+true
+```
+"""
+function asin_(x::Real; rtol::Real=√eps(1.0))
+    if x > 1 && isapprox(x, 1; rtol=rtol)
+        return π / 2
+    elseif x < -1 && isapprox(x, -1; rtol=rtol)
+        return -π / 2
+    else
+        return asin(x)
+    end
+end
+
+"""
+    acos_(x::Real; rtol::Real) -> Float64
+
+Compute the arccos of `x` with a tolerance for values of `x` that are slightly outside of
+the mathematical domain [-1, 1].
+
+When the value of `x` is approximately equal to 1, `acos_(x)` returns 0; when the value
+of `x` is approximately equal to -1, `acos_(x)` returns π.
+
+Return values
+=============
+- arccos of `x`
+
+Examples
+========
+```jldoctest
+julia> acos_(0.5) ≈ π / 3
+true
+julia> acos_(1 + eps(1.0)) == 0
+true
+julia> acos_(-1 - eps(1.0)) == π
+true
+```
+"""
+function acos_(x::Real; rtol::Real=√eps(1.0))
+    if x > 1 && isapprox(x, 1; rtol=rtol)
+        return 0
+    elseif x < -1 && isapprox(x, -1; rtol=rtol)
+        return π
+    else
+        return acos(x)
+    end
+end
+
+# ------ linear algebra
 
 """
     is_basis(
@@ -52,6 +125,8 @@ TODO
 function is_basis(v1::Vector{<:Real}, v2::Vector{<:Real}, v3::Vector{<:Real})
     return volume(v1, v2, v3) > norm(v1) * norm(v2) * norm(v3) * LINEAR_INDEPENDENCE_ZERO
 end
+
+# ------ geometry
 
 function volume(basis_a::T, basis_b::T, basis_c::T) where {T<:Vector{<:Real}}
     return abs(det(reduce(hcat, [basis_a, basis_b, basis_c])))

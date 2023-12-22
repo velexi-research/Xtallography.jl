@@ -18,6 +18,7 @@ Tests for the unit cell standardization methods for rhombohedral lattices
 # --- Imports
 
 # Standard library
+using Logging
 using Test
 
 # XtallographyUtils package
@@ -154,7 +155,7 @@ end
 @testset "conventional_cell(): chain of limiting cases" begin
     # --- Exercise functionality and check results
 
-    # primitive unit cell
+    # primitive unit cell: aP --> mI --> hR
     a = 5
     α = 4π / 7
     lattice_constants = RhombohedralLatticeConstants(a, α)
@@ -166,5 +167,6 @@ end
     expected_unit_cell = UnitCell(lattice_constants, Primitive())
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa RhombohedralLatticeConstants
+    @debug "chain of limiting cases: aP --> mI --> hR"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end
