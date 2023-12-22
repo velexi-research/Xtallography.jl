@@ -30,7 +30,7 @@ export TriclinicLatticeConstants
 
 # Functions
 export satisfies_triclinic_angle_constraints, is_triclinic_type_I_cell
-export convert_to_mP, convert_to_mI, convert_to_mS
+export convert_to_mP, convert_to_mI, convert_to_mC
 
 # Constants
 export TRICLINIC_MIN_ANGLE, TRICLINIC_MAX_ANGLE
@@ -361,8 +361,11 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
 
     # Check limiting case: monoclinic, primitive
     try
+        monoclinic_lattice_constants = convert_to_mP(lattice_constants)
+
         @debug "aP --> mP"
-        return conventional_cell(UnitCell(convert_to_mP(lattice_constants), Primitive()))
+        return conventional_cell(UnitCell(monoclinic_lattice_constants, Primitive()))
+
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
@@ -375,8 +378,11 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
 
     # Check limiting case: monoclinic, body-centered
     try
+        monoclinic_lattice_constants = convert_to_mI(lattice_constants)
+
         @debug "aP --> mI"
-        return conventional_cell(UnitCell(convert_to_mI(lattice_constants), BodyCentered()))
+        return conventional_cell(UnitCell(monoclinic_lattice_constants, BodyCentered()))
+
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
@@ -389,12 +395,14 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
 
     # Check limiting case: monoclinic, base-centered
     try
-        @debug "aP --> mS"
-        body_centered_lattice_constants, centering = standardize(
-            convert_to_mS(lattice_constants), BaseCentered()
-        )
+        monoclinic_lattice_constants = convert_to_mC(lattice_constants)
 
+        @debug "aP --> mC"
+        body_centered_lattice_constants, centering = standardize(
+            monoclinic_lattice_constants, BaseCentered()
+        )
         return conventional_cell(UnitCell(body_centered_lattice_constants, BodyCentered()))
+
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
@@ -491,26 +499,6 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
 
     # --- Preparations
 
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
-
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
-
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
-
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
-
     # Initialize monoclinic basis vectors
     m_basis_a = nothing
     m_basis_b = nothing
@@ -525,6 +513,8 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
     try
         # Compute monoclinic basis vectors
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_1(lattice_constants)
+
+        @debug "aP --> mI (case 1)"
         return convert_to_mI_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
@@ -542,6 +532,8 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
     try
         # Compute monoclinic basis vectors
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_2(lattice_constants)
+
+        @debug "aP --> mI (case 2)"
         return convert_to_mI_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
@@ -562,6 +554,8 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
     try
         # Compute monoclinic basis vectors
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_3(lattice_constants)
+
+        @debug "aP --> mI (case 3)"
         return convert_to_mI_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
@@ -579,6 +573,8 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
     try
         # Compute monoclinic basis vectors
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4(lattice_constants)
+
+        @debug "aP --> mI (case 4)"
         return convert_to_mI_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
@@ -597,6 +593,8 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
     try
         # Compute monoclinic basis vectors
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_5(lattice_constants)
+
+        @debug "aP --> mI (case 5)"
         return convert_to_mI_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
@@ -650,199 +648,65 @@ function convert_to_mI_case_1(lattice_constants::TriclinicLatticeConstants)
     #
     #   - triclinic basis contains the unique monoclinic symmetry direction m_basis_b
     #
+    #   - basis_a and basis_b are m_basis_a and m_basis_b, respectively
+    #
+    # - Conditions
+    #
+    #   - abs(a_dot_b) = 0
+    #
+    #   - 2 * abs(b_dot_c) = b_dot_b
+    #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    # --- Preparations
+    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+        # Initialize monoclinic basis vectors
+        m_basis_a = nothing
+        m_basis_b = nothing
+        m_basis_c = nothing
 
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
+        a_dot_a = dot(basis_a, basis_a)
+        b_dot_b = dot(basis_b, basis_b)
 
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+        a_dot_b = dot(basis_a, basis_b)
+        b_dot_c = dot(basis_b, basis_c)
+        c_dot_a = dot(basis_c, basis_a)
 
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
-
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
-
-    # Initialize monoclinic basis vectors
-    m_basis_a = nothing
-    m_basis_b = nothing
-    m_basis_c = nothing
-
-    # --- Attempt to convert the triclinic unit cell to a body-centered monoclinic unit cell
-
-    if abs(a_dot_b) < a * b * COS_APPROX_ZERO
-        # Case: `a` and `b` are basis vectors of the monoclinic unit cell
-
-        if 2 * abs(c_dot_a) ≈ a_dot_a
-            # Case: `a` is the unique monoclinic symmetry direction, `b` is basis vector
-            #       on B-face of the monoclinic unit cell
-
-            # Compute monoclinic basis
-            m_basis_a = basis_b
-            m_basis_b = basis_a
-
-            local basis_c_minus_m_basis_b =
-                basis_c - dot(basis_c, m_basis_b) / a_dot_a * m_basis_b
-
-            local m_basis_c
-            if 2 * abs(b_dot_c) > b_dot_b
-                if b_dot_c > 0
-                    m_basis_c = m_basis_a - 2 * basis_c_minus_m_basis_b
-                else
-                    m_basis_c = m_basis_a + 2 * basis_c_minus_m_basis_b
-                end
-            else
-                m_basis_c = -m_basis_a + 2 * basis_c_minus_m_basis_b
-            end
-
-        elseif 2 * abs(b_dot_c) ≈ b_dot_b
-            # Case: `b` is the unique monoclinic symmetry direction, `a` is basis vector
-            #       on B-face of the monoclinic unit cell
+        if abs(a_dot_b) < sqrt(a_dot_a) * sqrt(b_dot_b) * COS_APPROX_ZERO &&
+            2 * abs(b_dot_c) ≈ b_dot_b
 
             # Compute monoclinic basis
             m_basis_a = basis_a
             m_basis_b = basis_b
 
-            local basis_c_minus_m_basis_b =
-                basis_c - dot(basis_c, m_basis_b) / b_dot_b * m_basis_b
-
-            local m_basis_c
             if 2 * abs(c_dot_a) > a_dot_a
                 if c_dot_a > 0
-                    m_basis_c = m_basis_a - 2 * basis_c_minus_m_basis_b
+                    m_basis_c = m_basis_a - 2 * basis_c
                 else
-                    m_basis_c = m_basis_a + 2 * basis_c_minus_m_basis_b
+                    m_basis_c = m_basis_a + 2 * basis_c
                 end
             else
-                m_basis_c = -m_basis_a + 2 * basis_c_minus_m_basis_b
+                m_basis_c = -m_basis_a + 2 * basis_c
             end
+            m_basis_c -= dot(m_basis_c, m_basis_b) / b_dot_b * m_basis_b
         end
 
-    elseif abs(b_dot_c) < b * c * COS_APPROX_ZERO
-        # Case: `b` and `c` are basis vectors of the monoclinic unit cell
-
-        if 2 * abs(a_dot_b) ≈ b_dot_b
-            # Case: `b` is the unique monoclinic symmetry direction, `c` is basis vector
-            #       on B-face of the monoclinic unit cell
-
-            # Compute monoclinic basis
-            m_basis_a = basis_c
-            m_basis_b = basis_b
-
-            local basis_a_minus_m_basis_b =
-                basis_a - dot(basis_a, m_basis_b) / b_dot_b * m_basis_b
-
-            local m_basis_c
-            if 2 * abs(c_dot_a) > c_dot_c
-                if c_dot_a > 0
-                    m_basis_c = m_basis_a - 2 * basis_a_minus_m_basis_b
-                else
-                    m_basis_c = m_basis_a + 2 * basis_a_minus_m_basis_b
-                end
-            else
-                m_basis_c = -m_basis_a + 2 * basis_a_minus_m_basis_b
-            end
-
-        elseif 2 * abs(c_dot_a) ≈ c_dot_c
-            # Case: `c` is the unique monoclinic symmetry direction, `b` is basis vector
-            #       on B-face of the monoclinic unit cell
-
-            # Compute monoclinic basis
-            m_basis_a = basis_b
-            m_basis_b = basis_c
-
-            local basis_a_minus_m_basis_b =
-                basis_a - dot(basis_a, m_basis_b) / c_dot_c * m_basis_b
-
-            local m_basis_c
-            if 2 * abs(a_dot_b) > b_dot_b
-                if a_dot_b > 0
-                    m_basis_c = m_basis_a - 2 * basis_a_minus_m_basis_b
-                else
-                    m_basis_c = m_basis_a + 2 * basis_a_minus_m_basis_b
-                end
-            else
-                m_basis_c = -m_basis_a + 2 * basis_a_minus_m_basis_b
-            end
-        end
-
-    elseif abs(c_dot_a) < c * a * COS_APPROX_ZERO
-        # Case: `c` and `a` are basis vectors of the monoclinic unit cell
-
-        if 2 * abs(b_dot_c) ≈ c_dot_c
-            # Case: `c` is the unique monoclinic symmetry direction, `a` is basis vector
-            #       on B-face of the monoclinic unit cell
-
-            # Compute monoclinic basis
-            m_basis_a = basis_a
-            m_basis_b = basis_c
-
-            local basis_b_minus_m_basis_b =
-                basis_b - dot(basis_b, m_basis_b) / c_dot_c * m_basis_b
-
-            local m_basis_c
-            if 2 * abs(a_dot_b) > a_dot_a
-                if a_dot_b > 0
-                    m_basis_c = m_basis_a - 2 * basis_b_minus_m_basis_b
-                else
-                    m_basis_c = m_basis_a + 2 * basis_b_minus_m_basis_b
-                end
-            else
-                m_basis_c = -m_basis_a + 2 * basis_b_minus_m_basis_b
-            end
-
-        elseif 2 * abs(a_dot_b) ≈ a_dot_a
-            # Case: `a` is the unique monoclinic symmetry direction, `c` is basis vector
-            #       on B-face of the monoclinic unit cell
-
-            # Compute monoclinic basis
-            m_basis_a = basis_c
-            m_basis_b = basis_a
-
-            local basis_b_minus_m_basis_b =
-                basis_b - dot(basis_b, m_basis_b) / a_dot_a * m_basis_b
-
-            local m_basis_c
-            if 2 * abs(b_dot_c) > c_dot_c
-                if b_dot_c > 0
-                    m_basis_c = m_basis_a - 2 * basis_b_minus_m_basis_b
-                else
-                    m_basis_c = m_basis_a + 2 * basis_b_minus_m_basis_b
-                end
-            else
-                m_basis_c = -m_basis_a + 2 * basis_b_minus_m_basis_b
-            end
+        if !isnothing(m_basis_a) && !isnothing(m_basis_b) && !isnothing(m_basis_c)
+            return m_basis_a, m_basis_b, m_basis_c
         end
     end
 
-    # --- Construct return value
+    # --- Failed to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
-        throw(
-            ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
-                "include the unique monoclinic symmetry direction, one other monoclinic " *
-                "basis vector, and one body-centered lattice vector.",
-            ),
-        )
-    end
-
-    return m_basis_a, m_basis_b, m_basis_c
+    throw(
+        ErrorException(
+            "The triclinic basis vectors defined by `lattice_constants` do not include " *
+            "the unique monoclinic symmetry direction, one other monoclinic basis " *
+            "vector, and one body-centered lattice vector.",
+        ),
+    )
 end
 
 function convert_to_mI_case_2(lattice_constants::TriclinicLatticeConstants)
-
     # --- Preparations
 
     # Initialize monoclinic basis vectors
@@ -855,6 +719,7 @@ function convert_to_mI_case_2(lattice_constants::TriclinicLatticeConstants)
     try
         # Compute monoclinic basis vectors
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_2a(lattice_constants)
+        @debug "aP --> mI (case 2a)"
 
     catch error
         if !(error isa ErrorException) || (
@@ -869,6 +734,7 @@ function convert_to_mI_case_2(lattice_constants::TriclinicLatticeConstants)
     try
         # Compute monoclinic basis vectors
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_2b(lattice_constants)
+        @debug "aP --> mI (case 2b)"
 
     catch error
         if !(error isa ErrorException) || (
@@ -902,125 +768,72 @@ function convert_to_mI_case_2a(lattice_constants::TriclinicLatticeConstants)
     #   - triclinic unit cell basis contains 2 monoclinic unit cell basis vectors and
     #     1 body-centered lattice vector
     #
-    #   - triclinic basis does not contain the unique monoclinic symmetry direction
-    #     m_basis_b
+    #   - triclinic basis contains m_basis_a and m_basis_c (not the unique monoclinic
+    #     symmetry direction m_basis_b)
+    #
+    #   - basis_b is the vector to body-centered lattice point in monoclinic unit cell
+    #
+    #   - basis_a and basis_c are m_basis_a and m_basis_c, respectively
+    #
+    #   - m_basis_a and m_basis_c have the same sign in basis_b
+    #
+    # - Conditions
+    #
+    #   - 2 * abs(a_dot_b) = abs(a_dot_a + c_dot_a)
+    #
+    #   - 2 * abs(b_dot_c) = abs(c_dot_c + c_dot_a)
+    #
+    #   - abs(c_dot_a) != 0
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    # --- Preparations
+    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+        # Initialize monoclinic basis vectors
+        m_basis_a = nothing
+        m_basis_b = nothing
+        m_basis_c = nothing
 
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
+        a_dot_a = dot(basis_a, basis_a)
+        c_dot_c = dot(basis_c, basis_c)
 
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+        a_dot_b = dot(basis_a, basis_b)
+        b_dot_c = dot(basis_b, basis_c)
+        c_dot_a = dot(basis_c, basis_a)
 
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
-
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
-
-    # Initialize monoclinic basis vectors
-    m_basis_a = nothing
-    m_basis_b = nothing
-    m_basis_c = nothing
-
-    # --- Attempt to convert the triclinic unit cell to a body-centered monoclinic unit cell
-
-    if (
-        2 * abs(a_dot_b) ≈ abs(b_dot_b + b_dot_c) &&
-        2 * abs(c_dot_a) ≈ abs(c_dot_c + b_dot_c) &&
-        abs(b_dot_c) > b * c * COS_APPROX_ZERO
-    )
-        # --- Case: `a` is vector to body-centered lattice point in monoclinic unit cell,
-        #           `b` and `c` are `m_a` and `m_c`. `m_a` and `m_c` have the same sign
-        #           in `a`.
-
-        # Compute monoclinic basis vectors
-        m_basis_a = basis_b
-
-        if 2 * a_dot_b ≈ b^2 + b_dot_c
-            m_basis_b = 2 * basis_a - basis_b - basis_c
-        else
-            m_basis_b = 2 * basis_a + basis_b + basis_c
-        end
-
-        if b_dot_c < 0
-            m_basis_c = basis_c
-        else
-            m_basis_c = -basis_c
-        end
-
-    elseif (
-        2 * abs(b_dot_c) ≈ abs(c_dot_c + c_dot_a) &&
-        2 * abs(a_dot_b) ≈ abs(a_dot_a + c_dot_a) &&
-        abs(c_dot_a) > c * a * COS_APPROX_ZERO
-    )
-        # --- Case: `b` is vector to body-centered lattice point in monoclinic unit cell,
-        #           `a` and `c` are `m_a` and `m_c`. `m_a` and `m_c` have the same sign
-        #           in `b`.
-
-        # Compute monoclinic basis vectors
-        m_basis_a = basis_c
-
-        if 2 * b_dot_c ≈ c^2 + c_dot_a
-            m_basis_b = 2 * basis_b - basis_c - basis_a
-        elseif 2 * b_dot_c ≈ -c^2 - c_dot_a
-            m_basis_b = 2 * basis_b + basis_c + basis_a
-        end
-
-        if c_dot_a < 0
-            m_basis_c = basis_a
-        else
-            m_basis_c = -basis_a
-        end
-
-    elseif (
-        2 * abs(c_dot_a) ≈ abs(a_dot_a + a_dot_b) &&
-        2 * abs(b_dot_c) ≈ abs(b_dot_b + a_dot_b) &&
-        abs(a_dot_b) > a * b * COS_APPROX_ZERO
-    )
-        # --- Case: `c` is vector to body-centered lattice point in monoclinic unit cell,
-        #           `a` and `b` are `m_a` and `m_c`. `m_a` and `m_c` have the same sign
-        #           in `c`.
-
-        # Compute monoclinic basis vectors
-        m_basis_a = basis_a
-
-        if 2 * c_dot_a ≈ a^2 + a_dot_b
-            m_basis_b = 2 * basis_c - basis_a - basis_b
-        else
-            m_basis_b = 2 * basis_c + basis_a + basis_b
-        end
-
-        if a_dot_b < 0
-            m_basis_c = basis_b
-        else
-            m_basis_c = -basis_b
-        end
-    end
-
-    # --- Construct return value
-
-    if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
-        throw(
-            ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
-                "satisfy conditions for case 2a.",
-            ),
+        if (
+            2 * abs(a_dot_b) ≈ abs(a_dot_a + c_dot_a) &&
+            2 * abs(b_dot_c) ≈ abs(c_dot_c + c_dot_a) &&
+            abs(c_dot_a) > sqrt(c_dot_c) * sqrt(a_dot_a) * COS_APPROX_ZERO
         )
+            # Compute monoclinic basis vectors
+            m_basis_a = basis_a
+
+            if 2 * a_dot_b ≈ a_dot_a + c_dot_a
+                m_basis_b = 2 * basis_b - basis_a - basis_c
+            else
+                m_basis_b = 2 * basis_b + basis_a + basis_c
+            end
+
+            if c_dot_a < 0
+                m_basis_c = basis_c
+            else
+                m_basis_c = -basis_c
+            end
+        end
+
+        if !isnothing(m_basis_a) && !isnothing(m_basis_b) && !isnothing(m_basis_c)
+            return m_basis_a, m_basis_b, m_basis_c
+        end
     end
 
-    return m_basis_a, m_basis_b, m_basis_c
+    # --- Failed to convert the triclinic unit cell to a base-centered monoclinic unit cell
+
+    throw(
+        ErrorException(
+            "The triclinic basis vectors defined by `lattice_constants` do not satisfy " *
+            "conditions for case 2a.",
+        ),
+    )
 end
 
 function convert_to_mI_case_2b(lattice_constants::TriclinicLatticeConstants)
@@ -1030,125 +843,72 @@ function convert_to_mI_case_2b(lattice_constants::TriclinicLatticeConstants)
     #   - triclinic unit cell basis contains 2 monoclinic unit cell basis vectors and
     #     1 body-centered lattice vector
     #
-    #   - triclinic basis does not contain the unique monoclinic symmetry direction
-    #     m_basis_b
+    #   - triclinic basis contains m_basis_a and m_basis_c (not the unique monoclinic
+    #     symmetry direction m_basis_b)
+    #
+    #   - basis_b is the vector to body-centered lattice point in monoclinic unit cell
+    #
+    #   - basis_a and basis_c are m_basis_a and m_basis_c, respectively
+    #
+    #   - m_basis_a and m_basis_c have the opposite signs in basis_b
+    #
+    # - Conditions
+    #
+    #   - 2 * abs(a_dot_b) = abs(a_dot_a - c_dot_a)
+    #
+    #   - 2 * abs(b_dot_c) = abs(c_dot_c - c_dot_a)
+    #
+    #   - abs(c_dot_a) != 0
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    # --- Preparations
+    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+        # Initialize monoclinic basis vectors
+        m_basis_a = nothing
+        m_basis_b = nothing
+        m_basis_c = nothing
 
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
+        a_dot_a = dot(basis_a, basis_a)
+        c_dot_c = dot(basis_c, basis_c)
 
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+        a_dot_b = dot(basis_a, basis_b)
+        b_dot_c = dot(basis_b, basis_c)
+        c_dot_a = dot(basis_c, basis_a)
 
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
-
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
-
-    # Initialize monoclinic basis vectors
-    m_basis_a = nothing
-    m_basis_b = nothing
-    m_basis_c = nothing
-
-    # --- Attempt to convert the triclinic unit cell to a body-centered monoclinic unit cell
-
-    if (
-        2 * abs(a_dot_b) ≈ abs(b_dot_b - b_dot_c) &&
-        2 * abs(c_dot_a) ≈ abs(c_dot_c - b_dot_c) &&
-        abs(b_dot_c) > b * c * COS_APPROX_ZERO
-    )
-        # --- Case: `a` is vector to body-centered lattice point in monoclinic unit cell,
-        #           `b` and `c` are `m_a` and `m_c`. `m_a` and `m_c` have opposite signs
-        #           in `a`.
-
-        # Compute monoclinic basis vectors
-        m_basis_a = basis_b
-
-        if 2 * a_dot_b ≈ b^2 - b_dot_c
-            m_basis_b = 2 * basis_a - basis_b + basis_c
-        else
-            m_basis_b = 2 * basis_a + basis_b - basis_c
-        end
-
-        if b_dot_c < 0
-            m_basis_c = basis_c
-        else
-            m_basis_c = -basis_c
-        end
-
-    elseif (
-        2 * abs(b_dot_c) ≈ abs(c_dot_c - c_dot_a) &&
-        2 * abs(a_dot_b) ≈ abs(a_dot_a - c_dot_a) &&
-        abs(c_dot_a) > c * a * COS_APPROX_ZERO
-    )
-        # --- Case: `b` is vector to body-centered lattice point in monoclinic unit cell,
-        #           `a` and `c` are `m_a` and `m_c`. `m_a` and `m_c` have opposite signs
-        #           in `b`.
-
-        # Compute monoclinic basis vectors
-        m_basis_a = basis_c
-
-        if 2 * b_dot_c ≈ c^2 - c_dot_a
-            m_basis_b = 2 * basis_b - basis_c + basis_a
-        else
-            m_basis_b = 2 * basis_b + basis_c - basis_a
-        end
-
-        if c_dot_a < 0
-            m_basis_c = basis_a
-        else
-            m_basis_c = -basis_a
-        end
-
-    elseif (
-        2 * abs(c_dot_a) ≈ abs(a_dot_a - a_dot_b) &&
-        2 * abs(b_dot_c) ≈ abs(b_dot_b - a_dot_b) &&
-        abs(a_dot_b) > a * b * COS_APPROX_ZERO
-    )
-        # --- Case: `c` is vector to body-centered lattice point in monoclinic unit cell,
-        #           `a` and `b` are `m_a` and `m_c`. `m_a` and `m_c` have opposite signs
-        #           in `c`.
-
-        # Compute monoclinic basis vectors
-        m_basis_a = basis_a
-
-        if 2 * c_dot_a ≈ a^2 - a_dot_b
-            m_basis_b = 2 * basis_c - basis_a + basis_b
-        else
-            m_basis_b = 2 * basis_c + basis_a - basis_b
-        end
-
-        if a_dot_b < 0
-            m_basis_c = basis_b
-        else
-            m_basis_c = -basis_b
-        end
-    end
-
-    # --- Construct return value
-
-    if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
-        throw(
-            ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
-                "satisfy conditions for case 2b.",
-            ),
+        if (
+            2 * abs(a_dot_b) ≈ abs(a_dot_a - c_dot_a) &&
+            2 * abs(b_dot_c) ≈ abs(c_dot_c - c_dot_a) &&
+            abs(c_dot_a) > sqrt(c_dot_c) * sqrt(a_dot_a) * COS_APPROX_ZERO
         )
+            # Compute monoclinic basis vectors
+            m_basis_a = basis_a
+
+            if 2 * a_dot_b ≈ a_dot_a - c_dot_a
+                m_basis_b = 2 * basis_b - basis_a + basis_c
+            else
+                m_basis_b = 2 * basis_b + basis_a - basis_c
+            end
+
+            if c_dot_a < 0
+                m_basis_c = basis_c
+            else
+                m_basis_c = -basis_c
+            end
+        end
+
+        if !isnothing(m_basis_a) && !isnothing(m_basis_b) && !isnothing(m_basis_c)
+            return m_basis_a, m_basis_b, m_basis_c
+        end
     end
 
-    return m_basis_a, m_basis_b, m_basis_c
+    # --- Failed to convert the triclinic unit cell to a base-centered monoclinic unit cell
+
+    throw(
+        ErrorException(
+            "The triclinic basis vectors defined by `lattice_constants` do not satisfy " *
+            "conditions for case 2b.",
+        ),
+    )
 end
 
 function convert_to_mI_case_3(lattice_constants::TriclinicLatticeConstants)
@@ -1160,99 +920,54 @@ function convert_to_mI_case_3(lattice_constants::TriclinicLatticeConstants)
     #
     #   - triclinic basis contains the unique monoclinic symmetry direction m_basis_b
     #
+    # - Conditions
+    #
+    #   - abs(b_dot_c) = abs(a_dot_b) = 0.5 * b_dot_b
+    #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    # --- Preparations
+    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+        # Initialize monoclinic basis vectors
+        m_basis_a = nothing
+        m_basis_b = nothing
+        m_basis_c = nothing
 
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
+        a_dot_a = dot(basis_a, basis_a)
+        b_dot_b = dot(basis_b, basis_b)
+        c_dot_c = dot(basis_c, basis_c)
 
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+        a_dot_b = dot(basis_a, basis_b)
+        b_dot_c = dot(basis_b, basis_c)
 
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
+        if abs(b_dot_c) ≈ abs(a_dot_b) ≈ 0.5 * b_dot_b
+            # Compute monoclinic basis vectors
+            m_basis_b = basis_b
 
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
+            m_basis_a = basis_a + basis_c
+            m_basis_a -= dot(m_basis_a, m_basis_b) / b_dot_b * m_basis_b
 
-    # Initialize monoclinic basis vectors
-    m_basis_a = nothing
-    m_basis_b = nothing
-    m_basis_c = nothing
-
-    # --- Attempt to convert the triclinic unit cell to a body-centered monoclinic unit cell
-
-    if abs(a_dot_b) ≈ abs(c_dot_a) ≈ 0.5 * a_dot_a
-        # Case: `a` is the unique symmetry direction of the monoclinic unit cell
-
-        # Compute monoclinic basis vectors
-        m_basis_b = basis_a
-
-        m_basis_a = basis_b + basis_c
-        m_basis_a -= dot(m_basis_a, m_basis_b) / a_dot_a * m_basis_b
-
-        if b < c
-            m_basis_c = basis_b - basis_c
-        else
-            m_basis_c = -basis_b + basis_c
+            if a_dot_a < c_dot_c
+                m_basis_c = basis_a - basis_c
+            else
+                m_basis_c = -basis_a + basis_c
+            end
+            m_basis_c -= dot(m_basis_c, m_basis_b) / b_dot_b * m_basis_b
         end
-        m_basis_c -= dot(m_basis_c, m_basis_b) / a_dot_a * m_basis_b
 
-    elseif abs(b_dot_c) ≈ abs(a_dot_b) ≈ 0.5 * b_dot_b
-        # Case: `b` is the unique symmetry direction of the monoclinic unit cell
-
-        # Compute monoclinic basis vectors
-        m_basis_b = basis_b
-
-        m_basis_a = basis_a + basis_c
-        m_basis_a -= dot(m_basis_a, m_basis_b) / b_dot_b * m_basis_b
-
-        if a < c
-            m_basis_c = basis_a - basis_c
-        else
-            m_basis_c = -basis_a + basis_c
+        if !isnothing(m_basis_a) && !isnothing(m_basis_b) && !isnothing(m_basis_c)
+            return m_basis_a, m_basis_b, m_basis_c
         end
-        m_basis_c -= dot(m_basis_c, m_basis_b) / b_dot_b * m_basis_b
-
-    elseif abs(c_dot_a) ≈ abs(b_dot_c) ≈ 0.5 * c_dot_c
-        # Case: `c` is the unique symmetry direction of the monoclinic unit cell
-
-        # Compute monoclinic basis vectors
-        m_basis_b = basis_c
-
-        m_basis_a = basis_a + basis_b
-        m_basis_a -= dot(m_basis_a, m_basis_b) / c_dot_c * m_basis_b
-
-        if a < b
-            m_basis_c = basis_a - basis_b
-        else
-            m_basis_c = -basis_a + basis_b
-        end
-        m_basis_c -= dot(m_basis_c, m_basis_b) / c_dot_c * m_basis_b
     end
 
-    # --- Construct return value
+    # --- Failed to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
-        throw(
-            ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
-                "include the unique monoclinic symmetry direction and two body-centered " *
-                "lattice vectors.",
-            ),
-        )
-    end
-
-    return m_basis_a, m_basis_b, m_basis_c
+    throw(
+        ErrorException(
+            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "include the unique monoclinic symmetry direction and two body-centered " *
+            "lattice vectors.",
+        ),
+    )
 end
 
 function convert_to_mI_case_4(lattice_constants::TriclinicLatticeConstants)
@@ -1268,6 +983,7 @@ function convert_to_mI_case_4(lattice_constants::TriclinicLatticeConstants)
     try
         # Compute monoclinic basis vectors
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4a(lattice_constants)
+        @debug "aP --> mI (case 4a)"
 
     catch error
         if !(error isa ErrorException) || (
@@ -1282,6 +998,7 @@ function convert_to_mI_case_4(lattice_constants::TriclinicLatticeConstants)
     try
         # Compute monoclinic basis vectors
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4b(lattice_constants)
+        @debug "aP --> mI (case 4b)"
 
     catch error
         if !(error isa ErrorException) || (
@@ -1329,167 +1046,82 @@ function convert_to_mI_case_4a(lattice_constants::TriclinicLatticeConstants)
     #   - triclinic unit cell basis contains 1 monoclinic unit cell basis vector and
     #     2 body-centered lattice vectors
     #
-    #   - triclinic basis does not contain the unique monoclinic symmetry direction
-    #     m_basis_b
+    #   - triclinic basis contains m_basis_a (not the unique monoclinic symmetry direction
+    #     m_basis_b)
     #
-    #   - norm(basis_b) = norm(basis_c) and
-    #     |dot(basis_a, basis_b)| = |dot(basis_a, basis_c)| != 0.5 a^2
+    #   - the coefficients of m_basis_a and m_basis_c have the same relative signs in
+    #     both basis_b and basis_c
+    #
+    # - Conditions
+    #
+    #   - b_dot_b = c_dot_c
+    #
+    #   - abs(a_dot_b) = abs(c_dot_a) != 0.5 * a_dot_a
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    # --- Preparations
+    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+        # Initialize monoclinic basis vectors
+        m_basis_a = nothing
+        m_basis_b = nothing
+        m_basis_c = nothing
 
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
+        a_dot_a = dot(basis_a, basis_a)
+        b_dot_b = dot(basis_b, basis_b)
+        c_dot_c = dot(basis_c, basis_c)
 
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+        a_dot_b = dot(basis_a, basis_b)
+        c_dot_a = dot(basis_c, basis_a)
 
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
+        if (b_dot_b ≈ c_dot_c) && (abs(a_dot_b) ≈ abs(c_dot_a) ≉ 0.5 * a_dot_a)
+            # Compute m_basis_a
+            m_basis_a = basis_a
 
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
+            # Compute m_basis_b and m_basis_c
+            if a_dot_b ≈ c_dot_a
+                # Case: coefficients of m_basis_a and m_basis_c are the same in basis_b
+                #       and basis_c, so the sign of m_basis_b must be opposite in basis_b
+                #       and basis_c
 
-    # Initialize monoclinic basis vectors
-    m_basis_a = nothing
-    m_basis_b = nothing
-    m_basis_c = nothing
+                # Compute m_basis_b
+                m_basis_b = basis_b - basis_c
 
-    # --- Attempt to convert the triclinic unit cell to a body-centered monoclinic unit cell
-
-    if (b_dot_b ≈ c_dot_c) && (abs(a_dot_b) ≈ abs(c_dot_a) ≉ 0.5 * a_dot_a)
-        # Case: `a` is monoclinic basis vector
-
-        # Compute m_basis_a
-        m_basis_a = basis_a
-
-        # Compute m_basis_b and m_basis_c
-        if a_dot_b ≈ c_dot_a
-            # Case: coefficients of `m_basis_a` and `m_basis_c` are the same in `basis_b`
-            #       and `basis_c`, so the sign of `m_basis_b` must be opposite in `basis_b`
-            #       and `basis_c`
-
-            # Compute m_basis_b
-            m_basis_b = basis_b - basis_c
-
-            # Compute m_basis_c
-            if 2 * a_dot_b < a_dot_a
-                m_basis_c = basis_b + basis_c - basis_a
+                # Compute m_basis_c
+                if 2 * a_dot_b < a_dot_a
+                    m_basis_c = basis_b + basis_c - basis_a
+                else
+                    m_basis_c = -(basis_b + basis_c - basis_a)
+                end
             else
-                m_basis_c = -(basis_b + basis_c - basis_a)
-            end
-        else
-            # Case: coefficients of `m_basis_a` and `m_basis_c` are opposite in `basis_b`
-            #       and `basis_c`, so the sign of `m_basis_b` must be the same in `basis_b`
-            #       and `basis_c`
+                # Case: coefficients of m_basis_a and m_basis_c are opposite in basis_b
+                #       and basis_c, so the sign of m_basis_b must be the same in basis_b
+                #       and basis_c
 
-            # Compute m_basis_b
-            m_basis_b = basis_b + basis_c
+                # Compute m_basis_b
+                m_basis_b = basis_b + basis_c
 
-            # Compute m_basis_c
-            if 2 * a_dot_b < a_dot_a
-                m_basis_c = basis_b - basis_c - basis_a
-            else
-                m_basis_c = -(basis_b - basis_c - basis_a)
+                # Compute m_basis_c
+                if 2 * a_dot_b < a_dot_a
+                    m_basis_c = basis_b - basis_c - basis_a
+                else
+                    m_basis_c = -(basis_b - basis_c - basis_a)
+                end
             end
         end
 
-    elseif abs(b_dot_c) ≈ abs(a_dot_b) ≉ 0.5 * b_dot_b
-        # Case: `b` is monoclinic basis vector
-
-        # Compute m_basis_a
-        m_basis_a = basis_b
-
-        # Compute m_basis_b and m_basis_c
-        if b_dot_c ≈ a_dot_b
-            # Case: coefficients of `m_basis_a` and `m_basis_c` are the same in `basis_c`
-            #       and `basis_a`, so the sign of `m_basis_b` must be opposite in `basis_c`
-            #       and `basis_a`
-
-            # Compute m_basis_b
-            m_basis_b = basis_c - basis_a
-
-            # Compute m_basis_c
-            if 2 * b_dot_c < b_dot_b
-                m_basis_c = basis_c + basis_a - basis_b
-            else
-                m_basis_c = -(basis_c + basis_a - basis_b)
-            end
-        else
-            # Case: coefficients of `m_basis_a` and `m_basis_c` are opposite in `basis_c`
-            #       and `basis_a`, so the sign of `m_basis_b` must be the same in `basis_c`
-            #       and `basis_a`
-
-            # Compute m_basis_b
-            m_basis_b = basis_c + basis_a
-
-            # Compute m_basis_c
-            if 2 * b_dot_c < b_dot_b
-                m_basis_c = basis_c - basis_a - basis_b
-            else
-                m_basis_c = -(basis_c - basis_a - basis_b)
-            end
-        end
-
-    elseif abs(c_dot_a) ≈ abs(b_dot_c) ≉ 0.5 * c_dot_c
-        # Case: `c` is monoclinic basis vector
-
-        # Compute m_basis_a
-        m_basis_a = basis_c
-
-        # Compute m_basis_b and m_basis_c
-        if c_dot_a ≈ b_dot_c
-            # Case: coefficients of `m_basis_a` and `m_basis_c` are the same in `basis_a`
-            #       and `basis_b`, so the sign of `m_basis_b` must be opposite in `basis_a`
-            #       and `basis_b`
-
-            # Compute m_basis_b
-            m_basis_b = basis_a - basis_b
-
-            # Compute m_basis_c
-            if 2 * c_dot_a < c_dot_c
-                m_basis_c = basis_a + basis_b - basis_c
-            else
-                m_basis_c = -(basis_a + basis_b - basis_c)
-            end
-        else
-            # Case: coefficients of `m_basis_a` and `m_basis_c` are opposite in `basis_a`
-            #       and `basis_b`, so the sign of `m_basis_b` must be the same in `basis_a`
-            #       and `basis_b`
-
-            # Compute m_basis_b
-            m_basis_b = basis_a + basis_b
-
-            # Compute m_basis_c
-            if 2 * c_dot_a < c_dot_c
-                m_basis_c = basis_a - basis_b - basis_c
-            else
-                m_basis_c = -(basis_a - basis_b - basis_c)
-            end
+        if !isnothing(m_basis_a) && !isnothing(m_basis_b) && !isnothing(m_basis_c)
+            return m_basis_a, m_basis_b, m_basis_c
         end
     end
 
-    # --- Construct return value
+    # --- Failed to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
-        throw(
-            ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
-                "satisfy conditions for case 4a.",
-            ),
-        )
-    end
-
-    return m_basis_a, m_basis_b, m_basis_c
+    throw(
+        ErrorException(
+            "The triclinic basis vectors defined by `lattice_constants` do not satisfy " *
+            "conditions for case 4a.",
+        ),
+    )
 end
 
 function convert_to_mI_case_4b(lattice_constants::TriclinicLatticeConstants)
@@ -1499,113 +1131,63 @@ function convert_to_mI_case_4b(lattice_constants::TriclinicLatticeConstants)
     #   - triclinic unit cell basis contains 1 monoclinic unit cell basis vector and
     #     2 body-centered lattice vectors
     #
-    #   - triclinic basis does not contain the unique monoclinic symmetry direction
+    #   - triclinic basis contains m_basis_a (not the unique monoclinic symmetry direction
+    #     m_basis_b)
     #     m_basis_b
     #
-    #   - |dot(basis_a, basis_b) + dot(basis_a, basis_c)| = a^2
-    #     and |dot(basis_a, basis_b)| != |dot(basis_a, basis_c)|
+    #   - the coefficients of m_basis_a in basis_b and basis_c have the same sign
+    #
+    #   - the coefficients of m_basis_c in basis_b and basis_c have opposite sign
+    #
+    # - Conditions
+    #
+    #   - abs(a_dot_b + c_dot_a) ≈ a_dot_a
+    #
+    #   - abs(a_dot_b) != abs(c_dot_a)
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    # --- Preparations
+    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+        # Initialize monoclinic basis vectors
+        m_basis_a = nothing
+        m_basis_b = nothing
+        m_basis_c = nothing
 
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
+        a_dot_a = dot(basis_a, basis_a)
 
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+        a_dot_b = dot(basis_a, basis_b)
+        c_dot_a = dot(basis_c, basis_a)
 
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
+        if (abs(a_dot_b + c_dot_a) ≈ a_dot_a) && (abs(a_dot_b) ≉ abs(c_dot_a))
+            # Compute monoclinic basis vectors
+            m_basis_a = basis_a
 
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
+            if a_dot_b + c_dot_a < 0
+                m_basis_b = basis_b + basis_c + basis_a
+            else
+                m_basis_b = basis_b + basis_c - basis_a
+            end
 
-    # Initialize monoclinic basis vectors
-    m_basis_a = nothing
-    m_basis_b = nothing
-    m_basis_c = nothing
-
-    # --- Attempt to convert the triclinic unit cell to a body-centered monoclinic unit cell
-
-    if (abs(a_dot_b + c_dot_a) ≈ a_dot_a) && (abs(a_dot_b) ≉ abs(c_dot_a))
-        # --- Case: `a` is monoclinic basis vector, coefficients of `m_a` have same
-        #     sign in the 2 body-centered lattice vectors, coefficients of `m_c` have
-        #     opposite signs in the 2 body-centered lattice vectors
-
-        m_basis_a = basis_a
-
-        if a_dot_b + c_dot_a < 0
-            m_basis_b = basis_b + basis_c + basis_a
-        else
-            m_basis_b = basis_b + basis_c - basis_a
+            if a_dot_b < c_dot_a
+                m_basis_c = basis_b - basis_c
+            else
+                m_basis_c = -basis_b + basis_c
+            end
         end
 
-        if a_dot_b < c_dot_a
-            m_basis_c = basis_b - basis_c
-        else
-            m_basis_c = -basis_b + basis_c
-        end
-
-    elseif (abs(b_dot_c + a_dot_b) ≈ b_dot_b) && (abs(b_dot_c) ≉ abs(a_dot_b))
-        # --- Case: `b` is monoclinic basis vector, coefficients of `m_b` have same
-        #     sign in the 2 body-centered lattice vectors, coefficients of `m_a` have
-        #     opposite signs in the 2 body-centered lattice vectors
-
-        m_basis_a = basis_b
-
-        if b_dot_c + a_dot_b < 0
-            m_basis_b = basis_c + basis_a + basis_b
-        else
-            m_basis_b = basis_c + basis_a - basis_b
-        end
-
-        if b_dot_c < a_dot_b
-            m_basis_c = basis_c - basis_a
-        else
-            m_basis_c = -basis_c + basis_a
-        end
-
-    elseif (abs(c_dot_a + b_dot_c) ≈ c_dot_c) && (abs(c_dot_a) ≉ abs(b_dot_c))
-        # --- Case: `c` is monoclinic basis vector, coefficients of `m_c` have same
-        #     sign in the 2 body-centered lattice vectors, coefficients of `m_b` have
-        #     opposite signs in the 2 body-centered lattice vectors
-
-        m_basis_a = basis_c
-
-        if c_dot_a + b_dot_c < 0
-            m_basis_b = basis_a + basis_b + basis_c
-        else
-            m_basis_b = basis_a + basis_b - basis_c
-        end
-
-        if c_dot_a < b_dot_c
-            m_basis_c = basis_a - basis_b
-        else
-            m_basis_c = -basis_a + basis_b
+        if !isnothing(m_basis_a) && !isnothing(m_basis_b) && !isnothing(m_basis_c)
+            return m_basis_a, m_basis_b, m_basis_c
         end
     end
 
-    # --- Construct return value
+    # --- Failed to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
-        throw(
-            ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
-                "satisfy conditions for case 4b.",
-            ),
-        )
-    end
-
-    return m_basis_a, m_basis_b, m_basis_c
+    throw(
+        ErrorException(
+            "The triclinic basis vectors defined by `lattice_constants` do not satisfy " *
+            "conditions for case 4b.",
+        ),
+    )
 end
 
 function convert_to_mI_case_4c(lattice_constants::TriclinicLatticeConstants)
@@ -1615,114 +1197,63 @@ function convert_to_mI_case_4c(lattice_constants::TriclinicLatticeConstants)
     #   - triclinic unit cell basis contains 1 monoclinic unit cell basis vector and
     #     2 body-centered lattice vectors
     #
-    #   - triclinic basis does not contain the unique monoclinic symmetry direction
-    #     m_basis_b
+    #   - triclinic basis contains m_basis_a (not the unique monoclinic symmetry direction
+    #     m_basis_b)
     #
-    #   - |dot(basis_a, basis_b) - dot(basis_a, basis_c)| = a^2
-    #     and |dot(basis_a, basis_b)| != |dot(basis_a, basis_c)|
+    #   - the coefficients of m_basis_a in basis_b and basis_c have opposite sign
     #
+    #   - the coefficients of m_basis_c in basis_b and basis_c have the same sign
+    #
+    # - Conditions
+    #
+    #   - abs(a_dot_b - c_dot_a) ≈ a_dot_a
+    #
+    #   - abs(a_dot_b) != abs(c_dot_a)
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    # --- Preparations
+    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+        # Initialize monoclinic basis vectors
+        m_basis_a = nothing
+        m_basis_b = nothing
+        m_basis_c = nothing
 
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
+        a_dot_a = dot(basis_a, basis_a)
 
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+        a_dot_b = dot(basis_a, basis_b)
+        c_dot_a = dot(basis_c, basis_a)
 
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
+        if (abs(a_dot_b - c_dot_a) ≈ a_dot_a) && (abs(a_dot_b) ≉ abs(c_dot_a))
 
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
+            # Compute monoclinic basis vectors
+            m_basis_a = basis_a
 
-    # Initialize monoclinic basis vectors
-    m_basis_a = nothing
-    m_basis_b = nothing
-    m_basis_c = nothing
+            if a_dot_b - c_dot_a < 0
+                m_basis_b = basis_b - basis_c + basis_a
+            else
+                m_basis_b = -basis_b + basis_c + basis_a
+            end
 
-    # --- Attempt to convert the triclinic unit cell to a body-centered monoclinic unit cell
-
-    if (abs(a_dot_b - c_dot_a) ≈ a_dot_a) && (abs(a_dot_b) ≉ abs(c_dot_a))
-        # --- Case: `a` is monoclinic basis vector, coefficients of `m_a` have opposite
-        #     signs in the 2 body-centered lattice vectors, coefficients of `m_c` have
-        #     the same sign in the 2 body-centered lattice vectors
-
-        m_basis_a = basis_a
-
-        if a_dot_b - c_dot_a < 0
-            m_basis_b = basis_b - basis_c + basis_a
-        else
-            m_basis_b = -basis_b + basis_c + basis_a
+            if a_dot_b < -c_dot_a
+                m_basis_c = basis_b + basis_c
+            else
+                m_basis_c = -(basis_b + basis_c)
+            end
         end
 
-        if a_dot_b < -c_dot_a
-            m_basis_c = basis_b + basis_c
-        else
-            m_basis_c = -(basis_b + basis_c)
-        end
-
-    elseif (abs(b_dot_c - a_dot_b) ≈ b_dot_b) && (abs(b_dot_c) ≉ abs(a_dot_b))
-        # --- Case: `b` is monoclinic basis vector, coefficients of `m_b` have opposite
-        #     signs in the 2 body-centered lattice vectors, coefficients of `m_a` have
-        #     the same sign in the 2 body-centered lattice vectors
-
-        m_basis_a = basis_b
-
-        if b_dot_c - a_dot_b < 0
-            m_basis_b = basis_c - basis_a + basis_b
-        else
-            m_basis_b = -basis_c + basis_a + basis_b
-        end
-
-        if b_dot_c < -a_dot_b
-            m_basis_c = basis_c + basis_a
-        else
-            m_basis_c = -(basis_c + basis_a)
-        end
-
-    elseif (abs(c_dot_a - b_dot_c) ≈ c_dot_c) && (abs(c_dot_a) ≉ abs(b_dot_c))
-        # --- Case: `c` is monoclinic basis vector, coefficients of `m_c` have opposite
-        #     signs in the 2 body-centered lattice vectors, coefficients of `m_b` have
-        #     the same sign in the 2 body-centered lattice vectors
-
-        m_basis_a = basis_c
-
-        if c_dot_a - b_dot_c < 0
-            m_basis_b = basis_a - basis_b + basis_c
-        else
-            m_basis_b = -basis_a + basis_b + basis_c
-        end
-
-        if c_dot_a < -b_dot_c
-            m_basis_c = basis_a + basis_b
-        else
-            m_basis_c = -(basis_a + basis_b)
+        if !isnothing(m_basis_a) && !isnothing(m_basis_b) && !isnothing(m_basis_c)
+            return m_basis_a, m_basis_b, m_basis_c
         end
     end
 
-    # --- Construct return value
+    # --- Failed to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
-        throw(
-            ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
-                "satisfy conditions for case 4c.",
-            ),
-        )
-    end
-
-    return m_basis_a, m_basis_b, m_basis_c
+    throw(
+        ErrorException(
+            "The triclinic basis vectors defined by `lattice_constants` do not satisfy " *
+            "conditions for case 4c.",
+        ),
+    )
 end
 
 function convert_to_mI_case_5(lattice_constants::TriclinicLatticeConstants)
@@ -1731,112 +1262,77 @@ function convert_to_mI_case_5(lattice_constants::TriclinicLatticeConstants)
     # - Case
     #   - triclinic unit cell basis contains 3 body-centered lattice vectors
     #
+    #   - basis_b and basis_c are the triclinic basis vector with the same length
+    #
+    # - Conditions
+    #
+    #   - b_dot_b = c_dot_c
+    #
+    #   - abs(a_dot_b) != abs(c_dot_a)
+    #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    # --- Preparations
+    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+        # Initialize monoclinic basis vectors
+        m_basis_a = nothing
+        m_basis_b = nothing
+        m_basis_c = nothing
 
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
+        b_dot_b = dot(basis_b, basis_b)
+        c_dot_c = dot(basis_c, basis_c)
 
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+        a_dot_b = dot(basis_a, basis_b)
+        b_dot_c = dot(basis_b, basis_c)
+        c_dot_a = dot(basis_c, basis_a)
 
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
+        if b_dot_b ≈ c_dot_c && abs(a_dot_b) ≉ abs(c_dot_a)
 
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
+            # Compute m_basis_b and precursors to m_basis_a and m_basis_c
+            m_basis_d_1 = nothing
+            m_basis_d_2 = nothing
 
-    # Initialize monoclinic basis vectors
-    m_basis_a = nothing
-    m_basis_b = nothing
-    m_basis_c = nothing
+            if 2 * abs(a_dot_b + c_dot_a) ≈ b_dot_b + c_dot_c + 2 * b_dot_c
+                m_basis_b = basis_b + basis_c
+                m_basis_d_1 = basis_b - basis_c
 
-    m_basis_d_1 = nothing
-    m_basis_d_2 = nothing
+            elseif 2 * abs(a_dot_b - c_dot_a) ≈ b_dot_b + c_dot_c - 2 * b_dot_c
+                m_basis_b = basis_b - basis_c
+                m_basis_d_1 = basis_b + basis_c
+            end
 
-    # --- Attempt to convert the triclinic unit cell to a body-centered monoclinic unit cell
+            m_basis_d_2 = 2 * basis_a
+            m_basis_d_2 -=
+                dot(m_basis_d_2, m_basis_b) / dot(m_basis_b, m_basis_b) * m_basis_b
 
-    if a_dot_a ≈ b_dot_b && abs(c_dot_a) ≉ abs(b_dot_c)
-        # --- Case: `a` and `b` are the basis vector with the same length
+            # Compute m_basis_a and m_basis_c
+            if !isnothing(m_basis_d_1) && !isnothing(m_basis_d_2)
+                m_basis_a = 0.5 * (m_basis_d_1 + m_basis_d_2)
 
-        if 2 * abs(c_dot_a + b_dot_c) ≈ a_dot_a + b_dot_b + 2 * a_dot_b
-            m_basis_b = basis_a + basis_b
-            m_basis_d_1 = basis_a - basis_b
-
-        elseif 2 * abs(c_dot_a - b_dot_c) ≈ a_dot_a + b_dot_b - 2 * a_dot_b
-            m_basis_b = basis_a - basis_b
-            m_basis_d_1 = basis_a + basis_b
+                if dot(m_basis_d_1, m_basis_d_1) < dot(m_basis_d_2, m_basis_d_2)
+                    m_basis_c = 0.5 * (m_basis_d_1 - m_basis_d_2)
+                else
+                    m_basis_c = 0.5 * (-m_basis_d_1 + m_basis_d_2)
+                end
+            end
         end
 
-        m_basis_d_2 =
-            2 * (basis_c - dot(basis_c, m_basis_b) / dot(m_basis_b, m_basis_b) * m_basis_b)
-
-    elseif b_dot_b ≈ c_dot_c && abs(a_dot_b) ≉ abs(c_dot_a)
-        # --- Case: `b` and `c` are the basis vector with the same length
-
-        if 2 * abs(a_dot_b + c_dot_a) ≈ b_dot_b + c_dot_c + 2 * b_dot_c
-            m_basis_b = basis_b + basis_c
-            m_basis_d_1 = basis_b - basis_c
-
-        elseif 2 * abs(a_dot_b - c_dot_a) ≈ b_dot_b + c_dot_c - 2 * b_dot_c
-            m_basis_b = basis_b - basis_c
-            m_basis_d_1 = basis_b + basis_c
-        end
-
-        m_basis_d_2 =
-            2 * (basis_a - dot(basis_a, m_basis_b) / dot(m_basis_b, m_basis_b) * m_basis_b)
-
-    elseif c_dot_c ≈ a_dot_a && abs(b_dot_c) ≉ abs(a_dot_b)
-        # --- Case: `c` and `a` are the basis vector with the same length
-
-        if 2 * abs(b_dot_c + a_dot_b) ≈ c_dot_c + a_dot_a + 2 * c_dot_a
-            m_basis_b = basis_c + basis_a
-            m_basis_d_1 = basis_c - basis_a
-
-        elseif 2 * abs(b_dot_c - a_dot_b) ≈ c_dot_c + a_dot_a - 2 * c_dot_a
-            m_basis_b = basis_c - basis_a
-            m_basis_d_1 = basis_c + basis_a
-        end
-
-        m_basis_d_2 =
-            2 * (basis_b - dot(basis_b, m_basis_b) / dot(m_basis_b, m_basis_b) * m_basis_b)
-    end
-
-    if !isnothing(m_basis_d_1) && !isnothing(m_basis_d_2)
-        m_basis_a = 0.5 * (m_basis_d_1 + m_basis_d_2)
-
-        if dot(m_basis_d_1, m_basis_d_1) < dot(m_basis_d_2, m_basis_d_2)
-            m_basis_c = 0.5 * (m_basis_d_1 - m_basis_d_2)
-        else
-            m_basis_c = 0.5 * (-m_basis_d_1 + m_basis_d_2)
+        if !isnothing(m_basis_a) && !isnothing(m_basis_b) && !isnothing(m_basis_c)
+            return m_basis_a, m_basis_b, m_basis_c
         end
     end
 
-    # --- Construct return value
+    # --- Failed to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
-        throw(
-            ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
-                "include three body-centered lattice vectors.",
-            ),
-        )
-    end
-
-    return m_basis_a, m_basis_b, m_basis_c
+    throw(
+        ErrorException(
+            "The triclinic basis vectors defined by `lattice_constants` do not include " *
+            "three body-centered lattice vectors.",
+        ),
+    )
 end
 
 """
-    convert_to_mS(
+    convert_to_mC(
         lattice_constants::TriclinicLatticeConstants
     ) -> MonoclinicLatticeConstants
 
@@ -1857,7 +1353,7 @@ Exceptions
 Throws an `ErrorException` if the triclinic unit cell defined by `lattice_constants` is not
 equivalent to a base-centered monoclinic unit cell.
 """
-function convert_to_mS(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # This method adopts the following variable conventions.
@@ -1869,26 +1365,6 @@ function convert_to_mS(lattice_constants::TriclinicLatticeConstants)
     #   the "m_" prefix.
 
     # --- Preparations
-
-    # Get basis for triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
-
-    # Get lattice constants for triclinic unit cell
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
-
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
-
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
 
     # Initialize monoclinic basis vectors
     m_basis_a = nothing
@@ -1903,8 +1379,8 @@ function convert_to_mS(lattice_constants::TriclinicLatticeConstants)
     # Case: triclinic basis contains m_basis_a and m_basis_c
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_1(lattice_constants)
-        return convert_to_mS_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1(lattice_constants)
+        return convert_to_mC_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
@@ -1923,8 +1399,8 @@ function convert_to_mS(lattice_constants::TriclinicLatticeConstants)
     # Case: triclinic basis contains the m_basis_a
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_2(lattice_constants)
-        return convert_to_mS_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2(lattice_constants)
+        return convert_to_mC_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
@@ -1949,7 +1425,7 @@ function convert_to_mS(lattice_constants::TriclinicLatticeConstants)
     end
 end
 
-function convert_to_mS_basis_to_lattice_constants(
+function convert_to_mC_basis_to_lattice_constants(
     m_basis_a::Vector{<:Real}, m_basis_b::Vector{<:Real}, m_basis_c::Vector{<:Real}
 )
     # Compute monoclinic lattice constants
@@ -1966,400 +1442,7 @@ function convert_to_mS_basis_to_lattice_constants(
     return MonoclinicLatticeConstants(m_a, m_b, m_c, m_β)
 end
 
-#=
-function convert_to_mS_OLD(lattice_constants::TriclinicLatticeConstants)
-    # Notes
-    # =====
-    # This method adopts the following variable conventions.
-    #
-    # - Unless otherwise noted, lattice constants and basis vectors refer to the triclinic
-    #   (not monoclinic) unit cell.
-    #
-    # - Lattice constants and basis vectors for the monoclinic unit cell are indicated by
-    #   the "m_" prefix.
-
-    # --- Preparations
-
-    # Get basis vectors of triclinic unit cell
-    basis_a, basis_b, basis_c = basis(lattice_constants)
-
-    # Get lattice constants for triclinic unit cell
-    a = norm(basis_a)
-    b = norm(basis_b)
-    c = norm(basis_c)
-    α = dot(basis_b, basis_c) / b / c
-    β = dot(basis_c, basis_a) / c / a
-    γ = dot(basis_a, basis_b) / a / b
-
-    # Compute dot products
-    a_dot_a = a^2
-    b_dot_b = b^2
-    c_dot_c = c^2
-
-    a_dot_b = dot(basis_a, basis_b)
-    b_dot_c = dot(basis_b, basis_c)
-    c_dot_a = dot(basis_c, basis_a)
-
-    # Initialize monoclinic lattice constants
-    m_a = nothing
-    m_b = nothing
-    m_c = nothing
-    m_β = nothing
-
-    # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
-
-    # ------ Case: triclinic unit cell basis contains 2 monoclinic unit cell basis vectors
-    #        and 1 base-centered vector
-
-    # --------- Case: triclinic basis contains unique monoclinic symmetry direction
-
-    if abs(a_dot_b) < a * b * COS_APPROX_ZERO
-        # Case: `a` and `b` are basis vectors of the monoclinic unit cell
-
-        if abs(b_dot_c) ≈ 0.5 * b_dot_b
-            # Case: `b` is the unique monoclinic symmetry direction, `a` is basis vector
-            #       on B-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = a
-            m_b = b
-            m_c = sqrt(4 * c_dot_c - b_dot_b)
-            m_β = acos(2 * c_dot_a / m_a / m_c)
-
-        elseif abs(c_dot_a) ≈ 0.5 * a_dot_a
-            # Case: `a` is the unique monoclinic symmetry direction, `b` is basis vector
-            #       on B-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = b
-            m_b = a
-            m_c = sqrt(4 * c_dot_c - a_dot_a)
-            m_β = acos(2 * b_dot_c / m_a / m_c)
-        end
-
-    elseif abs(b_dot_c) < b * c * COS_APPROX_ZERO
-        # Case: `b` and `c` are basis vectors of the monoclinic unit cell
-
-        if abs(c_dot_a) ≈ 0.5 * c_dot_c
-            # Case: `c` is the unique monoclinic symmetry direction, `b` is basis vector
-            #       on B-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = b
-            m_b = c
-            m_c = sqrt(4 * a_dot_a - c_dot_c)
-            m_β = acos(2 * a_dot_b / m_a / m_c)
-
-        elseif abs(a_dot_b) ≈ 0.5 * b_dot_b
-            # Case: `b` is the unique monoclinic symmetry direction, `c` is basis vector
-            #       on B-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = c
-            m_b = b
-            m_c = sqrt(4 * a_dot_a - b_dot_b)
-            m_β = acos(2 * c_dot_a / m_a / m_c)
-        end
-
-    elseif abs(c_dot_a) < c * a * COS_APPROX_ZERO
-        # Case: `c` and `a` are basis vectors of the monoclinic unit cell
-
-        if abs(a_dot_b) ≈ 0.5 * a_dot_a
-            # Case: `a` is the unique monoclinic symmetry direction, `c` is basis vector
-            #       on B-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = c
-            m_b = a
-            m_c = sqrt(4 * b_dot_b - a_dot_a)
-            m_β = acos(2 * b_dot_c / m_a / m_c)
-
-        elseif abs(b_dot_c) ≈ 0.5 * c_dot_c
-            # Case: `c` is the unique monoclinic symmetry direction, `a` is basis vector
-            #       on B-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = a
-            m_b = c
-            m_c = sqrt(4 * b_dot_b - c_dot_c)
-            m_β = acos(2 * a_dot_b / m_a / m_c)
-        end
-    end
-
-    # --------- Case: triclinic basis does not contain unique monoclinic symmetry direction
-
-    if (abs(a_dot_b) ≈ 2 * abs(c_dot_a) || abs(a_dot_b) ≈ 2 * abs(b_dot_c))
-        # Case: `a` and `b` are basis vectors of the monoclinic unit cell
-
-        if abs(a_dot_b) ≈ 2 * abs(b_dot_c)
-            # Case: `a` is basis vector on C-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = a
-            m_b = sqrt(4 * c_dot_c - a_dot_a)
-            m_c = b
-            m_β = acos(a_dot_b / m_a / m_c)
-
-        else  # abs(a_dot_b) ≈ 2 * abs(c_dot_a)
-            # Case: `b` is basis vector on C-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = b
-            m_b = sqrt(4 * c_dot_c - b_dot_b)
-            m_c = a
-            m_β = acos(a_dot_b / m_a / m_c)
-        end
-
-    elseif (abs(b_dot_c) ≈ 2 * abs(a_dot_b) || abs(b_dot_c) ≈ 2 * abs(c_dot_a))
-        # Case: `b` and `c` are basis vectors of the monoclinic unit cell
-
-        if abs(b_dot_c) ≈ 2 * abs(c_dot_a)
-            # Case: `b` is basis vector on C-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = b
-            m_b = sqrt(4 * a_dot_a - b_dot_b)
-            m_c = c
-            m_β = acos(b_dot_c / m_a / m_c)
-
-        else  # abs(b_dot_c) ≈ 2 * abs(a_dot_b)
-            # Case: `c` is basis vector on C-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = c
-            m_b = sqrt(4 * a_dot_a - c_dot_c)
-            m_c = b
-            m_β = acos(b_dot_c / m_a / m_c)
-        end
-
-    elseif (abs(c_dot_a) ≈ 2 * abs(b_dot_c) || abs(c_dot_a) ≈ 2 * abs(a_dot_b))
-        # Case: `c` and `a` are basis vectors of the monoclinic unit cell
-
-        if abs(c_dot_a) ≈ 2 * abs(a_dot_b)
-            # Case: `c` is basis vector on C-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = c
-            m_b = sqrt(4 * b_dot_b - c_dot_c)
-            m_c = a
-            m_β = acos(c_dot_a / m_a / m_c)
-
-        else  # abs(c_dot_a) ≈ 2 * abs(b_dot_c)
-            # Case: `a` is basis vector on C-face of the monoclinic unit cell
-
-            # Compute monoclinic lattice constants
-            m_a = a
-            m_b = sqrt(4 * b_dot_b - a_dot_a)
-            m_c = c
-            m_β = acos(c_dot_a / m_a / m_c)
-        end
-    end
-
-    # ------ Case: triclinic unit cell basis contains 1 monoclinic unit cell basis vector
-    #        2 base-centered vectors
-
-    # --------- Case: triclinic basis contains the unique monoclinic symmetry direction
-
-    # Impossible because basis is not linearly independent
-
-    # --------- Case: triclinic basis does not contain unique monoclinic symmetry direction
-
-    if (abs(a_dot_b) ≈ abs(c_dot_a) && b_dot_b ≈ c_dot_c)
-        # Case: `a` is C-basis vector of the monoclinic unit cell
-
-        # --- Compute monoclinic basis vectors
-
-        m_basis_a = basis_b + basis_c
-        m_basis_b = basis_b - basis_c
-        m_basis_c = basis_a
-
-        # Swap m_basis_a and m_basis_b if they are reversed
-        if abs(dot(m_basis_b, m_basis_c)) >= a * norm(m_basis_b) * COS_APPROX_ZERO
-            m_basis_tmp = m_basis_a
-            m_basis_a = m_basis_b
-            m_basis_b = m_basis_tmp
-        end
-
-        # --- Compute monoclinic lattice constants
-
-        m_a = norm(m_basis_a)
-        m_b = norm(m_basis_b)
-        m_c = a
-        m_β = angle(m_basis_a, m_basis_c)
-
-    elseif (abs(b_dot_c) ≈ abs(a_dot_b) && c_dot_c ≈ a_dot_a)
-        # Case: `b` is C-basis vector of the monoclinic unit cell
-
-        # --- Compute monoclinic basis vectors
-
-        m_basis_a = basis_c + basis_a
-        m_basis_b = basis_c - basis_a
-        m_basis_c = basis_b
-
-        # Swap m_basis_a and m_basis_b if they are reversed
-        if abs(dot(m_basis_b, m_basis_c)) >= b * norm(m_basis_b) * COS_APPROX_ZERO
-            m_basis_tmp = m_basis_a
-            m_basis_a = m_basis_b
-            m_basis_b = m_basis_tmp
-        end
-
-        # --- Compute monoclinic lattice constants
-
-        m_a = norm(m_basis_a)
-        m_b = norm(m_basis_b)
-        m_c = b
-        m_β = angle(m_basis_a, m_basis_c)
-
-    elseif (abs(c_dot_a) ≈ abs(b_dot_c) && a_dot_a ≈ b_dot_b)
-        # Case: `c` is C-basis vector of the monoclinic unit cell
-
-        # --- Compute monoclinic basis vectors
-
-        m_basis_a = basis_a + basis_b
-        m_basis_b = basis_a - basis_b
-        m_basis_c = basis_c
-
-        # Swap m_basis_a and m_basis_b if they are reversed
-        if abs(dot(m_basis_b, m_basis_c)) >= c * norm(m_basis_b) * COS_APPROX_ZERO
-            m_basis_tmp = m_basis_a
-            m_basis_a = m_basis_b
-            m_basis_b = m_basis_tmp
-        end
-
-        # --- Compute monoclinic lattice constants
-
-        m_a = norm(m_basis_a)
-        m_b = norm(m_basis_b)
-        m_c = c
-        m_β = angle(m_basis_a, m_basis_c)
-    end
-
-    # ------ Case: triclinic unit cell basis contains 3 base-centered vectors
-
-    if (a_dot_a ≈ b_dot_b && abs(c_dot_a) ≉ abs(b_dot_c))
-        # Case: `a` and `b` are base-centered basis vectors that combine only two
-        #       monoclinic basis vectors
-
-        # --- Compute monoclinic basis vectors
-
-        m_basis_a = basis_a + basis_b
-        m_basis_b = basis_a - basis_b
-
-        # Swap m_basis_a and m_basis_a if they are reversed
-        #
-        # m_basis_b should satisfy the following equation
-        #
-        #   abs(dot(m_basis_b, basis_c)) = 0.5 * dot(m_basis_b, m_basis_b)
-        if abs(dot(m_basis_b, basis_c)) ≉ 0.5 * dot(m_basis_b, m_basis_b)
-            m_basis_tmp = m_basis_a
-            m_basis_a = m_basis_b
-            m_basis_b = m_basis_tmp
-        end
-
-        # Compute m_basis_c by (1) removing m_basis_b from basis_c and (2) adding
-        # 0.5 * m_basis_a
-        m_basis_c =
-            basis_c - dot(basis_c, m_basis_b) / dot(m_basis_b, m_basis_b) * m_basis_b +
-            0.5 * m_basis_a
-
-        # --- Compute monoclinic lattice constants
-
-        m_a = norm(m_basis_a)
-        m_b = norm(m_basis_b)
-        m_c = norm(m_basis_c)
-        m_β = angle(m_basis_a, m_basis_c)
-
-    elseif (b_dot_b ≈ c_dot_c && abs(a_dot_b) ≉ abs(c_dot_a))
-        # Case: `b` and `c` are base-centered basis vectors that combine only two
-        #       monoclinic basis vectors
-
-        # --- Compute monoclinic basis vectors
-
-        m_basis_a = basis_b + basis_c
-        m_basis_b = basis_b - basis_c
-
-        # Swap m_basis_a and m_basis_a if they are reversed
-        #
-        # m_basis_b should satisfy the following equation
-        #
-        #   abs(dot(m_basis_b, basis_a)) = 0.5 * dot(m_basis_b, m_basis_b)
-        if abs(dot(m_basis_b, basis_a)) ≉ 0.5 * dot(m_basis_b, m_basis_b)
-            m_basis_tmp = m_basis_a
-            m_basis_a = m_basis_b
-            m_basis_b = m_basis_tmp
-        end
-
-        # Compute m_basis_c by (1) removing m_basis_b from basis_a and (2) adding
-        # 0.5 * m_basis_a
-        m_basis_c =
-            basis_a - dot(basis_a, m_basis_b) / dot(m_basis_b, m_basis_b) * m_basis_b +
-            0.5 * m_basis_a
-
-        # --- Compute monoclinic lattice constants
-
-        m_a = norm(m_basis_a)
-        m_b = norm(m_basis_b)
-        m_c = norm(m_basis_c)
-        m_β = angle(m_basis_a, m_basis_c)
-
-    elseif (c_dot_c ≈ a_dot_a && abs(b_dot_c) ≉ abs(a_dot_b))
-        # Case: `c` and `a` are base-centered basis vectors that combine only two
-        #       monoclinic basis vectors
-
-        # --- Compute monoclinic basis vectors
-
-        m_basis_a = basis_c + basis_a
-        m_basis_b = basis_c - basis_a
-
-        m_basis_a = basis_c - basis_a
-        m_basis_b = basis_c + basis_a
-
-        # Swap m_basis_a and m_basis_a if they are reversed
-        #
-        # m_basis_b should satisfy the following equation
-        #
-        #   abs(dot(m_basis_b, basis_b)) = 0.5 * dot(m_basis_b, m_basis_b)
-        if abs(dot(m_basis_b, basis_b)) ≉ 0.5 * dot(m_basis_b, m_basis_b)
-            m_basis_tmp = m_basis_a
-            m_basis_a = m_basis_b
-            m_basis_b = m_basis_tmp
-        end
-
-        # Compute m_basis_c by (1) removing m_basis_b from basis_b and (2) adding
-        # 0.5 * m_basis_a
-        m_basis_c =
-            basis_b - dot(basis_b, m_basis_b) / dot(m_basis_b, m_basis_b) * m_basis_b +
-            0.5 * m_basis_a
-
-        # --- Compute monoclinic lattice constants
-
-        m_a = norm(m_basis_a)
-        m_b = norm(m_basis_b)
-        m_c = norm(m_basis_c)
-        m_β = angle(m_basis_a, m_basis_c)
-    end
-
-    # --- Construct return value
-
-    if isnothing(m_a) || isnothing(m_b) || isnothing(m_c) || isnothing(m_β)
-        throw(
-            ErrorException(
-                "The triclinic unit cell defined by `lattice_constants` is not " *
-                "equivalent to a base-centered monoclinic unit cell.",
-            ),
-        )
-    end
-
-    mI_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
-    )
-    mS_lattice_constants = convert_to_base_centering(mI_lattice_constants)
-
-    return mS_lattice_constants
-end
-=#
-
-function convert_to_mS_case_1(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_1(lattice_constants::TriclinicLatticeConstants)
     # --- Preparations
 
     # Initialize monoclinic basis vectors
@@ -2371,7 +1454,8 @@ function convert_to_mS_case_1(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_1a(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1a(lattice_constants)
+        @debug "aP --> mC (case 1a)"
 
     catch error
         if !(error isa ErrorException) || (
@@ -2385,7 +1469,8 @@ function convert_to_mS_case_1(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_1b(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1b(lattice_constants)
+        @debug "aP --> mC (case 1b)"
 
     catch error
         if !(error isa ErrorException) || (
@@ -2412,7 +1497,7 @@ function convert_to_mS_case_1(lattice_constants::TriclinicLatticeConstants)
     return m_basis_a, m_basis_b, m_basis_c
 end
 
-function convert_to_mS_case_1a(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_1a(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
@@ -2421,9 +1506,15 @@ function convert_to_mS_case_1a(lattice_constants::TriclinicLatticeConstants)
     #
     #   - base-centered vector does not include a contribution from m_basis_c
     #
-    #   - triclinic basis contains the m_basis_a and m_basis_c
+    #   - basis_a and basis_c are m_basis_a and m_basis_c, respectively
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - Conditions
+    #
+    #   - 2 * abs(a_dot_b) = a_dot_a
+    #
+    #   - 2 * abs(b_dot_c) = abs(c_dot_a)
+    #
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
@@ -2441,9 +1532,8 @@ function convert_to_mS_case_1a(lattice_constants::TriclinicLatticeConstants)
         c_dot_a = dot(basis_c, basis_a)
 
         if 2 * abs(a_dot_b) ≈ a_dot_a && 2 * abs(b_dot_c) ≈ abs(c_dot_a)
-            # --- Case: `a` and `c` are the monoclinic basis vectors in the triclinic basis
-            #     and `a` is m_basis_a
 
+            # Compute monoclinic basis
             m_basis_a = basis_a
 
             if 2 * a_dot_b ≈ a_dot_a
@@ -2474,18 +1564,26 @@ function convert_to_mS_case_1a(lattice_constants::TriclinicLatticeConstants)
     )
 end
 
-function convert_to_mS_case_1b(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_1b(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
     #   - triclinic unit cell basis contains m_basis_a, m_basis_c, and 1 base-centered
     #     lattice vector
     #
-    #   - base-centered vector does includes a contribution from m_basis_c
+    #   - base-centered vector include a contribution from m_basis_c
     #
-    #   - triclinic basis contains the m_basis_a and m_basis_c
+    #   - basis_a and basis_c are m_basis_a and m_basis_c, respectively
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - Conditions
+    #
+    #   - abs(a_dot_b - 0.5 * a_dot_a) = abs(c_dot_a) or
+    #     abs(a_dot_b + 0.5 * a_dot_a) = abs(c_dot_a)
+    #
+    #   - 2 * abs(b_dot_c - c_dot_c) = abs(c_dot_a) or
+    #     2 * abs(b_dot_c + c_dot_c) = abs(c_dot_a)
+    #
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
@@ -2564,7 +1662,7 @@ function convert_to_mS_case_1b(lattice_constants::TriclinicLatticeConstants)
     )
 end
 
-function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2(lattice_constants::TriclinicLatticeConstants)
     # --- Preparations
 
     # Initialize monoclinic basis vectors
@@ -2576,8 +1674,8 @@ function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_2a(lattice_constants)
-        println("Convert to mS Case 2a, $m_basis_a, $m_basis_b, $m_basis_c")
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2a(lattice_constants)
+        @debug "aP --> mC (case 2a)"
 
     catch error
         if !(error isa ErrorException) || (
@@ -2591,8 +1689,8 @@ function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_2b(lattice_constants)
-        println("Convert to mS Case 2b, $m_basis_a, $m_basis_b, $m_basis_c")
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2b(lattice_constants)
+        @debug "aP --> mC (case 2b)"
 
     catch error
         if !(error isa ErrorException) || (
@@ -2606,8 +1704,8 @@ function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_2c(lattice_constants)
-        println("Convert to mS Case 2c, $m_basis_a, $m_basis_b, $m_basis_c")
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2c(lattice_constants)
+        @debug "aP --> mC (case 2c)"
 
     catch error
         if !(error isa ErrorException) || (
@@ -2621,8 +1719,8 @@ function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mS_case_2d(lattice_constants)
-        println("Convert to mS Case 2d, $m_basis_a, $m_basis_b, $m_basis_c")
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2d(lattice_constants)
+        @debug "aP --> mC (case 2d)"
 
     catch error
         if !(error isa ErrorException) || (
@@ -2649,7 +1747,7 @@ function convert_to_mS_case_2(lattice_constants::TriclinicLatticeConstants)
     return m_basis_a, m_basis_b, m_basis_c
 end
 
-function convert_to_mS_case_2a(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2a(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
@@ -2658,7 +1756,13 @@ function convert_to_mS_case_2a(lattice_constants::TriclinicLatticeConstants)
     #   - the sign of the coefficient of m_basis_a in basis_b is positive and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are the same
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - Conditions
+    #
+    #   - 2 * a_dot_b = a_dot_a
+    #
+    #   - 2 * abs(b_dot_c - b_dot_b - 0.5 * a_dot_a + a_dot_b) = abs(c_dot_a - a_dot_b)
+    #
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
@@ -2677,13 +1781,11 @@ function convert_to_mS_case_2a(lattice_constants::TriclinicLatticeConstants)
 
         if 2 * a_dot_b ≈ a_dot_a &&
             2 * abs(b_dot_c - b_dot_b - 0.5 * a_dot_a + a_dot_b) ≈ abs(c_dot_a - a_dot_b)
-            # Compute m_basis_a
-            m_basis_a = basis_a
 
-            # Compute m_basis_b
+            # Compute monoclinic basis
+            m_basis_a = basis_a
             m_basis_b = 2 * basis_b - basis_a
 
-            # Compute m_basis_c
             if a_dot_b < c_dot_a
                 m_basis_c = basis_b - basis_c
             else
@@ -2706,7 +1808,7 @@ function convert_to_mS_case_2a(lattice_constants::TriclinicLatticeConstants)
     )
 end
 
-function convert_to_mS_case_2b(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2b(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
@@ -2715,7 +1817,13 @@ function convert_to_mS_case_2b(lattice_constants::TriclinicLatticeConstants)
     #   - the sign of the coefficient of m_basis_a in basis_b is positive and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are opposite
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - Conditions
+    #
+    #   - 2 * a_dot_b = a_dot_a
+    #
+    #   - 2 * abs(b_dot_c + b_dot_b - a_dot_b) = abs(c_dot_a - a_dot_b)
+    #
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
@@ -2734,13 +1842,11 @@ function convert_to_mS_case_2b(lattice_constants::TriclinicLatticeConstants)
 
         if 2 * a_dot_b ≈ a_dot_a &&
             2 * abs(b_dot_c + b_dot_b - a_dot_b) ≈ abs(c_dot_a - a_dot_b)
-            # Compute m_basis_a
-            m_basis_a = basis_a
 
-            # Compute m_basis_b
+            # Compute monoclinic basis
+            m_basis_a = basis_a
             m_basis_b = 2 * basis_b - basis_a
 
-            # Compute m_basis_c
             if a_dot_b < -c_dot_a
                 m_basis_c = basis_b + basis_c
             else
@@ -2763,7 +1869,7 @@ function convert_to_mS_case_2b(lattice_constants::TriclinicLatticeConstants)
     )
 end
 
-function convert_to_mS_case_2c(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2c(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
@@ -2772,7 +1878,13 @@ function convert_to_mS_case_2c(lattice_constants::TriclinicLatticeConstants)
     #   - the sign of the coefficient of m_basis_a in basis_b is negative and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are the same
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - Conditions
+    #
+    #   - 2 * a_dot_b = -a_dot_a
+    #
+    #   - 2 * abs(b_dot_c - b_dot_b - 0.5 * a_dot_a - a_dot_b) = abs(c_dot_a - a_dot_b)
+    #
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
@@ -2792,13 +1904,10 @@ function convert_to_mS_case_2c(lattice_constants::TriclinicLatticeConstants)
         if 2 * a_dot_b ≈ -a_dot_a &&
             2 * abs(b_dot_c - b_dot_b - 0.5 * a_dot_a - a_dot_b) ≈ abs(c_dot_a - a_dot_b)
 
-            # Compute m_basis_a
+            # Compute monoclinic basis
             m_basis_a = basis_a
-
-            # Compute m_basis_b
             m_basis_b = 2 * basis_b + basis_a
 
-            # Compute m_basis_c
             if a_dot_b < c_dot_a
                 m_basis_c = basis_b - basis_c
             else
@@ -2821,7 +1930,7 @@ function convert_to_mS_case_2c(lattice_constants::TriclinicLatticeConstants)
     )
 end
 
-function convert_to_mS_case_2d(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2d(lattice_constants::TriclinicLatticeConstants)
     # Notes
     # =====
     # - Case
@@ -2830,7 +1939,13 @@ function convert_to_mS_case_2d(lattice_constants::TriclinicLatticeConstants)
     #   - the sign of the coefficient of m_basis_a in basis_b is negative and the signs of
     #     the coefficients of m_basis_b in basis_b and basis_c are opposite
     #
-    # - This method adopts the same variable conventions as convert_to_mS().
+    # - Conditions
+    #
+    #   - 2 * a_dot_b ≈ -a_dot_a
+    #
+    #   - 2 * abs(b_dot_c + b_dot_b + a_dot_b) = abs(c_dot_a - a_dot_b)
+    #
+    # - This method adopts the same variable conventions as convert_to_mC().
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
@@ -2849,13 +1964,11 @@ function convert_to_mS_case_2d(lattice_constants::TriclinicLatticeConstants)
 
         if 2 * a_dot_b ≈ -a_dot_a &&
             2 * abs(b_dot_c + b_dot_b + a_dot_b) ≈ abs(c_dot_a - a_dot_b)
-            # Compute m_basis_a
-            m_basis_a = basis_a
 
-            # Compute m_basis_b
+            # Compute monoclinic basis
+            m_basis_a = basis_a
             m_basis_b = 2 * basis_b + basis_a
 
-            # Compute m_basis_c
             if a_dot_b < -c_dot_a
                 m_basis_c = basis_b + basis_c
             else

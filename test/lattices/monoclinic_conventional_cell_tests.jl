@@ -18,8 +18,9 @@ Tests for the unit cell standardization methods for monoclinic lattices
 # --- Imports
 
 # Standard library
-using Test
 using LinearAlgebra: dot, norm
+using Logging
+using Test
 
 # XtallographyUtils package
 using XtallographyUtils
@@ -490,6 +491,7 @@ end
     expected_unit_cell = standardize(UnitCell(m_lattice_constants, Primitive()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
+    @debug "chain of limiting cases: aP --> mP"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # body-centered unit cell: aP --> mI
@@ -507,6 +509,7 @@ end
     expected_unit_cell = standardize(UnitCell(m_lattice_constants, BodyCentered()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
+    @debug "chain of limiting cases: aP --> mI"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # body-centered unit cell: aP --> mI
@@ -524,9 +527,10 @@ end
     expected_unit_cell = standardize(UnitCell(m_lattice_constants, BodyCentered()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
+    @debug "chain of limiting cases: aP --> mI"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
-    # base-centered unit cell: aP --> mS
+    # base-centered unit cell: aP --> mC
     #
     # Case #1: m_basis_a and m_basis_c in triclinic basis
     triclinic_unit_cell = UnitCell(
@@ -540,7 +544,7 @@ end
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
-    # base-centered unit cell: aP --> mS
+    # base-centered unit cell: aP --> mC
     #
     # Case #2: m_basis_a and two base-centered lattice vectors in triclinic basis
     triclinic_unit_cell = UnitCell(
@@ -555,5 +559,6 @@ end
     expected_unit_cell = standardize(UnitCell(m_lattice_constants, BaseCentered()))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
+    @debug "chain of limiting cases: aP --> mC"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end

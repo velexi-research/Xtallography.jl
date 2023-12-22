@@ -125,8 +125,6 @@ function surface_area(lattice_constants::RhombohedralLatticeConstants)
     return 6 * lattice_constants.a^2 * sin(lattice_constants.α)
 end
 
-# TODO
-
 function conventional_cell(::Rhombohedral, unit_cell::UnitCell)
     # --- Check arguments
 

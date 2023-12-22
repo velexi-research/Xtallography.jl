@@ -29,6 +29,142 @@ using XtallographyUtils
 
 # --- Tests
 
+# ------ basic mathematical functions
+
+@testset "asin_()" begin
+    # --- Preparations
+
+    delta = eps(1.0)
+
+    # --- Tests
+
+    # ------ x in [-1, 1], x far from endpoints
+
+    @test asin_(0.5) == asin(0.5)
+
+    # ------ x near 1
+
+    # x < 1
+    @test asin_(1 - delta) == asin(1 - delta)
+
+    # x = 1
+    @test asin_(1) == asin(1)
+
+    # x > 1
+    @test asin_(1 + delta) == π / 2
+
+    # ------ x near -1
+
+    # x > -1
+    @test asin_(-1 + delta) == asin(-1 + delta)
+
+    # x = -1
+    @test asin_(-1) == asin(-1)
+
+    # x < -1
+    @test asin_(-1 - delta) == -π / 2
+
+    # ------ x not in [-1, 1], x far from endpoints
+
+    # |x| >> 1, x > 0
+    local error = nothing
+    local error_message = ""
+    try
+        asin_(2.0)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa DomainError
+
+    expected_error = "DomainError with 2.0:\nasin(x) is not defined for |x| > 1"
+    @test startswith(error_message, expected_error)
+
+    # |x| >> 1, x < 0
+    local error = nothing
+    local error_message = ""
+    try
+        asin_(-3.0)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa DomainError
+
+    expected_error = "DomainError with -3.0:\nasin(x) is not defined for |x| > 1"
+    @test startswith(error_message, expected_error)
+end
+
+@testset "acos_()" begin
+    # --- Preparations
+
+    delta = eps(1.0)
+
+    # --- Tests
+
+    # ------ x in [-1, 1], x far from endpoints
+
+    @test acos_(0.5) == acos(0.5)
+
+    # ------ x near 1
+
+    # x < 1
+    @test acos_(1 - delta) == acos(1 - delta)
+
+    # x = 1
+    @test acos_(1) == acos(1)
+
+    # x > 1
+    @test acos_(1 + delta) == 0
+
+    # ------ x near -1
+
+    # x < -1
+    @test acos_(-1 - delta) == π
+
+    # x = -1
+    @test acos_(-1) == acos(-1)
+
+    # x < -1
+    @test acos_(-1 - delta) == π
+
+    # ------ x not in [-1, 1], x far from endpoints
+
+    # |x| >> 1, x > 0
+    local error = nothing
+    local error_message = ""
+    try
+        acos_(2.0)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa DomainError
+
+    expected_error = "DomainError with 2.0:\nacos(x) not defined for |x| > 1"
+    @test startswith(error_message, expected_error)
+
+    # |x| >> 1, x < 0
+    local error = nothing
+    local error_message = ""
+    try
+        acos_(-3.0)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa DomainError
+
+    expected_error = "DomainError with -3.0:\nacos(x) not defined for |x| > 1"
+    @test startswith(error_message, expected_error)
+end
+
+# ------ linear algebra
+
 @testset "is_basis()" begin
     # --- Tests
 
@@ -72,6 +208,8 @@ using XtallographyUtils
     v3 = 1e-50 * [7, 8, 9]
     @test !is_basis(v1, v2, v3)
 end
+
+# --- geometry
 
 @testset "volume(::Vector,::Vector,::Vector)" begin
     # --- Tests

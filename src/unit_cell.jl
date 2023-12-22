@@ -445,10 +445,7 @@ function conventional_cell(unit_cell::UnitCell)
     # --- Compute IUCr conventional cells for lattice systems with limiting cases that
     #     change the Bravais lattice type
 
-    # Get lattice system
     lattice_system_ = lattice_system(unit_cell.lattice_constants)
-
-    # TODO
     if lattice_system_ === Triclinic()
         return conventional_cell(Triclinic(), unit_cell)
     elseif lattice_system_ === Monoclinic()
