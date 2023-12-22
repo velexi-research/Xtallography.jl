@@ -177,29 +177,27 @@ const face_centered = FaceCentered()
 
 # Lattice Types
 const BRAVAIS_LATTICES = (
-    (lattice_system=Triclinic(), centering=Primitive()),
-    (lattice_system=Monoclinic(), centering=Primitive()),
-    (lattice_system=Monoclinic(), centering=BodyCentered()),
-    (lattice_system=Monoclinic(), centering=BaseCentered()),
-    (lattice_system=Orthorhombic(), centering=Primitive()),
-    (lattice_system=Orthorhombic(), centering=BodyCentered()),
-    (lattice_system=Orthorhombic(), centering=FaceCentered()),
-    (lattice_system=Orthorhombic(), centering=BaseCentered()),
-    (lattice_system=Tetragonal(), centering=Primitive()),
-    (lattice_system=Tetragonal(), centering=BodyCentered()),
-    (lattice_system=Rhombohedral(), centering=Primitive()),
-    (lattice_system=Hexagonal(), centering=Primitive()),
-    (lattice_system=Cubic(), centering=Primitive()),
-    (lattice_system=Cubic(), centering=BodyCentered()),
-    (lattice_system=Cubic(), centering=FaceCentered()),
+    (lattice_system=triclinic, centering=primitive),
+    (lattice_system=monoclinic, centering=primitive),
+    (lattice_system=monoclinic, centering=body_centered),
+    (lattice_system=monoclinic, centering=base_centered),
+    (lattice_system=orthorhombic, centering=primitive),
+    (lattice_system=orthorhombic, centering=body_centered),
+    (lattice_system=orthorhombic, centering=face_centered),
+    (lattice_system=orthorhombic, centering=base_centered),
+    (lattice_system=tetragonal, centering=primitive),
+    (lattice_system=tetragonal, centering=body_centered),
+    (lattice_system=rhombohedral, centering=primitive),
+    (lattice_system=hexagonal, centering=primitive),
+    (lattice_system=cubic, centering=primitive),
+    (lattice_system=cubic, centering=body_centered),
+    (lattice_system=cubic, centering=face_centered),
 )
 
 # --- Functions/Methods
 
 """
     is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering) -> Bool
-
-    is_bravais_lattice(lattice_system::Type{<:LatticeSystem}, centering::Centering) -> Bool
 
     is_bravais_lattice(unit_cell::UnitCell) -> Bool
 
@@ -215,10 +213,6 @@ Examples
 ========
 TODO
 """
-function is_bravais_lattice(lattice_system_::LatticeSystem, centering::Centering)
-    return (lattice_system=lattice_system_, centering=centering) in BRAVAIS_LATTICES
-end
-
-function is_bravais_lattice(lattice_system_::Type{<:LatticeSystem}, centering::Centering)
-    return is_bravais_lattice(lattice_system_(), centering)
+function is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering)
+    return (lattice_system=lattice_system, centering=centering) in BRAVAIS_LATTICES
 end

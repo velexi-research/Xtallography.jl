@@ -76,91 +76,45 @@ end
 @testset "is_bravais_lattice(::LatticeSystem, ::Centering)" begin
     # --- Tests
 
-    # Cubic
-    @test is_bravais_lattice(Cubic(), Primitive())
-    @test is_bravais_lattice(Cubic(), BodyCentered())
-    @test is_bravais_lattice(Cubic(), FaceCentered())
-    @test !is_bravais_lattice(Cubic(), BaseCentered())
+    # cubic
+    @test is_bravais_lattice(cubic, primitive)
+    @test is_bravais_lattice(cubic, body_centered)
+    @test is_bravais_lattice(cubic, face_centered)
+    @test !is_bravais_lattice(cubic, base_centered)
 
-    # Tetragonal
-    @test is_bravais_lattice(Tetragonal(), Primitive())
-    @test is_bravais_lattice(Tetragonal(), BodyCentered())
-    @test !is_bravais_lattice(Tetragonal(), FaceCentered())
-    @test !is_bravais_lattice(Tetragonal(), BaseCentered())
+    # tetragonal
+    @test is_bravais_lattice(tetragonal, primitive)
+    @test is_bravais_lattice(tetragonal, body_centered)
+    @test !is_bravais_lattice(tetragonal, face_centered)
+    @test !is_bravais_lattice(tetragonal, base_centered)
 
-    # Orthorhombic
-    @test is_bravais_lattice(Orthorhombic(), Primitive())
-    @test is_bravais_lattice(Orthorhombic(), BodyCentered())
-    @test is_bravais_lattice(Orthorhombic(), FaceCentered())
-    @test is_bravais_lattice(Orthorhombic(), BaseCentered())
+    # orthorhombic
+    @test is_bravais_lattice(orthorhombic, primitive)
+    @test is_bravais_lattice(orthorhombic, body_centered)
+    @test is_bravais_lattice(orthorhombic, face_centered)
+    @test is_bravais_lattice(orthorhombic, base_centered)
 
-    # Hexagonal
-    @test is_bravais_lattice(Hexagonal(), Primitive())
-    @test !is_bravais_lattice(Hexagonal(), BodyCentered())
-    @test !is_bravais_lattice(Hexagonal(), FaceCentered())
-    @test !is_bravais_lattice(Hexagonal(), BaseCentered())
+    # hexagonal
+    @test is_bravais_lattice(hexagonal, primitive)
+    @test !is_bravais_lattice(hexagonal, body_centered)
+    @test !is_bravais_lattice(hexagonal, face_centered)
+    @test !is_bravais_lattice(hexagonal, base_centered)
 
-    # Rhombohedral
-    @test is_bravais_lattice(Rhombohedral(), Primitive())
-    @test !is_bravais_lattice(Rhombohedral(), BodyCentered())
-    @test !is_bravais_lattice(Rhombohedral(), FaceCentered())
-    @test !is_bravais_lattice(Rhombohedral(), BaseCentered())
+    # rhombohedral
+    @test is_bravais_lattice(rhombohedral, primitive)
+    @test !is_bravais_lattice(rhombohedral, body_centered)
+    @test !is_bravais_lattice(rhombohedral, face_centered)
+    @test !is_bravais_lattice(rhombohedral, base_centered)
 
-    # Monoclinic
-    @test is_bravais_lattice(Monoclinic(), Primitive())
-    @test is_bravais_lattice(Monoclinic(), BodyCentered())
-    @test !is_bravais_lattice(Monoclinic(), FaceCentered())
-    @test is_bravais_lattice(Monoclinic(), BaseCentered())
+    # monoclinic
+    @test is_bravais_lattice(monoclinic, primitive)
+    @test is_bravais_lattice(monoclinic, body_centered)
+    @test !is_bravais_lattice(monoclinic, face_centered)
+    @test is_bravais_lattice(monoclinic, base_centered)
 
-    # Triclinic
-    @test is_bravais_lattice(Triclinic(), Primitive())
-    @test !is_bravais_lattice(Triclinic(), BodyCentered())
-    @test !is_bravais_lattice(Triclinic(), FaceCentered())
-    @test !is_bravais_lattice(Triclinic(), BaseCentered())
-end
-
-@testset "is_bravais_lattice(::Type{<:LatticeSystem}, ::Centering)" begin
-    # --- Tests
-
-    # Cubic
-    @test is_bravais_lattice(Cubic, Primitive())
-    @test is_bravais_lattice(Cubic, BodyCentered())
-    @test is_bravais_lattice(Cubic, FaceCentered())
-    @test !is_bravais_lattice(Cubic, BaseCentered())
-
-    # Tetragonal
-    @test is_bravais_lattice(Tetragonal, Primitive())
-    @test is_bravais_lattice(Tetragonal, BodyCentered())
-    @test !is_bravais_lattice(Tetragonal, FaceCentered())
-    @test !is_bravais_lattice(Tetragonal, BaseCentered())
-
-    # Orthorhombic
-    @test is_bravais_lattice(Orthorhombic, Primitive())
-    @test is_bravais_lattice(Orthorhombic, BodyCentered())
-    @test is_bravais_lattice(Orthorhombic, FaceCentered())
-    @test is_bravais_lattice(Orthorhombic, BaseCentered())
-
-    # Hexagonal
-    @test is_bravais_lattice(Hexagonal, Primitive())
-    @test !is_bravais_lattice(Hexagonal, BodyCentered())
-    @test !is_bravais_lattice(Hexagonal, FaceCentered())
-    @test !is_bravais_lattice(Hexagonal, BaseCentered())
-
-    # Rhombohedral
-    @test is_bravais_lattice(Rhombohedral, Primitive())
-    @test !is_bravais_lattice(Rhombohedral, BodyCentered())
-    @test !is_bravais_lattice(Rhombohedral, FaceCentered())
-    @test !is_bravais_lattice(Rhombohedral, BaseCentered())
-
-    # Monoclinic
-    @test is_bravais_lattice(Monoclinic, Primitive())
-    @test is_bravais_lattice(Monoclinic, BodyCentered())
-    @test !is_bravais_lattice(Monoclinic, FaceCentered())
-    @test is_bravais_lattice(Monoclinic, BaseCentered())
-
-    # Triclinic
-    @test is_bravais_lattice(Triclinic, Primitive())
-    @test !is_bravais_lattice(Triclinic, BodyCentered())
-    @test !is_bravais_lattice(Triclinic, FaceCentered())
-    @test !is_bravais_lattice(Triclinic, BaseCentered())
+    # triclinic
+    @test is_bravais_lattice(triclinic, primitive)
+    @test !is_bravais_lattice(triclinic, body_centered)
+    @test !is_bravais_lattice(triclinic, face_centered)
+    @test !is_bravais_lattice(triclinic, base_centered)
 end
