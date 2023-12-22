@@ -731,9 +731,9 @@ end
 
     # Test all cases for body-centered basis vector
     basis_a = m_basis_a
-    basis_c = m_basis_c
-    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
-        basis_b = 0.5 * (signs[1] * basis_a + signs[2] * m_basis_b + signs[3] * basis_c)
+    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1), (-1, 1))
+        basis_b = 0.5 * (signs[1] * basis_a + signs[2] * m_basis_b + signs[3] * m_basis_c)
+        basis_c = signs[4] * m_basis_c
 
         convert_to_mI_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
@@ -761,9 +761,9 @@ end
 
     # Test all cases for body-centered basis vector
     basis_a = m_basis_a
-    basis_c = m_basis_c
-    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
-        basis_b = 0.5 * (signs[1] * basis_a + signs[2] * m_basis_b + signs[3] * basis_c)
+    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1), (-1, 1))
+        basis_b = 0.5 * (signs[1] * basis_a + signs[2] * m_basis_b + signs[3] * m_basis_c)
+        basis_c = signs[4] * m_basis_c
 
         convert_to_mI_test_all_triclinic_basis_permutations(
             basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
