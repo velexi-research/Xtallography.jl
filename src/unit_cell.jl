@@ -51,7 +51,7 @@ using LinearAlgebra: norm, cross, dot
         basis_b::Vector{<:Real},
         basis_c::Vector{<:Real};
         identify_lattice_system=true,
-        centering=Primitive()
+        centering=primitive
     ) -> LatticeConstants
 
 Construct a LatticeConstants object from a set of basis vectors.
@@ -73,7 +73,7 @@ function LatticeConstants(
     basis_b::Vector{<:Real},
     basis_c::Vector{<:Real};
     identify_lattice_system=true,
-    centering=Primitive(),
+    centering=primitive,
 )
     # Convert basis vectors to Vector{AbstractFloat}
     basis_a = convert(Vector{Float64}, basis_a)
@@ -314,10 +314,10 @@ TODO
 function standardize(lattice_constants::LatticeConstants)
     # --- Check arguments
 
-    standardize_arg_checks(lattice_constants, Primitive())
+    standardize_arg_checks(lattice_constants, primitive)
 
     # Return standardized lattice constants for primitive unit cell
-    standardized_lattice_constants, _ = standardize(lattice_constants, Primitive())
+    standardized_lattice_constants, _ = standardize(lattice_constants, primitive)
     return standardized_lattice_constants
 end
 
@@ -446,16 +446,16 @@ function conventional_cell(unit_cell::UnitCell)
     #     change the Bravais lattice type
 
     lattice_system_ = lattice_system(unit_cell.lattice_constants)
-    if lattice_system_ === Triclinic()
-        return conventional_cell(Triclinic(), unit_cell)
-    elseif lattice_system_ === Monoclinic()
-        return conventional_cell(Monoclinic(), unit_cell)
-    elseif lattice_system_ === Orthorhombic()
-        return conventional_cell(Orthorhombic(), unit_cell)
-    elseif lattice_system_ === Tetragonal()
-        return conventional_cell(Tetragonal(), unit_cell)
-    elseif lattice_system_ === Rhombohedral()
-        return conventional_cell(Rhombohedral(), unit_cell)
+    if lattice_system_ === triclinic
+        return conventional_cell(triclinic, unit_cell)
+    elseif lattice_system_ === monoclinic
+        return conventional_cell(monoclinic, unit_cell)
+    elseif lattice_system_ === orthorhombic
+        return conventional_cell(orthorhombic, unit_cell)
+    elseif lattice_system_ === tetragonal
+        return conventional_cell(tetragonal, unit_cell)
+    elseif lattice_system_ === rhombohedral
+        return conventional_cell(rhombohedral, unit_cell)
     end
 
     # --- By default, the unit cell is unchanged
@@ -499,13 +499,13 @@ function reduced_cell(unit_cell::UnitCell)
     basis_a, basis_b, basis_c = basis(unit_cell.lattice_constants)
 
     # Construct primitive cell basis for centering
-    if unit_cell.centering == BaseCentered()
+    if unit_cell.centering == base_centered
         basis_a = 0.5 * (basis_a + basis_b)
 
-    elseif unit_cell.centering == BodyCentered()
+    elseif unit_cell.centering == body_centered
         basis_c = 0.5 * (basis_a + basis_b + basis_c)
 
-    elseif unit_cell.centering == FaceCentered()
+    elseif unit_cell.centering == face_centered
         basis_a_primitive = 0.5 * (basis_a + basis_b)
         basis_b_primitive = 0.5 * (basis_a - basis_b)
         basis_c_primitive = 0.5 * (basis_a + basis_c)
@@ -771,7 +771,7 @@ function reduced_cell(unit_cell::UnitCell)
 
     return UnitCell(
         standardize(LatticeConstants(reduced_basis_a, reduced_basis_b, reduced_basis_c)),
-        Primitive(),
+        primitive,
     )
 end
 
@@ -842,8 +842,8 @@ function is_equivalent_unit_cell(
 )
     # Compare primitive unit cells
     return is_equivalent_unit_cell(
-        UnitCell(lattice_constants_test, Primitive()),
-        UnitCell(lattice_constants_ref, Primitive());
+        UnitCell(lattice_constants_test, primitive),
+        UnitCell(lattice_constants_ref, primitive);
         tol=tol,
     )
 end

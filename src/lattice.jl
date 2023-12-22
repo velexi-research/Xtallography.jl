@@ -24,6 +24,8 @@ export Centering, Primitive, BaseCentered, BodyCentered, FaceCentered
 
 # Constants
 export BRAVAIS_LATTICES
+export triclinic, monoclinic, orthorhombic, hexagonal, rhombohedral, tetragonal, cubic
+export primitive, base_centered, body_centered, face_centered
 
 # Functions
 export is_bravais_lattice
@@ -52,6 +54,7 @@ Type representing the triclinic lattice system
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Triclinic <: LatticeSystem end
+const triclinic = Triclinic()
 
 """
     Monoclinic
@@ -61,6 +64,7 @@ Type representing the monoclinic lattice system
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Monoclinic <: LatticeSystem end
+const monoclinic = Monoclinic()
 
 """
     Orthorhombic
@@ -70,6 +74,7 @@ Type representing the orthorhombic lattice system
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Orthorhombic <: LatticeSystem end
+const orthorhombic = Orthorhombic()
 
 """
     Hexagonal
@@ -79,6 +84,7 @@ Type representing the hexagonal lattice system
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Hexagonal <: LatticeSystem end
+const hexagonal = Hexagonal()
 
 """
     Rhombohedral
@@ -88,6 +94,7 @@ Type representing the rhombohedral lattice system
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Rhombohedral <: LatticeSystem end
+const rhombohedral = Rhombohedral()
 
 """
     Tetragonal
@@ -97,6 +104,7 @@ Type representing the tetragonal lattice system
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Tetragonal <: LatticeSystem end
+const tetragonal = Tetragonal()
 
 """
     Cubic
@@ -106,6 +114,7 @@ Type representing the cubic lattice system
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Cubic <: LatticeSystem end
+const cubic = Cubic()
 
 # ------ Lattice centerings
 
@@ -128,6 +137,7 @@ Type representing no centering
 Supertype: [`Centering`](@ref)
 """
 struct Primitive <: Centering end
+const primitive = Primitive()
 
 """
     BaseCentered
@@ -141,6 +151,7 @@ Type representing base centering
 Supertype: [`Centering`](@ref)
 """
 struct BaseCentered <: Centering end
+const base_centered = BaseCentered()
 
 """
     BodyCentered
@@ -150,6 +161,7 @@ Type representing body centering
 Supertype: [`Centering`](@ref)
 """
 struct BodyCentered <: Centering end
+const body_centered = BodyCentered()
 
 """
     FaceCentered
@@ -159,34 +171,33 @@ Type representing face centering
 Supertype: [`Centering`](@ref)
 """
 struct FaceCentered <: Centering end
+const face_centered = FaceCentered()
 
 # --- Constants
 
 # Lattice Types
 const BRAVAIS_LATTICES = (
-    (lattice_system=Triclinic(), centering=Primitive()),
-    (lattice_system=Monoclinic(), centering=Primitive()),
-    (lattice_system=Monoclinic(), centering=BodyCentered()),
-    (lattice_system=Monoclinic(), centering=BaseCentered()),
-    (lattice_system=Orthorhombic(), centering=Primitive()),
-    (lattice_system=Orthorhombic(), centering=BodyCentered()),
-    (lattice_system=Orthorhombic(), centering=FaceCentered()),
-    (lattice_system=Orthorhombic(), centering=BaseCentered()),
-    (lattice_system=Tetragonal(), centering=Primitive()),
-    (lattice_system=Tetragonal(), centering=BodyCentered()),
-    (lattice_system=Rhombohedral(), centering=Primitive()),
-    (lattice_system=Hexagonal(), centering=Primitive()),
-    (lattice_system=Cubic(), centering=Primitive()),
-    (lattice_system=Cubic(), centering=BodyCentered()),
-    (lattice_system=Cubic(), centering=FaceCentered()),
+    (lattice_system=triclinic, centering=primitive),
+    (lattice_system=monoclinic, centering=primitive),
+    (lattice_system=monoclinic, centering=body_centered),
+    (lattice_system=monoclinic, centering=base_centered),
+    (lattice_system=orthorhombic, centering=primitive),
+    (lattice_system=orthorhombic, centering=body_centered),
+    (lattice_system=orthorhombic, centering=face_centered),
+    (lattice_system=orthorhombic, centering=base_centered),
+    (lattice_system=tetragonal, centering=primitive),
+    (lattice_system=tetragonal, centering=body_centered),
+    (lattice_system=rhombohedral, centering=primitive),
+    (lattice_system=hexagonal, centering=primitive),
+    (lattice_system=cubic, centering=primitive),
+    (lattice_system=cubic, centering=body_centered),
+    (lattice_system=cubic, centering=face_centered),
 )
 
 # --- Functions/Methods
 
 """
     is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering) -> Bool
-
-    is_bravais_lattice(lattice_system::Type{<:LatticeSystem}, centering::Centering) -> Bool
 
     is_bravais_lattice(unit_cell::UnitCell) -> Bool
 
@@ -202,10 +213,6 @@ Examples
 ========
 TODO
 """
-function is_bravais_lattice(lattice_system_::LatticeSystem, centering::Centering)
-    return (lattice_system=lattice_system_, centering=centering) in BRAVAIS_LATTICES
-end
-
-function is_bravais_lattice(lattice_system_::Type{<:LatticeSystem}, centering::Centering)
-    return is_bravais_lattice(lattice_system_(), centering)
+function is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering)
+    return (lattice_system=lattice_system, centering=centering) in BRAVAIS_LATTICES
 end
