@@ -1125,8 +1125,7 @@ function convert_to_mC_test_all_triclinic_basis_permutations(
 
     # --- Test convert_to_mC() for each permutation of the basis vectors
 
-    # for permuted_basis in permutations([basis_a, basis_b, basis_c])
-    for permuted_basis in ([basis_a, basis_b, basis_c],)
+    for permuted_basis in permutations([basis_a, basis_b, basis_c])
         # Extract permuted basis vectors
         permuted_basis_a = permuted_basis[1]
         permuted_basis_b = permuted_basis[2]
