@@ -31,7 +31,7 @@ using XtallographyUtils
 
 # ------ Types
 
-@testset "LatticeSystem Subtypes" begin
+@testset "LatticeSystem subtypes" begin
     expected_types = [
         Triclinic, Monoclinic, Orthorhombic, Tetragonal, Rhombohedral, Hexagonal, Cubic
     ]
@@ -40,7 +40,7 @@ using XtallographyUtils
     end
 end
 
-@testset "Centering Subtypes" begin
+@testset "Centering subtypes" begin
     expected_types = [Primitive, BaseCentered, BodyCentered, FaceCentered]
     for type in expected_types
         @test type <: Centering
@@ -48,6 +48,23 @@ end
 end
 
 # ------ Constants
+
+@testset "LatticeSystem constants" begin
+    @test triclinic === Triclinic()
+    @test monoclinic === Monoclinic()
+    @test orthorhombic === Orthorhombic()
+    @test tetragonal === Tetragonal()
+    @test rhombohedral === Rhombohedral()
+    @test hexagonal === Hexagonal()
+    @test cubic === Cubic()
+end
+
+@testset "Centering constants" begin
+    @test primitive === Primitive()
+    @test base_centered === BaseCentered()
+    @test body_centered === BodyCentered()
+    @test face_centered === FaceCentered()
+end
 
 @testset "BRAVAIS_LATTICES" begin
     @test BRAVAIS_LATTICES isa Tuple
