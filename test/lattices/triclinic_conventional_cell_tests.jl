@@ -591,7 +591,7 @@ function convert_to_mI_test_all_triclinic_basis_permutations(
     end
 end
 
-@testset "convert_to_mI(): {m_a, m_b} in aP basis, (m_c/m_a) |cos m_β| < 1" begin
+@testset "convert_to_mI_case_1(): {m_a, m_b} in aP basis, (m_c/m_a) |cos m_β| < 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -621,7 +621,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): {m_a, m_b} in aP basis, (m_c/m_a) |cos m_β| > 1" begin
+@testset "convert_to_mI_case_1(): {m_a, m_b} in aP basis, (m_c/m_a) |cos m_β| > 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -651,7 +651,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): {m_b, m_c} in aP basis, (m_c/m_a) |cos m_β| < 1" begin
+@testset "convert_to_mI_case_1(): {m_b, m_c} in aP basis, (m_c/m_a) |cos m_β| < 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -681,7 +681,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): {m_b, m_c} in aP basis, (m_c/m_a) |cos m_β| > 1" begin
+@testset "convert_to_mI_case_1(): {m_b, m_c} in aP basis, (m_c/m_a) |cos m_β| > 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -711,7 +711,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): {m_a, m_c} in aP basis, (m_c/m_a) |cos m_β| < 1" begin
+@testset "convert_to_mI_case_2(): {m_a, m_c} in aP basis, (m_c/m_a) |cos m_β| < 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -741,7 +741,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): {m_a, m_c} in aP basis, (m_c/m_a) |cos m_β| > 1" begin
+@testset "convert_to_mI_case_2(): {m_a, m_c} in aP basis, (m_c/m_a) |cos m_β| > 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -771,7 +771,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): only m_a in aP basis, (m_c/m_a) |cos m_β| < 1" begin
+@testset "convert_to_mI_case_4(): only m_a in aP basis, (m_c/m_a) |cos m_β| < 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -809,7 +809,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): only m_a in aP basis, (m_c/m_a) |cos m_β| > 1" begin
+@testset "convert_to_mI_case_4(): only m_a in aP basis, (m_c/m_a) |cos m_β| > 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -847,7 +847,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): only m_b in aP basis, (m_c/m_a) |cos m_β| < 1" begin
+@testset "convert_to_mI_case_3(): only m_b in aP basis, (m_c/m_a) |cos m_β| < 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -885,7 +885,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): only m_b in aP basis, (m_c/m_a) |cos m_β| > 1" begin
+@testset "convert_to_mI_case_3(): only m_b in aP basis, (m_c/m_a) |cos m_β| > 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -923,7 +923,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): only m_c in aP basis, (m_c/m_a) |cos m_β| < 1" begin
+@testset "convert_to_mI_case_4(): only m_c in aP basis, (m_c/m_a) |cos m_β| < 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -961,7 +961,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): only m_c in aP basis, (m_c/m_a) |cos m_β| > 1" begin
+@testset "convert_to_mI_case_4(): only m_c in aP basis, (m_c/m_a) |cos m_β| > 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -999,7 +999,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): no mI basis vectors in aP basis, (m_c/m_a) |cos m_β| < 1" begin
+@testset "convert_to_mI_case_5(): no mI basis vectors in aP basis, (m_c/m_a) |cos m_β| < 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1038,7 +1038,7 @@ end
     end
 end
 
-@testset "convert_to_mI(): no mI basis vectors in aP basis, (m_c/m_a) |cos m_β| > 1" begin
+@testset "convert_to_mI_case_5(): no mI basis vectors in aP basis, (m_c/m_a) |cos m_β| > 1" begin
     # --- Preparations
 
     # Construct basis for monoclinic unit cell
@@ -1514,196 +1514,6 @@ end
     end
 end
 
-#=
-@testset "convert_to_mC(): {m_b, m_c} in aP basis, |m_a| < |m_c|" begin
-    # --- Preparations
-
-    # Construct basis for monoclinic unit cell
-    m_a = 1.0
-    m_b = 2.0
-    m_c = 3.0
-    m_β = 3π / 5
-
-    expected_monoclinic_lattice_constants = MonoclinicLatticeConstants(m_a, m_b, m_c, m_β)
-
-    m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
-
-    # --- Tests
-
-    # Test all cases for base-centered basis vector
-    basis_b = m_basis_b
-    basis_c = m_basis_c
-    for signs in Iterators.product((-1, 1), (-1, 1))
-        basis_a = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b)
-
-        convert_to_mC_test_all_triclinic_basis_permutations(
-            basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
-        )
-    end
-end
-
-@testset "convert_to_mC(): {m_b, m_c} in aP basis, |m_a| > |m_c|" begin
-    # --- Preparations
-
-    # Construct basis for monoclinic unit cell
-    m_a = 3.0
-    m_b = 2.0
-    m_c = 1.0
-    m_β = 3π / 5
-
-    expected_monoclinic_lattice_constants = MonoclinicLatticeConstants(m_a, m_b, m_c, m_β)
-
-    m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
-
-    # --- Tests
-
-    # Test all cases for base-centered basis vector
-    basis_b = m_basis_b
-    basis_c = m_basis_c
-    for signs in Iterators.product((-1, 1), (-1, 1))
-        basis_a = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b)
-
-        convert_to_mC_test_all_triclinic_basis_permutations(
-            basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
-        )
-    end
-end
-
-@testset "convert_to_mC(): only m_c in aP basis, |m_a| < |m_c|" begin
-    # --- Preparations
-
-    # Construct basis for monoclinic unit cell
-    m_a = 1.0
-    m_b = 2.0
-    m_c = 3.0
-    m_β = 3π / 5
-
-    expected_monoclinic_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
-    )
-
-    m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
-
-    # --- Tests
-
-    # Test all cases for base-centered basis vector
-    basis_c = m_basis_c
-    for signs in Iterators.product((-1, 1), (-1, 1))
-        basis_a = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b)
-        basis_b = 0.5 * (signs[1] * m_basis_a - signs[2] * m_basis_b)
-
-        # Check that basis vectors are linearly independent
-        if !is_basis(basis_a, basis_b, basis_c)
-            continue
-        end
-
-        convert_to_mC_test_all_triclinic_basis_permutations(
-            basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
-        )
-    end
-end
-
-@testset "convert_to_mC(): only m_c in aP basis, |m_a| > |m_c|" begin
-    # --- Preparations
-
-    # Construct basis for monoclinic unit cell
-    m_a = 3.0
-    m_b = 2.0
-    m_c = 1.0
-    m_β = 3π / 5
-
-    expected_monoclinic_lattice_constants = MonoclinicLatticeConstants(m_a, m_b, m_c, m_β)
-
-    m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
-
-    # --- Tests
-
-    # Test all cases for base-centered basis vector
-    basis_c = m_basis_c
-    for signs in Iterators.product((-1, 1), (-1, 1))
-        basis_a = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b)
-        basis_b = 0.5 * (signs[1] * m_basis_a - signs[2] * m_basis_b)
-
-        # Check that basis vectors are linearly independent
-        if !is_basis(basis_a, basis_b, basis_c)
-            continue
-        end
-
-        convert_to_mC_test_all_triclinic_basis_permutations(
-            basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
-        )
-    end
-end
-
-@testset "convert_to_mC(): no mC basis vectors in aP basis, |m_a| < |m_c|" begin
-    # --- Preparations
-
-    # Construct basis for monoclinic unit cell
-    m_a = 1.0
-    m_b = 2.0
-    m_c = 3.0
-    m_β = 3π / 5
-
-    expected_monoclinic_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
-    )
-
-    m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
-
-    # --- Tests
-
-    # Test all cases for body-centered basis vector
-    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
-        basis_a = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b)
-        basis_b = 0.5 * (signs[1] * m_basis_a - signs[2] * m_basis_b)
-        basis_c = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b) + signs[3] * m_basis_c
-
-        # Check that basis vectors are linearly independent
-        if !is_basis(basis_a, basis_b, basis_c)
-            continue
-        end
-
-        convert_to_mC_test_all_triclinic_basis_permutations(
-            basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
-        )
-    end
-end
-
-@testset "convert_to_mC(): no mC basis vectors in aP basis, |m_a| > |m_c|" begin
-    # --- Preparations
-
-    # Construct basis for monoclinic unit cell
-    m_a = 3.0
-    m_b = 2.0
-    m_c = 1.0
-    m_β = 3π / 5
-
-    # expected_monoclinic_lattice_constants = MonoclinicLatticeConstants(m_a, m_b, m_c, m_β)
-    expected_monoclinic_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
-    )
-
-    m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
-
-    # --- Tests
-
-    # Test all cases for body-centered basis vector
-    for signs in Iterators.product((-1, 1), (-1, 1), (-1, 1))
-        basis_a = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b)
-        basis_b = 0.5 * (signs[1] * m_basis_a - signs[2] * m_basis_b)
-        basis_c = 0.5 * (signs[1] * m_basis_a + signs[2] * m_basis_b) + signs[3] * m_basis_c
-
-        # Check that basis vectors are linearly independent
-        if !is_basis(basis_a, basis_b, basis_c)
-            continue
-        end
-
-        convert_to_mC_test_all_triclinic_basis_permutations(
-            basis_a, basis_b, basis_c, expected_monoclinic_lattice_constants
-        )
-    end
-end
-
 @testset "convert_to_mC(): aP cell not equivalent to a mC cell" begin
     # --- Tests
 
@@ -1733,4 +1543,3 @@ end
         "a base-centered monoclinic unit cell."
     @test startswith(error_message, expected_error)
 end
-=#
