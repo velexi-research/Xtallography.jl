@@ -108,9 +108,7 @@ end
 # ------ linear algebra
 
 """
-    is_basis(
-        v1::Vector{Real}, v2::Vector{Real}, v3::Vector{Real}
-    ) -> Bool
+    is_basis(v1::Vector{Real}, v2::Vector{Real}, v3::Vector{Real}) -> Bool
 
 Determine if the vectors `v1`, `v2`, and `v3` are a basis for a three-dimensional lattice
 (i.e., `v1`, `v2`, and `v3` are linearly independent).
@@ -130,9 +128,7 @@ end
 # ------ geometry
 
 """
-    volume(
-        v1::Vector{Real}, v2::Vector{Real}, v3::Vector{Real}
-    ) -> Bool
+    volume(v1::Vector{Real}, v2::Vector{Real}, v3::Vector{Real}) -> Float64
 
 Compute the volume of the parallelipiped defined by the vectors `v1`, `v2`, and `v3`.
 
@@ -149,9 +145,7 @@ function volume(v1::Vector{<:Real}, v2::Vector{<:Real}, v3::Vector{<:Real})
 end
 
 """
-    surface_area(
-        v1::Vector{Real}, v2::Vector{Real}, v3::Vector{Real}
-    ) -> Bool
+    surface_area(v1::Vector{Real}, v2::Vector{Real}, v3::Vector{Real}) -> Float64
 
 Compute the surface area of the parallelipiped defined by the vectors `v1`, `v2`, and `v3`.
 
