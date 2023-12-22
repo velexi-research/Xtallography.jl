@@ -129,16 +129,46 @@ end
 
 # ------ geometry
 
-function volume(basis_a::T, basis_b::T, basis_c::T) where {T<:Vector{<:Real}}
-    return abs(det(reduce(hcat, [basis_a, basis_b, basis_c])))
+"""
+    volume(
+        v1::Vector{Real}, v2::Vector{Real}, v3::Vector{Real}
+    ) -> Bool
+
+Compute the volume of the parallelipiped defined by the vectors `v1`, `v2`, and `v3`.
+
+Return values
+=============
+- volume of the parallelipiped defined by `v1`, `v2`, and `v3`
+
+Examples
+========
+TODO
+"""
+function volume(v1::Vector{<:Real}, v2::Vector{<:Real}, v3::Vector{<:Real})
+    return abs(det(reduce(hcat, [v1, v2, v3])))
 end
 
-function surface_area(basis_a::T, basis_b::T, basis_c::T) where {T<:Vector{<:Real}}
+"""
+    surface_area(
+        v1::Vector{Real}, v2::Vector{Real}, v3::Vector{Real}
+    ) -> Bool
+
+Compute the surface area of the parallelipiped defined by the vectors `v1`, `v2`, and `v3`.
+
+Return values
+=============
+- surface area of the parallelipiped defined by `v1`, `v2`, and `v3`
+
+Examples
+========
+TODO
+"""
+function surface_area(v1::Vector{<:Real}, v2::Vector{<:Real}, v3::Vector{<:Real})
 
     # Compute the cross products of the basis vectors
-    cross_ab = cross(basis_a, basis_b)
-    cross_ac = cross(basis_a, basis_c)
-    cross_bc = cross(basis_b, basis_c)
+    cross_ab = cross(v1, v2)
+    cross_ac = cross(v1, v3)
+    cross_bc = cross(v2, v3)
 
     # Compute the surface area
     return 2 * (
