@@ -15,7 +15,7 @@ CurrentModule = XtallographyUtils
 * `UnitCell`
 
 -------------------------------------------------------------------------------------------
-## `LatticeSytem`
+## `LatticeSystem`
 
 ```@docs
 LatticeSystem
