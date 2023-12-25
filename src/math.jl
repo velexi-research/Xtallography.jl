@@ -119,9 +119,12 @@ Return values
 
 Examples
 ========
-```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2***"
-julia> surface_area([1, 0, 0], [1, 1, 0], [1, 0, 1])
-7.464101615137754
+```jldoctest
+julia> is_basis([1, 0, 0], [1, 1, 0], [1, 0, 1])
+true
+
+julia> is_basis([1, 0, 0], [1, 1, 0], [1, -1, 0])
+false
 ```
 """
 function is_basis(v1::Vector{<:Real}, v2::Vector{<:Real}, v3::Vector{<:Real})
@@ -161,7 +164,10 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2***"
+julia> surface_area([1, 0, 0], [1, 1, 0], [1, 0, 1])
+7.464101615137754
+```
 """
 function surface_area(v1::Vector{<:Real}, v2::Vector{<:Real}, v3::Vector{<:Real})
 

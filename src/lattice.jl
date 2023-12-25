@@ -282,7 +282,19 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> is_bravais_lattice(cubic, body_centered)
+true
+
+julia> is_bravais_lattice(cubic, base_centered)
+false
+
+julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), primitive))
+true
+
+julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), face_centered))
+false
+```
 """
 function is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering)
     return (lattice_system=lattice_system, centering=centering) in BRAVAIS_LATTICES
