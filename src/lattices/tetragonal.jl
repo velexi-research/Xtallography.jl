@@ -80,7 +80,7 @@ function isapprox(
 end
 
 function lattice_system(::TetragonalLatticeConstants)
-    return Tetragonal()
+    return tetragonal
 end
 
 # ------ Unit cell computations
@@ -118,23 +118,23 @@ function conventional_cell(::Tetragonal, unit_cell::UnitCell)
     # --- Compute IUCr conventional cell
 
     # Check limiting cases
-    if centering == Primitive()
+    if centering === primitive
         if a ≈ c
             # cubic, primitive, edge length `a`
             @debug "tP --> cP"
-            return conventional_cell(UnitCell(CubicLatticeConstants(a), Primitive()))
+            return conventional_cell(UnitCell(CubicLatticeConstants(a), primitive))
         end
 
-    elseif centering == BodyCentered()
+    elseif centering === body_centered
         if a ≈ c
             # cubic, body-centered, edge length `a`
             @debug "tI --> cI"
-            return conventional_cell(UnitCell(CubicLatticeConstants(a), BodyCentered()))
+            return conventional_cell(UnitCell(CubicLatticeConstants(a), body_centered))
 
         elseif c * SIN_PI_OVER_FOUR ≈ a
             # cubic, face-centered, edge length `c`
             @debug "tI --> cF"
-            return conventional_cell(UnitCell(CubicLatticeConstants(c), FaceCentered()))
+            return conventional_cell(UnitCell(CubicLatticeConstants(c), face_centered))
         end
     end
 
