@@ -1,7 +1,7 @@
 Xtallography Utilities
 ===============================================================================
 
-[----------------------------- BADGES: BEGIN -----------------------------]: #
+[------------------------------------ BADGES: BEGIN ------------------------------------]: #
 
 <table>
   <tr>
@@ -30,58 +30,26 @@ Xtallography Utilities
   </tr>
 </table>
 
-[------------------------------ BADGES: END ------------------------------]: #
+[------------------------------------- BADGES: END -------------------------------------]: #
 
--------------------------------------------------------------------------------
+The Xtallography Utilities package defines a collection of basic types and miscellaneous
+utility functions that support crystallography computations. The functionality provided by
+this package are _not_ intended to be comprehensive. Rather, functionality is added on an
+as-needed basis to support research projects.
 
-A brief description of the package.
+Currently, the Xtallography Utilities provides support for:
 
-The Xtallography Utilities package features:
+* types for defining Bravais lattice types,
 
-* a list of the core features of the package.
+* basic unit cell computations (e.g., basis, volume, surface area),
 
--------------------------------------------------------------------------------
+* standardization of lattice constants for unit cells, and
 
-Table of Contents
------------------
+* conversions between equivalent unit cells for a lattice.
 
-1. [Overview][#1]
+## Getting Started
 
-2. [Getting Started][#2]
-
-   2.1. [Installation][#2.1]
-
-   2.2. [Examples][#2.2]
-
-3. [Known Issues][#3]
-
-4. [Contributor Notes][#4]
-
-   4.1. [License][#4.1]
-
-   4.2. [Package Contents][#4.2]
-
-   4.3. [Setting Up a Development Environment][#4.3]
-
-   4.4. [Running Automated Tests][#4.4]
-
-   4.5. [Cleaning the Development Directory][#4.5]
-
--------------------------------------------------------------------------------
-
-## 1. Overview
-
-A more detailed description of the package.
-
--------------------------------------------------------------------------------
-
-## 2. Getting Started
-
-### 2.1. Installation
-
-<!-- Instructions for adding a local registry that the Julia package is registered with
-
-* Add the XYZ Julia package registry.
+* Add the Velexi Julia package registry.
 
   ```julia
   julia>  # Press ']' to enter the Pkg REPL mode.
@@ -90,13 +58,13 @@ A more detailed description of the package.
 
   ___Notes___
 
-  * _Only needed once_. This step only needs to be performed once per Julia installation.
+  * `XtallographyUtils` is registered with the Velexi Julia package registry (not the
+    General Julia package registry), so the Pkg REPL will be able to find
+    `XtallographyUtils` only if the Velexi Julia package registry has been added to your
+    Julia installation. For more information about local registries for Julia packages,
+    [LocalRegistry.jl](https://github.com/GunnarFarneback/LocalRegistry.jl)
 
-  * _Xtallography Utilities is registered with a local Julia package registry_.
-    The XYZ registry needs to be added to your Julia installation because
-    Xtallography Utilities is currently registered with XYZ Julia package
-    registry (not the General Julia package registry).
--->
+  * This step only needs to be performed once per Julia installation.
 
 * Install the `XtallographyUtils` package via the Pkg REPL. That's it!
 
@@ -105,148 +73,61 @@ A more detailed description of the package.
   pkg> add XtallographyUtils
   ```
 
-### 2.2. Examples
+## Examples
 
-Some examples of code that uses the package.
+* Create a unit cell object.
 
--------------------------------------------------------------------------------
-
-## 3. Known Issues
-
-Known issues for the package.
-
--------------------------------------------------------------------------------
-
-## 4. Contributor Notes
-
-### 4.1. License
-
-The contents of this package are covered under the Apache License 2.0 (included
-in the `LICENSE` file). The copyright for this package is contained in the
-`NOTICE` file.
-
-### 4.2. Package Contents
-
-```
-├── README.md          <- this file
-├── NEWS.md            <- package release notes
-├── LICENSE            <- package license
-├── NOTICE            <- package copyright notice
-├── Makefile           <- Makefile containing useful shortcuts (`make` rules).
-│                         Use `make help` to show the list of available rules.
-├── Project.toml       <- Julia package metadata file
-├── Manifest.toml      <- Julia environment manifest file
-├── pyproject.toml     <- Python dependency and configuration file
-├── poetry.lock        <- Poetry lockfile
-├── docs/              <- package documentation
-├── extras/            <- additional files and references that may be useful
-│                         for package development
-├── spikes/            <- experimental code snippets, etc.
-├── src/               <- package source code
-└── tests/             <- package test code
-```
-
-### 4.3. Setting Up a Development Environment
-
-___Note___: this project uses `poetry` to manage Python package dependencies.
-
-1. Prerequisites
-
-   * Install [Git][git].
-
-   * Install [Python][python] 3.8 (or greater).
-
-   * Install [Poetry][poetry] 1.2 (or greater).
-
-   * _Optional_. Install [direnv][direnv].
-
-2. ___Recommended___. Set up a dedicated virtual environment for the package
-   development using `direnv` (because manages the environment for both the
-   shell and Python).
-
-   * Prerequisite. Install `direnv`.
-
-   * Copy `extras/dot-envrc` to the package root directory, and rename it to
-     `.envrc`.
-
-     ```shell
-     $ cd $PROJECT_ROOT_DIR
-     $ cp extras/dot-envrc .envrc
-     ```
-
-   * Grant permission to direnv to execute the .envrc file.
-
-     ```shell
-     $ direnv allow
-     ```
-
-3. Install the Python package dependencies required for development.
-
-   ```shell
-   $ poetry install
-   ```
-
-4. Install the Git pre-commit hooks.
-
-   ```shell
-   $ pre-commit install
-   ```
-
-### 4.4. Running Automated Tests
-
-This package is configured to support (1) automated testing of code located in
-the `src` directory and (2) analysis of how well the tests cover of the source
-code (i.e., coverage analysis).
-
-* Run all of the tests.
-
-  ```shell
-  $ make test
+  ```julia
+  julia> unit_cell = UnitCell(OrthorhombicLatticeConstants(2, 3, 4), body_centered)
+  UnitCell(OrthorhombicLatticeConstants(2.0, 3.0, 4.0), BodyCentered())
   ```
 
-* Run all of the tests in fail-fast mode (i.e., stop after the first failing
-  test).
+* Compute basic unit cell attributes.
 
-  ```shell
-  $ make fast-test
+  ```julia
+  julia> volume(unit_cell)
+  24.0
+
+  julia> surface_area(unit_cell)
+  52.0
+
+  julia> basis(unit_cell)
+  ([2.0, 0.0, 0.0], [0.0, 3.0, 0.0], [0.0, 0.0, 4.0])
   ```
 
-### 4.5. Cleaning the Development Directory
+* Standardize the lattice constants for a unit cell to be consistent with IUCr conventions.
 
-* Use `make clean` to automatically remove temporary files and directories
-  generated during testing (e.g., temporary directories, coverage files).
+  ```julia
+  julia> unit_cell = UnitCell(OrthorhombicLatticeConstants(4, 2, 3), primitive)
+  UnitCell(OrthorhombicLatticeConstants(4.0, 2.0, 3.0), Primitive())
 
-  ```shell
-  $ make clean
+  julia> standardize(unit_cell)
+  UnitCell(OrthorhombicLatticeConstants(2.0, 3.0, 4.0), Primitive())
   ```
 
--------------------------------------------------------------------------------
+* Compute the Delaunay reduced cell for a unit cell.
 
-[----------------------------- INTERNAL LINKS -----------------------------]: #
+  ```julia
+  julia> unit_cell = UnitCell(CubicLatticeConstants(4), face_centered)
+  UnitCell(CubicLatticeConstants(4.0), FaceCentered())
 
-[#1]: #1-overview
+  julia> r_cell = reduced_cell(unit_cell)
+  UnitCell(TriclinicLatticeConstants(2.8284271247461903, 2.8284271247461903, 2.8284271247461903, 1.0471975511965974, 1.0471975511965974, 1.5707963267948966), Primitive())
+  ```
 
-[#2]: #2-getting-started
-[#2.1]: #21-installation
-[#2.2]: #22-examples
+* Compute the conventional cell for a unit cell.
 
-[#3]: #3-known-issues
+  ```julia
+  julia> conventional_cell(r_cell)
+  UnitCell(CubicLatticeConstants(3.9999999999999982), FaceCentered())
+  ```
 
-[#4]: #4-contributor-notes
-[#4.1]: #41-license
-[#4.2]: #42-package-contents
-[#4.3]: #43-setting-up-a-development-environment
-[#4.4]: #44-running-automated-tests
-[#4.5]: #45-cleaning-the-development-directory
+## Related Packages
 
-[---------------------------- REPOSITORY LINKS ----------------------------]: #
+There are a couple of crystallography packages in the Julia ecosystem that provide support
+for various crystall and lattice computations.
 
-[----------------------------- EXTERNAL LINKS -----------------------------]: #
+* [Crystallography.jl](https://github.com/MineralsCloud/Crystallography.jl) and related
+  packages
 
-[direnv]: https://direnv.net/
-
-[git]: https://git-scm.com/
-
-[python]: https://www.python.org/
-
-[poetry]: https://python-poetry.org/
+* [Spglib](https://github.com/singularitti/Spglib.jl)
