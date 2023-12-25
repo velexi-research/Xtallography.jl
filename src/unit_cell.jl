@@ -384,7 +384,13 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> volume(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]), primitive))
+2.0
+
+julia> volume(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]))
+2.0
+```
 """
 function volume(unit_cell::UnitCell)
     return volume(unit_cell.lattice_constants)
@@ -403,11 +409,12 @@ Return values
 
 Examples
 ========
-```jldoctest
-julia> S = surface_area([1, 0, 0], [1, 1, 0], [1, 0, 1]);
+```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2***"
+julia> surface_area(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 1]), primitive))
+7.464101615137754
 
-julia> S ≈ 4 * (1 + sqrt(3)/2)
-true
+julia> surface_area(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 1]))
+7.464101615137754
 ```
 """
 function surface_area(unit_cell::UnitCell)
