@@ -376,12 +376,7 @@ end
 
     volume(lattice_constants::LatticeConstants) -> Float64
 
-    volume(
-        basis_a::Vector{<:Real}, basis_b::Vector{<:Real}, basis_c::Vector{<:Real}
-    ) -> Float64
-
-Compute the volume of the unit cell defined by `unit_cell`, `lattice_constants`, or the
-basis vectors [`basis_a`, `basis_b`, `basis_c`].
+Compute the volume of the unit cell defined by `unit_cell` or `lattice_constants`.
 
 Return values
 =============
@@ -400,12 +395,7 @@ end
 
     surface_area(lattice_constants::LatticeConstants) -> Float64
 
-    surface_area(
-        basis_a::Vector{<:Real}, basis_b::Vector{<:Real}, basis_c::Vector{<:Real}
-    ) -> Float64
-
-Compute the surface area of the unit cell defined by `unit_cell`, `lattice_constants`, or
-the basis vectors [`basis_a`, `basis_b`, `basis_c`].
+Compute the surface area of the unit cell defined by `unit_cell` or `lattice_constants`.
 
 Return values
 =============
