@@ -2,23 +2,32 @@
 CurrentModule = XtallographyUtils
 ```
 
-# Core Types
+# Types
 
+__Lattice Types__
 * `LatticeSystem`
-
 * `Centering`
 
-# Unit Cell Types
-
+__Unit Cell Types__
 * `LatticeConstants`
-
 * `UnitCell`
 
 -------------------------------------------------------------------------------------------
-## `LatticeSystem`
+## Lattice Types
 
 ```@docs
 LatticeSystem
+Centering
+```
+
+### Concrete Types
+
+#### Lattice Systems
+
+All subtypes of `LatticeSystem` are singleton types. For convenience, a singleton instance
+is defined for each lattice system type.
+
+```@docs
 Triclinic
 Monoclinic
 Orthorhombic
@@ -28,29 +37,58 @@ Tetragonal
 Cubic
 ```
 
--------------------------------------------------------------------------------------------
-## `Centering`
+#### Centerings
+
+All subtypes of `Centering` are singleton types. For convenience, a singleton instance is
+defined for each centering type.
 
 ```@docs
-Centering
 Primitive
 BaseCentered
 BodyCentered
 FaceCentered
 ```
 
-### Interface
+### Constants
 
-#### Functions
+#### Lattice Systems
 
 ```@docs
-is_bravais_lattice
+triclinic
+monoclinic
+orthorhombic
+hexagonal
+rhombohedral
+tetragonal
+cubic
 ```
+
+#### Centerings
+
+```@docs
+primitive
+base_centered
+body_centered
+face_centered
+```
+
+#### Other Constants
+
+```@docs
+BRAVAIS_LATTICES
+```
+
 -------------------------------------------------------------------------------------------
-## `LatticeConstants`
+## Unit Cell Types
 
 ```@docs
 LatticeConstants
+UnitCell
+```
+
+### Lattice Constants
+
+```@docs
 TriclinicLatticeConstants
 MonoclinicLatticeConstants
 OrthorhombicLatticeConstants
@@ -59,20 +97,5 @@ RhombohedralLatticeConstants
 TetragonalLatticeConstants
 CubicLatticeConstants
 ```
-
-### Interface
-
-#### Functions
-
--------------------------------------------------------------------------------------------
-## `UnitCell`
-
-```@docs
-UnitCell
-```
-
-### Interface
-
-#### Functions
 
 -------------------------------------------------------------------------------------------
