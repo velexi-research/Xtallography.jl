@@ -261,7 +261,12 @@ end
 """
     satisfies_triclinic_angle_constraints(α::Real, β::Real, γ::Real) -> Bool
 
-Determine whether `α`, `β`, and `γ` satisfy the angle constraints for triclinic lattices.
+Determine whether `α`, `β`, and `γ` satisfy the angle constraints for triclinic lattices:
+
+* ``0 <  α + β + γ < 2π``
+* ``0 <  α + β - γ < 2π``
+* ``0 <  α - β + γ < 2π``
+* ``0 < -α + β + γ < 2π``
 
 Return values
 =============
