@@ -124,18 +124,18 @@ end
 
     lattice_constants = CubicLatticeConstants(1.0)
 
-    @test standardize(lattice_constants, Primitive()) == (lattice_constants, Primitive())
-    @test standardize(lattice_constants, BodyCentered()) ==
-        (lattice_constants, BodyCentered())
-    @test standardize(lattice_constants, FaceCentered()) ==
-        (lattice_constants, FaceCentered())
+    @test standardize(lattice_constants, primitive) == (lattice_constants, primitive)
+    @test standardize(lattice_constants, body_centered) ==
+        (lattice_constants, body_centered)
+    @test standardize(lattice_constants, face_centered) ==
+        (lattice_constants, face_centered)
 
     # ------ Invalid centering
 
     local error = nothing
     local error_message = ""
     try
-        standardize(lattice_constants, BaseCentered())
+        standardize(lattice_constants, base_centered)
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -199,12 +199,12 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell
-    unit_cell = UnitCell(lattice_constants, Primitive())
+    unit_cell = UnitCell(lattice_constants, primitive)
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-            Primitive(),
+            primitive,
         ),
     )
 
@@ -214,12 +214,12 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # body-centered unit cell
-    unit_cell = UnitCell(lattice_constants, BodyCentered())
+    unit_cell = UnitCell(lattice_constants, body_centered)
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c)),
-            Primitive(),
+            primitive,
         ),
     )
 
@@ -229,7 +229,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # face-centered unit cell
-    unit_cell = UnitCell(lattice_constants, FaceCentered())
+    unit_cell = UnitCell(lattice_constants, face_centered)
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
@@ -239,7 +239,7 @@ end
                 0.5 * (basis_b + basis_c);
                 identify_lattice_system=false,
             ),
-            Primitive(),
+            primitive,
         ),
     )
 
@@ -259,27 +259,27 @@ end
     # --- Tests
 
     # equivalent cubic and triclinic unit cells
-    cubic_unit_cell = UnitCell(lattice_constants, Primitive())
+    cubic_unit_cell = UnitCell(lattice_constants, primitive)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(cubic_unit_cell, triclinic_unit_cell)
 
     # equivalent body-centered unit cell and primitive rhombohedral unit cell
-    body_centered_unit_cell = UnitCell(lattice_constants, BodyCentered())
+    body_centered_unit_cell = UnitCell(lattice_constants, body_centered)
     primitive_unit_cell = UnitCell(
-        LatticeConstants(basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c)), Primitive()
+        LatticeConstants(basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c)), primitive
     )
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 
     # equivalent face-centered unit cell and primitive triclinic unit cell
-    face_centered_unit_cell = UnitCell(lattice_constants, FaceCentered())
+    face_centered_unit_cell = UnitCell(lattice_constants, face_centered)
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             0.5 * (basis_a + basis_b), 0.5 * (basis_b - basis_c), 0.5 * (basis_b + basis_c)
         ),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(face_centered_unit_cell, primitive_unit_cell)
 end

@@ -380,13 +380,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ edge lengths not sorted
 
@@ -401,13 +401,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, c, b, α, γ, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ origin not at "homogeneous corner"
 
@@ -422,13 +422,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, α, π - β, π - γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ edge lengths not sorted and origin not at "homogeneous corner"
 
@@ -443,13 +443,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(b, c, a, π - β, π - γ, α)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ a ≈ b ≈ c, only need to swap α and β
 
@@ -462,13 +462,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, β, α, γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ a ≈ b ≈ c, only need to swap β and γ
 
@@ -481,13 +481,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, α, γ, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ a ≈ b ≈ c, only need to reverse order of angles
 
@@ -500,13 +500,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, γ, β, α)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ a ≈ b (after sorting a, b, c)
 
@@ -520,13 +520,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, π - β, α, π - γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ b ≈ c (after sorting a, b, c)
 
@@ -540,13 +540,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(c, a, b, γ, π - α, π - β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 end
 
 @testset "standardize(): Type II cell" begin
@@ -565,13 +565,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = lattice_constants
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ edge lengths not sorted
 
@@ -586,13 +586,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, c, b, α, γ, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ origin not at "homogeneous corner"
 
@@ -607,13 +607,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, π - α, π - β, γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ edge lengths not sorted and origin not at "homogeneous corner"
 
@@ -628,13 +628,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(b, c, a, π - β, γ, π - α)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ a ≈ b ≈ c, only need to swap α and β
 
@@ -647,13 +647,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, β, α, γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ a ≈ b ≈ c, only need to swap β and γ
 
@@ -666,13 +666,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, α, γ, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ a ≈ b ≈ c, only need to reverse order of angles
 
@@ -685,13 +685,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, γ, β, α)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ a ≈ b (after sorting a, b, c)
 
@@ -705,13 +705,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(a, b, c, π - β, α, π - γ)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ b ≈ c (after sorting a, b, c)
 
@@ -725,13 +725,13 @@ end
 
     # Exercise functionality and check results
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = TriclinicLatticeConstants(c, a, b, π - γ, π - β, α)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 end
 
 @testset "standardize(): invalid arguments" begin
@@ -741,11 +741,11 @@ end
 
     # --- Tests
 
-    for centering in (BodyCentered, FaceCentered, BaseCentered)
+    for centering in (body_centered, face_centered, base_centered)
         local error = nothing
         local error_message = ""
         try
-            standardize(lattice_constants, centering())
+            standardize(lattice_constants, centering)
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -756,7 +756,7 @@ end
         expected_error =
             "ArgumentError: " *
             "Invalid Bravais lattice: " *
-            "(lattice_system=Triclinic, centering=$(nameof(centering)))"
+            "(lattice_system=Triclinic, centering=$(nameof(typeof(centering))))"
 
         @test startswith(error_message, expected_error)
     end
@@ -855,9 +855,9 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell defined by [basis_a, basis_b, basis_c]
-    unit_cell = UnitCell(lattice_constants, Primitive())
+    unit_cell = UnitCell(lattice_constants, primitive)
 
-    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa TriclinicLatticeConstants
@@ -866,10 +866,10 @@ end
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c]
     unit_cell = UnitCell(
-        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c), Primitive()
+        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c), primitive
     )
 
-    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa TriclinicLatticeConstants
@@ -887,10 +887,10 @@ end
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
     basis_a, basis_b, basis_c = basis(lattice_constants)
     unit_cell = UnitCell(
-        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c), Primitive()
+        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c), primitive
     )
 
-    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive))
 
     reduced_cell_ = reduced_cell(unit_cell)
     =#
@@ -911,22 +911,22 @@ end
     # --- Tests
 
     # identical triclinic unit cells
-    unit_cell_ref = UnitCell(lattice_constants, Primitive())
+    unit_cell_ref = UnitCell(lattice_constants, primitive)
     unit_cell_test = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c]
-    unit_cell_ref = reduced_cell(UnitCell(lattice_constants, Primitive()))
+    unit_cell_ref = reduced_cell(UnitCell(lattice_constants, primitive))
     unit_cell_test = UnitCell(
-        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c), Primitive()
+        LatticeConstants(basis_a + basis_b + basis_c, basis_b, basis_c), primitive
     )
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 
     # body-centered unit cell
-    body_centered_unit_cell = UnitCell(lattice_constants, BodyCentered())
+    body_centered_unit_cell = UnitCell(lattice_constants, body_centered)
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             basis_a,
@@ -934,7 +934,7 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 end

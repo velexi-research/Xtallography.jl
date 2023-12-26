@@ -119,7 +119,13 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> is_basis([1, 0, 0], [1, 1, 0], [1, 0, 1])
+true
+
+julia> is_basis([1, 0, 0], [1, 1, 0], [1, -1, 0])
+false
+```
 """
 function is_basis(v1::Vector{<:Real}, v2::Vector{<:Real}, v3::Vector{<:Real})
     return volume(v1, v2, v3) > norm(v1) * norm(v2) * norm(v3) * LINEAR_INDEPENDENCE_ZERO
@@ -138,7 +144,10 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> volume([1, 0, 0], [1, 1, 0], [1, 0, 2])
+2.0
+```
 """
 function volume(v1::Vector{<:Real}, v2::Vector{<:Real}, v3::Vector{<:Real})
     return abs(det(reduce(hcat, [v1, v2, v3])))
@@ -155,7 +164,10 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2***"
+julia> surface_area([1, 0, 0], [1, 1, 0], [1, 0, 1])
+7.464101615137754
+```
 """
 function surface_area(v1::Vector{<:Real}, v2::Vector{<:Real}, v3::Vector{<:Real})
 

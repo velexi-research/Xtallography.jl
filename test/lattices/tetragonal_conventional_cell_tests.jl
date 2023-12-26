@@ -34,20 +34,20 @@ using XtallographyUtils
     a = 5.0
     c = a
     lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     @test iucr_unit_cell.lattice_constants ≈ CubicLatticeConstants(a)
-    @test iucr_unit_cell.centering == Primitive()
+    @test iucr_unit_cell.centering === primitive
 
     # ------ tetragonal unit cell is not equivalent to a cubic unit cell
 
     a = 5.0
     c = 10.0
     lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     @test iucr_unit_cell.lattice_constants ≈ lattice_constants
-    @test iucr_unit_cell.centering == Primitive()
+    @test iucr_unit_cell.centering === primitive
 end
 
 @testset "conventional_cell(): limiting cases, centering = body" begin
@@ -58,30 +58,30 @@ end
     a = 5.0
     c = a
     lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
 
     @test iucr_unit_cell.lattice_constants ≈ CubicLatticeConstants(a)
-    @test iucr_unit_cell.centering == BodyCentered()
+    @test iucr_unit_cell.centering === body_centered
 
     # ------ c = a √2
 
     a = 5.0
     c = a * sqrt(2)
     lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
 
     @test iucr_unit_cell.lattice_constants ≈ CubicLatticeConstants(c)
-    @test iucr_unit_cell.centering == FaceCentered()
+    @test iucr_unit_cell.centering === face_centered
 
     # ------ tetragonal unit cell is not equivalent to a cubic unit cell
 
     a = 5.0
     c = 10.0
     lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, BodyCentered()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
 
     @test iucr_unit_cell.lattice_constants ≈ lattice_constants
-    @test iucr_unit_cell.centering == BodyCentered()
+    @test iucr_unit_cell.centering === body_centered
 end
 
 @testset "conventional_cell(): chain of limiting cases" begin
@@ -98,9 +98,9 @@ end
 
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, Primitive()))
+    expected_unit_cell = standardize(UnitCell(lattice_constants, primitive))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
     @debug "chain of limiting cases: aP --> mP --> oP --> tP"
@@ -112,9 +112,9 @@ end
         LatticeConstants(
             basis_a, basis_a + basis_b, basis_c; identify_lattice_system=false
         ),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, Primitive()))
+    expected_unit_cell = standardize(UnitCell(lattice_constants, primitive))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
     @debug "chain of limiting cases: aP --> mP --> oC --> tP"
@@ -126,9 +126,9 @@ end
         LatticeConstants(
             basis_a, basis_b + basis_a, basis_c + basis_b; identify_lattice_system=false
         ),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, Primitive()))
+    expected_unit_cell = standardize(UnitCell(lattice_constants, primitive))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oC --> tP"
@@ -143,9 +143,9 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, BodyCentered()))
+    expected_unit_cell = standardize(UnitCell(lattice_constants, body_centered))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oI --> tI"
@@ -160,9 +160,9 @@ end
             0.5 * (basis_a + basis_b - basis_c);
             identify_lattice_system=false,
         ),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, BodyCentered()))
+    expected_unit_cell = standardize(UnitCell(lattice_constants, body_centered))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oF --> tI"
@@ -179,11 +179,11 @@ end
 
     # --- Tests
 
-    for centering in (FaceCentered, BaseCentered)
+    for centering in (face_centered, base_centered)
         local error = nothing
         local error_message = ""
         try
-            conventional_cell(UnitCell(lattice_constants, centering()))
+            conventional_cell(UnitCell(lattice_constants, centering))
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -194,7 +194,7 @@ end
         expected_error =
             "ArgumentError: " *
             "Invalid Bravais lattice: " *
-            "(lattice_system=Tetragonal, centering=$(nameof(centering)))"
+            "(lattice_system=Tetragonal, centering=$(nameof(typeof(centering))))"
 
         @test startswith(error_message, expected_error)
     end

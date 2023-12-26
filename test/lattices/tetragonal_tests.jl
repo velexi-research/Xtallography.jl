@@ -169,31 +169,31 @@ end
 
     # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = lattice_constants
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BodyCentered()
+        lattice_constants, body_centered
     )
 
     expected_lattice_constants = lattice_constants
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 
     # ------ Invalid centerings
 
-    for centering in (FaceCentered, BaseCentered)
+    for centering in (face_centered, base_centered)
         local error = nothing
         local error_message = ""
         try
-            standardize(lattice_constants, centering())
+            standardize(lattice_constants, centering)
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -204,7 +204,7 @@ end
         expected_error =
             "ArgumentError: " *
             "Invalid Bravais lattice: " *
-            "(lattice_system=Tetragonal, centering=$(nameof(centering)))"
+            "(lattice_system=Tetragonal, centering=$(nameof(typeof(centering))))"
 
         @test startswith(error_message, expected_error)
     end
@@ -262,12 +262,12 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell
-    unit_cell = UnitCell(lattice_constants, Primitive())
+    unit_cell = UnitCell(lattice_constants, primitive)
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-            Primitive(),
+            primitive,
         ),
     )
 
@@ -277,7 +277,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # body-centered unit cell
-    unit_cell = UnitCell(lattice_constants, BodyCentered())
+    unit_cell = UnitCell(lattice_constants, body_centered)
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
@@ -287,7 +287,7 @@ end
                 0.5 * (basis_a + basis_b + basis_c);
                 identify_lattice_system=false,
             ),
-            Primitive(),
+            primitive,
         ),
     )
 
@@ -297,10 +297,10 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # face-centered unit cell
-    unit_cell = UnitCell(lattice_constants, FaceCentered())
+    unit_cell = UnitCell(lattice_constants, face_centered)
 
     expected_reduced_cell = reduced_cell(
-        UnitCell(TetragonalLatticeConstants(a / sqrt(2), c), BodyCentered())
+        UnitCell(TetragonalLatticeConstants(a / sqrt(2), c), body_centered)
     )
 
     reduced_cell_ = reduced_cell(unit_cell)
@@ -320,15 +320,15 @@ end
     # --- Exercise functionality and check results
 
     # equivalent tetragonal and triclinic unit cells
-    tetragonal_unit_cell = UnitCell(lattice_constants, Primitive())
+    tetragonal_unit_cell = UnitCell(lattice_constants, primitive)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(tetragonal_unit_cell, triclinic_unit_cell)
 
     # body-centered unit cell
-    body_centered_unit_cell = UnitCell(lattice_constants, BodyCentered())
+    body_centered_unit_cell = UnitCell(lattice_constants, body_centered)
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             basis_a,
@@ -336,14 +336,14 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 
     # face-centered unit cell
-    face_centered_unit_cell = UnitCell(lattice_constants, FaceCentered())
+    face_centered_unit_cell = UnitCell(lattice_constants, face_centered)
     primitive_unit_cell = UnitCell(
-        TetragonalLatticeConstants(a / sqrt(2), c), BodyCentered()
+        TetragonalLatticeConstants(a / sqrt(2), c), body_centered
     )
     @test is_equivalent_unit_cell(face_centered_unit_cell, primitive_unit_cell)
 end

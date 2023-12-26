@@ -67,7 +67,7 @@ function isapprox(
 end
 
 function lattice_system(::CubicLatticeConstants)
-    return Cubic()
+    return cubic
 end
 
 # ------ Unit cell computations

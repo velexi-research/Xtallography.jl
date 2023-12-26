@@ -66,7 +66,10 @@ Keyword Arguments
 
 Examples
 ========
-TODO
+```jldoctest
+julia> LatticeConstants([1, 0, 0], [0, 2, 0], [0, 0, 1])
+TetragonalLatticeConstants(1.0, 2.0)
+```
 """
 function LatticeConstants(
     basis_a::Vector{<:Real},
@@ -219,6 +222,16 @@ Return the lattice system for a set of `lattice_constants`.
 Return values
 =============
 - lattice system
+
+Examples
+========
+```jldoctest
+julia> lattice_system(HexagonalLatticeConstants(2, 4))
+Hexagonal()
+
+julia> lattice_system(CubicLatticeConstants(2))
+Cubic()
+```
 """
 function lattice_system end
 
@@ -266,7 +279,17 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> unit_cell = UnitCell(OrthorhombicLatticeConstants(3, 2, 1), primitive)
+UnitCell(OrthorhombicLatticeConstants(3.0, 2.0, 1.0), Primitive())
+julia> standardize(unit_cell)
+UnitCell(OrthorhombicLatticeConstants(1.0, 2.0, 3.0), Primitive())
+
+julia> unit_cell = UnitCell(OrthorhombicLatticeConstants(3, 2, 1), base_centered)
+UnitCell(OrthorhombicLatticeConstants(3.0, 2.0, 1.0), BaseCentered())
+julia> standardize(unit_cell)
+UnitCell(OrthorhombicLatticeConstants(2.0, 3.0, 1.0), BaseCentered())
+```
 """
 function standardize(unit_cell::UnitCell)
     return UnitCell(standardize(unit_cell.lattice_constants, unit_cell.centering)...)
@@ -286,7 +309,13 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> standardize(OrthorhombicLatticeConstants(3, 2, 1), primitive)
+(OrthorhombicLatticeConstants(1.0, 2.0, 3.0), Primitive())
+
+julia> standardize(OrthorhombicLatticeConstants(3, 2, 1), base_centered)
+(OrthorhombicLatticeConstants(2.0, 3.0, 1.0), BaseCentered())
+```
 """
 function standardize(lattice_constants::LatticeConstants, centering::Centering)
     # --- Check arguments
@@ -309,7 +338,10 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> standardize(OrthorhombicLatticeConstants(3, 2, 1))
+OrthorhombicLatticeConstants(1.0, 2.0, 3.0)
+```
 """
 function standardize(lattice_constants::LatticeConstants)
     # --- Check arguments
@@ -363,7 +395,25 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> B = basis(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]), primitive));
+
+julia> B[1] ≈ [1.0, 0.0, 0.0]
+true
+julia> B[2] ≈ [1.0, 1.0, 0.0]
+true
+julia> B[3] ≈ [1.0, 0.0, 2.0]
+true
+
+julia> B = basis(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]));
+
+julia> B[1] ≈ [1.0, 0.0, 0.0]
+true
+julia> B[2] ≈ [1.0, 1.0, 0.0]
+true
+julia> B[3] ≈ [1.0, 0.0, 2.0]
+true
+```
 """
 function basis end
 
@@ -376,12 +426,7 @@ end
 
     volume(lattice_constants::LatticeConstants) -> Float64
 
-    volume(
-        basis_a::Vector{<:Real}, basis_b::Vector{<:Real}, basis_c::Vector{<:Real}
-    ) -> Float64
-
-Compute the volume of the unit cell defined by `unit_cell`, `lattice_constants`, or the
-basis vectors [`basis_a`, `basis_b`, `basis_c`].
+Compute the volume of the unit cell defined by `unit_cell` or `lattice_constants`.
 
 Return values
 =============
@@ -389,7 +434,13 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> volume(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]), primitive))
+2.0
+
+julia> volume(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]))
+2.0
+```
 """
 function volume(unit_cell::UnitCell)
     return volume(unit_cell.lattice_constants)
@@ -400,12 +451,7 @@ end
 
     surface_area(lattice_constants::LatticeConstants) -> Float64
 
-    surface_area(
-        basis_a::Vector{<:Real}, basis_b::Vector{<:Real}, basis_c::Vector{<:Real}
-    ) -> Float64
-
-Compute the surface area of the unit cell defined by `unit_cell`, `lattice_constants`, or
-the basis vectors [`basis_a`, `basis_b`, `basis_c`].
+Compute the surface area of the unit cell defined by `unit_cell` or `lattice_constants`.
 
 Return values
 =============
@@ -413,11 +459,12 @@ Return values
 
 Examples
 ========
-```jldoctest
-julia> S = surface_area([1, 0, 0], [1, 1, 0], [1, 0, 1]);
+```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2***"
+julia> surface_area(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 1]), primitive))
+7.464101615137754
 
-julia> S ≈ 4 * (1 + sqrt(3)/2)
-true
+julia> surface_area(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 1]))
+7.464101615137754
 ```
 """
 function surface_area(unit_cell::UnitCell)
@@ -435,7 +482,15 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> unit_cell = UnitCell(LatticeConstants([1, 1, 0], [1, -1, 0], [0, 1, 1]), primitive);
+
+julia> lattice_system(unit_cell.lattice_constants)
+Triclinic()
+
+julia> conventional_cell(unit_cell) ≈ UnitCell(CubicLatticeConstants(2.0), FaceCentered())
+true
+```
 """
 function conventional_cell(unit_cell::UnitCell)
     # --- Check arguments
@@ -490,7 +545,10 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> reduced_cell(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [0, 0, 2]), primitive))
+UnitCell(TetragonalLatticeConstants(1.0, 2.0), Primitive())
+```
 """
 function reduced_cell(unit_cell::UnitCell)
     # --- Preparations
@@ -796,7 +854,18 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> lattice_constants_ref = LatticeConstants([1, 0, 0], [1, 1, 0], [0, 0, 2]);
+
+julia> unit_cell_ref = UnitCell(lattice_constants_ref, body_centered);
+
+julia> lattice_constants_test = TetragonalLatticeConstants(1.0, 2.0);
+
+julia> unit_cell_test = UnitCell(lattice_constants_test, body_centered);
+
+julia> is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+true
+```
 """
 function is_equivalent_unit_cell(
     unit_cell_test::UnitCell, unit_cell_ref::UnitCell; tol::Real=1e-3
@@ -833,7 +902,12 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> lattice_constants_ref = LatticeConstants([1, 0, 0], [1, 1, 0], [0, 0, 2]);
+
+julia> is_equivalent_unit_cell(TetragonalLatticeConstants(1.0, 2.0), lattice_constants_ref)
+true
+```
 """
 function is_equivalent_unit_cell(
     lattice_constants_test::LatticeConstants,
@@ -877,6 +951,22 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> lattice_constants_ref = LatticeConstants([1, 0, 0], [0, 1, 0], [0, 0, 1]);
+
+julia> is_supercell(CubicLatticeConstants(2), lattice_constants_ref)
+true
+
+julia> is_supercell(CubicLatticeConstants(2.5), lattice_constants_ref)
+false
+
+julia> is_supercell(LatticeConstants([1, 0, 0], [0, 2, 0], [0, 0, 3]),
+                    lattice_constants_ref)
+false
+```
 """
-function is_supercell end
+function is_supercell(::LatticeConstants, ::LatticeConstants)
+    # Default is_supercell() implementation to allow comparison between lattice constants
+    # of different lattice systems.
+    return false
+end

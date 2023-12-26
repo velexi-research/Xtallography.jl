@@ -127,7 +127,7 @@ function isapprox(
 end
 
 function lattice_system(::TriclinicLatticeConstants)
-    return Triclinic()
+    return triclinic
 end
 
 function standardize(lattice_constants::TriclinicLatticeConstants, centering::Centering)
@@ -255,13 +255,18 @@ function standardize(lattice_constants::TriclinicLatticeConstants, centering::Ce
         end
     end
 
-    return TriclinicLatticeConstants(a, b, c, α, β, γ), Primitive()
+    return TriclinicLatticeConstants(a, b, c, α, β, γ), primitive
 end
 
 """
     satisfies_triclinic_angle_constraints(α::Real, β::Real, γ::Real) -> Bool
 
-Determine whether `α`, `β`, and `γ` satisfy the angle constraints for triclinic lattices.
+Determine whether `α`, `β`, and `γ` satisfy the angle constraints for triclinic lattices:
+
+* ``0 <  α + β + γ < 2π``
+* ``0 <  α + β - γ < 2π``
+* ``0 <  α - β + γ < 2π``
+* ``0 < -α + β + γ < 2π``
 
 Return values
 =============
@@ -364,7 +369,7 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
         monoclinic_lattice_constants = convert_to_mP(lattice_constants)
 
         @debug "aP --> mP"
-        return conventional_cell(UnitCell(monoclinic_lattice_constants, Primitive()))
+        return conventional_cell(UnitCell(monoclinic_lattice_constants, primitive))
 
     catch error
         if !(error isa ErrorException) || (
@@ -381,7 +386,7 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
         monoclinic_lattice_constants = convert_to_mI(lattice_constants)
 
         @debug "aP --> mI"
-        return conventional_cell(UnitCell(monoclinic_lattice_constants, BodyCentered()))
+        return conventional_cell(UnitCell(monoclinic_lattice_constants, body_centered))
 
     catch error
         if !(error isa ErrorException) || (
@@ -399,9 +404,9 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
 
         @debug "aP --> mC"
         body_centered_lattice_constants, centering = standardize(
-            monoclinic_lattice_constants, BaseCentered()
+            monoclinic_lattice_constants, base_centered
         )
-        return conventional_cell(UnitCell(body_centered_lattice_constants, BodyCentered()))
+        return conventional_cell(UnitCell(body_centered_lattice_constants, body_centered))
 
     catch error
         if !(error isa ErrorException) || (
@@ -414,7 +419,7 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
     end
 
     # Not a limiting case, so return unit cell with standardized lattice constants
-    return UnitCell(lattice_constants, Primitive())
+    return UnitCell(lattice_constants, primitive)
 end
 
 """
@@ -634,7 +639,7 @@ function convert_to_mI_basis_to_lattice_constants(
     end
 
     m_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BodyCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), body_centered
     )
     return m_lattice_constants
 end
@@ -1995,6 +2000,15 @@ end
     is_triclinic_type_I_cell(lattice_constants::TriclinicLatticeConstants) -> Bool
 
 Determine whether the unit cell defined by `lattice_constants` is a Type I or Type II cell.
+
+A triclinic unit cell is Type I if the product of the dot products of all pairs of basis
+vectors for unit cell is positive:
+
+```math
+(\\vec{a} \\cdot \\vec{b})(\\vec{b} \\cdot \\vec{c})(\\vec{c} \\cdot \\vec{a}) > 0.
+```
+
+Otherwise, the triclinic unit cell is Type II.
 
 Return values
 =============

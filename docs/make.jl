@@ -18,10 +18,12 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "Examples" => "examples.md",
         "Types" => "types.md",
-        "Utility Functions" => "utilities.md",
+        "Functions" => "functions.md",
         "Index" => "docs-index.md",
     ],
+    warnonly=[:missing_docs],
 )
 
 deploydocs(; repo="github.com/velexi-research/XtallographyUtils.jl", devbranch="main")

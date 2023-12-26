@@ -49,71 +49,113 @@ abstract type LatticeSystem end
 """
     Triclinic
 
-Type representing the triclinic lattice system
+Type representing the triclinic lattice system that is the type of [`triclinic`](@ref)
 
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Triclinic <: LatticeSystem end
+
+"""
+    triclinic
+
+The singleton instance of type [`Triclinic`](@ref)
+"""
 const triclinic = Triclinic()
 
 """
     Monoclinic
 
-Type representing the monoclinic lattice system
+Type representing the monoclinic lattice system that is the type of [`monoclinic`](@ref)
 
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Monoclinic <: LatticeSystem end
+
+"""
+    monoclinic
+
+The singleton instance of type [`Monoclinic`](@ref)
+"""
 const monoclinic = Monoclinic()
 
 """
     Orthorhombic
 
-Type representing the orthorhombic lattice system
+Type representing the orthorhombic lattice system that is the type of [`orthorhombic`](@ref)
 
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Orthorhombic <: LatticeSystem end
+
+"""
+    orthorhombic
+
+The singleton instance of type [`Orthorhombic`](@ref)
+"""
 const orthorhombic = Orthorhombic()
 
 """
     Hexagonal
 
-Type representing the hexagonal lattice system
+Type representing the hexagonal lattice system that is the type of [`hexagonal`](@ref)
 
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Hexagonal <: LatticeSystem end
+
+"""
+    hexagonal
+
+The singleton instance of type [`Hexagonal`](@ref)
+"""
 const hexagonal = Hexagonal()
 
 """
     Rhombohedral
 
-Type representing the rhombohedral lattice system
+Type representing the rhombohedral lattice system that is the type of [`rhombohedral`](@ref)
 
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Rhombohedral <: LatticeSystem end
+
+"""
+    rhombohedral
+
+The singleton instance of type [`Rhombohedral`](@ref)
+"""
 const rhombohedral = Rhombohedral()
 
 """
     Tetragonal
 
-Type representing the tetragonal lattice system
+Type representing the tetragonal lattice system that is the type of [`tetragonal`](@ref)
 
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Tetragonal <: LatticeSystem end
+
+"""
+    tetragonal
+
+The singleton instance of type [`Tetragonal`](@ref)
+"""
 const tetragonal = Tetragonal()
 
 """
     Cubic
 
-Type representing the cubic lattice system
+Type representing the cubic lattice system that is the type of [`cubic`](@ref)
 
 Supertype: [`LatticeSystem`](@ref)
 """
 struct Cubic <: LatticeSystem end
+
+"""
+    cubic
+
+The singleton instance of type [`Cubic`](@ref)
+"""
 const cubic = Cubic()
 
 # ------ Lattice centerings
@@ -132,17 +174,23 @@ abstract type Centering end
 """
     Primitive
 
-Type representing no centering
+Type representing no centering that is the type of [`primitive`](@ref)
 
 Supertype: [`Centering`](@ref)
 """
 struct Primitive <: Centering end
+
+"""
+    primitive
+
+The singleton instance of type [`Primitive`](@ref)
+"""
 const primitive = Primitive()
 
 """
     BaseCentered
 
-Type representing base centering
+Type representing base centering that is the type of [`base_centered`](@ref)
 
 !!! note
 
@@ -151,31 +199,54 @@ Type representing base centering
 Supertype: [`Centering`](@ref)
 """
 struct BaseCentered <: Centering end
+
+"""
+    base_centered
+
+The singleton instance of type [`BaseCentered`](@ref)
+"""
 const base_centered = BaseCentered()
 
 """
     BodyCentered
 
-Type representing body centering
+Type representing body centering that is the type of [`body_centered`](@ref)
 
 Supertype: [`Centering`](@ref)
 """
 struct BodyCentered <: Centering end
+
+"""
+    body_centered
+
+The singleton instance of type [`BodyCentered`](@ref)
+"""
 const body_centered = BodyCentered()
 
 """
     FaceCentered
 
-Type representing face centering
+Type representing face centering that is the type of [`face_centered`](@ref)
 
 Supertype: [`Centering`](@ref)
 """
 struct FaceCentered <: Centering end
+
+"""
+    face_centered
+
+The singleton instance of type [`FaceCentered`](@ref)
+"""
 const face_centered = FaceCentered()
 
 # --- Constants
 
 # Lattice Types
+"""
+    BRAVAIS_LATTICES
+
+List of valid Bravais lattices.
+"""
 const BRAVAIS_LATTICES = (
     (lattice_system=triclinic, centering=primitive),
     (lattice_system=monoclinic, centering=primitive),
@@ -211,7 +282,19 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> is_bravais_lattice(cubic, body_centered)
+true
+
+julia> is_bravais_lattice(cubic, base_centered)
+false
+
+julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), primitive))
+true
+
+julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), face_centered))
+false
+```
 """
 function is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering)
     return (lattice_system=lattice_system, centering=centering) in BRAVAIS_LATTICES

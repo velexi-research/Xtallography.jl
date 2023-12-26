@@ -1038,3 +1038,12 @@ end
     expected_error = "ArgumentError: `tol` must be positive"
     @test startswith(error_message, expected_error)
 end
+
+@testset "is_supercell(): different LatticeConstant types" begin
+    # --- Tests
+
+    cubic_lattice_constants = CubicLatticeConstants(1.0)
+    orthorhombic_lattice_constants = OrthorhombicLatticeConstants(1.0, 2.0, 3.0)
+
+    @test !is_supercell(cubic_lattice_constants, orthorhombic_lattice_constants)
+end
