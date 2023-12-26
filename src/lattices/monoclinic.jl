@@ -136,11 +136,9 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
         c = tmp
     end
 
-    if β < π / 2 || β > π
-        β = mod(β, π)
-        if β < π / 2
-            β = π - β
-        end
+    β = mod(β, π)
+    if β < π / 2
+        β = π - β
     end
 
     # --- Reduce the 2D unit cell in the plane normal to the b-axis so that the IUCr
@@ -361,7 +359,23 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> lattice_constants = MonoclinicLatticeConstants(1.0, 2.0, 3.0, 3π / 5);
+
+julia> body_centered_lattice_constants = convert_to_body_centering(lattice_constants);
+
+julia> body_centered_lattice_constants.a ≈ 2.8541019662496847
+true
+
+julia> body_centered_lattice_constants.b ≈ 2
+true
+
+julia> body_centered_lattice_constants.c ≈ 3
+true
+
+julia> body_centered_lattice_constants.β ≈ 2.8018712454717734
+true
+```
 """
 function convert_to_body_centering(lattice_constants::MonoclinicLatticeConstants)
 
@@ -374,15 +388,13 @@ function convert_to_body_centering(lattice_constants::MonoclinicLatticeConstants
     # Compute lattice constants for base-centered unit cell
     a_base = sqrt(a^2 + c^2 - 2 * a * c * abs(cos(β)))
     β_base = π - asin_(sin(β) / a_base * a)
+    c_base = c
 
-    if c < a_base
-        c_base = a_base
-        a_base = c
+    if a_base < c_base
+        return MonoclinicLatticeConstants(a_base, b, c_base, β_base)
     else
-        c_base = c
+        return MonoclinicLatticeConstants(c_base, b, a_base, β_base)
     end
-
-    return MonoclinicLatticeConstants(a_base, b, c_base, β_base)
 end
 
 """
@@ -398,7 +410,23 @@ Return values
 
 Examples
 ========
-TODO
+```jldoctest
+julia> lattice_constants = MonoclinicLatticeConstants(1.0, 2.0, 3.0, 3π / 5);
+
+julia> base_centered_lattice_constants = convert_to_base_centering(lattice_constants);
+
+julia> base_centered_lattice_constants.a ≈ 1
+true
+
+julia> base_centered_lattice_constants.b ≈ 2
+true
+
+julia> base_centered_lattice_constants.c ≈ 2.8541019662496847
+true
+
+julia> base_centered_lattice_constants.β ≈ 1.5963584695539381
+true
+```
 """
 function convert_to_base_centering(lattice_constants::MonoclinicLatticeConstants)
 
