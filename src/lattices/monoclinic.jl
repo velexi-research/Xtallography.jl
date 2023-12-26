@@ -415,13 +415,13 @@ julia> lattice_constants = MonoclinicLatticeConstants(1.0, 2.0, 3.0, 3π / 5);
 
 julia> base_centered_lattice_constants = convert_to_base_centering(lattice_constants);
 
-julia> base_centered_lattice_constants.a ≈ 1
+julia> base_centered_lattice_constants.a ≈ 2.8541019662496847
 true
 
 julia> base_centered_lattice_constants.b ≈ 2
 true
 
-julia> base_centered_lattice_constants.c ≈ 2.8541019662496847
+julia> base_centered_lattice_constants.c ≈ 1
 true
 
 julia> base_centered_lattice_constants.β ≈ 1.5963584695539381
