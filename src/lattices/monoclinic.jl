@@ -438,8 +438,13 @@ function convert_to_base_centering(lattice_constants::MonoclinicLatticeConstants
 
     # Compute lattice constants for base-centered unit cell
     a_base = sqrt(a^2 + c^2 - 2 * a * c * abs(cos(β)))
-    c_base = a
-    β_base = π - asin_(sin(β) / a_base * c)
+    if a < c
+        c_base = a
+        β_base = π - asin_(sin(β) / a_base * c)
+    else
+        c_base = c
+        β_base = π - asin_(sin(β) / a_base * a)
+    end
 
     return MonoclinicLatticeConstants(a_base, b, c_base, β_base)
 end

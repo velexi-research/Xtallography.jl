@@ -575,18 +575,16 @@ end
 end
 
 @testset "convert_to_base_centering()" begin
-    # --- Preparations
+    # --- Tests
+
+    # ------ a < c, β > π/2
 
     # Construct basis vectors for body-centered unit cell
     a = 6
     b = 3
     c = 10
     β = 3π / 5
-    body_centered_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(a, b, c, β), BodyCentered()
-    )
-
-    # --- Exercise functionality and check results
+    body_centered_lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     # Check conversion to base-centering
     base_centered_lattice_constants = convert_to_base_centering(
@@ -606,6 +604,38 @@ end
         base_centered_lattice_constants, BaseCentered()
     )
     @test standardized_lattice_constants ≈ body_centered_lattice_constants
+    @test standardized_centering == BodyCentered()
+
+    # ------ a > c, β < π/2
+
+    # Construct basis vectors for body-centered unit cell
+    a = 8
+    b = 3
+    c = 4
+    β = 2π / 5
+    body_centered_lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
+
+    # Check conversion to base-centering
+    base_centered_lattice_constants = convert_to_base_centering(
+        body_centered_lattice_constants
+    )
+
+    a_base = sqrt(a^2 + c^2 - 2 * a * c * cos(β))
+    c_base = c
+    β_base = π - acos((a_base^2 + c_base^2 - a^2) / 2 / a_base / c_base)
+    expected_base_centered_lattice_constants = MonoclinicLatticeConstants(
+        a_base, b, c_base, β_base
+    )
+    @test base_centered_lattice_constants ≈ expected_base_centered_lattice_constants
+
+    # Check conversion back to body-centering via standardize()
+    standardized_lattice_constants, standardized_centering = standardize(
+        base_centered_lattice_constants, BaseCentered()
+    )
+    standardized_body_centered_lattice_constants, _ = standardize(
+        body_centered_lattice_constants, body_centered
+    )
+    @test standardized_lattice_constants ≈ standardized_body_centered_lattice_constants
     @test standardized_centering == BodyCentered()
 end
 
