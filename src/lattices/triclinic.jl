@@ -2001,6 +2001,15 @@ end
 
 Determine whether the unit cell defined by `lattice_constants` is a Type I or Type II cell.
 
+A triclinic unit cell is Type I if the product of the dot products of all pairs of basis
+vectors for unit cell is positive:
+
+```math
+(\\vec{a} \\cdot \\vec{b})(\\vec{b} \\cdot \\vec{c})(\\vec{c} \\cdot \\vec{a}) > 0.
+```
+
+Otherwise, the triclinic unit cell is Type II.
+
 Return values
 =============
 - `true` if `lattice_constants` defines a Type I cell; `false` if `lattice_constants`
