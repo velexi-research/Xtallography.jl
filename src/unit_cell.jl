@@ -222,6 +222,16 @@ Return the lattice system for a set of `lattice_constants`.
 Return values
 =============
 - lattice system
+
+Examples
+========
+```jldoctest
+julia> lattice_system(HexagonalLatticeConstants(2, 4))
+Hexagonal()
+
+julia> lattice_system(CubicLatticeConstants(2))
+Cubic()
+```
 """
 function lattice_system end
 
