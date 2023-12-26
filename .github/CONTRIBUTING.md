@@ -73,7 +73,7 @@ ___Note___: this project uses `poetry` to manage Python package dependencies.
 3. Install the Python package dependencies required for development.
 
    ```shell
-   $ poetry install
+   $ poetry install --no-root
    ```
 
 4. Install the Git pre-commit hooks.
