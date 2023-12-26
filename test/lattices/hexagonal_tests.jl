@@ -155,7 +155,7 @@ end
     # --- Tests
 
     lattice_constants = HexagonalLatticeConstants(1, 2)
-    @test lattice_system(lattice_constants) === Hexagonal()
+    @test lattice_system(lattice_constants) === hexagonal
 end
 
 @testset "standardize()" begin
@@ -167,21 +167,21 @@ end
     lattice_constants = HexagonalLatticeConstants(1.0, 2.0)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = lattice_constants
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # ------ Invalid centerings
 
-    for centering in (BodyCentered, FaceCentered, BaseCentered)
+    for centering in (body_centered, face_centered, base_centered)
         local error = nothing
         local error_message = ""
         try
-            standardize(lattice_constants, centering())
+            standardize(lattice_constants, centering)
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -192,7 +192,7 @@ end
         expected_error =
             "ArgumentError: " *
             "Invalid Bravais lattice: " *
-            "(lattice_system=Hexagonal, centering=$(nameof(centering)))"
+            "(lattice_system=Hexagonal, centering=$(nameof(typeof(centering))))"
 
         @test startswith(error_message, expected_error)
     end
@@ -262,12 +262,12 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell defined by [basis_a, basis_b, basis_c]
-    unit_cell = UnitCell(lattice_constants, Primitive())
+    unit_cell = UnitCell(lattice_constants, primitive)
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-            Primitive(),
+            primitive,
         ),
     )
 
@@ -278,9 +278,9 @@ end
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ π / 3
-    unit_cell = UnitCell(LatticeConstants(basis_a + basis_b, basis_b, basis_c), Primitive())
+    unit_cell = UnitCell(LatticeConstants(basis_a + basis_b, basis_b, basis_c), primitive)
 
-    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa HexagonalLatticeConstants
@@ -289,9 +289,9 @@ end
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ 2π / 3
-    unit_cell = UnitCell(LatticeConstants(basis_a - basis_b, basis_b, basis_c), Primitive())
+    unit_cell = UnitCell(LatticeConstants(basis_a - basis_b, basis_b, basis_c), primitive)
 
-    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa HexagonalLatticeConstants
@@ -310,26 +310,26 @@ end
     # --- Exercise functionality and check results
 
     # equivalent hexagonal and triclinic unit cells
-    hexagonal_unit_cell = UnitCell(lattice_constants, Primitive())
+    hexagonal_unit_cell = UnitCell(lattice_constants, primitive)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(hexagonal_unit_cell, triclinic_unit_cell)
 
     # equivalent unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ π / 3
-    unit_cell_ref = UnitCell(lattice_constants, Primitive())
+    unit_cell_ref = UnitCell(lattice_constants, primitive)
     unit_cell_test = UnitCell(
-        LatticeConstants(basis_a + basis_b, basis_b, basis_c), Primitive()
+        LatticeConstants(basis_a + basis_b, basis_b, basis_c), primitive
     )
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 
     # equivalent unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ 2π / 3
-    unit_cell_ref = UnitCell(lattice_constants, Primitive())
+    unit_cell_ref = UnitCell(lattice_constants, primitive)
     unit_cell_test = UnitCell(
-        LatticeConstants(basis_a - basis_b, basis_b, basis_c), Primitive()
+        LatticeConstants(basis_a - basis_b, basis_b, basis_c), primitive
     )
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 end

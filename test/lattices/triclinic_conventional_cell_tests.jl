@@ -59,11 +59,11 @@ using XtallographyUtils
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈ standardize(lattice_constants)
-    @test iucr_unit_cell.centering == Primitive()
+    @test iucr_unit_cell.centering === primitive
 
     # ------ triclinic unit cell is equivalent to a primitive monoclinic unit cell
 
@@ -77,12 +77,12 @@ using XtallographyUtils
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈
         standardize(MonoclinicLatticeConstants(b, a, c, π - α))
-    @test iucr_unit_cell.centering == Primitive()
+    @test iucr_unit_cell.centering === primitive
 
     # ------ triclinic unit cell is equivalent to a body-centered monoclinic unit cell
 
@@ -112,14 +112,14 @@ using XtallographyUtils
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     # Check results
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BodyCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), body_centered
     )
     @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering == BodyCentered()
+    @test iucr_unit_cell.centering === body_centered
 end
 
 @testset "conventional_cell(): limiting cases - base-centered" begin
@@ -158,14 +158,14 @@ end
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     # Check results
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
     @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering == BodyCentered()
+    @test iucr_unit_cell.centering === body_centered
 
     # ------ triclinic basis contains m_basis_a, m_basis_c, and one base-centered lattice
     #        vector. Case #1: m_basis_c makes no contribution to basis_b
@@ -197,14 +197,14 @@ end
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     # Check results
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
     @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering == BodyCentered()
+    @test iucr_unit_cell.centering === body_centered
 
     # ------ triclinic basis contains m_basis_a, m_basis_c, and one base-centered lattice
     #        vector. Case #2: m_basis_c contributes to basis_b
@@ -236,14 +236,14 @@ end
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     # Check results
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
     @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering == BodyCentered()
+    @test iucr_unit_cell.centering === body_centered
 
     # ------ triclinic basis m_basis_a and two base-centered lattice vectors.
     #        Case #1: relative signs of m_basis_a and m_basis_b are the same in basis_b
@@ -276,14 +276,14 @@ end
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     # Check results
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
     @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering == BodyCentered()
+    @test iucr_unit_cell.centering === body_centered
 
     # ------ triclinic basis m_basis_a and two base-centered lattice vectors.
     #        Case #2: relative signs of m_basis_a and m_basis_b are opposite in basis_b
@@ -316,14 +316,14 @@ end
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     # Check results
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
     @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering == BodyCentered()
+    @test iucr_unit_cell.centering === body_centered
 
     # ------ triclinic basis m_basis_b and two base-centered lattice vectors
 
@@ -354,14 +354,14 @@ end
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     # Check results
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
     @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering == BodyCentered()
+    @test iucr_unit_cell.centering === body_centered
 
     # ------ triclinic basis m_basis_c and two base-centered lattice vectors
 
@@ -392,14 +392,14 @@ end
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     # Check results
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
     @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering == BodyCentered()
+    @test iucr_unit_cell.centering === body_centered
 
     # ------ triclinic basis three base-centered lattice vectors
 
@@ -430,14 +430,14 @@ end
     lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, γ)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, Primitive()))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
 
     # Check results
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
     @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering == BodyCentered()
+    @test iucr_unit_cell.centering === body_centered
 end
 
 @testset "conventional_cell(): invalid arguments" begin
@@ -454,11 +454,11 @@ end
 
     # --- Tests
 
-    for centering in (BodyCentered, FaceCentered, BaseCentered)
+    for centering in (body_centered, face_centered, base_centered)
         local error = nothing
         local error_message = ""
         try
-            conventional_cell(UnitCell(lattice_constants, centering()))
+            conventional_cell(UnitCell(lattice_constants, centering))
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -469,7 +469,7 @@ end
         expected_error =
             "ArgumentError: " *
             "Invalid Bravais lattice: " *
-            "(lattice_system=Triclinic, centering=$(nameof(centering)))"
+            "(lattice_system=Triclinic, centering=$(nameof(typeof(centering))))"
 
         @test startswith(error_message, expected_error)
     end
@@ -561,7 +561,7 @@ function convert_to_mI_test_all_triclinic_basis_permutations(
 
     # Construct expected unit cell
     expected_monoclinic_unit_cell = UnitCell(
-        expected_monoclinic_lattice_constants, BodyCentered()
+        expected_monoclinic_lattice_constants, body_centered
     )
 
     # --- Test convert_to_mI() for each permutation of the basis vectors
@@ -584,7 +584,7 @@ function convert_to_mI_test_all_triclinic_basis_permutations(
 
         # Exercise functionality
         monoclinic_lattice_constants = convert_to_mI(lattice_constants)
-        monoclinic_unit_cell = UnitCell(monoclinic_lattice_constants, BodyCentered())
+        monoclinic_unit_cell = UnitCell(monoclinic_lattice_constants, body_centered)
 
         # Check results
         @test is_equivalent_unit_cell(monoclinic_unit_cell, expected_monoclinic_unit_cell)
@@ -1120,7 +1120,7 @@ function convert_to_mC_test_all_triclinic_basis_permutations(
 
     # Construct expected unit cell
     expected_monoclinic_unit_cell = UnitCell(
-        expected_monoclinic_lattice_constants, BaseCentered()
+        expected_monoclinic_lattice_constants, base_centered
     )
 
     # --- Test convert_to_mC() for each permutation of the basis vectors
@@ -1143,7 +1143,7 @@ function convert_to_mC_test_all_triclinic_basis_permutations(
 
         # Exercise functionality
         monoclinic_lattice_constants = convert_to_mC(lattice_constants)
-        monoclinic_unit_cell = UnitCell(monoclinic_lattice_constants, BaseCentered())
+        monoclinic_unit_cell = UnitCell(monoclinic_lattice_constants, base_centered)
 
         # Check results
         @test is_equivalent_unit_cell(monoclinic_unit_cell, expected_monoclinic_unit_cell)
@@ -1272,7 +1272,7 @@ end
     m_β = 3π / 5
 
     expected_monoclinic_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
@@ -1301,7 +1301,7 @@ end
     m_β = 3π / 5
 
     expected_monoclinic_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
@@ -1336,7 +1336,7 @@ end
     m_β = 3π / 5
 
     expected_monoclinic_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
@@ -1365,7 +1365,7 @@ end
     m_β = 3π / 5
 
     expected_monoclinic_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
@@ -1400,7 +1400,7 @@ end
     m_β = 3π / 5
 
     expected_monoclinic_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
@@ -1429,7 +1429,7 @@ end
     m_β = 3π / 5
 
     expected_monoclinic_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
@@ -1464,7 +1464,7 @@ end
     m_β = 3π / 5
 
     expected_monoclinic_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)
@@ -1493,7 +1493,7 @@ end
     m_β = 3π / 5
 
     expected_monoclinic_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), BaseCentered()
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), base_centered
     )
 
     m_basis_a, m_basis_b, m_basis_c = basis(expected_monoclinic_lattice_constants)

@@ -261,23 +261,23 @@ end
 
     # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BodyCentered()
+        lattice_constants, body_centered
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 
     # ------ β ∉ [π/2, π]
 
@@ -289,23 +289,23 @@ end
 
     # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, c, π - β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BodyCentered()
+        lattice_constants, body_centered
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, c, π - β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 
     # ------ a > c
 
@@ -317,23 +317,23 @@ end
 
     # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(c, b, a, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BodyCentered()
+        lattice_constants, body_centered
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(c, b, a, β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 
     # ------ base-centered unit cell, a < c
 
@@ -344,7 +344,7 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BaseCentered()
+        lattice_constants, base_centered
     )
 
     a_body = sqrt(a^2 + c^2 + 2 * a * c * cos(β))
@@ -352,7 +352,7 @@ end
     expected_lattice_constants = MonoclinicLatticeConstants(c, b, a_body, β_body)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 
     # ------ base-centered unit cell, a > c
 
@@ -363,7 +363,7 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BaseCentered()
+        lattice_constants, base_centered
     )
 
     a_body = sqrt(a^2 + c^2 + 2 * a * c * cos(β))
@@ -371,7 +371,7 @@ end
     expected_lattice_constants = MonoclinicLatticeConstants(c, b, a_body, β_body)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 
     # ------ unit cell requires single reduction in plane normal to b-axis
 
@@ -388,7 +388,7 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_c = sqrt(a^2 + c^2 + 2 * a * c * cos(β))
@@ -396,7 +396,7 @@ end
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, expected_c, expected_β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # centering = body-centered
     a = a_ref
@@ -406,13 +406,13 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BodyCentered()
+        lattice_constants, body_centered
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a_ref, b_ref, c_ref, β_ref)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 
     # ------ unit cell requires multiple reductions in plane normal to b-axis
 
@@ -429,7 +429,7 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_c = sqrt(a_ref^2 + c_ref^2 + 2 * a_ref * c_ref * cos(β_ref))
@@ -437,7 +437,7 @@ end
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, expected_c, expected_β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # centering = body-centered
     a = a_ref
@@ -447,22 +447,22 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BodyCentered()
+        lattice_constants, body_centered
     )
 
     expected_lattice_constants = MonoclinicLatticeConstants(a, b, expected_c, expected_β)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 
     # ------ Invalid centering
 
     # centering = face-centered
-    centering = FaceCentered
+    centering = face_centered
     local error = nothing
     local error_message = ""
     try
-        standardize(lattice_constants, centering())
+        standardize(lattice_constants, centering)
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -473,7 +473,7 @@ end
     expected_error =
         "ArgumentError: " *
         "Invalid Bravais lattice: " *
-        "(lattice_system=Monoclinic, centering=$(nameof(centering)))"
+        "(lattice_system=Monoclinic, centering=$(nameof(typeof(centering))))"
 
     @test startswith(error_message, expected_error)
 end
@@ -601,10 +601,10 @@ end
 
     # Check conversion back to body-centering via standardize()
     standardized_lattice_constants, standardized_centering = standardize(
-        base_centered_lattice_constants, BaseCentered()
+        base_centered_lattice_constants, base_centered
     )
     @test standardized_lattice_constants ≈ body_centered_lattice_constants
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 
     # ------ a > c, β < π/2
 
@@ -630,13 +630,13 @@ end
 
     # Check conversion back to body-centering via standardize()
     standardized_lattice_constants, standardized_centering = standardize(
-        base_centered_lattice_constants, BaseCentered()
+        base_centered_lattice_constants, base_centered
     )
     standardized_body_centered_lattice_constants, _ = standardize(
         body_centered_lattice_constants, body_centered
     )
     @test standardized_lattice_constants ≈ standardized_body_centered_lattice_constants
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 end
 
 @testset "reduced_cell()" begin
@@ -652,9 +652,9 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell defined by [basis_a, basis_b, basis_c]
-    unit_cell = UnitCell(lattice_constants, Primitive())
+    unit_cell = UnitCell(lattice_constants, primitive)
 
-    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa MonoclinicLatticeConstants
@@ -662,9 +662,9 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c]
-    unit_cell = UnitCell(LatticeConstants(basis_a + basis_c, basis_b, basis_c), Primitive())
+    unit_cell = UnitCell(LatticeConstants(basis_a + basis_c, basis_b, basis_c), primitive)
 
-    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa MonoclinicLatticeConstants
@@ -672,12 +672,12 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # body-centered unit cell
-    unit_cell = UnitCell(lattice_constants, BodyCentered())
+    unit_cell = UnitCell(lattice_constants, body_centered)
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c)),
-            Primitive(),
+            primitive,
         ),
     )
 
@@ -687,10 +687,10 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # base-centered unit cell
-    unit_cell = UnitCell(lattice_constants, BaseCentered())
+    unit_cell = UnitCell(lattice_constants, base_centered)
 
     expected_reduced_cell = reduced_cell(
-        UnitCell(LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c), Primitive())
+        UnitCell(LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c), primitive)
     )
 
     reduced_cell_ = reduced_cell(unit_cell)
@@ -699,7 +699,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # equivalent body-centered and base-centered monoclinic unit cells
-    base_centered_unit_cell = UnitCell(lattice_constants, BaseCentered())
+    base_centered_unit_cell = UnitCell(lattice_constants, base_centered)
     body_centered_basis_a = basis_a + basis_c
     body_centered_basis_b = basis_b
     body_centered_basis_c = basis_c
@@ -713,7 +713,7 @@ end
                 norm(body_centered_basis_a) / norm(body_centered_basis_c),
             ),
         ),
-        BodyCentered(),
+        body_centered,
     )
 
     @test base_centered_unit_cell.lattice_constants isa MonoclinicLatticeConstants
@@ -722,7 +722,7 @@ end
     @test reduced_cell(base_centered_unit_cell) ≈ reduced_cell(body_centered_unit_cell)
 
     # face-centered unit cell (equivalent to smaller body-centered unit cell)
-    face_centered_unit_cell = UnitCell(lattice_constants, FaceCentered())
+    face_centered_unit_cell = UnitCell(lattice_constants, face_centered)
     body_centered_basis_a = 0.5 * (basis_a + basis_c)
     body_centered_basis_b = basis_b
     body_centered_basis_c = 0.5 * (basis_a - basis_c)
@@ -736,7 +736,7 @@ end
                 norm(body_centered_basis_a) / norm(body_centered_basis_c),
             ),
         ),
-        BodyCentered(),
+        body_centered,
     )
 
     reduced_face_centered_unit_cell = reduced_cell(face_centered_unit_cell)
@@ -763,15 +763,15 @@ end
     # --- Tests
 
     # equivalent monoclinic and triclinic unit cells
-    monoclinic_unit_cell = UnitCell(lattice_constants, Primitive())
+    monoclinic_unit_cell = UnitCell(lattice_constants, primitive)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(monoclinic_unit_cell, triclinic_unit_cell)
 
     # body-centered unit cell
-    body_centered_unit_cell = UnitCell(lattice_constants, BodyCentered())
+    body_centered_unit_cell = UnitCell(lattice_constants, body_centered)
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             basis_a,
@@ -779,15 +779,15 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 
     # equivalent base-centered and body-centered monoclinic unit cells
-    base_centered_unit_cell = UnitCell(lattice_constants, BaseCentered())
+    base_centered_unit_cell = UnitCell(lattice_constants, base_centered)
     body_centered_unit_cell = UnitCell(
-        LatticeConstants(basis_a + basis_c, basis_b, basis_c; centering=BodyCentered()),
-        BodyCentered(),
+        LatticeConstants(basis_a + basis_c, basis_b, basis_c; centering=body_centered),
+        body_centered,
     )
     @test is_equivalent_unit_cell(base_centered_unit_cell, body_centered_unit_cell)
 end

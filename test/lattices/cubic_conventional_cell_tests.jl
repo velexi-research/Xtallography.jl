@@ -33,7 +33,7 @@ using XtallographyUtils
 
     lattice_constants = CubicLatticeConstants(1.0)
 
-    for centering in (Primitive(), BodyCentered(), FaceCentered())
+    for centering in (primitive, body_centered, face_centered)
         unit_cell = UnitCell(lattice_constants, centering)
 
         iucr_unit_cell = conventional_cell(unit_cell)
@@ -46,7 +46,7 @@ using XtallographyUtils
     local error = nothing
     local error_message = ""
     try
-        conventional_cell(UnitCell(lattice_constants, BaseCentered()))
+        conventional_cell(UnitCell(lattice_constants, base_centered))
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -77,9 +77,9 @@ end
 
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = UnitCell(lattice_constants, Primitive())
+    expected_unit_cell = UnitCell(lattice_constants, primitive)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mP --> oP --> tP --> cP " *
@@ -92,9 +92,9 @@ end
         LatticeConstants(
             basis_a, basis_a + basis_b, basis_c; identify_lattice_system=false
         ),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = UnitCell(lattice_constants, Primitive())
+    expected_unit_cell = UnitCell(lattice_constants, primitive)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mP --> oC --> tP --> cP"
@@ -116,9 +116,9 @@ end
         LatticeConstants(
             basis_a, basis_b + basis_c, basis_a + basis_c; identify_lattice_system=false
         ),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = UnitCell(lattice_constants, Primitive())
+    expected_unit_cell = UnitCell(lattice_constants, primitive)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oC --> tP --> cP " *
@@ -134,9 +134,9 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = UnitCell(lattice_constants, BodyCentered())
+    expected_unit_cell = UnitCell(lattice_constants, body_centered)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oI --> tI --> cI"
@@ -156,9 +156,9 @@ end
             0.5 * (-basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = UnitCell(lattice_constants, BodyCentered())
+    expected_unit_cell = UnitCell(lattice_constants, body_centered)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oF --> tI --> cI " *
@@ -179,9 +179,9 @@ end
             0.5 * (basis_c + basis_a);
             identify_lattice_system=false,
         ),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = UnitCell(lattice_constants, FaceCentered())
+    expected_unit_cell = UnitCell(lattice_constants, face_centered)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oI --> tI --> cF " *
@@ -200,9 +200,9 @@ end
             0.5 * (basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        Primitive(),
+        primitive,
     )
-    expected_unit_cell = UnitCell(lattice_constants, FaceCentered())
+    expected_unit_cell = UnitCell(lattice_constants, face_centered)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oF --> tI --> cF " *

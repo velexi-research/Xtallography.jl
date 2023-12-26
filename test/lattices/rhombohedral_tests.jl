@@ -181,7 +181,7 @@ end
     lattice_constants = RhombohedralLatticeConstants(1.0, 2π / 5)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = lattice_constants
@@ -189,11 +189,11 @@ end
 
     # ------ Invalid centering
 
-    for centering in (BodyCentered, FaceCentered, BaseCentered)
+    for centering in (body_centered, face_centered, base_centered)
         local error = nothing
         local error_message = ""
         try
-            standardize(lattice_constants, centering())
+            standardize(lattice_constants, centering)
         catch error
             bt = catch_backtrace()
             error_message = sprint(showerror, error, bt)
@@ -204,7 +204,7 @@ end
         expected_error =
             "ArgumentError: " *
             "Invalid Bravais lattice: " *
-            "(lattice_system=Rhombohedral, centering=$(nameof(centering)))"
+            "(lattice_system=Rhombohedral, centering=$(nameof(typeof(centering))))"
 
         @test startswith(error_message, expected_error)
     end
@@ -278,10 +278,10 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell
-    unit_cell = UnitCell(lattice_constants, Primitive())
+    unit_cell = UnitCell(lattice_constants, primitive)
 
     expected_reduced_cell = reduced_cell(
-        UnitCell(LatticeConstants(basis_a, basis_b, basis_c), Primitive())
+        UnitCell(LatticeConstants(basis_a, basis_b, basis_c), primitive)
     )
 
     reduced_cell_ = reduced_cell(unit_cell)
@@ -301,10 +301,10 @@ end
     # --- Exercise functionality and check results
 
     # equivalent rhombohedral and triclinic unit cells
-    rhombohedral_unit_cell = UnitCell(lattice_constants, Primitive())
+    rhombohedral_unit_cell = UnitCell(lattice_constants, primitive)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(rhombohedral_unit_cell, triclinic_unit_cell)
 end

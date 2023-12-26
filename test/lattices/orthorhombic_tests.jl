@@ -205,33 +205,33 @@ end
 
     # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, b, c)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BodyCentered()
+        lattice_constants, body_centered
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, b, c)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 
     # centering = face-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, FaceCentered()
+        lattice_constants, face_centered
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, b, c)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == FaceCentered()
+    @test standardized_centering === face_centered
 
     # ------ lattice constants not sorted
 
@@ -242,33 +242,33 @@ end
 
     # centering = primitive
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, Primitive()
+        lattice_constants, primitive
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, c, b)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == Primitive()
+    @test standardized_centering === primitive
 
     # centering = body-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BodyCentered()
+        lattice_constants, body_centered
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, c, b)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BodyCentered()
+    @test standardized_centering === body_centered
 
     # centering = face-centered
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, FaceCentered()
+        lattice_constants, face_centered
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, c, b)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == FaceCentered()
+    @test standardized_centering === face_centered
 end
 
 @testset "standardize(): base-centered" begin
@@ -282,13 +282,13 @@ end
     lattice_constants = OrthorhombicLatticeConstants(a, b, c)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BaseCentered()
+        lattice_constants, base_centered
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(a, b, c)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BaseCentered()
+    @test standardized_centering === base_centered
 
     # ------ lattice constants not sorted
 
@@ -298,13 +298,13 @@ end
     lattice_constants = OrthorhombicLatticeConstants(a, b, c)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, BaseCentered()
+        lattice_constants, base_centered
     )
 
     expected_lattice_constants = OrthorhombicLatticeConstants(b, a, c)
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering == BaseCentered()
+    @test standardized_centering === base_centered
 end
 
 # ------ Unit cell computations
@@ -366,9 +366,9 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell
-    unit_cell = UnitCell(lattice_constants, Primitive())
+    unit_cell = UnitCell(lattice_constants, primitive)
 
-    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, Primitive()))
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa OrthorhombicLatticeConstants
@@ -376,12 +376,12 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # body-centered unit cell
-    unit_cell = UnitCell(lattice_constants, BodyCentered())
+    unit_cell = UnitCell(lattice_constants, body_centered)
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c)),
-            Primitive(),
+            primitive,
         ),
     )
 
@@ -391,7 +391,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # face-centered unit cell
-    unit_cell = UnitCell(lattice_constants, FaceCentered())
+    unit_cell = UnitCell(lattice_constants, face_centered)
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
@@ -400,7 +400,7 @@ end
                 0.5 * (basis_a - basis_b),
                 0.5 * (basis_b + basis_c),
             ),
-            Primitive(),
+            primitive,
         ),
     )
 
@@ -410,10 +410,10 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 
     # base-centered unit cell
-    unit_cell = UnitCell(lattice_constants, BaseCentered())
+    unit_cell = UnitCell(lattice_constants, base_centered)
 
     expected_reduced_cell = reduced_cell(
-        UnitCell(LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c), Primitive())
+        UnitCell(LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c), primitive)
     )
 
     reduced_cell_ = reduced_cell(unit_cell)
@@ -434,15 +434,15 @@ end
     # --- Exercise functionality and check results
 
     # equivalent orthorhombic and triclinic unit cells
-    orthorhombic_unit_cell = UnitCell(lattice_constants, Primitive())
+    orthorhombic_unit_cell = UnitCell(lattice_constants, primitive)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(orthorhombic_unit_cell, triclinic_unit_cell)
 
     # body-centered unit cell
-    body_centered_unit_cell = UnitCell(lattice_constants, BodyCentered())
+    body_centered_unit_cell = UnitCell(lattice_constants, body_centered)
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             basis_a,
@@ -450,24 +450,24 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 
     # face-centered unit cell
-    face_centered_unit_cell = UnitCell(lattice_constants, FaceCentered())
+    face_centered_unit_cell = UnitCell(lattice_constants, face_centered)
     primitive_unit_cell = UnitCell(
         LatticeConstants(
             0.5 * (basis_a + basis_b), 0.5 * (basis_a - basis_b), 0.5 * (basis_b + basis_c)
         ),
-        Primitive(),
+        primitive,
     )
     @test is_equivalent_unit_cell(face_centered_unit_cell, primitive_unit_cell)
 
     # base-centered unit cell
-    base_centered_unit_cell = UnitCell(lattice_constants, BaseCentered())
+    base_centered_unit_cell = UnitCell(lattice_constants, base_centered)
     primitive_unit_cell = UnitCell(
-        LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c), Primitive()
+        LatticeConstants(basis_a, 0.5 * (basis_a + basis_b), basis_c), primitive
     )
     @test is_equivalent_unit_cell(base_centered_unit_cell, primitive_unit_cell)
 end
