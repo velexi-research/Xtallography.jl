@@ -1,0 +1,11 @@
+# --- Auto-generated files
+
+docs/build/
+
+# --- Experimental code
+
+spikes/
+
+# --- Miscellaneous
+
+extras/
