@@ -26,7 +26,7 @@ using Combinatorics: permutations
 # --- Exports
 
 # Types
-export TriclinicLatticeConstants
+export TriclinicLatticeConstants, TriclinicLatticeConstantDeltas
 
 # Functions
 export satisfies_triclinic_angle_constraints, is_triclinic_type_I_cell
@@ -51,8 +51,8 @@ Fields
 ======
 * `a`, `b`, `c`: lengths of the edges of the unit cell
 
-* `α`, `β`, `γ`: angles between edges of the unit cell in the planes of the
-  faces of the unit cell
+* `α`, `β`, `γ`: angles between edges of the unit cell in the planes of the faces of the
+  unit cell
 
 !!! note
 
@@ -105,6 +105,39 @@ struct TriclinicLatticeConstants <: LatticeConstants
         # --- Construct and return new TriclinicLatticeConstants
 
         return new(a, b, c, α, β, γ)
+    end
+end
+
+"""
+    TriclinicLatticeConstantDeltas
+
+Lattice constant deltas for a triclinic unit cell
+
+Fields
+======
+* `Δa`, `Δb`, `Δc`: deltas of the lengths of the edges of the unit cell
+
+* `Δα`, `Δβ`, `Δγ`: deltas of the angles between edges of the unit cell in the planes of
+  the faces of the unit cell
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct TriclinicLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+    Δb::Float64
+    Δc::Float64
+    Δα::Float64
+    Δβ::Float64
+    Δγ::Float64
+
+    """
+    Construct a set of triclinic lattice constant deltas.
+    """
+    function TriclinicLatticeConstantDeltas(
+        Δa::Real, Δb::Real, Δc::Real, Δα::Real, Δβ::Real, Δγ::Real
+    )
+        return new(Δa, Δb, Δc, Δα, Δβ, Δγ)
     end
 end
 

@@ -117,6 +117,17 @@ end
     @test startswith(error_message, expected_error)
 end
 
+@testset "TetragonalLatticeConstantDeltas constructor" begin
+    # --- Tests
+
+    Δa = 1
+    Δc = 5
+    lattice_constants_Δ = TetragonalLatticeConstantDeltas(Δa, Δc)
+
+    @test lattice_constants_Δ.Δa == Δa
+    @test lattice_constants_Δ.Δc == Δc
+end
+
 # ------ LatticeConstants functions
 
 @testset "isapprox(::LatticeConstants)" begin

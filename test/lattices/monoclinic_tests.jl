@@ -206,6 +206,21 @@ end
     @test startswith(error_message, expected_error)
 end
 
+@testset "MonoclinicLatticeConstantDeltas constructor" begin
+    # --- Tests
+
+    Δa = 1
+    Δb = 2
+    Δc = 3
+    Δβ = π / 3
+    lattice_constants_Δ = MonoclinicLatticeConstantDeltas(Δa, Δb, Δc, Δβ)
+
+    @test lattice_constants_Δ.Δa == Δa
+    @test lattice_constants_Δ.Δb == Δb
+    @test lattice_constants_Δ.Δc == Δc
+    @test lattice_constants_Δ.Δβ == Δβ
+end
+
 # ------ LatticeConstants functions
 
 @testset "isapprox(::LatticeConstants)" begin

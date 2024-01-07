@@ -17,7 +17,7 @@ Functions that support computations specific to hexagonal lattices
 # --- Exports
 
 # Types
-export HexagonalLatticeConstants
+export HexagonalLatticeConstants, HexagonalLatticeConstantDeltas
 
 # --- Types
 
@@ -55,6 +55,30 @@ struct HexagonalLatticeConstants <: LatticeConstants
         # --- Construct and return new HexagonalLatticeConstants
 
         return new(a, c)
+    end
+end
+
+"""
+    HexagonalLatticeConstantDeltas
+
+Lattice constant deltas for a hexagonal unit cell
+
+Fields
+======
+* `Δa`, `Δc`: deltas of the lengths of the edges of the unit cell
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct HexagonalLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+    Δc::Float64
+
+    """
+    Construct a set of hexagonal lattice constant deltas.
+    """
+    function HexagonalLatticeConstantDeltas(Δa::Real, Δc::Real)
+        return new(Δa, Δc)
     end
 end
 

@@ -132,6 +132,17 @@ end
     @test startswith(error_message, expected_error)
 end
 
+@testset "RhombohedralLatticeConstantDeltas constructor" begin
+    # --- Tests
+
+    Δa = 1
+    Δα = π / 3
+    lattice_constants_Δ = RhombohedralLatticeConstantDeltas(Δa, Δα)
+
+    @test lattice_constants_Δ.Δa == Δa
+    @test lattice_constants_Δ.Δα == Δα
+end
+
 # ------ LatticeConstants functions
 
 @testset "isapprox(::LatticeConstants)" begin

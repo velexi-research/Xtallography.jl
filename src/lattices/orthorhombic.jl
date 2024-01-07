@@ -22,7 +22,7 @@ using Logging
 # --- Exports
 
 # Types
-export OrthorhombicLatticeConstants
+export OrthorhombicLatticeConstants, OrthorhombicLatticeConstantDeltas
 
 # Functions
 
@@ -70,6 +70,31 @@ struct OrthorhombicLatticeConstants <: LatticeConstants
         # --- Construct and return new OrthorhombicLatticeConstants
 
         return new(a, b, c)
+    end
+end
+
+"""
+    OrthorhombicLatticeConstantDeltas
+
+Lattice constant deltas for a orthorhombic unit cell
+
+Fields
+======
+* `Δa`, `Δb`, `Δc`: deltas of the lengths of the edges of the unit cell
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct OrthorhombicLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+    Δb::Float64
+    Δc::Float64
+
+    """
+    Construct a set of orthorhombic lattice constant deltas.
+    """
+    function OrthorhombicLatticeConstantDeltas(Δa::Real, Δb::Real, Δc::Real)
+        return new(Δa, Δb, Δc)
     end
 end
 
@@ -217,6 +242,7 @@ function conventional_cell(::Orthorhombic, unit_cell::UnitCell)
     return UnitCell(lattice_constants, centering)
 end
 
+#=
 function is_supercell(
     lattice_constants_test::OrthorhombicLatticeConstants,
     lattice_constants_ref::OrthorhombicLatticeConstants;
@@ -228,3 +254,4 @@ function is_supercell(
     # TODO
     return true
 end
+=#

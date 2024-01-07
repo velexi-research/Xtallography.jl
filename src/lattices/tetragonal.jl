@@ -22,7 +22,7 @@ using Logging
 # --- Exports
 
 # Types
-export TetragonalLatticeConstants
+export TetragonalLatticeConstants, TetragonalLatticeConstantDeltas
 
 # Functions
 
@@ -62,6 +62,30 @@ struct TetragonalLatticeConstants <: LatticeConstants
         # --- Construct and return new TetragonalLatticeConstants
 
         return new(a, c)
+    end
+end
+
+"""
+    TetragonalLatticeConstantDeltas
+
+Lattice constant deltas for a tetragonal unit cell
+
+Fields
+======
+* `Δa`, `Δc`: deltas of the lengths of the edges of the unit cell
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct TetragonalLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+    Δc::Float64
+
+    """
+    Construct a set of tetragonal lattice constant deltas.
+    """
+    function TetragonalLatticeConstantDeltas(Δa::Real, Δc::Real)
+        return new(Δa, Δc)
     end
 end
 

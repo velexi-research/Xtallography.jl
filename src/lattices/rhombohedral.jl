@@ -22,7 +22,7 @@ using Logging
 # --- Exports
 
 # Types
-export RhombohedralLatticeConstants
+export RhombohedralLatticeConstants, RhombohedralLatticeConstantDeltas
 
 # Functions
 
@@ -72,6 +72,33 @@ struct RhombohedralLatticeConstants <: LatticeConstants
         # --- Construct and return new RhombohedralLatticeConstants
 
         return new(a, α)
+    end
+end
+
+"""
+    RhombohedralLatticeConstantDeltas
+
+Lattice constant deltas for a rhombohedral unit cell
+
+Fields
+======
+* `Δa`: delta of the length of the edge of the unit cell
+
+* `Δα`: delta of angle between edges of the unit cell in the plane of the faces of the unit
+  cell
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct RhombohedralLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+    Δα::Float64
+
+    """
+    Construct a set of rhombohedral lattice constant deltas.
+    """
+    function RhombohedralLatticeConstantDeltas(Δa::Real, Δα::Real)
+        return new(Δa, Δα)
     end
 end
 

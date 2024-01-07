@@ -77,6 +77,15 @@ end
     @test startswith(error_message, expected_error)
 end
 
+@testset "CubicLatticeConstantDeltas constructor" begin
+    # --- Tests
+
+    Δa = 1
+    lattice_constants_Δ = CubicLatticeConstantDeltas(Δa)
+
+    @test lattice_constants_Δ.Δa == Δa
+end
+
 # ------ LatticeConstants functions
 
 @testset "isapprox(::LatticeConstants)" begin

@@ -18,7 +18,7 @@ Types and functions that support lattice computations
 # --- Exports
 
 # Types
-export LatticeConstants
+export LatticeConstants, LatticeConstantDeltas
 export UnitCell
 
 # Functions
@@ -42,6 +42,20 @@ Subtypes
 [`CubicLatticeConstants`](@ref)
 """
 abstract type LatticeConstants end
+
+"""
+    LatticeConstantDeltas
+
+Supertype for lattice constant deltas for the seven lattice systems in 3D
+
+Subtypes
+========
+[`TriclinicLatticeConstantDeltas`](@ref), [`MonoclinicLatticeConstantDeltas`](@ref),
+[`OrthorhombicLatticeConstantDeltas`](@ref), [`TetragonalLatticeConstantDeltas`](@ref),
+[`RhombohedralLatticeConstantDeltas`](@ref), [`HexagonalLatticeConstantDeltas`](@ref),
+[`CubicLatticeConstantDeltas`](@ref)
+"""
+abstract type LatticeConstantDeltas end
 
 using AngleBetweenVectors: angle
 using LinearAlgebra: norm, cross, dot
@@ -205,6 +219,7 @@ end
 # ------ LatticeConstants functions
 
 import Base.isapprox
+import Base.:(-)
 
 # Default isapprox() implementation to allow comparison between lattice constants of
 # different lattice systems.
@@ -367,8 +382,24 @@ function standardize_arg_checks(lattice_constants::LatticeConstants, centering::
     end
 end
 
+# ------ LatticeConstantDeltas functions
+
+import Base.isapprox
+
+# Default isapprox() implementation to allow comparison between deltas of lattice constants
+# for different lattice systems.
+function isapprox(
+    x::LatticeConstantDeltas,
+    y::LatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return false
+end
+
 # ------ UnitCell functions
 
+import Base.isapprox
 using LinearAlgebra: dot
 using Combinatorics: combinations
 

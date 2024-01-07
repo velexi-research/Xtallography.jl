@@ -22,7 +22,7 @@ using Logging
 # --- Exports
 
 # Types
-export MonoclinicLatticeConstants
+export MonoclinicLatticeConstants, MonoclinicLatticeConstantDeltas
 
 # Functions
 export convert_to_body_centering, convert_to_base_centering
@@ -84,6 +84,35 @@ struct MonoclinicLatticeConstants <: LatticeConstants
         # --- Construct MonoclinicLatticeConstants object
 
         return new(a, b, c, β)
+    end
+end
+
+"""
+    MonoclinicLatticeConstantDeltas
+
+Lattice constant deltas for a monoclinic unit cell
+
+Fields
+======
+* `Δa`, `Δb`, `Δc`: deltas of the lengths of the edges of the unit cell
+
+* `Δβ`: delta of the angle between edges of the unit cell in the plane of the face of the
+  unit cell where the edges are not orthogonal
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct MonoclinicLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+    Δb::Float64
+    Δc::Float64
+    Δβ::Float64
+
+    """
+    Construct a set of monoclinic lattice constant deltas.
+    """
+    function MonoclinicLatticeConstantDeltas(Δa::Real, Δb::Real, Δc::Real, Δβ::Real)
+        return new(Δa, Δb, Δc, Δβ)
     end
 end
 

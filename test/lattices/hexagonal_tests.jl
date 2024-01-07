@@ -118,6 +118,17 @@ end
     @test startswith(error_message, expected_error)
 end
 
+@testset "HexagonalLatticeConstantDeltas constructor" begin
+    # --- Tests
+
+    Δa = 1
+    Δc = 2
+    lattice_constants_Δ = HexagonalLatticeConstantDeltas(Δa, Δc)
+
+    @test lattice_constants_Δ.Δa == Δa
+    @test lattice_constants_Δ.Δc == Δc
+end
+
 # ------ LatticeConstants functions
 
 @testset "isapprox(::LatticeConstants)" begin

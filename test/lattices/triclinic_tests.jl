@@ -320,6 +320,25 @@ end
     @test startswith(error_message, expected_error)
 end
 
+@testset "TriclinicLatticeConstantDeltas constructor" begin
+    # --- Tests
+
+    Δa = 1
+    Δb = 3
+    Δc = 5
+    Δα = π / 7
+    Δβ = 2π / 7
+    Δγ = 3π / 7
+    lattice_constants_Δ = TriclinicLatticeConstantDeltas(Δa, Δb, Δc, Δα, Δβ, Δγ)
+
+    @test lattice_constants_Δ.Δa == Δa
+    @test lattice_constants_Δ.Δb == Δb
+    @test lattice_constants_Δ.Δc == Δc
+    @test lattice_constants_Δ.Δα == Δα
+    @test lattice_constants_Δ.Δβ == Δβ
+    @test lattice_constants_Δ.Δγ == Δγ
+end
+
 # ------ LatticeConstants functions
 
 @testset "isapprox(::LatticeConstants)" begin
