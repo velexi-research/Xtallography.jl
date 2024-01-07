@@ -194,6 +194,14 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "-(::TetragonalLatticeConstants)" begin
+    # --- Tests
+
+    x = TetragonalLatticeConstants(1, 5)
+    y = TetragonalLatticeConstants(2, 2.3)
+    @test x - y == TetragonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
+end
+
 @testset "lattice_system(::TetragonalLatticeConstants)" begin
     # --- Tests
 

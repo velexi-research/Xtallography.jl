@@ -176,6 +176,14 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "-(::RhombohedralLatticeConstants)" begin
+    # --- Tests
+
+    x = RhombohedralLatticeConstants(1, π / 6)
+    y = RhombohedralLatticeConstants(2, π / 5)
+    @test x - y == RhombohedralLatticeConstantDeltas(x.a - y.a, x.α - y.α)
+end
+
 @testset "lattice_system(::RhombohedralLatticeConstants)" begin
     # --- Tests
 

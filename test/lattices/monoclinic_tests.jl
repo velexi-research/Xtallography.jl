@@ -256,6 +256,15 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "-(::MonoclinicLatticeConstants)" begin
+    # --- Tests
+
+    x = MonoclinicLatticeConstants(1, 3, 5, π / 3)
+    y = MonoclinicLatticeConstants(2, 10, 20, π / 6)
+    @test x - y ==
+        MonoclinicLatticeConstantDeltas(x.a - y.a, x.b - y.b, x.c - y.c, x.β - y.β)
+end
+
 @testset "lattice_system(::MonoclinicLatticeConstants)" begin
     # --- Tests
 

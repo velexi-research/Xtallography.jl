@@ -199,6 +199,14 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "-(::OrthorhombicLatticeConstants)" begin
+    # --- Tests
+
+    x = OrthorhombicLatticeConstants(1, 3, 5)
+    y = OrthorhombicLatticeConstants(2, 10, 20)
+    @test x - y == OrthorhombicLatticeConstantDeltas(x.a - y.a, x.b - y.b, x.c - y.c)
+end
+
 @testset "lattice_system(::OrthorhombicLatticeConstants)" begin
     # --- Tests
 

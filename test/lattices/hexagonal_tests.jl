@@ -162,6 +162,14 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "-(::HexagonalLatticeConstants)" begin
+    # --- Tests
+
+    x = HexagonalLatticeConstants(1, 3)
+    y = HexagonalLatticeConstants(2, 10)
+    @test x - y == HexagonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
+end
+
 @testset "lattice_system(::HexagonalLatticeConstants)" begin
     # --- Tests
 

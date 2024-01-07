@@ -376,6 +376,16 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "-(::TriclinicLatticeConstants)" begin
+    # --- Tests
+
+    x = TriclinicLatticeConstants(1, 5, 3, π / 7, 2π / 7, 3π / 7)
+    y = TriclinicLatticeConstants(2, 2.3, 3, 5π / 9, 6π / 9, 7π / 9)
+    @test x - y == TriclinicLatticeConstantDeltas(
+        x.a - y.a, x.b - y.b, x.c - y.c, x.α - y.α, x.β - y.β, x.γ - y.γ
+    )
+end
+
 @testset "lattice_system(::TriclinicLatticeConstants)" begin
     # --- Tests
 
