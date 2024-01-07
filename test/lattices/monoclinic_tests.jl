@@ -493,6 +493,41 @@ end
     @test startswith(error_message, expected_error)
 end
 
+# ------ LatticeConstantDeltas functions
+
+@testset "isapprox(::LatticeConstantDeltas)" begin
+    # --- Preparations
+
+    x = MonoclinicLatticeConstantDeltas(1.0, 2.0, 3.0, π / 5)
+    y = MonoclinicLatticeConstantDeltas(1.5, 2.5, 3.5, π / 5 + 0.5)
+
+    # --- Exercise functionality and check results
+
+    # x ≈ (x + delta)
+    @test x ≈ MonoclinicLatticeConstantDeltas(1.0 + 1e-9, 2.0, 3.0, π / 5)
+    @test x ≈ MonoclinicLatticeConstantDeltas(1.0, 2.0 + 1e-9, 3.0, π / 5)
+    @test x ≈ MonoclinicLatticeConstantDeltas(1.0, 2.0, 3.0 - 1e-9, π / 5)
+    @test x ≈ MonoclinicLatticeConstantDeltas(1.0, 2.0, 3.0, π / 5 - 1e-9)
+
+    # x !≈ y
+    @test !(x ≈ y)
+
+    # x ≈ y: atol = 1
+    @test isapprox(x, y; atol=1)
+
+    # x ≈ y: rtol = 1
+    @test isapprox(x, y; rtol=1)
+
+    # x ≈ y: atol = 0.01, rtol = 1
+    @test isapprox(x, y; atol=0.01, rtol=1)
+
+    # x ≈ y: atol = 1, rtol = 0.01
+    @test isapprox(x, y; atol=1, rtol=0.01)
+
+    # x !≈ y: atol = 0.01, rtol = 0.01
+    @test !isapprox(x, y; atol=0.01, rtol=0.01)
+end
+
 # ------ Unit cell computations
 
 @testset "basis()" begin

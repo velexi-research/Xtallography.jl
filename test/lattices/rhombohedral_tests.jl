@@ -221,6 +221,39 @@ end
     end
 end
 
+# ------ LatticeConstantDeltas functions
+
+@testset "isapprox(::LatticeConstantDeltas)" begin
+    # --- Preparations
+
+    x = RhombohedralLatticeConstantDeltas(1.0, π / 4)
+    y = RhombohedralLatticeConstantDeltas(1.5, π / 5)
+
+    # --- Exercise functionality and check results
+
+    # x ≈ (x + delta)
+    @test x ≈ RhombohedralLatticeConstantDeltas(1.0 + 1e-9, π / 4)
+    @test x ≈ RhombohedralLatticeConstantDeltas(1.0, π / 4 + 1e-9)
+
+    # x !≈ y
+    @test !(x ≈ y)
+
+    # x ≈ y: atol = 1
+    @test isapprox(x, y; atol=1)
+
+    # x ≈ y: rtol = 1
+    @test isapprox(x, y; rtol=1)
+
+    # x ≈ y: atol = 0.01, rtol = 1
+    @test isapprox(x, y; atol=0.01, rtol=1)
+
+    # x ≈ y: atol = 1, rtol = 0.01
+    @test isapprox(x, y; atol=1, rtol=0.01)
+
+    # x !≈ y: atol = 0.01, rtol = 0.01
+    @test !isapprox(x, y; atol=0.01, rtol=0.01)
+end
+
 # ------ Unit cell computations
 
 @testset "basis()" begin

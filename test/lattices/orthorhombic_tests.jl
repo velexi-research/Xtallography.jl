@@ -320,6 +320,40 @@ end
     @test standardized_centering === base_centered
 end
 
+# ------ LatticeConstantDeltas functions
+
+@testset "isapprox(::LatticeConstantDeltas)" begin
+    # --- Preparations
+
+    x = OrthorhombicLatticeConstantDeltas(1.0, 2.0, 3.0)
+    y = OrthorhombicLatticeConstantDeltas(1.5, 2.5, 3.5)
+
+    # --- Exercise functionality and check results
+
+    # x ≈ (x + delta)
+    @test x ≈ OrthorhombicLatticeConstantDeltas(1.0 + 1e-9, 2.0, 3.0)
+    @test x ≈ OrthorhombicLatticeConstantDeltas(1.0, 2.0 + 1e-9, 3.0)
+    @test x ≈ OrthorhombicLatticeConstantDeltas(1.0, 2.0, 3.0 - 1e-9)
+
+    # x !≈ y
+    @test !(x ≈ y)
+
+    # x ≈ y: atol = 1
+    @test isapprox(x, y; atol=1)
+
+    # x ≈ y: rtol = 1
+    @test isapprox(x, y; rtol=1)
+
+    # x ≈ y: atol = 0.01, rtol = 1
+    @test isapprox(x, y; atol=0.01, rtol=1)
+
+    # x ≈ y: atol = 1, rtol = 0.01
+    @test isapprox(x, y; atol=1, rtol=0.01)
+
+    # x !≈ y: atol = 0.01, rtol = 0.01
+    @test !isapprox(x, y; atol=0.01, rtol=0.01)
+end
+
 # ------ Unit cell computations
 
 @testset "basis()" begin
