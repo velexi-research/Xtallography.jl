@@ -119,7 +119,7 @@ end
 
 # ------ LatticeConstantDeltas functions
 
-@testset "isapprox(::LatticeConstantDeltas)" begin
+@testset "isapprox(::TetragonalConstantDeltas)" begin
     # --- Preparations
 
     x = TetragonalLatticeConstantDeltas(1.0, 2.0)
@@ -155,15 +155,15 @@ end
 
     Δa = 1
     Δc = 5
-    lattice_constants_Δ = TetragonalLatticeConstantDeltas(Δa, Δc)
+    Δlattice_constants = TetragonalLatticeConstantDeltas(Δa, Δc)
 
-    @test lattice_constants_Δ.Δa == Δa
-    @test lattice_constants_Δ.Δc == Δc
+    @test Δlattice_constants.Δa == Δa
+    @test Δlattice_constants.Δc == Δc
 end
 
 # ------ LatticeConstants functions
 
-@testset "isapprox(::LatticeConstants)" begin
+@testset "isapprox(::TetragonalLatticeConstants)" begin
     # --- Preparations
 
     x = TetragonalLatticeConstants(1.0, 2.0)
@@ -194,14 +194,14 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
-@testset "lattice_system()" begin
+@testset "lattice_system(::TetragonalLatticeConstants)" begin
     # --- Tests
 
     lattice_constants = TetragonalLatticeConstants(1, 2)
-    @test lattice_system(lattice_constants) === Tetragonal()
+    @test lattice_system(lattice_constants) === tetragonal
 end
 
-@testset "standardize()" begin
+@testset "standardize(): tetragonal" begin
     # --- Tests
 
     # ------ Tetragonal lattices have no lattice constants conventions for primitive and
@@ -254,9 +254,16 @@ end
     end
 end
 
+@testset "lattice_system(::TetragonalLatticeConstantDeltas)" begin
+    # --- Tests
+
+    Δlattice_constants = TetragonalLatticeConstantDeltas(1, 2)
+    @test lattice_system(Δlattice_constants) === tetragonal
+end
+
 # ------ Unit cell computations
 
-@testset "basis()" begin
+@testset "basis(::TetragonalLatticeConstants)" begin
     # --- Preparations
 
     a = 5
@@ -274,7 +281,7 @@ end
     @test basis_c ≈ [0, 0, c]
 end
 
-@testset "volume()" begin
+@testset "volume(::TetragonalLatticeConstants)" begin
     # --- Preparations
 
     lattice_constants = TetragonalLatticeConstants(5, 7)
@@ -284,7 +291,7 @@ end
     @test volume(lattice_constants) ≈ lattice_constants.a^2 * lattice_constants.c
 end
 
-@testset "surface_area()" begin
+@testset "surface_area(::TetragonalLatticeConstants)" begin
     # --- Preparations
 
     lattice_constants = TetragonalLatticeConstants(5, 7)
@@ -295,7 +302,7 @@ end
         2 * lattice_constants.a^2 + 4 * lattice_constants.a * lattice_constants.c
 end
 
-@testset "reduced_cell()" begin
+@testset "reduced_cell(): tetragonal" begin
     # --- Preparations
 
     a = 5
@@ -392,7 +399,7 @@ end
     @test is_equivalent_unit_cell(face_centered_unit_cell, primitive_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::LatticeConstants, ::LatticeConstants)" begin
+@testset "is_equivalent_unit_cell(::TetragonalLatticeConstants)" begin
     # --- Preparations
 
     a_ref = 2

@@ -113,6 +113,10 @@ function isapprox(
            isapprox(x.c, y.c; atol=atol, rtol=rtol)
 end
 
+function -(x::OrthorhombicLatticeConstants, y::OrthorhombicLatticeConstants)
+    return OrthorhombicLatticeConstantDeltas(x.a - y.a, x.b - y.b, x.c - y.c)
+end
+
 function lattice_system(::OrthorhombicLatticeConstants)
     return orthorhombic
 end
@@ -137,6 +141,23 @@ function standardize(lattice_constants::OrthorhombicLatticeConstants, centering:
 
     # all other centerings
     return OrthorhombicLatticeConstants(sort([a, b, c])...), centering
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::OrthorhombicLatticeConstantDeltas,
+    y::OrthorhombicLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
+           isapprox(x.Δb, y.Δb; atol=atol, rtol=rtol) &&
+           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::OrthorhombicLatticeConstantDeltas)
+    return orthorhombic
 end
 
 # ------ Unit cell computations

@@ -232,7 +232,9 @@ end
 """
     lattice_system(lattice_constants::LatticesConstants) -> LatticeSystem
 
-Return the lattice system for a set of `lattice_constants`.
+    lattice_system(Δlattice_constants::LatticesConstantDeltas) -> LatticeSystem
+
+Return the lattice system for a set of `lattice_constants` or `Δlattice_constants`.
 
 Return values
 =============

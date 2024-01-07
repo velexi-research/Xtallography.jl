@@ -40,7 +40,7 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "conventional_cell(): limiting cases, centering = primitive" begin
+@testset "conventional_cell():orthorhombic: limiting cases, centering = primitive" begin
     # --- Preparations
 
     # Construct lattice constants for tetragonal unit cell
@@ -103,7 +103,7 @@ using XtallographyUtils
     @test iucr_unit_cell.centering === primitive
 end
 
-@testset "conventional_cell(): limiting cases, centering = body" begin
+@testset "conventional_cell():orthorhombic: limiting cases, centering = body" begin
     # --- Preparations
 
     # Construct lattice constants for tetragonal unit cell
@@ -167,7 +167,7 @@ end
     @test iucr_unit_cell.centering === body_centered
 end
 
-@testset "conventional_cell(): limiting cases, centering = face" begin
+@testset "conventional_cell():orthorhombic: limiting cases, centering = face" begin
     # --- Tests
 
     # ------ a = b
@@ -239,7 +239,7 @@ end
     @test iucr_unit_cell.centering === face_centered
 end
 
-@testset "conventional_cell(): limiting cases, centering = base" begin
+@testset "conventional_cell():orthorhombic: limiting cases, centering = base" begin
     # --- Preparations
 
     # Construct basis for tetragonal unit cell
@@ -330,7 +330,7 @@ end
     @test iucr_unit_cell.centering === base_centered
 end
 
-@testset "conventional_cell(): chain of limiting cases" begin
+@testset "conventional_cell():orthorhombic: chain of limiting cases" begin
     # --- Preparations
 
     a = 5

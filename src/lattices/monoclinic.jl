@@ -132,6 +132,10 @@ function isapprox(
            isapprox(x.β, y.β; atol=atol, rtol=rtol)
 end
 
+function -(x::MonoclinicLatticeConstants, y::MonoclinicLatticeConstants)
+    return MonoclinicLatticeConstantDeltas(x.a - y.a, x.b - y.b, x.c - y.c, x.β - y.β)
+end
+
 function lattice_system(::MonoclinicLatticeConstants)
     return monoclinic
 end
@@ -218,6 +222,24 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
     end
 
     return MonoclinicLatticeConstants(a, b, c, β), centering
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::MonoclinicLatticeConstantDeltas,
+    y::MonoclinicLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
+           isapprox(x.Δb, y.Δb; atol=atol, rtol=rtol) &&
+           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol) &&
+           isapprox(x.Δβ, y.Δβ; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::MonoclinicLatticeConstantDeltas)
+    return monoclinic
 end
 
 # ------ Unit cell computations

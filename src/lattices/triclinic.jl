@@ -159,6 +159,12 @@ function isapprox(
            isapprox(x.γ, y.γ; atol=atol, rtol=rtol)
 end
 
+function -(x::TriclinicLatticeConstants, y::TriclinicLatticeConstants)
+    return TriclinicLatticeConstantDeltas(
+        x.a - y.a, x.b - y.b, x.c - y.c, x.α - y.α, x.β - y.β, x.γ - y.γ
+    )
+end
+
 function lattice_system(::TriclinicLatticeConstants)
     return triclinic
 end
@@ -320,6 +326,26 @@ function satisfies_triclinic_angle_constraints(α::Real, β::Real, γ::Real)
            (0 < α + β - γ < 2π) &&
            (0 < α - β + γ < 2π) &&
            (0 < -α + β + γ < 2π)
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::TriclinicLatticeConstantDeltas,
+    y::TriclinicLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
+           isapprox(x.Δb, y.Δb; atol=atol, rtol=rtol) &&
+           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol) &&
+           isapprox(x.Δα, y.Δα; atol=atol, rtol=rtol) &&
+           isapprox(x.Δβ, y.Δβ; atol=atol, rtol=rtol) &&
+           isapprox(x.Δγ, y.Δγ; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::TriclinicLatticeConstantDeltas)
+    return triclinic
 end
 
 # ------ Unit cell computations

@@ -36,7 +36,7 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "conventional_cell(): limiting cases" begin
+@testset "conventional_cell():rhomobohedral: limiting cases" begin
     # --- Preparations
 
     # Construct basis for cubic unit cell
@@ -121,7 +121,7 @@ using XtallographyUtils
     @test iucr_unit_cell.centering === primitive
 end
 
-@testset "conventional_cell(): invalid arguments" begin
+@testset "conventional_cell():rhomobohedral: invalid arguments" begin
     # --- Preparations
 
     # Construct lattice constants for rhombohedral unit cell
@@ -152,7 +152,7 @@ end
     end
 end
 
-@testset "conventional_cell(): chain of limiting cases" begin
+@testset "conventional_cell():rhomobohedral: chain of limiting cases" begin
     # --- Exercise functionality and check results
 
     # primitive unit cell: aP --> mI --> hR

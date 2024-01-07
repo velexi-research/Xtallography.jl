@@ -103,7 +103,27 @@ function isapprox(
            isapprox(x.c, y.c; atol=atol, rtol=rtol)
 end
 
+function -(x::TetragonalLatticeConstants, y::TetragonalLatticeConstants)
+    return TetragonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
+end
+
 function lattice_system(::TetragonalLatticeConstants)
+    return tetragonal
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::TetragonalLatticeConstantDeltas,
+    y::TetragonalLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
+           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::TetragonalLatticeConstantDeltas)
     return tetragonal
 end
 

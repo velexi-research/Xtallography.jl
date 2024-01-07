@@ -329,19 +329,19 @@ end
     Δα = π / 7
     Δβ = 2π / 7
     Δγ = 3π / 7
-    lattice_constants_Δ = TriclinicLatticeConstantDeltas(Δa, Δb, Δc, Δα, Δβ, Δγ)
+    Δlattice_constants = TriclinicLatticeConstantDeltas(Δa, Δb, Δc, Δα, Δβ, Δγ)
 
-    @test lattice_constants_Δ.Δa == Δa
-    @test lattice_constants_Δ.Δb == Δb
-    @test lattice_constants_Δ.Δc == Δc
-    @test lattice_constants_Δ.Δα == Δα
-    @test lattice_constants_Δ.Δβ == Δβ
-    @test lattice_constants_Δ.Δγ == Δγ
+    @test Δlattice_constants.Δa == Δa
+    @test Δlattice_constants.Δb == Δb
+    @test Δlattice_constants.Δc == Δc
+    @test Δlattice_constants.Δα == Δα
+    @test Δlattice_constants.Δβ == Δβ
+    @test Δlattice_constants.Δγ == Δγ
 end
 
 # ------ LatticeConstants functions
 
-@testset "isapprox(::LatticeConstants)" begin
+@testset "isapprox(::TriclinicLatticeConstants)" begin
     # --- Preparations
 
     x = TriclinicLatticeConstants(1.0, 2.0, 3.0, π / 5, π / 4, 2π / 5)
@@ -376,14 +376,14 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
-@testset "lattice_system()" begin
+@testset "lattice_system(::TriclinicLatticeConstants)" begin
     # --- Tests
 
     lattice_constants = TriclinicLatticeConstants(1, 2, 3, π / 5, 2π / 5, 3π / 5)
-    @test lattice_system(lattice_constants) === Triclinic()
+    @test lattice_system(lattice_constants) === triclinic
 end
 
-@testset "standardize(): Type I cell" begin
+@testset "standardize(::TriclinicLatticeConstants): Type I cell" begin
     # --- Tests
 
     # ------ lattice constants already in standard form
@@ -568,7 +568,7 @@ end
     @test standardized_centering === primitive
 end
 
-@testset "standardize(): Type II cell" begin
+@testset "standardize(::TriclinicLatticeConstants): Type II cell" begin
     # --- Tests
 
     # ------ lattice constants already in standard form
@@ -753,7 +753,7 @@ end
     @test standardized_centering === primitive
 end
 
-@testset "standardize(): invalid arguments" begin
+@testset "standardize(::TriclinicLatticeConstants): invalid arguments" begin
     # --- Preparations
 
     lattice_constants = TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5)
@@ -793,7 +793,7 @@ end
 
 # ------ LatticeConstantDeltas functions
 
-@testset "isapprox(::LatticeConstantDeltas)" begin
+@testset "isapprox(::TriclinicLatticeConstantDeltas)" begin
     # --- Preparations
 
     x = TriclinicLatticeConstantDeltas(1.0, 2.0, 3.0, π / 5, π / 4, 2π / 5)
@@ -830,9 +830,16 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "lattice_system(::TriclinicConstantDeltas)" begin
+    # --- Tests
+
+    Δlattice_constants = TriclinicLatticeConstantDeltas(1, 2, 3, π / 5, 2π / 5, 3π / 5)
+    @test lattice_system(Δlattice_constants) === triclinic
+end
+
 # ------ Unit cell computations
 
-@testset "basis()" begin
+@testset "basis(::TriclinicLatticeConstants)" begin
     # --- Preparations
 
     a = 2
@@ -857,7 +864,7 @@ end
         [c * cos(β), c / sin(γ) * (cos(α) - cos(β) * cos(γ)), V / sin(γ) / a / b]
 end
 
-@testset "volume()" begin
+@testset "volume(::TricinicLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -876,7 +883,7 @@ end
     @test volume(lattice_constants) ≈ abs(det(hcat(basis_a, basis_b, basis_c)))
 end
 
-@testset "surface_area(::LatticeConstants)" begin
+@testset "surface_area(::TricinicLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -898,7 +905,7 @@ end
           2 * norm(cross(basis_c, basis_a))
 end
 
-@testset "reduced_cell()" begin
+@testset "reduced_cell(): triclnic" begin
     # --- Preparations
 
     a = 5
@@ -954,7 +961,7 @@ end
     =#
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin
+@testset "is_equivalent_unit_cell(::UnitCell): triclinic" begin
     # --- Preparations
 
     a = 2
@@ -997,7 +1004,7 @@ end
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::LatticeConstants, ::LatticeConstants)" begin
+@testset "is_equivalent_unit_cell(::TriclinicLatticeConstants)" begin
     # --- Preparations
 
     a_ref = 6

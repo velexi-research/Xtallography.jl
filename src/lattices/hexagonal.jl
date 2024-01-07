@@ -96,8 +96,28 @@ function isapprox(
            isapprox(x.c, y.c; atol=atol, rtol=rtol)
 end
 
+function -(x::HexagonalLatticeConstants, y::HexagonalLatticeConstants)
+    return HexagonalLatticeConstantDeltas(x.a - y.a, x.b - y.b)
+end
+
 function lattice_system(::HexagonalLatticeConstants)
-    return Hexagonal()
+    return hexagonal
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::HexagonalLatticeConstantDeltas,
+    y::HexagonalLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
+           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::HexagonalLatticeConstantDeltas)
+    return hexagonal
 end
 
 # ------ Unit cell computations

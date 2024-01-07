@@ -40,7 +40,7 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "conventional_cell(): limiting cases, centering = primitive" begin
+@testset "conventional_cell():monoclinic: limiting cases, centering = primitive" begin
     # --- Preparations
 
     # Construct basis for orthorhombic unit cell
@@ -139,7 +139,7 @@ using XtallographyUtils
     @test iucr_unit_cell.centering === primitive
 end
 
-@testset "conventional_cell(): limiting cases, centering = body, orthorhombic limits" begin
+@testset "conventional_cell():monoclinic: limiting cases, centering = body, orthorhombic limits" begin
     # --- Preparations
 
     # Construct basis for orthorhombic unit cell
@@ -251,7 +251,7 @@ end
     @test iucr_unit_cell.centering === face_centered
 end
 
-@testset "conventional_cell(): limiting cases, centering = body, rhombohedral limit cases" begin
+@testset "conventional_cell():monoclinic: limiting cases, centering = body, rhombohedral limit cases" begin
     # --- Tests
 
     # ------ r_α < π/3: a^2 + b^2 = c^2, a^2 + a c cos(β) = b^2
@@ -395,7 +395,7 @@ end
     @test iucr_unit_cell.centering === primitive
 end
 
-@testset "conventional_cell(): limiting cases, centering = body, non-limit cases" begin
+@testset "conventional_cell():monoclinic: limiting cases, centering = body, non-limit cases" begin
     # --- Preparations
 
     # Construct basis for orthorhombic unit cell
@@ -437,7 +437,7 @@ end
     @test iucr_unit_cell.centering === body_centered
 end
 
-@testset "conventional_cell(): invalid arguments" begin
+@testset "conventional_cell():monoclinic: invalid arguments" begin
     # --- Preparations
 
     # Construct lattice constants for monoclinic unit cell
@@ -470,7 +470,7 @@ end
     @test startswith(error_message, expected_error)
 end
 
-@testset "conventional_cell(): chain of limiting cases" begin
+@testset "conventional_cell():monoclinic: chain of limiting cases" begin
     # --- Preparations
 
     a = 5

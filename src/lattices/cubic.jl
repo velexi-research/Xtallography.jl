@@ -97,6 +97,21 @@ function lattice_system(::CubicLatticeConstants)
     return cubic
 end
 
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::CubicLatticeConstantDeltas,
+    y::CubicLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::CubicLatticeConstantDeltas)
+    return cubic
+end
+
 # ------ Unit cell computations
 
 function basis(lattice_constants::CubicLatticeConstants)

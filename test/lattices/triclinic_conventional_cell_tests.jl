@@ -40,7 +40,7 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "conventional_cell(): limiting cases" begin
+@testset "conventional_cell():triclinic: limiting cases" begin
     # Note: this test set only tests basic functionality. Comprehensive coverage of
     #       different cases for triclinic bases is covered in the convert_to_mP()
     #       convert_to_mI(), and convert_to_mC() test sets.
@@ -122,7 +122,7 @@ using XtallographyUtils
     @test iucr_unit_cell.centering === body_centered
 end
 
-@testset "conventional_cell(): limiting cases - base-centered" begin
+@testset "conventional_cell():triclinic: limiting cases - base-centered" begin
     # Note: this test checks that all base-centered limiting cases are covered by
     #       convert_to_mI() and convert_to_mC().
 
@@ -440,7 +440,7 @@ end
     @test iucr_unit_cell.centering === body_centered
 end
 
-@testset "conventional_cell(): invalid arguments" begin
+@testset "conventional_cell():triclinic: invalid arguments" begin
     # --- Preparations
 
     # Construct lattice constants for triclinic unit cell

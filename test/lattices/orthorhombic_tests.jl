@@ -158,16 +158,16 @@ end
     Δa = 1
     Δb = 2
     Δc = 3
-    lattice_constants_Δ = OrthorhombicLatticeConstantDeltas(Δa, Δb, Δc)
+    Δlattice_constants = OrthorhombicLatticeConstantDeltas(Δa, Δb, Δc)
 
-    @test lattice_constants_Δ.Δa == Δa
-    @test lattice_constants_Δ.Δb == Δb
-    @test lattice_constants_Δ.Δc == Δc
+    @test Δlattice_constants.Δa == Δa
+    @test Δlattice_constants.Δb == Δb
+    @test Δlattice_constants.Δc == Δc
 end
 
 # ------ LatticeConstants functions
 
-@testset "isapprox(::LatticeConstants)" begin
+@testset "isapprox(::OrthorhombicLatticeConstants)" begin
     # --- Preparations
 
     x = OrthorhombicLatticeConstants(1.0, 2.0, 3.0)
@@ -199,14 +199,14 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
-@testset "lattice_system()" begin
+@testset "lattice_system(::OrthorhombicLatticeConstants)" begin
     # --- Tests
 
     lattice_constants = OrthorhombicLatticeConstants(1, 2, 3)
-    @test lattice_system(lattice_constants) === Orthorhombic()
+    @test lattice_system(lattice_constants) === orthorhombic
 end
 
-@testset "standardize(): primitive, body-centered, face-centered" begin
+@testset "standardize():orthorhombic: primitive, body-centered, face-centered" begin
     # --- Tests
 
     # ------ lattice constants already in standard form
@@ -284,7 +284,7 @@ end
     @test standardized_centering === face_centered
 end
 
-@testset "standardize(): base-centered" begin
+@testset "standardize():orthorhombic: base-centered" begin
     # --- Tests
 
     # ------ lattice constants already in standard form
@@ -322,7 +322,7 @@ end
 
 # ------ LatticeConstantDeltas functions
 
-@testset "isapprox(::LatticeConstantDeltas)" begin
+@testset "isapprox(::OrthorhombicLatticeConstantDeltas)" begin
     # --- Preparations
 
     x = OrthorhombicLatticeConstantDeltas(1.0, 2.0, 3.0)
@@ -354,9 +354,16 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "lattice_system(::OrthorhombicLatticeConstantDeltas)" begin
+    # --- Tests
+
+    Δlattice_constants = OrthorhombicLatticeConstantDeltas(1, 2, 3)
+    @test lattice_system(Δlattice_constants) === orthorhombic
+end
+
 # ------ Unit cell computations
 
-@testset "basis()" begin
+@testset "basis(::OrthorhombicLatticeConstants)" begin
     # --- Preparations
 
     a = 2
@@ -375,7 +382,7 @@ end
     @test basis_c ≈ [0, 0, c]
 end
 
-@testset "volume()" begin
+@testset "volume(::OrthorhombicLatticeConstants)" begin
     # --- Preparations
 
     a = 6
@@ -388,7 +395,7 @@ end
     @test volume(lattice_constants) ≈ a * b * c
 end
 
-@testset "surface_area()" begin
+@testset "surface_area(::OrthorhombicLatticeConstants)" begin
     # --- Preparations
 
     a = 6
@@ -401,7 +408,7 @@ end
     @test surface_area(lattice_constants) ≈ 2 * a * b + 2 * b * c + 2 * c * a
 end
 
-@testset "reduced_cell()" begin
+@testset "reduced_cell(): orthorhombic" begin
     # --- Preparations
 
     a = 2
@@ -469,7 +476,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin
+@testset "is_equivalent_unit_cell(::UnitCell): orthorhombic" begin
     # --- Preparations
 
     a = 2
@@ -519,7 +526,7 @@ end
     @test is_equivalent_unit_cell(base_centered_unit_cell, primitive_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::LatticeConstants, ::LatticeConstants)" begin
+@testset "is_equivalent_unit_cell(::OrthorhombicLatticeConstants)" begin
     # --- Preparations
 
     a_ref = 2

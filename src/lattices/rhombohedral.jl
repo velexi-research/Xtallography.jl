@@ -116,7 +116,27 @@ function isapprox(
            isapprox(x.α, y.α; atol=atol, rtol=rtol)
 end
 
+function -(x::RhombohedralLatticeConstants, y::RhombohedralLatticeConstants)
+    return RhombohedralLatticeConstantDeltas(x.a - y.a, x.α - y.α)
+end
+
 function lattice_system(::RhombohedralLatticeConstants)
+    return rhombohedral
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::RhombohedralLatticeConstantDeltas,
+    y::RhombohedralLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
+           isapprox(x.Δα, y.Δα; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::RhombohedralLatticeConstantDeltas)
     return rhombohedral
 end
 

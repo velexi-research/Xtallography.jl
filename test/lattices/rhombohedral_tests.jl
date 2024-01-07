@@ -137,15 +137,15 @@ end
 
     Δa = 1
     Δα = π / 3
-    lattice_constants_Δ = RhombohedralLatticeConstantDeltas(Δa, Δα)
+    Δlattice_constants = RhombohedralLatticeConstantDeltas(Δa, Δα)
 
-    @test lattice_constants_Δ.Δa == Δa
-    @test lattice_constants_Δ.Δα == Δα
+    @test Δlattice_constants.Δa == Δa
+    @test Δlattice_constants.Δα == Δα
 end
 
 # ------ LatticeConstants functions
 
-@testset "isapprox(::LatticeConstants)" begin
+@testset "isapprox(::RhombohedralLatticeConstants)" begin
     # --- Preparations
 
     x = RhombohedralLatticeConstants(1.0, π / 4)
@@ -176,14 +176,14 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
-@testset "lattice_system()" begin
+@testset "lattice_system(::RhombohedralLatticeConstants)" begin
     # --- Tests
 
     lattice_constants = RhombohedralLatticeConstants(1, π / 5)
-    @test lattice_system(lattice_constants) === Rhombohedral()
+    @test lattice_system(lattice_constants) === rhombohedral
 end
 
-@testset "standardize()" begin
+@testset "standardize(): rhombohedral" begin
     # --- Tests
 
     # ------ Rhombohedral lattices have no lattice constants conventions for primitive
@@ -223,7 +223,7 @@ end
 
 # ------ LatticeConstantDeltas functions
 
-@testset "isapprox(::LatticeConstantDeltas)" begin
+@testset "isapprox(::RhombohedralLatticeConstantDeltas)" begin
     # --- Preparations
 
     x = RhombohedralLatticeConstantDeltas(1.0, π / 4)
@@ -254,9 +254,16 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "lattice_system(::RhombohedralLatticeConstantDeltas)" begin
+    # --- Tests
+
+    Δlattice_constants = RhombohedralLatticeConstantDeltas(1, π / 5)
+    @test lattice_system(Δlattice_constants) === rhombohedral
+end
+
 # ------ Unit cell computations
 
-@testset "basis()" begin
+@testset "basis(::RhombohedralLatticeConstants)" begin
     # --- Preparations
 
     a = 2
@@ -278,7 +285,7 @@ end
     ]
 end
 
-@testset "volume()" begin
+@testset "volume(::RhombohedralLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -293,7 +300,7 @@ end
     @test volume(lattice_constants) ≈ abs(det(hcat(basis_a, basis_b, basis_c)))
 end
 
-@testset "surface_area()" begin
+@testset "surface_area(::RhombohedralLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -311,7 +318,7 @@ end
           2 * norm(cross(basis_c, basis_a))
 end
 
-@testset "reduced_cell()" begin
+@testset "reduced_cell(): rhombohedral" begin
     # --- Preparations
 
     a = 2
@@ -334,7 +341,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin
+@testset "is_equivalent_unit_cell(::UnitCell): rhombohedral" begin
     # --- Preparations
 
     a = 2
@@ -353,7 +360,7 @@ end
     @test is_equivalent_unit_cell(rhombohedral_unit_cell, triclinic_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::LatticeConstants, ::LatticeConstants)" begin
+@testset "is_equivalent_unit_cell(::RhombohedralLatticeConstants)" begin
     # --- Preparations
 
     a_ref = 2

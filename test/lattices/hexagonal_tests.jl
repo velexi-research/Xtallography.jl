@@ -123,15 +123,15 @@ end
 
     Δa = 1
     Δc = 2
-    lattice_constants_Δ = HexagonalLatticeConstantDeltas(Δa, Δc)
+    Δlattice_constants = HexagonalLatticeConstantDeltas(Δa, Δc)
 
-    @test lattice_constants_Δ.Δa == Δa
-    @test lattice_constants_Δ.Δc == Δc
+    @test Δlattice_constants.Δa == Δa
+    @test Δlattice_constants.Δc == Δc
 end
 
 # ------ LatticeConstants functions
 
-@testset "isapprox(::LatticeConstants)" begin
+@testset "isapprox(::HexagonalLatticeConstants)" begin
     # --- Preparations
 
     x = HexagonalLatticeConstants(1.0, 2.0)
@@ -162,14 +162,14 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
-@testset "lattice_system()" begin
+@testset "lattice_system(::HexagonalLatticeConstants)" begin
     # --- Tests
 
     lattice_constants = HexagonalLatticeConstants(1, 2)
     @test lattice_system(lattice_constants) === hexagonal
 end
 
-@testset "standardize()" begin
+@testset "standardize(): hexagonal" begin
     # --- Tests
 
     # ------ Hexagonal lattices have no lattice constants conventions for primitive
@@ -211,7 +211,7 @@ end
 
 # ------ LatticeConstantDeltas functions
 
-@testset "isapprox(::LatticeConstantDeltas)" begin
+@testset "isapprox(::HexagonalLatticeConstantDeltas)" begin
     # --- Preparations
 
     x = HexagonalLatticeConstantDeltas(1.0, 2.0)
@@ -242,9 +242,16 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "lattice_system(::HexagonalLatticeConstantDeltas)" begin
+    # --- Tests
+
+    Δlattice_constants = HexagonalLatticeConstantDeltas(1, 2)
+    @test lattice_system(Δlattice_constants) === hexagonal
+end
+
 # ------ Unit cell computations
 
-@testset "basis()" begin
+@testset "basis(::HexagonalLatticeConstants)" begin
     # --- Preparations
 
     a = 2
@@ -262,7 +269,7 @@ end
     @test basis_c ≈ [0, 0, c]
 end
 
-@testset "volume()" begin
+@testset "volume(::HexagonalLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -277,7 +284,7 @@ end
     @test volume(lattice_constants) ≈ abs(det(hcat(basis_a, basis_b, basis_c)))
 end
 
-@testset "surface_area()" begin
+@testset "surface_area(::HexagonalLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -295,7 +302,7 @@ end
           2 * norm(cross(basis_c, basis_a))
 end
 
-@testset "reduced_cell()" begin
+@testset "reduced_cell(): hexagonal" begin
     # --- Preparations
 
     a = 2
@@ -343,7 +350,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin
+@testset "is_equivalent_unit_cell(::UnitCell): hexagonal" begin
     # --- Preparations
 
     a = 2
@@ -378,7 +385,7 @@ end
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 end
 
-@testset "is_equivalent_unit_cell(::LatticeConstants, ::LatticeConstants)" begin
+@testset "is_equivalent_unit_cell(::HexagonalLatticeConstants)" begin
     # --- Preparations
 
     a_ref = 2
