@@ -97,7 +97,7 @@ function isapprox(
 end
 
 function -(x::HexagonalLatticeConstants, y::HexagonalLatticeConstants)
-    return HexagonalLatticeConstantDeltas(x.a - y.a, x.b - y.b)
+    return HexagonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
 end
 
 function lattice_system(::HexagonalLatticeConstants)
