@@ -24,6 +24,7 @@ export UnitCell
 # Functions
 export isapprox, lattice_system, standardize
 export basis, volume, surface_area
+export norm
 export conventional_cell, reduced_cell
 export is_supercell, is_equivalent_unit_cell
 
@@ -387,6 +388,8 @@ end
 # ------ LatticeConstantDeltas functions
 
 import Base.isapprox
+import LinearAlgebra.norm
+using LinearAlgebra: LinearAlgebra
 
 # Default isapprox() implementation to allow comparison between deltas of lattice constants
 # for different lattice systems.
@@ -397,6 +400,25 @@ function isapprox(
     rtol::Real=atol > 0 ? 0 : √eps(),
 )
     return false
+end
+
+"""
+    norm(Δlattice_constants::LatticeConstantDeltas; p::Real=2) -> Float64
+
+Compute the `p`-norm of `Δlattice_constants`.
+"""
+function norm(Δlattice_constants::LatticeConstantDeltas, p::Real)
+    return LinearAlgebra.norm(
+        [
+            getfield(Δlattice_constants, name) for
+            name in fieldnames(typeof(Δlattice_constants))
+        ],
+        p,
+    )
+end
+
+function norm(Δlattice_constants::LatticeConstantDeltas; p::Real=2)
+    return norm(Δlattice_constants, p)
 end
 
 # ------ UnitCell functions
