@@ -257,6 +257,28 @@ end
     @test lattice_system(Δlattice_constants) === hexagonal
 end
 
+@testset "norm(::HexagonalLatticeConstantDeltas)" begin
+    # --- Preparations
+
+    deltas = randn(2)
+    Δlattice_constants = HexagonalLatticeConstantDeltas(deltas...)
+
+    # --- Tests
+
+    # 1-norm
+    @test norm(Δlattice_constants, 1) == sum(abs.(deltas))
+    @test norm(Δlattice_constants; p=1) == sum(abs.(deltas))
+
+    # 2-norm
+    @test norm(Δlattice_constants) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants, 2) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants; p=2) == sqrt(sum(deltas .^ 2))
+
+    # Inf-norm
+    @test norm(Δlattice_constants, Inf) == maximum(abs.(deltas))
+    @test norm(Δlattice_constants; p=Inf) == maximum(abs.(deltas))
+end
+
 # ------ Unit cell computations
 
 @testset "basis(::HexagonalLatticeConstants)" begin
