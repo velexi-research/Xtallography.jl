@@ -206,9 +206,24 @@ end
     @test startswith(error_message, expected_error)
 end
 
+@testset "MonoclinicLatticeConstantDeltas constructor" begin
+    # --- Tests
+
+    Δa = 1
+    Δb = 2
+    Δc = 3
+    Δβ = π / 3
+    Δlattice_constants = MonoclinicLatticeConstantDeltas(Δa, Δb, Δc, Δβ)
+
+    @test Δlattice_constants.Δa == Δa
+    @test Δlattice_constants.Δb == Δb
+    @test Δlattice_constants.Δc == Δc
+    @test Δlattice_constants.Δβ == Δβ
+end
+
 # ------ LatticeConstants functions
 
-@testset "isapprox(::LatticeConstants)" begin
+@testset "isapprox(::MonoclinicLatticeConstants)" begin
     # --- Preparations
 
     x = MonoclinicLatticeConstants(1.0, 2.0, 3.0, π / 5)
@@ -241,14 +256,23 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
-@testset "lattice_system()" begin
+@testset "-(::MonoclinicLatticeConstants)" begin
+    # --- Tests
+
+    x = MonoclinicLatticeConstants(1, 3, 5, π / 3)
+    y = MonoclinicLatticeConstants(2, 10, 20, π / 6)
+    @test x - y ==
+        MonoclinicLatticeConstantDeltas(x.a - y.a, x.b - y.b, x.c - y.c, x.β - y.β)
+end
+
+@testset "lattice_system(::MonoclinicLatticeConstants)" begin
     # --- Tests
 
     lattice_constants = MonoclinicLatticeConstants(1, 2, 3, π / 5)
-    @test lattice_system(lattice_constants) === Monoclinic()
+    @test lattice_system(lattice_constants) === monoclinic
 end
 
-@testset "standardize()" begin
+@testset "standardize(): monoclinic" begin
     # --- Tests
 
     # ------ lattice constants already in standard form
@@ -478,9 +502,73 @@ end
     @test startswith(error_message, expected_error)
 end
 
+# ------ LatticeConstantDeltas functions
+
+@testset "isapprox(::MonoclinicLatticeConstantDeltas)" begin
+    # --- Preparations
+
+    x = MonoclinicLatticeConstantDeltas(1.0, 2.0, 3.0, π / 5)
+    y = MonoclinicLatticeConstantDeltas(1.5, 2.5, 3.5, π / 5 + 0.5)
+
+    # --- Exercise functionality and check results
+
+    # x ≈ (x + delta)
+    @test x ≈ MonoclinicLatticeConstantDeltas(1.0 + 1e-9, 2.0, 3.0, π / 5)
+    @test x ≈ MonoclinicLatticeConstantDeltas(1.0, 2.0 + 1e-9, 3.0, π / 5)
+    @test x ≈ MonoclinicLatticeConstantDeltas(1.0, 2.0, 3.0 - 1e-9, π / 5)
+    @test x ≈ MonoclinicLatticeConstantDeltas(1.0, 2.0, 3.0, π / 5 - 1e-9)
+
+    # x !≈ y
+    @test !(x ≈ y)
+
+    # x ≈ y: atol = 1
+    @test isapprox(x, y; atol=1)
+
+    # x ≈ y: rtol = 1
+    @test isapprox(x, y; rtol=1)
+
+    # x ≈ y: atol = 0.01, rtol = 1
+    @test isapprox(x, y; atol=0.01, rtol=1)
+
+    # x ≈ y: atol = 1, rtol = 0.01
+    @test isapprox(x, y; atol=1, rtol=0.01)
+
+    # x !≈ y: atol = 0.01, rtol = 0.01
+    @test !isapprox(x, y; atol=0.01, rtol=0.01)
+end
+
+@testset "lattice_system(::MonoclinicLatticeConstantDeltas)" begin
+    # --- Tests
+
+    Δlattice_constants = MonoclinicLatticeConstantDeltas(1, 2, 3, π / 5)
+    @test lattice_system(Δlattice_constants) === monoclinic
+end
+
+@testset "norm(::MonoclinicLatticeConstantDeltas)" begin
+    # --- Preparations
+
+    deltas = randn(4)
+    Δlattice_constants = MonoclinicLatticeConstantDeltas(deltas...)
+
+    # --- Tests
+
+    # 1-norm
+    @test norm(Δlattice_constants, 1) == sum(abs.(deltas))
+    @test norm(Δlattice_constants; p=1) == sum(abs.(deltas))
+
+    # 2-norm
+    @test norm(Δlattice_constants) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants, 2) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants; p=2) == sqrt(sum(deltas .^ 2))
+
+    # Inf-norm
+    @test norm(Δlattice_constants, Inf) == maximum(abs.(deltas))
+    @test norm(Δlattice_constants; p=Inf) == maximum(abs.(deltas))
+end
+
 # ------ Unit cell computations
 
-@testset "basis()" begin
+@testset "basis(::MonoclinicLatticeConstants)" begin
     # --- Preparations
 
     a = 2
@@ -500,7 +588,7 @@ end
     @test basis_c ≈ [c * cos(β), 0, c * sin(β)]
 end
 
-@testset "volume()" begin
+@testset "volume(::MonoclinicLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -517,7 +605,7 @@ end
     @test volume(lattice_constants) ≈ abs(det(hcat(basis_a, basis_b, basis_c)))
 end
 
-@testset "surface_area()" begin
+@testset "surface_area(::MonoclinicLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -639,7 +727,7 @@ end
     @test standardized_centering === body_centered
 end
 
-@testset "reduced_cell()" begin
+@testset "reduced_cell(): monoclinic" begin
     # --- Preparations
 
     a = 2
@@ -750,7 +838,7 @@ end
     @test volume(reduced_face_centered_unit_cell) ≈ 0.25 * volume(face_centered_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin
+@testset "is_equivalent_unit_cell(::UnitCell): monoclinic" begin
     # --- Preparations
 
     a = 2
@@ -792,7 +880,7 @@ end
     @test is_equivalent_unit_cell(base_centered_unit_cell, body_centered_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::LatticeConstants, ::LatticeConstants)" begin
+@testset "is_equivalent_unit_cell(::MonoclinicLatticeConstants)" begin
     # --- Preparations
 
     a_ref = 6
@@ -862,7 +950,7 @@ end
     @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
 end
 
-@testset "is_supercell(): valid arguments" begin
+@testset "is_supercell(::MonoclinicLatticeConstants): valid arguments" begin
     # --- Preparations
 
     a_ref = 6
@@ -921,7 +1009,7 @@ end
     @test !is_supercell(lattice_constants_test, lattice_constants_ref)
 end
 
-@testset "is_supercell(): invalid arguments" begin
+@testset "is_supercell(::MonoclinicLatticeConstants): invalid arguments" begin
     # --- Preparations
 
     a_ref = 6

@@ -1,0 +1,14 @@
+# --- Auto-generated files
+
+Project.toml
+pyproject.toml
+
+docs/build/
+
+# --- Experimental code
+
+spikes/
+
+# --- Miscellaneous
+
+extras/

@@ -17,7 +17,7 @@ Functions that support computations specific to hexagonal lattices
 # --- Exports
 
 # Types
-export HexagonalLatticeConstants
+export HexagonalLatticeConstants, HexagonalLatticeConstantDeltas
 
 # --- Types
 
@@ -58,6 +58,30 @@ struct HexagonalLatticeConstants <: LatticeConstants
     end
 end
 
+"""
+    HexagonalLatticeConstantDeltas
+
+Lattice constant deltas for a hexagonal unit cell
+
+Fields
+======
+* `Δa`, `Δc`: deltas of the lengths of the edges of the unit cell
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct HexagonalLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+    Δc::Float64
+
+    """
+    Construct a set of hexagonal lattice constant deltas.
+    """
+    function HexagonalLatticeConstantDeltas(Δa::Real, Δc::Real)
+        return new(Δa, Δc)
+    end
+end
+
 # --- Functions/Methods
 
 # ------ LatticeConstants functions
@@ -72,8 +96,28 @@ function isapprox(
            isapprox(x.c, y.c; atol=atol, rtol=rtol)
 end
 
+function -(x::HexagonalLatticeConstants, y::HexagonalLatticeConstants)
+    return HexagonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
+end
+
 function lattice_system(::HexagonalLatticeConstants)
-    return Hexagonal()
+    return hexagonal
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::HexagonalLatticeConstantDeltas,
+    y::HexagonalLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
+           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::HexagonalLatticeConstantDeltas)
+    return hexagonal
 end
 
 # ------ Unit cell computations

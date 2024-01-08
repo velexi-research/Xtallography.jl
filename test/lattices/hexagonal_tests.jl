@@ -118,9 +118,20 @@ end
     @test startswith(error_message, expected_error)
 end
 
+@testset "HexagonalLatticeConstantDeltas constructor" begin
+    # --- Tests
+
+    Δa = 1
+    Δc = 2
+    Δlattice_constants = HexagonalLatticeConstantDeltas(Δa, Δc)
+
+    @test Δlattice_constants.Δa == Δa
+    @test Δlattice_constants.Δc == Δc
+end
+
 # ------ LatticeConstants functions
 
-@testset "isapprox(::LatticeConstants)" begin
+@testset "isapprox(::HexagonalLatticeConstants)" begin
     # --- Preparations
 
     x = HexagonalLatticeConstants(1.0, 2.0)
@@ -151,14 +162,22 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
-@testset "lattice_system()" begin
+@testset "-(::HexagonalLatticeConstants)" begin
+    # --- Tests
+
+    x = HexagonalLatticeConstants(1, 3)
+    y = HexagonalLatticeConstants(2, 10)
+    @test x - y == HexagonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
+end
+
+@testset "lattice_system(::HexagonalLatticeConstants)" begin
     # --- Tests
 
     lattice_constants = HexagonalLatticeConstants(1, 2)
     @test lattice_system(lattice_constants) === hexagonal
 end
 
-@testset "standardize()" begin
+@testset "standardize(): hexagonal" begin
     # --- Tests
 
     # ------ Hexagonal lattices have no lattice constants conventions for primitive
@@ -198,9 +217,71 @@ end
     end
 end
 
+# ------ LatticeConstantDeltas functions
+
+@testset "isapprox(::HexagonalLatticeConstantDeltas)" begin
+    # --- Preparations
+
+    x = HexagonalLatticeConstantDeltas(1.0, 2.0)
+    y = HexagonalLatticeConstantDeltas(1.5, 2.5)
+
+    # --- Exercise functionality and check results
+
+    # x ≈ (x + delta)
+    @test x ≈ HexagonalLatticeConstantDeltas(1.0 + 1e-9, 2.0)
+    @test x ≈ HexagonalLatticeConstantDeltas(1.0, 2.0 + 1e-9)
+
+    # x !≈ y
+    @test !(x ≈ y)
+
+    # x ≈ y: atol = 1
+    @test isapprox(x, y; atol=1)
+
+    # x ≈ y: rtol = 1
+    @test isapprox(x, y; rtol=1)
+
+    # x ≈ y: atol = 0.01, rtol = 1
+    @test isapprox(x, y; atol=0.01, rtol=1)
+
+    # x ≈ y: atol = 1, rtol = 0.01
+    @test isapprox(x, y; atol=1, rtol=0.01)
+
+    # x !≈ y: atol = 0.01, rtol = 0.01
+    @test !isapprox(x, y; atol=0.01, rtol=0.01)
+end
+
+@testset "lattice_system(::HexagonalLatticeConstantDeltas)" begin
+    # --- Tests
+
+    Δlattice_constants = HexagonalLatticeConstantDeltas(1, 2)
+    @test lattice_system(Δlattice_constants) === hexagonal
+end
+
+@testset "norm(::HexagonalLatticeConstantDeltas)" begin
+    # --- Preparations
+
+    deltas = randn(2)
+    Δlattice_constants = HexagonalLatticeConstantDeltas(deltas...)
+
+    # --- Tests
+
+    # 1-norm
+    @test norm(Δlattice_constants, 1) == sum(abs.(deltas))
+    @test norm(Δlattice_constants; p=1) == sum(abs.(deltas))
+
+    # 2-norm
+    @test norm(Δlattice_constants) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants, 2) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants; p=2) == sqrt(sum(deltas .^ 2))
+
+    # Inf-norm
+    @test norm(Δlattice_constants, Inf) == maximum(abs.(deltas))
+    @test norm(Δlattice_constants; p=Inf) == maximum(abs.(deltas))
+end
+
 # ------ Unit cell computations
 
-@testset "basis()" begin
+@testset "basis(::HexagonalLatticeConstants)" begin
     # --- Preparations
 
     a = 2
@@ -218,7 +299,7 @@ end
     @test basis_c ≈ [0, 0, c]
 end
 
-@testset "volume()" begin
+@testset "volume(::HexagonalLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -233,7 +314,7 @@ end
     @test volume(lattice_constants) ≈ abs(det(hcat(basis_a, basis_b, basis_c)))
 end
 
-@testset "surface_area()" begin
+@testset "surface_area(::HexagonalLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -251,7 +332,7 @@ end
           2 * norm(cross(basis_c, basis_a))
 end
 
-@testset "reduced_cell()" begin
+@testset "reduced_cell(): hexagonal" begin
     # --- Preparations
 
     a = 2
@@ -299,7 +380,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin
+@testset "is_equivalent_unit_cell(::UnitCell): hexagonal" begin
     # --- Preparations
 
     a = 2
@@ -334,7 +415,7 @@ end
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 end
 
-@testset "is_equivalent_unit_cell(::LatticeConstants, ::LatticeConstants)" begin
+@testset "is_equivalent_unit_cell(::HexagonalLatticeConstants)" begin
     # --- Preparations
 
     a_ref = 2

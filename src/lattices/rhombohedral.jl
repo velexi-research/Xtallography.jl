@@ -22,7 +22,7 @@ using Logging
 # --- Exports
 
 # Types
-export RhombohedralLatticeConstants
+export RhombohedralLatticeConstants, RhombohedralLatticeConstantDeltas
 
 # Functions
 
@@ -75,6 +75,33 @@ struct RhombohedralLatticeConstants <: LatticeConstants
     end
 end
 
+"""
+    RhombohedralLatticeConstantDeltas
+
+Lattice constant deltas for a rhombohedral unit cell
+
+Fields
+======
+* `Δa`: delta of the length of the edge of the unit cell
+
+* `Δα`: delta of angle between edges of the unit cell in the plane of the faces of the unit
+  cell
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct RhombohedralLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+    Δα::Float64
+
+    """
+    Construct a set of rhombohedral lattice constant deltas.
+    """
+    function RhombohedralLatticeConstantDeltas(Δa::Real, Δα::Real)
+        return new(Δa, Δα)
+    end
+end
+
 # --- Functions/Methods
 
 # ------ LatticeConstants functions
@@ -89,7 +116,27 @@ function isapprox(
            isapprox(x.α, y.α; atol=atol, rtol=rtol)
 end
 
+function -(x::RhombohedralLatticeConstants, y::RhombohedralLatticeConstants)
+    return RhombohedralLatticeConstantDeltas(x.a - y.a, x.α - y.α)
+end
+
 function lattice_system(::RhombohedralLatticeConstants)
+    return rhombohedral
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::RhombohedralLatticeConstantDeltas,
+    y::RhombohedralLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
+           isapprox(x.Δα, y.Δα; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::RhombohedralLatticeConstantDeltas)
     return rhombohedral
 end
 

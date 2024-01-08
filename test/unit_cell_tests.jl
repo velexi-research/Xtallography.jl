@@ -809,6 +809,22 @@ end
         expected_standardized_lattice_constants
 end
 
+# ------ LatticeConstantDeltas methods
+
+@testset "isapprox(::LatticeConstantDeltas): comparison between different types" begin
+    # --- Tests
+
+    # x ≈ y
+    x = CubicLatticeConstantDeltas(1 + 1e-9)
+    y = CubicLatticeConstantDeltas(1)
+    @test x ≈ y
+
+    # x ≉ y
+    x = CubicLatticeConstantDeltas(1)
+    y = TetragonalLatticeConstantDeltas(1, 2)
+    @test x ≉ y
+end
+
 # ------ UnitCell methods
 
 @testset "isapprox(::UnitCell)" begin

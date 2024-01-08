@@ -117,9 +117,53 @@ end
     @test startswith(error_message, expected_error)
 end
 
+# ------ LatticeConstantDeltas functions
+
+@testset "isapprox(::TetragonalConstantDeltas)" begin
+    # --- Preparations
+
+    x = TetragonalLatticeConstantDeltas(1.0, 2.0)
+    y = TetragonalLatticeConstantDeltas(1.5, 2.5)
+
+    # --- Exercise functionality and check results
+
+    # x ≈ (x + delta)
+    @test x ≈ TetragonalLatticeConstantDeltas(1.0 + 1e-9, 2.0)
+    @test x ≈ TetragonalLatticeConstantDeltas(1.0, 2.0 + 1e-9)
+
+    # x !≈ y
+    @test !(x ≈ y)
+
+    # x ≈ y: atol = 1
+    @test isapprox(x, y; atol=1)
+
+    # x ≈ y: rtol = 1
+    @test isapprox(x, y; rtol=1)
+
+    # x ≈ y: atol = 0.01, rtol = 1
+    @test isapprox(x, y; atol=0.01, rtol=1)
+
+    # x ≈ y: atol = 1, rtol = 0.01
+    @test isapprox(x, y; atol=1, rtol=0.01)
+
+    # x !≈ y: atol = 0.01, rtol = 0.01
+    @test !isapprox(x, y; atol=0.01, rtol=0.01)
+end
+
+@testset "TetragonalLatticeConstantDeltas constructor" begin
+    # --- Tests
+
+    Δa = 1
+    Δc = 5
+    Δlattice_constants = TetragonalLatticeConstantDeltas(Δa, Δc)
+
+    @test Δlattice_constants.Δa == Δa
+    @test Δlattice_constants.Δc == Δc
+end
+
 # ------ LatticeConstants functions
 
-@testset "isapprox(::LatticeConstants)" begin
+@testset "isapprox(::TetragonalLatticeConstants)" begin
     # --- Preparations
 
     x = TetragonalLatticeConstants(1.0, 2.0)
@@ -150,14 +194,22 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
-@testset "lattice_system()" begin
+@testset "-(::TetragonalLatticeConstants)" begin
+    # --- Tests
+
+    x = TetragonalLatticeConstants(1, 5)
+    y = TetragonalLatticeConstants(2, 2.3)
+    @test x - y == TetragonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
+end
+
+@testset "lattice_system(::TetragonalLatticeConstants)" begin
     # --- Tests
 
     lattice_constants = TetragonalLatticeConstants(1, 2)
-    @test lattice_system(lattice_constants) === Tetragonal()
+    @test lattice_system(lattice_constants) === tetragonal
 end
 
-@testset "standardize()" begin
+@testset "standardize(): tetragonal" begin
     # --- Tests
 
     # ------ Tetragonal lattices have no lattice constants conventions for primitive and
@@ -210,9 +262,38 @@ end
     end
 end
 
+@testset "lattice_system(::TetragonalLatticeConstantDeltas)" begin
+    # --- Tests
+
+    Δlattice_constants = TetragonalLatticeConstantDeltas(1, 2)
+    @test lattice_system(Δlattice_constants) === tetragonal
+end
+
+@testset "norm(::TetragonalLatticeConstantDeltas)" begin
+    # --- Preparations
+
+    deltas = randn(2)
+    Δlattice_constants = TetragonalLatticeConstantDeltas(deltas...)
+
+    # --- Tests
+
+    # 1-norm
+    @test norm(Δlattice_constants, 1) == sum(abs.(deltas))
+    @test norm(Δlattice_constants; p=1) == sum(abs.(deltas))
+
+    # 2-norm
+    @test norm(Δlattice_constants) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants, 2) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants; p=2) == sqrt(sum(deltas .^ 2))
+
+    # Inf-norm
+    @test norm(Δlattice_constants, Inf) == maximum(abs.(deltas))
+    @test norm(Δlattice_constants; p=Inf) == maximum(abs.(deltas))
+end
+
 # ------ Unit cell computations
 
-@testset "basis()" begin
+@testset "basis(::TetragonalLatticeConstants)" begin
     # --- Preparations
 
     a = 5
@@ -230,7 +311,7 @@ end
     @test basis_c ≈ [0, 0, c]
 end
 
-@testset "volume()" begin
+@testset "volume(::TetragonalLatticeConstants)" begin
     # --- Preparations
 
     lattice_constants = TetragonalLatticeConstants(5, 7)
@@ -240,7 +321,7 @@ end
     @test volume(lattice_constants) ≈ lattice_constants.a^2 * lattice_constants.c
 end
 
-@testset "surface_area()" begin
+@testset "surface_area(::TetragonalLatticeConstants)" begin
     # --- Preparations
 
     lattice_constants = TetragonalLatticeConstants(5, 7)
@@ -251,7 +332,7 @@ end
         2 * lattice_constants.a^2 + 4 * lattice_constants.a * lattice_constants.c
 end
 
-@testset "reduced_cell()" begin
+@testset "reduced_cell(): tetragonal" begin
     # --- Preparations
 
     a = 5
@@ -348,7 +429,7 @@ end
     @test is_equivalent_unit_cell(face_centered_unit_cell, primitive_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::LatticeConstants, ::LatticeConstants)" begin
+@testset "is_equivalent_unit_cell(::TetragonalLatticeConstants)" begin
     # --- Preparations
 
     a_ref = 2

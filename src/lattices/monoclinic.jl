@@ -22,7 +22,7 @@ using Logging
 # --- Exports
 
 # Types
-export MonoclinicLatticeConstants
+export MonoclinicLatticeConstants, MonoclinicLatticeConstantDeltas
 
 # Functions
 export convert_to_body_centering, convert_to_base_centering
@@ -87,6 +87,35 @@ struct MonoclinicLatticeConstants <: LatticeConstants
     end
 end
 
+"""
+    MonoclinicLatticeConstantDeltas
+
+Lattice constant deltas for a monoclinic unit cell
+
+Fields
+======
+* `Δa`, `Δb`, `Δc`: deltas of the lengths of the edges of the unit cell
+
+* `Δβ`: delta of the angle between edges of the unit cell in the plane of the face of the
+  unit cell where the edges are not orthogonal
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct MonoclinicLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+    Δb::Float64
+    Δc::Float64
+    Δβ::Float64
+
+    """
+    Construct a set of monoclinic lattice constant deltas.
+    """
+    function MonoclinicLatticeConstantDeltas(Δa::Real, Δb::Real, Δc::Real, Δβ::Real)
+        return new(Δa, Δb, Δc, Δβ)
+    end
+end
+
 # --- Functions/Methods
 
 # ------ LatticeConstants functions
@@ -101,6 +130,10 @@ function isapprox(
            isapprox(x.b, y.b; atol=atol, rtol=rtol) &&
            isapprox(x.c, y.c; atol=atol, rtol=rtol) &&
            isapprox(x.β, y.β; atol=atol, rtol=rtol)
+end
+
+function -(x::MonoclinicLatticeConstants, y::MonoclinicLatticeConstants)
+    return MonoclinicLatticeConstantDeltas(x.a - y.a, x.b - y.b, x.c - y.c, x.β - y.β)
 end
 
 function lattice_system(::MonoclinicLatticeConstants)
@@ -189,6 +222,24 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
     end
 
     return MonoclinicLatticeConstants(a, b, c, β), centering
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::MonoclinicLatticeConstantDeltas,
+    y::MonoclinicLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
+           isapprox(x.Δb, y.Δb; atol=atol, rtol=rtol) &&
+           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol) &&
+           isapprox(x.Δβ, y.Δβ; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::MonoclinicLatticeConstantDeltas)
+    return monoclinic
 end
 
 # ------ Unit cell computations

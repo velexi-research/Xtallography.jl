@@ -26,7 +26,7 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "conventional_cell(): limiting cases" begin
+@testset "conventional_cell():cubic: limiting cases" begin
     # --- Tests
 
     # ------ Cubic lattices have no limiting cases for primitive, body, and face centerings
@@ -61,7 +61,7 @@ using XtallographyUtils
     @test startswith(error_message, expected_error)
 end
 
-@testset "conventional_cell(): chain of limiting cases" begin
+@testset "conventional_cell():cubic: chain of limiting cases" begin
     # --- Preparations
 
     a = 5

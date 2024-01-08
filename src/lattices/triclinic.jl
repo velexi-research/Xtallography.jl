@@ -26,7 +26,7 @@ using Combinatorics: permutations
 # --- Exports
 
 # Types
-export TriclinicLatticeConstants
+export TriclinicLatticeConstants, TriclinicLatticeConstantDeltas
 
 # Functions
 export satisfies_triclinic_angle_constraints, is_triclinic_type_I_cell
@@ -51,8 +51,8 @@ Fields
 ======
 * `a`, `b`, `c`: lengths of the edges of the unit cell
 
-* `α`, `β`, `γ`: angles between edges of the unit cell in the planes of the
-  faces of the unit cell
+* `α`, `β`, `γ`: angles between edges of the unit cell in the planes of the faces of the
+  unit cell
 
 !!! note
 
@@ -108,6 +108,39 @@ struct TriclinicLatticeConstants <: LatticeConstants
     end
 end
 
+"""
+    TriclinicLatticeConstantDeltas
+
+Lattice constant deltas for a triclinic unit cell
+
+Fields
+======
+* `Δa`, `Δb`, `Δc`: deltas of the lengths of the edges of the unit cell
+
+* `Δα`, `Δβ`, `Δγ`: deltas of the angles between edges of the unit cell in the planes of
+  the faces of the unit cell
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct TriclinicLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+    Δb::Float64
+    Δc::Float64
+    Δα::Float64
+    Δβ::Float64
+    Δγ::Float64
+
+    """
+    Construct a set of triclinic lattice constant deltas.
+    """
+    function TriclinicLatticeConstantDeltas(
+        Δa::Real, Δb::Real, Δc::Real, Δα::Real, Δβ::Real, Δγ::Real
+    )
+        return new(Δa, Δb, Δc, Δα, Δβ, Δγ)
+    end
+end
+
 # --- Functions/Methods
 
 # ------ LatticeConstants functions
@@ -124,6 +157,12 @@ function isapprox(
            isapprox(x.α, y.α; atol=atol, rtol=rtol) &&
            isapprox(x.β, y.β; atol=atol, rtol=rtol) &&
            isapprox(x.γ, y.γ; atol=atol, rtol=rtol)
+end
+
+function -(x::TriclinicLatticeConstants, y::TriclinicLatticeConstants)
+    return TriclinicLatticeConstantDeltas(
+        x.a - y.a, x.b - y.b, x.c - y.c, x.α - y.α, x.β - y.β, x.γ - y.γ
+    )
 end
 
 function lattice_system(::TriclinicLatticeConstants)
@@ -287,6 +326,26 @@ function satisfies_triclinic_angle_constraints(α::Real, β::Real, γ::Real)
            (0 < α + β - γ < 2π) &&
            (0 < α - β + γ < 2π) &&
            (0 < -α + β + γ < 2π)
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::TriclinicLatticeConstantDeltas,
+    y::TriclinicLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
+           isapprox(x.Δb, y.Δb; atol=atol, rtol=rtol) &&
+           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol) &&
+           isapprox(x.Δα, y.Δα; atol=atol, rtol=rtol) &&
+           isapprox(x.Δβ, y.Δβ; atol=atol, rtol=rtol) &&
+           isapprox(x.Δγ, y.Δγ; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::TriclinicLatticeConstantDeltas)
+    return triclinic
 end
 
 # ------ Unit cell computations

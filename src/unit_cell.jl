@@ -18,12 +18,13 @@ Types and functions that support lattice computations
 # --- Exports
 
 # Types
-export LatticeConstants
+export LatticeConstants, LatticeConstantDeltas
 export UnitCell
 
 # Functions
 export isapprox, lattice_system, standardize
 export basis, volume, surface_area
+export norm
 export conventional_cell, reduced_cell
 export is_supercell, is_equivalent_unit_cell
 
@@ -42,6 +43,20 @@ Subtypes
 [`CubicLatticeConstants`](@ref)
 """
 abstract type LatticeConstants end
+
+"""
+    LatticeConstantDeltas
+
+Supertype for lattice constant deltas for the seven lattice systems in 3D
+
+Subtypes
+========
+[`TriclinicLatticeConstantDeltas`](@ref), [`MonoclinicLatticeConstantDeltas`](@ref),
+[`OrthorhombicLatticeConstantDeltas`](@ref), [`TetragonalLatticeConstantDeltas`](@ref),
+[`RhombohedralLatticeConstantDeltas`](@ref), [`HexagonalLatticeConstantDeltas`](@ref),
+[`CubicLatticeConstantDeltas`](@ref)
+"""
+abstract type LatticeConstantDeltas end
 
 using AngleBetweenVectors: angle
 using LinearAlgebra: norm, cross, dot
@@ -205,6 +220,7 @@ end
 # ------ LatticeConstants functions
 
 import Base.isapprox
+import Base.:(-)
 
 # Default isapprox() implementation to allow comparison between lattice constants of
 # different lattice systems.
@@ -217,7 +233,9 @@ end
 """
     lattice_system(lattice_constants::LatticesConstants) -> LatticeSystem
 
-Return the lattice system for a set of `lattice_constants`.
+    lattice_system(Δlattice_constants::LatticesConstantDeltas) -> LatticeSystem
+
+Return the lattice system for a set of `lattice_constants` or `Δlattice_constants`.
 
 Return values
 =============
@@ -367,8 +385,45 @@ function standardize_arg_checks(lattice_constants::LatticeConstants, centering::
     end
 end
 
+# ------ LatticeConstantDeltas functions
+
+import Base.isapprox
+import LinearAlgebra.norm
+using LinearAlgebra: LinearAlgebra
+
+# Default isapprox() implementation to allow comparison between deltas of lattice constants
+# for different lattice systems.
+function isapprox(
+    x::LatticeConstantDeltas,
+    y::LatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return false
+end
+
+"""
+    norm(Δlattice_constants::LatticeConstantDeltas; p::Real=2) -> Float64
+
+Compute the `p`-norm of `Δlattice_constants`.
+"""
+function norm(Δlattice_constants::LatticeConstantDeltas, p::Real)
+    return LinearAlgebra.norm(
+        [
+            getfield(Δlattice_constants, name) for
+            name in fieldnames(typeof(Δlattice_constants))
+        ],
+        p,
+    )
+end
+
+function norm(Δlattice_constants::LatticeConstantDeltas; p::Real=2)
+    return norm(Δlattice_constants, p)
+end
+
 # ------ UnitCell functions
 
+import Base.isapprox
 using LinearAlgebra: dot
 using Combinatorics: combinations
 

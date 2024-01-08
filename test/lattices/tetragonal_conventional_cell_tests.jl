@@ -26,7 +26,7 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "conventional_cell(): limiting cases, centering = primitive" begin
+@testset "conventional_cell():tetragonal: limiting cases, centering = primitive" begin
     # --- Tests
 
     # ------ a = b = c
@@ -50,7 +50,7 @@ using XtallographyUtils
     @test iucr_unit_cell.centering === primitive
 end
 
-@testset "conventional_cell(): limiting cases, centering = body" begin
+@testset "conventional_cell():tetragonal: limiting cases, centering = body" begin
     # --- Tests
 
     # ------ a = b = c
@@ -84,7 +84,7 @@ end
     @test iucr_unit_cell.centering === body_centered
 end
 
-@testset "conventional_cell(): chain of limiting cases" begin
+@testset "conventional_cell():tetragonal: chain of limiting cases" begin
     # --- Preparations
 
     a = 5
@@ -169,7 +169,7 @@ end
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end
 
-@testset "conventional_cell(): invalid arguments" begin
+@testset "conventional_cell():tetragonal: invalid arguments" begin
     # --- Preparations
 
     # Construct lattice constants for tetragonal unit cell

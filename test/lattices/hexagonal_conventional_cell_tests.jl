@@ -26,7 +26,7 @@ using XtallographyUtils
 
 # --- Tests
 
-@testset "conventional_cell(): limiting cases" begin
+@testset "conventional_cell():hexagonal: limiting cases" begin
     # --- Tests
 
     # ------ Hexagonal lattices have no limiting cases for primitive centering
@@ -61,7 +61,7 @@ using XtallographyUtils
     end
 end
 
-@testset "conventional_cell(): chain of limiting cases" begin
+@testset "conventional_cell():hexagonal: chain of limiting cases" begin
     # --- Exercise functionality and check results
 
     # ------ primitive unit cell: aP --> mP --> oC --> hP

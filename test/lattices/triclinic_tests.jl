@@ -320,9 +320,28 @@ end
     @test startswith(error_message, expected_error)
 end
 
+@testset "TriclinicLatticeConstantDeltas constructor" begin
+    # --- Tests
+
+    Δa = 1
+    Δb = 3
+    Δc = 5
+    Δα = π / 7
+    Δβ = 2π / 7
+    Δγ = 3π / 7
+    Δlattice_constants = TriclinicLatticeConstantDeltas(Δa, Δb, Δc, Δα, Δβ, Δγ)
+
+    @test Δlattice_constants.Δa == Δa
+    @test Δlattice_constants.Δb == Δb
+    @test Δlattice_constants.Δc == Δc
+    @test Δlattice_constants.Δα == Δα
+    @test Δlattice_constants.Δβ == Δβ
+    @test Δlattice_constants.Δγ == Δγ
+end
+
 # ------ LatticeConstants functions
 
-@testset "isapprox(::LatticeConstants)" begin
+@testset "isapprox(::TriclinicLatticeConstants)" begin
     # --- Preparations
 
     x = TriclinicLatticeConstants(1.0, 2.0, 3.0, π / 5, π / 4, 2π / 5)
@@ -357,14 +376,24 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
-@testset "lattice_system()" begin
+@testset "-(::TriclinicLatticeConstants)" begin
+    # --- Tests
+
+    x = TriclinicLatticeConstants(1, 5, 3, π / 7, 2π / 7, 3π / 7)
+    y = TriclinicLatticeConstants(2, 2.3, 3, 5π / 9, 6π / 9, 7π / 9)
+    @test x - y == TriclinicLatticeConstantDeltas(
+        x.a - y.a, x.b - y.b, x.c - y.c, x.α - y.α, x.β - y.β, x.γ - y.γ
+    )
+end
+
+@testset "lattice_system(::TriclinicLatticeConstants)" begin
     # --- Tests
 
     lattice_constants = TriclinicLatticeConstants(1, 2, 3, π / 5, 2π / 5, 3π / 5)
-    @test lattice_system(lattice_constants) === Triclinic()
+    @test lattice_system(lattice_constants) === triclinic
 end
 
-@testset "standardize(): Type I cell" begin
+@testset "standardize(::TriclinicLatticeConstants): Type I cell" begin
     # --- Tests
 
     # ------ lattice constants already in standard form
@@ -549,7 +578,7 @@ end
     @test standardized_centering === primitive
 end
 
-@testset "standardize(): Type II cell" begin
+@testset "standardize(::TriclinicLatticeConstants): Type II cell" begin
     # --- Tests
 
     # ------ lattice constants already in standard form
@@ -734,7 +763,7 @@ end
     @test standardized_centering === primitive
 end
 
-@testset "standardize(): invalid arguments" begin
+@testset "standardize(::TriclinicLatticeConstants): invalid arguments" begin
     # --- Preparations
 
     lattice_constants = TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5)
@@ -772,9 +801,77 @@ end
     @test !satisfies_triclinic_angle_constraints(3π / 4, 4π / 5, 5π / 6)
 end
 
+# ------ LatticeConstantDeltas functions
+
+@testset "isapprox(::TriclinicLatticeConstantDeltas)" begin
+    # --- Preparations
+
+    x = TriclinicLatticeConstantDeltas(1.0, 2.0, 3.0, π / 5, π / 4, 2π / 5)
+    y = TriclinicLatticeConstantDeltas(
+        1.5, 2.5, 3.5, π / 5 + 0.5, π / 4 + 0.5, 2π / 5 + 0.5
+    )
+
+    # --- Exercise functionality and check results
+
+    # x ≈ (x + delta)
+    @test x ≈ TriclinicLatticeConstantDeltas(1.0 + 1e-9, 2.0, 3.0, π / 5, π / 4, 2π / 5)
+    @test x ≈ TriclinicLatticeConstantDeltas(1.0, 2.0 + 1e-9, 3.0, π / 5, π / 4, 2π / 5)
+    @test x ≈ TriclinicLatticeConstantDeltas(1.0, 2.0, 3.0 - 1e-9, π / 5, π / 4, 2π / 5)
+    @test x ≈ TriclinicLatticeConstantDeltas(1.0, 2.0, 3.0, π / 5 - 1e-9, π / 4, 2π / 5)
+    @test x ≈ TriclinicLatticeConstantDeltas(1.0, 2.0, 3.0, π / 5, π / 4 + 1e-9, 2π / 5)
+    @test x ≈ TriclinicLatticeConstantDeltas(1.0, 2.0, 3.0, π / 5, π / 4, 2π / 5 - 1e-9)
+
+    # x !≈ y
+    @test !(x ≈ y)
+
+    # x ≈ y: atol = 1
+    @test isapprox(x, y; atol=1)
+
+    # x ≈ y: rtol = 1
+    @test isapprox(x, y; rtol=1)
+
+    # x ≈ y: atol = 0.01, rtol = 1
+    @test isapprox(x, y; atol=0.01, rtol=1)
+
+    # x ≈ y: atol = 1, rtol = 0.01
+    @test isapprox(x, y; atol=1, rtol=0.01)
+
+    # x !≈ y: atol = 0.01, rtol = 0.01
+    @test !isapprox(x, y; atol=0.01, rtol=0.01)
+end
+
+@testset "lattice_system(::TriclinicConstantDeltas)" begin
+    # --- Tests
+
+    Δlattice_constants = TriclinicLatticeConstantDeltas(1, 2, 3, π / 5, 2π / 5, 3π / 5)
+    @test lattice_system(Δlattice_constants) === triclinic
+end
+
+@testset "norm(::TriclinicLatticeConstantDeltas)" begin
+    # --- Preparations
+
+    deltas = randn(6)
+    Δlattice_constants = TriclinicLatticeConstantDeltas(deltas...)
+
+    # --- Tests
+
+    # 1-norm
+    @test norm(Δlattice_constants, 1) == sum(abs.(deltas))
+    @test norm(Δlattice_constants; p=1) == sum(abs.(deltas))
+
+    # 2-norm
+    @test norm(Δlattice_constants) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants, 2) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants; p=2) == sqrt(sum(deltas .^ 2))
+
+    # Inf-norm
+    @test norm(Δlattice_constants, Inf) == maximum(abs.(deltas))
+    @test norm(Δlattice_constants; p=Inf) == maximum(abs.(deltas))
+end
+
 # ------ Unit cell computations
 
-@testset "basis()" begin
+@testset "basis(::TriclinicLatticeConstants)" begin
     # --- Preparations
 
     a = 2
@@ -799,7 +896,7 @@ end
         [c * cos(β), c / sin(γ) * (cos(α) - cos(β) * cos(γ)), V / sin(γ) / a / b]
 end
 
-@testset "volume()" begin
+@testset "volume(::TricinicLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -818,7 +915,7 @@ end
     @test volume(lattice_constants) ≈ abs(det(hcat(basis_a, basis_b, basis_c)))
 end
 
-@testset "surface_area(::LatticeConstants)" begin
+@testset "surface_area(::TricinicLatticeConstants)" begin
     # --- Preparations
 
     # Construct basis vectors for unit cell
@@ -840,7 +937,7 @@ end
           2 * norm(cross(basis_c, basis_a))
 end
 
-@testset "reduced_cell()" begin
+@testset "reduced_cell(): triclnic" begin
     # --- Preparations
 
     a = 5
@@ -896,7 +993,7 @@ end
     =#
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin
+@testset "is_equivalent_unit_cell(::UnitCell): triclinic" begin
     # --- Preparations
 
     a = 2
@@ -939,7 +1036,7 @@ end
     @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::LatticeConstants, ::LatticeConstants)" begin
+@testset "is_equivalent_unit_cell(::TriclinicLatticeConstants)" begin
     # --- Preparations
 
     a_ref = 6

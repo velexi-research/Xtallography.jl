@@ -77,9 +77,18 @@ end
     @test startswith(error_message, expected_error)
 end
 
+@testset "CubicLatticeConstantDeltas constructor" begin
+    # --- Tests
+
+    Δa = 1
+    Δlattice_constants = CubicLatticeConstantDeltas(Δa)
+
+    @test Δlattice_constants.Δa == Δa
+end
+
 # ------ LatticeConstants functions
 
-@testset "isapprox(::LatticeConstants)" begin
+@testset "isapprox(::CubicLatticeConstants)" begin
     # --- Preparations
 
     x = CubicLatticeConstants(1.0)
@@ -109,14 +118,22 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
-@testset "lattice_system()" begin
+@testset "-(::CubicLatticeConstants)" begin
+    # --- Tests
+
+    x = CubicLatticeConstants(1)
+    y = CubicLatticeConstants(2)
+    @test x - y == CubicLatticeConstantDeltas(x.a - y.a)
+end
+
+@testset "lattice_system(::CubicLatticeConstants)" begin
     # --- Tests
 
     lattice_constants = CubicLatticeConstants(1)
-    @test lattice_system(lattice_constants) === Cubic()
+    @test lattice_system(lattice_constants) === cubic
 end
 
-@testset "standardize()" begin
+@testset "standardize(): cubic" begin
     # --- Tests
 
     # ------ Cubic lattices have no lattice constants conventions for primitive, body, and
@@ -150,9 +167,70 @@ end
     @test startswith(error_message, expected_error)
 end
 
+# ------ LatticeConstantDeltas functions
+
+@testset "isapprox(::CubicLatticeConstantDeltas)" begin
+    # --- Preparations
+
+    x = CubicLatticeConstantDeltas(1.0)
+    y = CubicLatticeConstantDeltas(2.0)
+
+    # --- Exercise functionality and check results
+
+    # x ≈ (x + delta)
+    @test x ≈ CubicLatticeConstantDeltas(1 + 1e-9)
+
+    # x !≈ y
+    @test !(x ≈ y)
+
+    # x ≈ y: atol = 1
+    @test isapprox(x, y; atol=1)
+
+    # x ≈ y: rtol = 1
+    @test isapprox(x, y; rtol=1)
+
+    # x ≈ y: atol = 0.01, rtol = 1
+    @test isapprox(x, y; atol=0.01, rtol=1)
+
+    # x ≈ y: atol = 1, rtol = 0.01
+    @test isapprox(x, y; atol=1, rtol=0.01)
+
+    # x !≈ y: atol = 0.01, rtol = 0.01
+    @test !isapprox(x, y; atol=0.01, rtol=0.01)
+end
+
+@testset "lattice_system(::CubicLatticeConstantDeltas)" begin
+    # --- Tests
+
+    Δlattice_constants = CubicLatticeConstantDeltas(1)
+    @test lattice_system(Δlattice_constants) === cubic
+end
+
+@testset "norm(::CubicLatticeConstantDeltas)" begin
+    # --- Preparations
+
+    deltas = randn(1)
+    Δlattice_constants = CubicLatticeConstantDeltas(deltas...)
+
+    # --- Tests
+
+    # 1-norm
+    @test norm(Δlattice_constants, 1) == sum(abs.(deltas))
+    @test norm(Δlattice_constants; p=1) == sum(abs.(deltas))
+
+    # 2-norm
+    @test norm(Δlattice_constants) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants, 2) == sqrt(sum(deltas .^ 2))
+    @test norm(Δlattice_constants; p=2) == sqrt(sum(deltas .^ 2))
+
+    # Inf-norm
+    @test norm(Δlattice_constants, Inf) == maximum(abs.(deltas))
+    @test norm(Δlattice_constants; p=Inf) == maximum(abs.(deltas))
+end
+
 # ------ Unit cell computations
 
-@testset "basis()" begin
+@testset "basis(::CubicLatticeConstants)" begin
     # --- Preparations
 
     a = 5
@@ -169,7 +247,7 @@ end
     @test basis_c ≈ [0, 0, a]
 end
 
-@testset "volume()" begin
+@testset "volume(::CubicLatticeConstants)" begin
     # --- Preparations
 
     lattice_constants = CubicLatticeConstants(5)
@@ -179,7 +257,7 @@ end
     @test volume(lattice_constants) ≈ lattice_constants.a^3
 end
 
-@testset "surface_area()" begin
+@testset "surface_area(::CubicLatticeConstants)" begin
     # --- Preparations
 
     lattice_constants = CubicLatticeConstants(5)
@@ -189,7 +267,7 @@ end
     @test surface_area(lattice_constants) ≈ 6 * lattice_constants.a^2
 end
 
-@testset "reduced_cell()" begin
+@testset "reduced_cell(): cubic" begin
     # --- Preparations
 
     a = 5
@@ -249,7 +327,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin
+@testset "is_equivalent_unit_cell(::UnitCell): cubic" begin
     # --- Preparations
 
     a = 5
@@ -284,7 +362,7 @@ end
     @test is_equivalent_unit_cell(face_centered_unit_cell, primitive_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::LatticeConstants, ::LatticeConstants)" begin
+@testset "is_equivalent_unit_cell(::CubicLatticeConstants)" begin
     # --- Preparations
 
     lattice_constants_ref = CubicLatticeConstants(2.0)
@@ -308,7 +386,7 @@ end
     @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
 end
 
-@testset "is_supercell(): valid arguments" begin
+@testset "is_supercell(::CubicLatticeConstants): valid arguments" begin
     # --- Preparations
 
     lattice_constants_ref = CubicLatticeConstants(2.5)
@@ -337,7 +415,7 @@ end
     @test !is_supercell(lattice_constants_test, lattice_constants_ref; tol=0.2)
 end
 
-@testset "is_supercell(): invalid arguments" begin
+@testset "is_supercell(::CubicLatticeConstants): invalid arguments" begin
     # --- Preparations
 
     lattice_constants_ref = CubicLatticeConstants(2.5)

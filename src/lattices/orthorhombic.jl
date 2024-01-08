@@ -22,7 +22,7 @@ using Logging
 # --- Exports
 
 # Types
-export OrthorhombicLatticeConstants
+export OrthorhombicLatticeConstants, OrthorhombicLatticeConstantDeltas
 
 # Functions
 
@@ -73,6 +73,31 @@ struct OrthorhombicLatticeConstants <: LatticeConstants
     end
 end
 
+"""
+    OrthorhombicLatticeConstantDeltas
+
+Lattice constant deltas for a orthorhombic unit cell
+
+Fields
+======
+* `Δa`, `Δb`, `Δc`: deltas of the lengths of the edges of the unit cell
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct OrthorhombicLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+    Δb::Float64
+    Δc::Float64
+
+    """
+    Construct a set of orthorhombic lattice constant deltas.
+    """
+    function OrthorhombicLatticeConstantDeltas(Δa::Real, Δb::Real, Δc::Real)
+        return new(Δa, Δb, Δc)
+    end
+end
+
 # --- Functions/Methods
 
 # ------ LatticeConstants functions
@@ -86,6 +111,10 @@ function isapprox(
     return isapprox(x.a, y.a; atol=atol, rtol=rtol) &&
            isapprox(x.b, y.b; atol=atol, rtol=rtol) &&
            isapprox(x.c, y.c; atol=atol, rtol=rtol)
+end
+
+function -(x::OrthorhombicLatticeConstants, y::OrthorhombicLatticeConstants)
+    return OrthorhombicLatticeConstantDeltas(x.a - y.a, x.b - y.b, x.c - y.c)
 end
 
 function lattice_system(::OrthorhombicLatticeConstants)
@@ -112,6 +141,23 @@ function standardize(lattice_constants::OrthorhombicLatticeConstants, centering:
 
     # all other centerings
     return OrthorhombicLatticeConstants(sort([a, b, c])...), centering
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::OrthorhombicLatticeConstantDeltas,
+    y::OrthorhombicLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
+           isapprox(x.Δb, y.Δb; atol=atol, rtol=rtol) &&
+           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::OrthorhombicLatticeConstantDeltas)
+    return orthorhombic
 end
 
 # ------ Unit cell computations
@@ -217,6 +263,7 @@ function conventional_cell(::Orthorhombic, unit_cell::UnitCell)
     return UnitCell(lattice_constants, centering)
 end
 
+#=
 function is_supercell(
     lattice_constants_test::OrthorhombicLatticeConstants,
     lattice_constants_ref::OrthorhombicLatticeConstants;
@@ -228,3 +275,4 @@ function is_supercell(
     # TODO
     return true
 end
+=#

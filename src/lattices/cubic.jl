@@ -17,7 +17,7 @@ Functions that support computations specific to cubic lattices
 # --- Exports
 
 # Types
-export CubicLatticeConstants
+export CubicLatticeConstants, CubicLatticeConstantDeltas
 
 # --- Types
 
@@ -53,6 +53,29 @@ struct CubicLatticeConstants <: LatticeConstants
     end
 end
 
+"""
+    CubicLatticeConstantDeltas
+
+Lattice constant deltas for a cubic unit cell
+
+Fields
+======
+* `Δa`: delta of the length of the edge of the unit cell
+
+Supertype: [`LatticeConstantDeltas`](@ref)
+"""
+struct CubicLatticeConstantDeltas <: LatticeConstantDeltas
+    # Fields
+    Δa::Float64
+
+    """
+    Construct a set of cubic lattice constant deltas.
+    """
+    function CubicLatticeConstantDeltas(Δa::Real)
+        return new(Δa)
+    end
+end
+
 # --- Functions/Methods
 
 # ------ LatticeConstants functions
@@ -66,7 +89,26 @@ function isapprox(
     return isapprox(x.a, y.a; atol=atol, rtol=rtol)
 end
 
+function -(x::CubicLatticeConstants, y::CubicLatticeConstants)
+    return CubicLatticeConstantDeltas(x.a - y.a)
+end
+
 function lattice_system(::CubicLatticeConstants)
+    return cubic
+end
+
+# ------ LatticeConstantDeltas functions
+
+function isapprox(
+    x::CubicLatticeConstantDeltas,
+    y::CubicLatticeConstantDeltas;
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : √eps(),
+)
+    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol)
+end
+
+function lattice_system(::CubicLatticeConstantDeltas)
     return cubic
 end
 
