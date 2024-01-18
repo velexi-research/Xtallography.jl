@@ -386,6 +386,28 @@ end
     )
 end
 
+@testset "norm(::TriclinicLatticeConstants)" begin
+    # --- Preparations
+
+    constants_vector = abs.(rand(6)) .+ 1
+    lattice_constants = TriclinicLatticeConstants(constants_vector...)
+
+    # --- Tests
+
+    # 1-norm
+    @test norm(lattice_constants, 1) == sum(abs.(constants_vector))
+    @test norm(lattice_constants; p=1) == sum(abs.(constants_vector))
+
+    # 2-norm
+    @test norm(lattice_constants) == sqrt(sum(constants_vector .^ 2))
+    @test norm(lattice_constants, 2) == sqrt(sum(constants_vector .^ 2))
+    @test norm(lattice_constants; p=2) == sqrt(sum(constants_vector .^ 2))
+
+    # Inf-norm
+    @test norm(lattice_constants, Inf) == maximum(abs.(constants_vector))
+    @test norm(lattice_constants; p=Inf) == maximum(abs.(constants_vector))
+end
+
 @testset "lattice_system(::TriclinicLatticeConstants)" begin
     # --- Tests
 
