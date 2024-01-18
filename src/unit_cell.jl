@@ -221,6 +221,8 @@ end
 
 import Base.isapprox
 import Base.:(-)
+import LinearAlgebra.norm
+using LinearAlgebra: LinearAlgebra
 
 # Default isapprox() implementation to allow comparison between lattice constants of
 # different lattice systems.
@@ -228,6 +230,25 @@ function isapprox(
     x::LatticeConstants, y::LatticeConstants; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps()
 )
     return false
+end
+
+"""
+    norm(lattice_constants::LatticeConstants; p::Real=2) -> Float64
+
+Compute the `p`-norm of `lattice_constants`.
+"""
+function norm(lattice_constants::LatticeConstants, p::Real)
+    return LinearAlgebra.norm(
+        [
+            getfield(lattice_constants, name) for
+            name in fieldnames(typeof(lattice_constants))
+        ],
+        p,
+    )
+end
+
+function norm(lattice_constants::LatticeConstants; p::Real=2)
+    return norm(lattice_constants, p)
 end
 
 """

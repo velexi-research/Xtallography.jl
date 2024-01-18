@@ -184,6 +184,28 @@ end
     @test x - y == RhombohedralLatticeConstantDeltas(x.a - y.a, x.α - y.α)
 end
 
+@testset "norm(::RhombohedralLatticeConstants)" begin
+    # --- Preparations
+
+    constants_vector = abs.(rand(2)) .+ 1
+    lattice_constants = RhombohedralLatticeConstants(constants_vector...)
+
+    # --- Tests
+
+    # 1-norm
+    @test norm(lattice_constants, 1) == sum(abs.(constants_vector))
+    @test norm(lattice_constants; p=1) == sum(abs.(constants_vector))
+
+    # 2-norm
+    @test norm(lattice_constants) == sqrt(sum(constants_vector .^ 2))
+    @test norm(lattice_constants, 2) == sqrt(sum(constants_vector .^ 2))
+    @test norm(lattice_constants; p=2) == sqrt(sum(constants_vector .^ 2))
+
+    # Inf-norm
+    @test norm(lattice_constants, Inf) == maximum(abs.(constants_vector))
+    @test norm(lattice_constants; p=Inf) == maximum(abs.(constants_vector))
+end
+
 @testset "lattice_system(::RhombohedralLatticeConstants)" begin
     # --- Tests
 
