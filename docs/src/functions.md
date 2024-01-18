@@ -66,6 +66,7 @@ convert_to_body_centering
 asin_
 acos_
 is_basis
+norm
 surface_area(::Vector{<:Real}, ::Vector{<:Real}, ::Vector{<:Real})
 volume(::Vector{<:Real}, ::Vector{<:Real}, ::Vector{<:Real})
 ```
