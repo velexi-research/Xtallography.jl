@@ -903,7 +903,7 @@ end
 @testset "is_equivalent_unit_cell(::UnitCell): valid arguments" begin
     # --- Tests
 
-    # equivalent unit cells, default tol
+    # equivalent unit cells, default atol and rtol
     b = 2
     c = 3
     β = 3π / 5
@@ -915,7 +915,7 @@ end
 
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 
-    # nonequivalent unit cells that are equivalent when tol is sufficiently large
+    # nonequivalent unit cells that are equivalent when atol is sufficiently large
     a = 1
     b = 2
     c = 3
@@ -924,7 +924,20 @@ end
         OrthorhombicLatticeConstants(a + 2, b - 1, c + 5), Primitive()
     )
     @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
-    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; tol=10)
+    @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=4)
+    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=6)
+
+    # nonequivalent unit cells that are equivalent when rtol is sufficiently large
+    a = 1
+    b = 2
+    c = 3
+    unit_cell_ref = UnitCell(OrthorhombicLatticeConstants(a, b, c), Primitive())
+    unit_cell_test = UnitCell(
+        OrthorhombicLatticeConstants(a + 2, b - 1, c + 5), Primitive()
+    )
+    @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+    @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=0, rtol=0.5)
+    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=0, rtol=1)
 
     # unit cells for different lattice systems
     b = 2
@@ -945,11 +958,11 @@ end
 
     # --- Exercise functionality and check results
 
-    # tol = 0
+    # atol < 0
     local error = nothing
     local error_message = ""
     try
-        is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; tol=0)
+        is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=-1)
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -957,14 +970,14 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `tol` must be positive"
+    expected_error = "ArgumentError: `atol` must be nonnegative"
     @test startswith(error_message, expected_error)
 
-    # tol < 0
+    # rtol < 0
     local error = nothing
     local error_message = ""
     try
-        is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; tol=-1)
+        is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; rtol=-1)
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -972,7 +985,7 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `tol` must be positive"
+    expected_error = "ArgumentError: `rtol` must be nonnegative"
     @test startswith(error_message, expected_error)
 end
 
@@ -1024,11 +1037,11 @@ end
 
     # --- Exercise functionality and check results
 
-    # tol = 0
+    # atol < 0
     local error = nothing
     local error_message = ""
     try
-        is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref; tol=0)
+        is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref; atol=-1)
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -1036,14 +1049,14 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `tol` must be positive"
+    expected_error = "ArgumentError: `atol` must be nonnegative"
     @test startswith(error_message, expected_error)
 
-    # tol < 0
+    # rtol < 0
     local error = nothing
     local error_message = ""
     try
-        is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref; tol=-1)
+        is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref; rtol=-1)
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -1051,7 +1064,7 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `tol` must be positive"
+    expected_error = "ArgumentError: `rtol` must be nonnegative"
     @test startswith(error_message, expected_error)
 end
 

@@ -53,6 +53,9 @@ using XtallographyUtils
     # x > 1
     @test asin_(1 + delta) == π / 2
 
+    # x > 1, within atol
+    @test asin_(1 + 0.5; atol=1) == π / 2
+
     # ------ x near -1
 
     # x > -1
@@ -63,6 +66,9 @@ using XtallographyUtils
 
     # x < -1
     @test asin_(-1 - delta) == -π / 2
+
+    # x < -1, within atol
+    @test asin_(-1 - 0.5; atol=1) == -π / 2
 
     # ------ x not in [-1, 1], x far from endpoints
 
@@ -119,6 +125,9 @@ end
     # x > 1
     @test acos_(1 + delta) == 0
 
+    # x > 1, within atol
+    @test acos_(1 + 0.5; atol=1) == 0
+
     # ------ x near -1
 
     # x < -1
@@ -129,6 +138,9 @@ end
 
     # x < -1
     @test acos_(-1 - delta) == π
+
+    # x < -1, within atol
+    @test acos_(-1 - 0.5; atol=1) == π
 
     # ------ x not in [-1, 1], x far from endpoints
 

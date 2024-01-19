@@ -10,6 +10,7 @@ __Lattice Types__
 
 __Unit Cell Types__
 * `LatticeConstants`
+* `LatticeConstantDeltas`
 * `UnitCell`
 
 -------------------------------------------------------------------------------------------
@@ -83,6 +84,7 @@ BRAVAIS_LATTICES
 
 ```@docs
 LatticeConstants
+LatticeConstantDeltas
 UnitCell
 ```
 
@@ -96,6 +98,18 @@ HexagonalLatticeConstants
 RhombohedralLatticeConstants
 TetragonalLatticeConstants
 CubicLatticeConstants
+```
+
+### Lattice Constant Deltas
+
+```@docs
+TriclinicLatticeConstantDeltas
+MonoclinicLatticeConstantDeltas
+OrthorhombicLatticeConstantDeltas
+HexagonalLatticeConstantDeltas
+RhombohedralLatticeConstantDeltas
+TetragonalLatticeConstantDeltas
+CubicLatticeConstantDeltas
 ```
 
 -------------------------------------------------------------------------------------------

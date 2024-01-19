@@ -117,39 +117,6 @@ end
     @test startswith(error_message, expected_error)
 end
 
-# ------ LatticeConstantDeltas functions
-
-@testset "isapprox(::TetragonalConstantDeltas)" begin
-    # --- Preparations
-
-    x = TetragonalLatticeConstantDeltas(1.0, 2.0)
-    y = TetragonalLatticeConstantDeltas(1.5, 2.5)
-
-    # --- Exercise functionality and check results
-
-    # x ≈ (x + delta)
-    @test x ≈ TetragonalLatticeConstantDeltas(1.0 + 1e-9, 2.0)
-    @test x ≈ TetragonalLatticeConstantDeltas(1.0, 2.0 + 1e-9)
-
-    # x !≈ y
-    @test !(x ≈ y)
-
-    # x ≈ y: atol = 1
-    @test isapprox(x, y; atol=1)
-
-    # x ≈ y: rtol = 1
-    @test isapprox(x, y; rtol=1)
-
-    # x ≈ y: atol = 0.01, rtol = 1
-    @test isapprox(x, y; atol=0.01, rtol=1)
-
-    # x ≈ y: atol = 1, rtol = 0.01
-    @test isapprox(x, y; atol=1, rtol=0.01)
-
-    # x !≈ y: atol = 0.01, rtol = 0.01
-    @test !isapprox(x, y; atol=0.01, rtol=0.01)
-end
-
 @testset "TetragonalLatticeConstantDeltas constructor" begin
     # --- Tests
 
@@ -194,34 +161,21 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "convert(::TetragonalLatticeConstants)" begin
+    # --- Tests
+
+    x = TetragonalLatticeConstants((rand(2) .+ 1)...)
+
+    x_vector = convert(Vector, x)
+    @test x_vector == [x.a, x.c]
+end
+
 @testset "-(::TetragonalLatticeConstants)" begin
     # --- Tests
 
     x = TetragonalLatticeConstants(1, 5)
     y = TetragonalLatticeConstants(2, 2.3)
     @test x - y == TetragonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
-end
-
-@testset "norm(::TetragonalLatticeConstants)" begin
-    # --- Preparations
-
-    constants_vector = abs.(rand(2)) .+ 1
-    lattice_constants = TetragonalLatticeConstants(constants_vector...)
-
-    # --- Tests
-
-    # 1-norm
-    @test norm(lattice_constants, 1) == sum(abs.(constants_vector))
-    @test norm(lattice_constants; p=1) == sum(abs.(constants_vector))
-
-    # 2-norm
-    @test norm(lattice_constants) == sqrt(sum(constants_vector .^ 2))
-    @test norm(lattice_constants, 2) == sqrt(sum(constants_vector .^ 2))
-    @test norm(lattice_constants; p=2) == sqrt(sum(constants_vector .^ 2))
-
-    # Inf-norm
-    @test norm(lattice_constants, Inf) == maximum(abs.(constants_vector))
-    @test norm(lattice_constants; p=Inf) == maximum(abs.(constants_vector))
 end
 
 @testset "lattice_system(::TetragonalLatticeConstants)" begin
@@ -291,26 +245,46 @@ end
     @test lattice_system(Δlattice_constants) === tetragonal
 end
 
-@testset "norm(::TetragonalLatticeConstantDeltas)" begin
+# ------ LatticeConstantDeltas functions
+
+@testset "isapprox(::TetragonalConstantDeltas)" begin
     # --- Preparations
 
-    deltas = randn(2)
-    Δlattice_constants = TetragonalLatticeConstantDeltas(deltas...)
+    x = TetragonalLatticeConstantDeltas(1.0, 2.0)
+    y = TetragonalLatticeConstantDeltas(1.5, 2.5)
 
+    # --- Exercise functionality and check results
+
+    # x ≈ (x + delta)
+    @test x ≈ TetragonalLatticeConstantDeltas(1.0 + 1e-9, 2.0)
+    @test x ≈ TetragonalLatticeConstantDeltas(1.0, 2.0 + 1e-9)
+
+    # x !≈ y
+    @test !(x ≈ y)
+
+    # x ≈ y: atol = 1
+    @test isapprox(x, y; atol=1)
+
+    # x ≈ y: rtol = 1
+    @test isapprox(x, y; rtol=1)
+
+    # x ≈ y: atol = 0.01, rtol = 1
+    @test isapprox(x, y; atol=0.01, rtol=1)
+
+    # x ≈ y: atol = 1, rtol = 0.01
+    @test isapprox(x, y; atol=1, rtol=0.01)
+
+    # x !≈ y: atol = 0.01, rtol = 0.01
+    @test !isapprox(x, y; atol=0.01, rtol=0.01)
+end
+
+@testset "convert(::TetragonalLatticeConstantDeltas)" begin
     # --- Tests
 
-    # 1-norm
-    @test norm(Δlattice_constants, 1) == sum(abs.(deltas))
-    @test norm(Δlattice_constants; p=1) == sum(abs.(deltas))
+    x = TetragonalLatticeConstantDeltas(rand(2)...)
 
-    # 2-norm
-    @test norm(Δlattice_constants) == sqrt(sum(deltas .^ 2))
-    @test norm(Δlattice_constants, 2) == sqrt(sum(deltas .^ 2))
-    @test norm(Δlattice_constants; p=2) == sqrt(sum(deltas .^ 2))
-
-    # Inf-norm
-    @test norm(Δlattice_constants, Inf) == maximum(abs.(deltas))
-    @test norm(Δlattice_constants; p=Inf) == maximum(abs.(deltas))
+    x_vector = convert(Vector, x)
+    @test x_vector == [x.Δa, x.Δc]
 end
 
 # ------ Unit cell computations

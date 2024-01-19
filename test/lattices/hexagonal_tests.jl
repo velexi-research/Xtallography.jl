@@ -162,34 +162,21 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "convert(::HexagonalLatticeConstants)" begin
+    # --- Tests
+
+    x = HexagonalLatticeConstants((rand(2) .+ 0.1)...)
+
+    x_vector = convert(Vector, x)
+    @test x_vector == [x.a, x.c]
+end
+
 @testset "-(::HexagonalLatticeConstants)" begin
     # --- Tests
 
     x = HexagonalLatticeConstants(1, 3)
     y = HexagonalLatticeConstants(2, 10)
     @test x - y == HexagonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
-end
-
-@testset "norm(::HexagonalLatticeConstants)" begin
-    # --- Preparations
-
-    constants_vector = abs.(rand(2)) .+ 1
-    lattice_constants = HexagonalLatticeConstants(constants_vector...)
-
-    # --- Tests
-
-    # 1-norm
-    @test norm(lattice_constants, 1) == sum(abs.(constants_vector))
-    @test norm(lattice_constants; p=1) == sum(abs.(constants_vector))
-
-    # 2-norm
-    @test norm(lattice_constants) == sqrt(sum(constants_vector .^ 2))
-    @test norm(lattice_constants, 2) == sqrt(sum(constants_vector .^ 2))
-    @test norm(lattice_constants; p=2) == sqrt(sum(constants_vector .^ 2))
-
-    # Inf-norm
-    @test norm(lattice_constants, Inf) == maximum(abs.(constants_vector))
-    @test norm(lattice_constants; p=Inf) == maximum(abs.(constants_vector))
 end
 
 @testset "lattice_system(::HexagonalLatticeConstants)" begin
@@ -272,33 +259,20 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "convert(::HexagonalLatticeConstantDeltas)" begin
+    # --- Tests
+
+    x = HexagonalLatticeConstantDeltas(rand(2)...)
+
+    x_vector = convert(Vector, x)
+    @test x_vector == [x.Δa, x.Δc]
+end
+
 @testset "lattice_system(::HexagonalLatticeConstantDeltas)" begin
     # --- Tests
 
     Δlattice_constants = HexagonalLatticeConstantDeltas(1, 2)
     @test lattice_system(Δlattice_constants) === hexagonal
-end
-
-@testset "norm(::HexagonalLatticeConstantDeltas)" begin
-    # --- Preparations
-
-    deltas = randn(2)
-    Δlattice_constants = HexagonalLatticeConstantDeltas(deltas...)
-
-    # --- Tests
-
-    # 1-norm
-    @test norm(Δlattice_constants, 1) == sum(abs.(deltas))
-    @test norm(Δlattice_constants; p=1) == sum(abs.(deltas))
-
-    # 2-norm
-    @test norm(Δlattice_constants) == sqrt(sum(deltas .^ 2))
-    @test norm(Δlattice_constants, 2) == sqrt(sum(deltas .^ 2))
-    @test norm(Δlattice_constants; p=2) == sqrt(sum(deltas .^ 2))
-
-    # Inf-norm
-    @test norm(Δlattice_constants, Inf) == maximum(abs.(deltas))
-    @test norm(Δlattice_constants; p=Inf) == maximum(abs.(deltas))
 end
 
 # ------ Unit cell computations

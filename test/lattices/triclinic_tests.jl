@@ -376,6 +376,15 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "convert(::TriclinicLatticeConstants)" begin
+    # --- Tests
+
+    x = TriclinicLatticeConstants((rand(6) .+ 0.1)...)
+
+    x_vector = convert(Vector, x)
+    @test x_vector == [x.a, x.b, x.c, x.α, x.β, x.γ]
+end
+
 @testset "-(::TriclinicLatticeConstants)" begin
     # --- Tests
 
@@ -384,28 +393,6 @@ end
     @test x - y == TriclinicLatticeConstantDeltas(
         x.a - y.a, x.b - y.b, x.c - y.c, x.α - y.α, x.β - y.β, x.γ - y.γ
     )
-end
-
-@testset "norm(::TriclinicLatticeConstants)" begin
-    # --- Preparations
-
-    constants_vector = abs.(rand(6)) .+ 1
-    lattice_constants = TriclinicLatticeConstants(constants_vector...)
-
-    # --- Tests
-
-    # 1-norm
-    @test norm(lattice_constants, 1) == sum(abs.(constants_vector))
-    @test norm(lattice_constants; p=1) == sum(abs.(constants_vector))
-
-    # 2-norm
-    @test norm(lattice_constants) == sqrt(sum(constants_vector .^ 2))
-    @test norm(lattice_constants, 2) == sqrt(sum(constants_vector .^ 2))
-    @test norm(lattice_constants; p=2) == sqrt(sum(constants_vector .^ 2))
-
-    # Inf-norm
-    @test norm(lattice_constants, Inf) == maximum(abs.(constants_vector))
-    @test norm(lattice_constants; p=Inf) == maximum(abs.(constants_vector))
 end
 
 @testset "lattice_system(::TriclinicLatticeConstants)" begin
@@ -862,33 +849,20 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "convert(::TriclinicLatticeConstantDeltas)" begin
+    # --- Tests
+
+    x = TriclinicLatticeConstantDeltas(rand(6)...)
+
+    x_vector = convert(Vector, x)
+    @test x_vector == [x.Δa, x.Δb, x.Δc, x.Δα, x.Δβ, x.Δγ]
+end
+
 @testset "lattice_system(::TriclinicConstantDeltas)" begin
     # --- Tests
 
     Δlattice_constants = TriclinicLatticeConstantDeltas(1, 2, 3, π / 5, 2π / 5, 3π / 5)
     @test lattice_system(Δlattice_constants) === triclinic
-end
-
-@testset "norm(::TriclinicLatticeConstantDeltas)" begin
-    # --- Preparations
-
-    deltas = randn(6)
-    Δlattice_constants = TriclinicLatticeConstantDeltas(deltas...)
-
-    # --- Tests
-
-    # 1-norm
-    @test norm(Δlattice_constants, 1) == sum(abs.(deltas))
-    @test norm(Δlattice_constants; p=1) == sum(abs.(deltas))
-
-    # 2-norm
-    @test norm(Δlattice_constants) == sqrt(sum(deltas .^ 2))
-    @test norm(Δlattice_constants, 2) == sqrt(sum(deltas .^ 2))
-    @test norm(Δlattice_constants; p=2) == sqrt(sum(deltas .^ 2))
-
-    # Inf-norm
-    @test norm(Δlattice_constants, Inf) == maximum(abs.(deltas))
-    @test norm(Δlattice_constants; p=Inf) == maximum(abs.(deltas))
 end
 
 # ------ Unit cell computations

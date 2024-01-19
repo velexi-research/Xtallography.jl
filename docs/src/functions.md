@@ -25,6 +25,7 @@ volume(::UnitCell)
 ### Unit Cell Standardization and Comparison Functions
 
 ```@docs
+isapprox(::LatticeConstants, ::LatticeConstants)
 conventional_cell
 is_equivalent_unit_cell
 is_supercell
@@ -38,6 +39,8 @@ standardize(::LatticeConstants)
 
 ```@docs
 lattice_system
+isapprox(::LatticeConstantDeltas, ::LatticeConstantDeltas)
+convert
 ```
 
 ### Lattice-Specific Functions
