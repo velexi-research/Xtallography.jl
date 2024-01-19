@@ -38,7 +38,7 @@ const ACOS_MINUS_ONE_THIRD = acos(-1 / 3)
 # ------ basic mathematical functions
 
 """
-    asin_(x::Real; rtol::Real) -> Float64
+    asin_(x::Real; atol::Real=√eps(1.0)) -> Float64
 
 Compute the arcsin of `x` with a tolerance for values of `x` that are slightly outside of
 the mathematical domain [-1, 1].
@@ -61,10 +61,10 @@ julia> asin_(-1 - eps(1.0)) == -π / 2
 true
 ```
 """
-function asin_(x::Real; rtol::Real=√eps(1.0))
-    if x > 1 && isapprox(x, 1; rtol=rtol)
+function asin_(x::Real; atol::Real=√eps(1.0))
+    if x > 1 && isapprox(x, 1; atol=atol)
         return π / 2
-    elseif x < -1 && isapprox(x, -1; rtol=rtol)
+    elseif x < -1 && isapprox(x, -1; atol=atol)
         return -π / 2
     else
         return asin(x)
@@ -72,7 +72,7 @@ function asin_(x::Real; rtol::Real=√eps(1.0))
 end
 
 """
-    acos_(x::Real; rtol::Real) -> Float64
+    acos_(x::Real; atol::Real=√eps(1.0)) -> Float64
 
 Compute the arccos of `x` with a tolerance for values of `x` that are slightly outside of
 the mathematical domain [-1, 1].
@@ -95,10 +95,10 @@ julia> acos_(-1 - eps(1.0)) == π
 true
 ```
 """
-function acos_(x::Real; rtol::Real=√eps(1.0))
-    if x > 1 && isapprox(x, 1; rtol=rtol)
+function acos_(x::Real; atol::Real=√eps(1.0))
+    if x > 1 && isapprox(x, 1; atol=atol)
         return 0
-    elseif x < -1 && isapprox(x, -1; rtol=rtol)
+    elseif x < -1 && isapprox(x, -1; atol=atol)
         return π
     else
         return acos(x)
