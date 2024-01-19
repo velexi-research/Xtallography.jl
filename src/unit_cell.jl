@@ -243,6 +243,20 @@ function isapprox(
     return false
 end
 
+"""
+    convert(::Type{<:Array}, lattice_constants::LatticeConstants)
+
+Convert `lattice_constants` to an `Array`. For each lattice system, the order of lattice
+constants in the array are in the conventional order:
+
+* triclinic: `[a, b, c, α, β, γ]`
+* monoclinic: `[a, b, c, β]`
+* orthorhombic: `[a, b, c]`
+* tetragonal: `[a, c]`
+* rhombohedral: `[a, α]`
+* hexagonal: `[a, c]`
+* cubic: `[a]`
+"""
 function convert(type::Type{T}, lattice_constants::LatticeConstants) where {T<:Array}
     return convert(
         type,
@@ -437,6 +451,20 @@ function isapprox(
     return false
 end
 
+"""
+    convert(::Type{<:Array}, Δlattice_constants::LatticeConstantDeltas)
+
+Convert `Δlattice_constants` to an `Array`. For each lattice system, the order of lattice
+constant deltas in the array are in the conventional order:
+
+* triclinic: `[Δa, Δb, Δc, Δα, Δβ, Δγ]`
+* monoclinic: `[Δa, Δb, Δc, Δβ]`
+* orthorhombic: `[Δa, Δb, Δc]`
+* tetragonal: `[Δa, Δc]`
+* rhombohedral: `[Δa, Δα]`
+* hexagonal: `[Δa, Δc]`
+* cubic: `[Δa]`
+"""
 function convert(type::Type{T}, Δlattice_constants::LatticeConstantDeltas) where {T<:Array}
     return convert(
         type,
