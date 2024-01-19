@@ -176,34 +176,21 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "convert(::RhombohedralLatticeConstants)" begin
+    # --- Tests
+
+    x = RhombohedralLatticeConstants((rand(2) .+ 1)...)
+
+    x_vector = convert(Vector, x)
+    @test x_vector == [x.a, x.α]
+end
+
 @testset "-(::RhombohedralLatticeConstants)" begin
     # --- Tests
 
     x = RhombohedralLatticeConstants(1, π / 6)
     y = RhombohedralLatticeConstants(2, π / 5)
     @test x - y == RhombohedralLatticeConstantDeltas(x.a - y.a, x.α - y.α)
-end
-
-@testset "norm(::RhombohedralLatticeConstants)" begin
-    # --- Preparations
-
-    constants_vector = abs.(rand(2)) .+ 1
-    lattice_constants = RhombohedralLatticeConstants(constants_vector...)
-
-    # --- Tests
-
-    # 1-norm
-    @test norm(lattice_constants, 1) == sum(abs.(constants_vector))
-    @test norm(lattice_constants; p=1) == sum(abs.(constants_vector))
-
-    # 2-norm
-    @test norm(lattice_constants) == sqrt(sum(constants_vector .^ 2))
-    @test norm(lattice_constants, 2) == sqrt(sum(constants_vector .^ 2))
-    @test norm(lattice_constants; p=2) == sqrt(sum(constants_vector .^ 2))
-
-    # Inf-norm
-    @test norm(lattice_constants, Inf) == maximum(abs.(constants_vector))
-    @test norm(lattice_constants; p=Inf) == maximum(abs.(constants_vector))
 end
 
 @testset "lattice_system(::RhombohedralLatticeConstants)" begin
@@ -284,33 +271,20 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "convert(::RhombohedralLatticeConstantDeltas)" begin
+    # --- Tests
+
+    x = RhombohedralLatticeConstantDeltas(rand(2)...)
+
+    x_vector = convert(Vector, x)
+    @test x_vector == [x.Δa, x.Δα]
+end
+
 @testset "lattice_system(::RhombohedralLatticeConstantDeltas)" begin
     # --- Tests
 
     Δlattice_constants = RhombohedralLatticeConstantDeltas(1, π / 5)
     @test lattice_system(Δlattice_constants) === rhombohedral
-end
-
-@testset "norm(::RhombohedralLatticeConstantDeltas)" begin
-    # --- Preparations
-
-    deltas = randn(2)
-    Δlattice_constants = RhombohedralLatticeConstantDeltas(deltas...)
-
-    # --- Tests
-
-    # 1-norm
-    @test norm(Δlattice_constants, 1) == sum(abs.(deltas))
-    @test norm(Δlattice_constants; p=1) == sum(abs.(deltas))
-
-    # 2-norm
-    @test norm(Δlattice_constants) == sqrt(sum(deltas .^ 2))
-    @test norm(Δlattice_constants, 2) == sqrt(sum(deltas .^ 2))
-    @test norm(Δlattice_constants; p=2) == sqrt(sum(deltas .^ 2))
-
-    # Inf-norm
-    @test norm(Δlattice_constants, Inf) == maximum(abs.(deltas))
-    @test norm(Δlattice_constants; p=Inf) == maximum(abs.(deltas))
 end
 
 # ------ Unit cell computations

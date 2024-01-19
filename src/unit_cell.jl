@@ -22,9 +22,9 @@ export LatticeConstants, LatticeConstantDeltas
 export UnitCell
 
 # Functions
-export isapprox, lattice_system, standardize
+export isapprox, convert
+export lattice_system, standardize
 export basis, volume, surface_area
-export norm
 export conventional_cell, reduced_cell
 export is_supercell, is_equivalent_unit_cell
 
@@ -220,35 +220,37 @@ end
 # ------ LatticeConstants functions
 
 import Base.isapprox
+import Base.convert
 import Base.:(-)
 import LinearAlgebra.norm
 using LinearAlgebra: LinearAlgebra
 
-# Default isapprox() implementation to allow comparison between lattice constants of
-# different lattice systems.
+"""
+    isapprox(x::LatticeConstants, y::LatticeConstants;
+             atol::Real=0, rtol::Real=atol>0 ? 0 : √eps)
+
+Inexact equality comparison between `LatticeConstants`. Two sets of lattice constants
+compare equal if all lattice constant values are within the tolerance bounds. For instance,
+`isapprox` returns `true` for `TetragonalLatticeConstants` if
+`isapprox(x.a - y.a; atol=atol, rtol=rtol)` and `isapprox(x.b - y.b; atol=atol, rtol=rtol)`.
+Returns `false` if `x` and `y` have different types.
+"""
 function isapprox(
     x::LatticeConstants, y::LatticeConstants; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps()
 )
+    # Default isapprox() implementation to allow comparison between lattice constants of
+    # different lattice systems.
     return false
 end
 
-"""
-    norm(lattice_constants::LatticeConstants; p::Real=2) -> Float64
-
-Compute the `p`-norm of `lattice_constants`.
-"""
-function norm(lattice_constants::LatticeConstants, p::Real)
-    return LinearAlgebra.norm(
+function convert(type::Type{T}, lattice_constants::LatticeConstants) where {T<:Array}
+    return convert(
+        type,
         [
             getfield(lattice_constants, name) for
             name in fieldnames(typeof(lattice_constants))
         ],
-        p,
     )
-end
-
-function norm(lattice_constants::LatticeConstants; p::Real=2)
-    return norm(lattice_constants, p)
 end
 
 """
@@ -409,37 +411,40 @@ end
 # ------ LatticeConstantDeltas functions
 
 import Base.isapprox
+import Base.convert
 import LinearAlgebra.norm
 using LinearAlgebra: LinearAlgebra
 
-# Default isapprox() implementation to allow comparison between deltas of lattice constants
-# for different lattice systems.
+"""
+    isapprox(Δx::LatticeConstantDeltas, Δy::LatticeConstantDeltas;
+             atol::Real=0, rtol::Real=atol>0 ? 0 : √eps)
+
+Inexact equality comparison between `LatticeConstantDeltas`. Two sets of lattice constant
+deltas compare equal if all lattice constant values are within the tolerance bounds. For
+instance, `isapprox` returns `true` for `TetragonalLatticeConstantDeltas` if
+`isapprox(Δx.a - Δy.a; atol=atol, rtol=rtol)` and
+`isapprox(Δx.b - Δy.b; atol=atol, rtol=rtol)`. Returns `false` if `Δx` and `Δy` have
+different types.
+"""
 function isapprox(
     x::LatticeConstantDeltas,
     y::LatticeConstantDeltas;
     atol::Real=0,
     rtol::Real=atol > 0 ? 0 : √eps(),
 )
+    # Default isapprox() implementation to allow comparison between deltas of lattice
+    # constants for different lattice systems.
     return false
 end
 
-"""
-    norm(Δlattice_constants::LatticeConstantDeltas; p::Real=2) -> Float64
-
-Compute the `p`-norm of `Δlattice_constants`.
-"""
-function norm(Δlattice_constants::LatticeConstantDeltas, p::Real)
-    return LinearAlgebra.norm(
+function convert(type::Type{T}, Δlattice_constants::LatticeConstantDeltas) where {T<:Array}
+    return convert(
+        type,
         [
             getfield(Δlattice_constants, name) for
             name in fieldnames(typeof(Δlattice_constants))
         ],
-        p,
     )
-end
-
-function norm(Δlattice_constants::LatticeConstantDeltas; p::Real=2)
-    return norm(Δlattice_constants, p)
 end
 
 # ------ UnitCell functions
@@ -913,7 +918,9 @@ end
     is_equivalent_unit_cell(
         unit_cell_test::UnitCell,
         unit_cell_ref::UnitCell;
-        tol::Real=1e-3
+        atol::Real=1e-3,
+        rtol::Real=atol > 0 ? 0 : 1e-3,
+        p::Real=2,
     ) -> Bool
 
 Check if the unit cell defined by `unit_cell_test` is equivalent to the unit cell defined
@@ -921,7 +928,10 @@ by `unit_cell_ref`.
 
 Keyword Arguments
 =================
-- `tol`: absolute tolerance of the deviation between the reduced unit cells defined by
+- `atol`: tolerance of the absolute difference between the reduced unit cells defined by
+  `unit_cell_test` and `unit_cell_ref`.
+
+- `rtol`: tolerance of the relative difference between the reduced unit cells defined by
   `unit_cell_test` and `unit_cell_ref`.
 
 Return values
@@ -944,24 +954,34 @@ true
 ```
 """
 function is_equivalent_unit_cell(
-    unit_cell_test::UnitCell, unit_cell_ref::UnitCell; tol::Real=1e-3
+    unit_cell_test::UnitCell,
+    unit_cell_ref::UnitCell;
+    atol::Real=1e-3,
+    rtol::Real=atol > 0 ? 0 : 1e-3,
 )
     # --- Check arguments
 
-    if tol <= 0
-        throw(ArgumentError("`tol` must be positive"))
+    if atol < 0
+        throw(ArgumentError("`atol` must be nonnegative"))
+    end
+
+    if rtol < 0
+        throw(ArgumentError("`rtol` must be nonnegative"))
     end
 
     # --- Compare reduced cells
 
-    return isapprox(reduced_cell(unit_cell_test), reduced_cell(unit_cell_ref); rtol=tol)
+    return isapprox(
+        reduced_cell(unit_cell_test), reduced_cell(unit_cell_ref); atol=atol, rtol=rtol
+    )
 end
 
 """
     is_equivalent_unit_cell(
         lattice_constants_test::LatticeConstants,
         lattice_constants_ref::LatticeConstants;
-        tol::Real=1e-3
+        atol::Real=1e-3,
+        rtol::Real=atol > 0 ? 0 : 1e-3,
     ) -> Bool
 
 Check if the primitive unit cell defined by `lattice_constants_test` is equivalent to the
@@ -988,13 +1008,15 @@ true
 function is_equivalent_unit_cell(
     lattice_constants_test::LatticeConstants,
     lattice_constants_ref::LatticeConstants;
-    tol::Real=1e-3,
+    atol::Real=1e-3,
+    rtol::Real=atol > 0 ? 0 : 1e-3,
 )
     # Compare primitive unit cells
     return is_equivalent_unit_cell(
         UnitCell(lattice_constants_test, primitive),
         UnitCell(lattice_constants_ref, primitive);
-        tol=tol,
+        atol=atol,
+        rtol=rtol,
     )
 end
 

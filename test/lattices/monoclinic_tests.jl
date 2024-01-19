@@ -256,6 +256,15 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "convert(::MonoclinicLatticeConstants)" begin
+    # --- Tests
+
+    x = MonoclinicLatticeConstants((rand(4) .+ 0.1)...)
+
+    x_vector = convert(Vector, x)
+    @test x_vector == [x.a, x.b, x.c, x.β]
+end
+
 @testset "-(::MonoclinicLatticeConstants)" begin
     # --- Tests
 
@@ -263,28 +272,6 @@ end
     y = MonoclinicLatticeConstants(2, 10, 20, π / 6)
     @test x - y ==
         MonoclinicLatticeConstantDeltas(x.a - y.a, x.b - y.b, x.c - y.c, x.β - y.β)
-end
-
-@testset "norm(::MonoclinicLatticeConstants)" begin
-    # --- Preparations
-
-    constants_vector = abs.(rand(4)) .+ 1
-    lattice_constants = MonoclinicLatticeConstants(constants_vector...)
-
-    # --- Tests
-
-    # 1-norm
-    @test norm(lattice_constants, 1) == sum(abs.(constants_vector))
-    @test norm(lattice_constants; p=1) == sum(abs.(constants_vector))
-
-    # 2-norm
-    @test norm(lattice_constants) == sqrt(sum(constants_vector .^ 2))
-    @test norm(lattice_constants, 2) == sqrt(sum(constants_vector .^ 2))
-    @test norm(lattice_constants; p=2) == sqrt(sum(constants_vector .^ 2))
-
-    # Inf-norm
-    @test norm(lattice_constants, Inf) == maximum(abs.(constants_vector))
-    @test norm(lattice_constants; p=Inf) == maximum(abs.(constants_vector))
 end
 
 @testset "lattice_system(::MonoclinicLatticeConstants)" begin
@@ -559,33 +546,20 @@ end
     @test !isapprox(x, y; atol=0.01, rtol=0.01)
 end
 
+@testset "convert(::MonoclinicLatticeConstantDeltas)" begin
+    # --- Tests
+
+    x = MonoclinicLatticeConstantDeltas(rand(4)...)
+
+    x_vector = convert(Vector, x)
+    @test x_vector == [x.Δa, x.Δb, x.Δc, x.Δβ]
+end
+
 @testset "lattice_system(::MonoclinicLatticeConstantDeltas)" begin
     # --- Tests
 
     Δlattice_constants = MonoclinicLatticeConstantDeltas(1, 2, 3, π / 5)
     @test lattice_system(Δlattice_constants) === monoclinic
-end
-
-@testset "norm(::MonoclinicLatticeConstantDeltas)" begin
-    # --- Preparations
-
-    deltas = randn(4)
-    Δlattice_constants = MonoclinicLatticeConstantDeltas(deltas...)
-
-    # --- Tests
-
-    # 1-norm
-    @test norm(Δlattice_constants, 1) == sum(abs.(deltas))
-    @test norm(Δlattice_constants; p=1) == sum(abs.(deltas))
-
-    # 2-norm
-    @test norm(Δlattice_constants) == sqrt(sum(deltas .^ 2))
-    @test norm(Δlattice_constants, 2) == sqrt(sum(deltas .^ 2))
-    @test norm(Δlattice_constants; p=2) == sqrt(sum(deltas .^ 2))
-
-    # Inf-norm
-    @test norm(Δlattice_constants, Inf) == maximum(abs.(deltas))
-    @test norm(Δlattice_constants; p=Inf) == maximum(abs.(deltas))
 end
 
 # ------ Unit cell computations
