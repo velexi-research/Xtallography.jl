@@ -244,7 +244,7 @@ end
 
 # ------ Unit cell computations
 
-import LinearAlgebra: det
+using LinearAlgebra: det
 
 function basis(lattice_constants::MonoclinicLatticeConstants)
     # Get lattice constants

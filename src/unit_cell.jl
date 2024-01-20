@@ -22,7 +22,7 @@ export LatticeConstants, LatticeConstantDeltas
 export UnitCell
 
 # Functions
-export isapprox, convert
+export isapprox, convert, (-)
 export lattice_system, standardize
 export basis, volume, surface_area
 export conventional_cell, reduced_cell
@@ -222,7 +222,6 @@ end
 import Base.isapprox
 import Base.convert
 import Base.:(-)
-import LinearAlgebra.norm
 using LinearAlgebra: LinearAlgebra
 
 """
