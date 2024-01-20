@@ -426,7 +426,6 @@ end
 
 import Base.isapprox
 import Base.convert
-import LinearAlgebra.norm
 using LinearAlgebra: LinearAlgebra
 
 """
