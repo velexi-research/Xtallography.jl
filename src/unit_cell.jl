@@ -211,6 +211,10 @@ end
 
 # ------ lattice methods
 
+function lattice_system(unit_cell::UnitCell)
+    return lattice_system(unit_cell.lattice_constants)
+end
+
 function is_bravais_lattice(unit_cell::UnitCell)
     return is_bravais_lattice(
         lattice_system(unit_cell.lattice_constants), unit_cell.centering
@@ -265,29 +269,6 @@ function convert(type::Type{T}, lattice_constants::LatticeConstants) where {T<:A
         ],
     )
 end
-
-"""
-    lattice_system(lattice_constants::LatticesConstants) -> LatticeSystem
-
-    lattice_system(Δlattice_constants::LatticesConstantDeltas) -> LatticeSystem
-
-Return the lattice system for a set of `lattice_constants` or `Δlattice_constants`.
-
-Return values
-=============
-- lattice system
-
-Examples
-========
-```jldoctest
-julia> lattice_system(HexagonalLatticeConstants(2, 4))
-Hexagonal()
-
-julia> lattice_system(CubicLatticeConstants(2))
-Cubic()
-```
-"""
-function lattice_system end
 
 """
     standardize(unit_cell::UnitCell) -> LatticeConstants
