@@ -268,9 +268,9 @@ const BRAVAIS_LATTICES = (
 # --- Functions/Methods
 
 """
-    lattice_system(lattice_constants::LatticesConstants) -> LatticeSystem
+    lattice_system(lattice_constants::LatticeConstants) -> LatticeSystem
 
-    lattice_system(Δlattice_constants::LatticesConstantDeltas) -> LatticeSystem
+    lattice_system(Δlattice_constants::LatticeConstantDeltas) -> LatticeSystem
 
     lattice_system(unit_cell::UnitCell) -> LatticeSystem
 
