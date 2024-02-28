@@ -31,7 +31,7 @@ export is_supercell, is_equivalent_unit_cell
 # --- Types
 
 """
-    LatticeConstants
+    LatticeConstants{T<:LatticeSystem}
 
 Supertype for lattice constants for the seven lattice systems in 3D
 
@@ -45,7 +45,7 @@ Subtypes
 abstract type LatticeConstants{T<:LatticeSystem} end
 
 """
-    LatticeConstantDeltas
+    LatticeConstantDeltas{T<:LatticeSystem}
 
 Supertype for lattice constant deltas for the seven lattice systems in 3D
 
