@@ -2,11 +2,13 @@ XtallographyUtils Release Notes
 ============================================================================================
 
 --------------------------------------------------------------------------------------------
-0.3.0 (2024-02-??)
+0.3.0 (2024-02-27)
 ==================
 * Add `LatticeSystem` parameter to `LatticeConstants` and `LatticeConstantDeltas` types.
 * Simplify implementation of `lattice_system()` methods.
+* Fix minimum angle for rhombohedral unit cells.
 * Update package documentation.
+* Remove unnecessary imports.
 
 --------------------------------------------------------------------------------------------
 0.2.0 (2024-01-19)
