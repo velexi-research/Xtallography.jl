@@ -31,7 +31,7 @@ export RHOMBOHEDRAL_MIN_ANGLE, RHOMBOHEDRAL_MAX_ANGLE
 
 # --- Constants
 
-const RHOMBOHEDRAL_MIN_ANGLE = π / 3
+const RHOMBOHEDRAL_MIN_ANGLE = 0
 const RHOMBOHEDRAL_MAX_ANGLE = 2π / 3
 
 # --- Types
@@ -49,7 +49,7 @@ Fields
 
 Supertype: [`LatticeConstants`](@ref)
 """
-struct RhombohedralLatticeConstants <: LatticeConstants
+struct RhombohedralLatticeConstants <: LatticeConstants{Rhombohedral}
     # Fields
     a::Float64
     α::Float64  # radians
@@ -89,7 +89,7 @@ Fields
 
 Supertype: [`LatticeConstantDeltas`](@ref)
 """
-struct RhombohedralLatticeConstantDeltas <: LatticeConstantDeltas
+struct RhombohedralLatticeConstantDeltas <: LatticeConstantDeltas{Rhombohedral}
     # Fields
     Δa::Float64
     Δα::Float64
@@ -120,10 +120,6 @@ function -(x::RhombohedralLatticeConstants, y::RhombohedralLatticeConstants)
     return RhombohedralLatticeConstantDeltas(x.a - y.a, x.α - y.α)
 end
 
-function lattice_system(::RhombohedralLatticeConstants)
-    return rhombohedral
-end
-
 # ------ LatticeConstantDeltas functions
 
 function isapprox(
@@ -134,10 +130,6 @@ function isapprox(
 )
     return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
            isapprox(x.Δα, y.Δα; atol=atol, rtol=rtol)
-end
-
-function lattice_system(::RhombohedralLatticeConstantDeltas)
-    return rhombohedral
 end
 
 # ------ Unit cell computations

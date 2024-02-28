@@ -39,7 +39,7 @@ Fields
 
 Supertype: [`LatticeConstants`](@ref)
 """
-struct TetragonalLatticeConstants <: LatticeConstants
+struct TetragonalLatticeConstants <: LatticeConstants{Tetragonal}
     # Fields
     a::Float64
     c::Float64
@@ -76,7 +76,7 @@ Fields
 
 Supertype: [`LatticeConstantDeltas`](@ref)
 """
-struct TetragonalLatticeConstantDeltas <: LatticeConstantDeltas
+struct TetragonalLatticeConstantDeltas <: LatticeConstantDeltas{Tetragonal}
     # Fields
     Δa::Float64
     Δc::Float64
@@ -107,10 +107,6 @@ function -(x::TetragonalLatticeConstants, y::TetragonalLatticeConstants)
     return TetragonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
 end
 
-function lattice_system(::TetragonalLatticeConstants)
-    return tetragonal
-end
-
 # ------ LatticeConstantDeltas functions
 
 function isapprox(
@@ -121,10 +117,6 @@ function isapprox(
 )
     return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
            isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol)
-end
-
-function lattice_system(::TetragonalLatticeConstantDeltas)
-    return tetragonal
 end
 
 # ------ Unit cell computations

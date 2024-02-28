@@ -37,12 +37,9 @@ Fields
 ======
 * `a`, `b`, `c`: lengths of the edges of the unit cell
 
-!!! note
-    By convention, edge lengths of the unit cell are ordered so that `a` <= `b` <= `c`.
-
 Supertype: [`LatticeConstants`](@ref)
 """
-struct OrthorhombicLatticeConstants <: LatticeConstants
+struct OrthorhombicLatticeConstants <: LatticeConstants{Orthorhombic}
     # Fields
     a::Float64
     b::Float64
@@ -84,7 +81,7 @@ Fields
 
 Supertype: [`LatticeConstantDeltas`](@ref)
 """
-struct OrthorhombicLatticeConstantDeltas <: LatticeConstantDeltas
+struct OrthorhombicLatticeConstantDeltas <: LatticeConstantDeltas{Orthorhombic}
     # Fields
     Δa::Float64
     Δb::Float64
@@ -115,10 +112,6 @@ end
 
 function -(x::OrthorhombicLatticeConstants, y::OrthorhombicLatticeConstants)
     return OrthorhombicLatticeConstantDeltas(x.a - y.a, x.b - y.b, x.c - y.c)
-end
-
-function lattice_system(::OrthorhombicLatticeConstants)
-    return orthorhombic
 end
 
 function standardize(lattice_constants::OrthorhombicLatticeConstants, centering::Centering)
@@ -154,10 +147,6 @@ function isapprox(
     return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
            isapprox(x.Δb, y.Δb; atol=atol, rtol=rtol) &&
            isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol)
-end
-
-function lattice_system(::OrthorhombicLatticeConstantDeltas)
-    return orthorhombic
 end
 
 # ------ Unit cell computations

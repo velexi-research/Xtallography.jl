@@ -22,7 +22,7 @@ export LatticeConstants, LatticeConstantDeltas
 export UnitCell
 
 # Functions
-export isapprox, convert
+export isapprox, convert, (-)
 export lattice_system, standardize
 export basis, volume, surface_area
 export conventional_cell, reduced_cell
@@ -31,7 +31,7 @@ export is_supercell, is_equivalent_unit_cell
 # --- Types
 
 """
-    LatticeConstants
+    LatticeConstants{T<:LatticeSystem}
 
 Supertype for lattice constants for the seven lattice systems in 3D
 
@@ -42,10 +42,10 @@ Subtypes
 [`RhombohedralLatticeConstants`](@ref), [`HexagonalLatticeConstants`](@ref),
 [`CubicLatticeConstants`](@ref)
 """
-abstract type LatticeConstants end
+abstract type LatticeConstants{T<:LatticeSystem} end
 
 """
-    LatticeConstantDeltas
+    LatticeConstantDeltas{T<:LatticeSystem}
 
 Supertype for lattice constant deltas for the seven lattice systems in 3D
 
@@ -56,7 +56,7 @@ Subtypes
 [`RhombohedralLatticeConstantDeltas`](@ref), [`HexagonalLatticeConstantDeltas`](@ref),
 [`CubicLatticeConstantDeltas`](@ref)
 """
-abstract type LatticeConstantDeltas end
+abstract type LatticeConstantDeltas{T<:LatticeSystem} end
 
 using AngleBetweenVectors: angle
 using LinearAlgebra: norm, cross, dot
@@ -211,6 +211,20 @@ end
 
 # ------ lattice methods
 
+function lattice_system(lattice_constants::LatticeConstants{T}) where {T<:LatticeSystem}
+    return T()
+end
+
+function lattice_system(
+    Δlattice_constant::LatticeConstantDeltas{T}
+) where {T<:LatticeSystem}
+    return T()
+end
+
+function lattice_system(unit_cell::UnitCell)
+    return lattice_system(unit_cell.lattice_constants)
+end
+
 function is_bravais_lattice(unit_cell::UnitCell)
     return is_bravais_lattice(
         lattice_system(unit_cell.lattice_constants), unit_cell.centering
@@ -222,7 +236,6 @@ end
 import Base.isapprox
 import Base.convert
 import Base.:(-)
-import LinearAlgebra.norm
 using LinearAlgebra: LinearAlgebra
 
 """
@@ -268,29 +281,6 @@ function convert(type::Type{T}, lattice_constants::LatticeConstants) where {T<:A
 end
 
 """
-    lattice_system(lattice_constants::LatticesConstants) -> LatticeSystem
-
-    lattice_system(Δlattice_constants::LatticesConstantDeltas) -> LatticeSystem
-
-Return the lattice system for a set of `lattice_constants` or `Δlattice_constants`.
-
-Return values
-=============
-- lattice system
-
-Examples
-========
-```jldoctest
-julia> lattice_system(HexagonalLatticeConstants(2, 4))
-Hexagonal()
-
-julia> lattice_system(CubicLatticeConstants(2))
-Cubic()
-```
-"""
-function lattice_system end
-
-"""
     standardize(unit_cell::UnitCell) -> LatticeConstants
 
 Standardize the lattice constants and centering for `unit_cell`.
@@ -304,18 +294,34 @@ Standardize the lattice constants and centering for `unit_cell`.
 !!! note
 
     Lattice constant standardizations are based on the conventions provided in the Table
-    3.1.4.1. of the International Tables for Crystallography (2016). For triclinic
-    lattices, the lattice constants are standardized using the following conventions:
+    3.1.4.1. of the International Tables for Crystallography (2016).
 
-    - `a` ≤ `b` ≤ `c`
+    * For triclinic lattices, the lattice constants are standardized using the following
+      conventions:
 
-    - all three angles are acute (Type I cell) or all three angles are non-acute (Type II
-      cell)
+      - `a` ≤ `b` ≤ `c`
 
-    - angles sorted in increasing order when edge lengths are equal
-        - `α` ≤ `β` when `a` = `b`
-        - `β` ≤ `γ` when `b` = `c`
-        - `α` ≤ `β` ≤ `γ` when `a` = `b` = `c`
+      - all three angles are acute (Type I cell) or all three angles are non-acute (Type II
+        cell)
+
+      - angles sorted in increasing order when edge lengths are equal
+          - `α` ≤ `β` when `a` = `b`
+          - `β` ≤ `γ` when `b` = `c`
+          - `α` ≤ `β` ≤ `γ` when `a` = `b` = `c`
+
+    * For monoclinic lattices, the lattice constants are standardized using the following
+      conventions:
+
+      - `a` ≤ `c`
+
+      - π/2 ≤ β ≤ π
+
+    * For orthorhombic lattices, the lattice constants are standardized using the following
+      conventions:
+
+      - Primitive, body-centered, and face-centered unit cells: `a` ≤ `b` ≤ `c`
+
+      - Base-C centered unit cells: `a` ≤ `b`, no constraints on `c`
 
 !!! note
 
@@ -426,7 +432,6 @@ end
 
 import Base.isapprox
 import Base.convert
-import LinearAlgebra.norm
 using LinearAlgebra: LinearAlgebra
 
 """

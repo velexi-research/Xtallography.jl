@@ -51,7 +51,7 @@ Fields
 
 Supertype: [`LatticeConstants`](@ref)
 """
-struct MonoclinicLatticeConstants <: LatticeConstants
+struct MonoclinicLatticeConstants <: LatticeConstants{Monoclinic}
     # Fields
     a::Float64  # arbitrary units
     b::Float64  # arbitrary units
@@ -101,7 +101,7 @@ Fields
 
 Supertype: [`LatticeConstantDeltas`](@ref)
 """
-struct MonoclinicLatticeConstantDeltas <: LatticeConstantDeltas
+struct MonoclinicLatticeConstantDeltas <: LatticeConstantDeltas{Monoclinic}
     # Fields
     Δa::Float64
     Δb::Float64
@@ -134,10 +134,6 @@ end
 
 function -(x::MonoclinicLatticeConstants, y::MonoclinicLatticeConstants)
     return MonoclinicLatticeConstantDeltas(x.a - y.a, x.b - y.b, x.c - y.c, x.β - y.β)
-end
-
-function lattice_system(::MonoclinicLatticeConstants)
-    return monoclinic
 end
 
 function standardize(lattice_constants::MonoclinicLatticeConstants, centering::Centering)
@@ -238,13 +234,9 @@ function isapprox(
            isapprox(x.Δβ, y.Δβ; atol=atol, rtol=rtol)
 end
 
-function lattice_system(::MonoclinicLatticeConstantDeltas)
-    return monoclinic
-end
-
 # ------ Unit cell computations
 
-import LinearAlgebra: det
+using LinearAlgebra: det
 
 function basis(lattice_constants::MonoclinicLatticeConstants)
     # Get lattice constants

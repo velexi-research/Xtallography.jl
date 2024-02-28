@@ -692,6 +692,14 @@ end
 
 # ------ lattice methods
 
+@testset "lattice_system(::UnitCell)" begin
+    # --- Tests
+
+    @test lattice_system(UnitCell(CubicLatticeConstants(1), primitive)) == cubic
+    @test lattice_system(UnitCell(TetragonalLatticeConstants(1, 2), base_centered)) ==
+        tetragonal
+end
+
 @testset "is_bravais_lattice(::UnitCell)" begin
     # --- Tests
 

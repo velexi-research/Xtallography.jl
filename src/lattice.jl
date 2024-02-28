@@ -194,7 +194,13 @@ Type representing base centering that is the type of [`base_centered`](@ref)
 
 !!! note
 
-    By convention, base-centering is on the C-face of the unit cell.
+    By convention, base-centering is
+
+    * on the C-face of the unit cell for orthorhombic lattice systems
+
+    and
+
+    * on the B-face of the unit cell for monoclinic lattice systems.
 
 Supertype: [`Centering`](@ref)
 """
@@ -266,6 +272,35 @@ const BRAVAIS_LATTICES = (
 )
 
 # --- Functions/Methods
+
+"""
+    lattice_system(lattice_constants::LatticeConstants) -> LatticeSystem
+
+    lattice_system(Δlattice_constants::LatticeConstantDeltas) -> LatticeSystem
+
+    lattice_system(unit_cell::UnitCell) -> LatticeSystem
+
+Return the lattice system for a set of `lattice_constants`, `Δlattice_constants` or
+`unit_cell`.
+
+Return values
+=============
+- lattice system
+
+Examples
+========
+```jldoctest
+julia> lattice_system(HexagonalLatticeConstants(2, 4))
+Hexagonal()
+
+julia> lattice_system(CubicLatticeConstants(2))
+Cubic()
+
+julia> lattice_system(UnitCell(OrthorhombicLatticeConstants(2, 3, 4), face_centered))
+Orthorhombic()
+```
+"""
+function lattice_system end
 
 """
     is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering) -> Bool

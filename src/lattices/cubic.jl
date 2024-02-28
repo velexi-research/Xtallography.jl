@@ -32,7 +32,7 @@ Fields
 
 Supertype: [`LatticeConstants`](@ref)
 """
-struct CubicLatticeConstants <: LatticeConstants
+struct CubicLatticeConstants <: LatticeConstants{Cubic}
     # Fields
     a::Float64
 
@@ -64,7 +64,7 @@ Fields
 
 Supertype: [`LatticeConstantDeltas`](@ref)
 """
-struct CubicLatticeConstantDeltas <: LatticeConstantDeltas
+struct CubicLatticeConstantDeltas <: LatticeConstantDeltas{Cubic}
     # Fields
     Δa::Float64
 
@@ -93,10 +93,6 @@ function -(x::CubicLatticeConstants, y::CubicLatticeConstants)
     return CubicLatticeConstantDeltas(x.a - y.a)
 end
 
-function lattice_system(::CubicLatticeConstants)
-    return cubic
-end
-
 # ------ LatticeConstantDeltas functions
 
 function isapprox(
@@ -106,10 +102,6 @@ function isapprox(
     rtol::Real=atol > 0 ? 0 : √eps(),
 )
     return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol)
-end
-
-function lattice_system(::CubicLatticeConstantDeltas)
-    return cubic
 end
 
 # ------ Unit cell computations
