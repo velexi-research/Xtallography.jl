@@ -194,7 +194,13 @@ Type representing base centering that is the type of [`base_centered`](@ref)
 
 !!! note
 
-    By convention, base-centering is on the C-face of the unit cell.
+    By convention, base-centering is
+
+    * on the C-face of the unit cell for orthorhombic lattice systems
+
+    and
+
+    * on the B-face of the unit cell for monoclinic lattice systems.
 
 Supertype: [`Centering`](@ref)
 """
