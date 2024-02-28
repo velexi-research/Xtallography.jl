@@ -309,6 +309,13 @@ Standardize the lattice constants and centering for `unit_cell`.
           - `β` ≤ `γ` when `b` = `c`
           - `α` ≤ `β` ≤ `γ` when `a` = `b` = `c`
 
+    * For monoclinic lattices, the lattice constants are standardized using the following
+      conventions:
+
+      - `a` ≤ `c`
+
+      - π/2 ≤ β ≤ π
+
     * For orthorhombic lattices, the lattice constants are standardized using the following
       conventions:
 
