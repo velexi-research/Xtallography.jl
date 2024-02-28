@@ -2,6 +2,13 @@ XtallographyUtils Release Notes
 ============================================================================================
 
 --------------------------------------------------------------------------------------------
+0.3.0 (2024-02-??)
+==================
+* Add `LatticeSystem` parameter to `LatticeConstants` and `LatticeConstantDeltas` types.
+* Simplify implementation of `lattice_system()` methods.
+* Update package documentation.
+
+--------------------------------------------------------------------------------------------
 0.2.0 (2024-01-19)
 ==================
 * Add `convert(::LatticeConstants)` and `convert(::LatticeConstantDeltas)` methods.
