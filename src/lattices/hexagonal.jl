@@ -32,7 +32,7 @@ Fields
 
 Supertype: [`LatticeConstants`](@ref)
 """
-struct HexagonalLatticeConstants <: LatticeConstants
+struct HexagonalLatticeConstants <: LatticeConstants{Hexagonal}
     # Fields
     a::Float64
     c::Float64
@@ -69,7 +69,7 @@ Fields
 
 Supertype: [`LatticeConstantDeltas`](@ref)
 """
-struct HexagonalLatticeConstantDeltas <: LatticeConstantDeltas
+struct HexagonalLatticeConstantDeltas <: LatticeConstantDeltas{Hexagonal}
     # Fields
     Δa::Float64
     Δc::Float64
@@ -100,10 +100,6 @@ function -(x::HexagonalLatticeConstants, y::HexagonalLatticeConstants)
     return HexagonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
 end
 
-function lattice_system(::HexagonalLatticeConstants)
-    return hexagonal
-end
-
 # ------ LatticeConstantDeltas functions
 
 function isapprox(
@@ -114,10 +110,6 @@ function isapprox(
 )
     return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
            isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol)
-end
-
-function lattice_system(::HexagonalLatticeConstantDeltas)
-    return hexagonal
 end
 
 # ------ Unit cell computations

@@ -62,7 +62,7 @@ Fields
 
 Supertype: [`LatticeConstants`](@ref)
 """
-struct TriclinicLatticeConstants <: LatticeConstants
+struct TriclinicLatticeConstants <: LatticeConstants{Triclinic}
     # Fields
     a::Float64
     b::Float64
@@ -122,7 +122,7 @@ Fields
 
 Supertype: [`LatticeConstantDeltas`](@ref)
 """
-struct TriclinicLatticeConstantDeltas <: LatticeConstantDeltas
+struct TriclinicLatticeConstantDeltas <: LatticeConstantDeltas{Triclinic}
     # Fields
     Δa::Float64
     Δb::Float64
@@ -163,10 +163,6 @@ function -(x::TriclinicLatticeConstants, y::TriclinicLatticeConstants)
     return TriclinicLatticeConstantDeltas(
         x.a - y.a, x.b - y.b, x.c - y.c, x.α - y.α, x.β - y.β, x.γ - y.γ
     )
-end
-
-function lattice_system(::TriclinicLatticeConstants)
-    return triclinic
 end
 
 function standardize(lattice_constants::TriclinicLatticeConstants, centering::Centering)
@@ -342,10 +338,6 @@ function isapprox(
            isapprox(x.Δα, y.Δα; atol=atol, rtol=rtol) &&
            isapprox(x.Δβ, y.Δβ; atol=atol, rtol=rtol) &&
            isapprox(x.Δγ, y.Δγ; atol=atol, rtol=rtol)
-end
-
-function lattice_system(::TriclinicLatticeConstantDeltas)
-    return triclinic
 end
 
 # ------ Unit cell computations
@@ -694,7 +686,7 @@ function convert_to_mI_basis_to_lattice_constants(
 
     # Check IUCr conventions
     if m_β < π / 2
-        throw(ErrorException("m_β > 0"))
+        throw(ErrorException("m_β < π/2"))
     end
 
     m_lattice_constants, _ = standardize(
@@ -1500,7 +1492,7 @@ function convert_to_mC_basis_to_lattice_constants(
 
     # Check IUCr conventions
     if m_β < π / 2
-        throw(ErrorException("m_β > 0"))
+        throw(ErrorException("m_β < π/2"))
     end
 
     return MonoclinicLatticeConstants(m_a, m_b, m_c, m_β)

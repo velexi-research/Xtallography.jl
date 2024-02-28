@@ -42,7 +42,7 @@ Subtypes
 [`RhombohedralLatticeConstants`](@ref), [`HexagonalLatticeConstants`](@ref),
 [`CubicLatticeConstants`](@ref)
 """
-abstract type LatticeConstants end
+abstract type LatticeConstants{T<:LatticeSystem} end
 
 """
     LatticeConstantDeltas
@@ -56,7 +56,7 @@ Subtypes
 [`RhombohedralLatticeConstantDeltas`](@ref), [`HexagonalLatticeConstantDeltas`](@ref),
 [`CubicLatticeConstantDeltas`](@ref)
 """
-abstract type LatticeConstantDeltas end
+abstract type LatticeConstantDeltas{T<:LatticeSystem} end
 
 using AngleBetweenVectors: angle
 using LinearAlgebra: norm, cross, dot
@@ -211,6 +211,16 @@ end
 
 # ------ lattice methods
 
+function lattice_system(lattice_constants::LatticeConstants{T}) where {T<:LatticeSystem}
+    return T()
+end
+
+function lattice_system(
+    Δlattice_constant::LatticeConstantDeltas{T}
+) where {T<:LatticeSystem}
+    return T()
+end
+
 function lattice_system(unit_cell::UnitCell)
     return lattice_system(unit_cell.lattice_constants)
 end
@@ -284,18 +294,27 @@ Standardize the lattice constants and centering for `unit_cell`.
 !!! note
 
     Lattice constant standardizations are based on the conventions provided in the Table
-    3.1.4.1. of the International Tables for Crystallography (2016). For triclinic
-    lattices, the lattice constants are standardized using the following conventions:
+    3.1.4.1. of the International Tables for Crystallography (2016).
 
-    - `a` ≤ `b` ≤ `c`
+    * For triclinic lattices, the lattice constants are standardized using the following
+      conventions:
 
-    - all three angles are acute (Type I cell) or all three angles are non-acute (Type II
-      cell)
+      - `a` ≤ `b` ≤ `c`
 
-    - angles sorted in increasing order when edge lengths are equal
-        - `α` ≤ `β` when `a` = `b`
-        - `β` ≤ `γ` when `b` = `c`
-        - `α` ≤ `β` ≤ `γ` when `a` = `b` = `c`
+      - all three angles are acute (Type I cell) or all three angles are non-acute (Type II
+        cell)
+
+      - angles sorted in increasing order when edge lengths are equal
+          - `α` ≤ `β` when `a` = `b`
+          - `β` ≤ `γ` when `b` = `c`
+          - `α` ≤ `β` ≤ `γ` when `a` = `b` = `c`
+
+    * For orthorhombic lattices, the lattice constants are standardized using the following
+      conventions:
+
+      - Primitive, body-centered, and face-centered unit cells: `a` ≤ `b` ≤ `c`
+
+      - Base-C centered unit cells: `a` ≤ `b`, no constraints on `c`
 
 !!! note
 
