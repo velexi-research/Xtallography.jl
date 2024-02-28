@@ -37,9 +37,6 @@ Fields
 ======
 * `a`, `b`, `c`: lengths of the edges of the unit cell
 
-!!! note
-    By convention, edge lengths of the unit cell are ordered so that `a` <= `b` <= `c`.
-
 Supertype: [`LatticeConstants`](@ref)
 """
 struct OrthorhombicLatticeConstants <: LatticeConstants
