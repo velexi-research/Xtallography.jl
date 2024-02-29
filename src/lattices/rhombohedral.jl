@@ -167,7 +167,7 @@ end
 function conventional_cell(::Rhombohedral, unit_cell::UnitCell)
     # --- Check arguments
 
-    conventional_cell_arg_checks(unit_cell)
+    conventional_cell_check_args(unit_cell)
 
     # --- Preparations
 
