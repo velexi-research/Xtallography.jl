@@ -46,24 +46,6 @@ using XtallographyUtils
     @test lattice_constants.b == b
     @test lattice_constants.c == c
     @test lattice_constants.β == β
-
-    # ------ edge cases for β
-
-    # β = 0
-    lattice_constants = MonoclinicLatticeConstants(a, b, c, 0)
-
-    @test lattice_constants.a == a
-    @test lattice_constants.b == b
-    @test lattice_constants.c == c
-    @test lattice_constants.β == 0
-
-    # β = π
-    lattice_constants = MonoclinicLatticeConstants(a, b, c, π)
-
-    @test lattice_constants.a == a
-    @test lattice_constants.b == b
-    @test lattice_constants.c == c
-    @test lattice_constants.β ≈ π
 end
 
 @testset "MonoclinicLatticeConstants constructor: invalid arguments" begin
@@ -175,6 +157,21 @@ end
 
     # ------ β
 
+    # β = 0
+    local error = nothing
+    local error_message = ""
+    try
+        lattice_constants = MonoclinicLatticeConstants(a, b, c, 0)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa ArgumentError
+
+    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
+    @test startswith(error_message, expected_error)
+
     # β < 0
     local error = nothing
     local error_message = ""
@@ -187,7 +184,7 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `β` must lie in the interval [0, π]"
+    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
     @test startswith(error_message, expected_error)
 
     # β > π
@@ -202,7 +199,22 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `β` must lie in the interval [0, π]"
+    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
+    @test startswith(error_message, expected_error)
+
+    # β = π
+    local error = nothing
+    local error_message = ""
+    try
+        lattice_constants = MonoclinicLatticeConstants(a, b, c, π)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa ArgumentError
+
+    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
     @test startswith(error_message, expected_error)
 end
 

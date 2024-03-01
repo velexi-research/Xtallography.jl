@@ -65,8 +65,8 @@ struct RhombohedralLatticeConstants <: LatticeConstants{Rhombohedral}
             throw(ArgumentError("`a` must be positive"))
         end
 
-        if α < 0 || α > π
-            throw(ArgumentError("`α` must lie in the interval [0, π]"))
+        if α <= 0 || α >= π
+            throw(ArgumentError("`α` must satisfy 0 < α < π"))
         end
 
         # --- Construct and return new RhombohedralLatticeConstants
@@ -167,7 +167,7 @@ end
 function conventional_cell(::Rhombohedral, unit_cell::UnitCell)
     # --- Check arguments
 
-    conventional_cell_arg_checks(unit_cell)
+    conventional_cell_check_args(unit_cell)
 
     # --- Preparations
 

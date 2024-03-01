@@ -381,7 +381,7 @@ julia> standardize(OrthorhombicLatticeConstants(3, 2, 1), base_centered)
 function standardize(lattice_constants::LatticeConstants, centering::Centering)
     # --- Check arguments
 
-    standardize_arg_checks(lattice_constants, centering)
+    standardize_check_args(lattice_constants, centering)
 
     # --- By default, no standardization is performed
 
@@ -407,14 +407,14 @@ OrthorhombicLatticeConstants(1.0, 2.0, 3.0)
 function standardize(lattice_constants::LatticeConstants)
     # --- Check arguments
 
-    standardize_arg_checks(lattice_constants, primitive)
+    standardize_check_args(lattice_constants, primitive)
 
     # Return standardized lattice constants for primitive unit cell
     standardized_lattice_constants, _ = standardize(lattice_constants, primitive)
     return standardized_lattice_constants
 end
 
-function standardize_arg_checks(lattice_constants::LatticeConstants, centering::Centering)
+function standardize_check_args(lattice_constants::LatticeConstants, centering::Centering)
     # --- Check arguments
 
     if !is_bravais_lattice(lattice_system(lattice_constants), centering)
@@ -609,7 +609,7 @@ true
 function conventional_cell(unit_cell::UnitCell)
     # --- Check arguments
 
-    conventional_cell_arg_checks(unit_cell)
+    conventional_cell_check_args(unit_cell)
 
     # --- Compute IUCr conventional cells for lattice systems with limiting cases that
     #     change the Bravais lattice type
@@ -632,7 +632,7 @@ function conventional_cell(unit_cell::UnitCell)
     return unit_cell
 end
 
-function conventional_cell_arg_checks(unit_cell::UnitCell)
+function conventional_cell_check_args(unit_cell::UnitCell)
     # --- Check arguments
 
     if !is_bravais_lattice(lattice_system(unit_cell.lattice_constants), unit_cell.centering)

@@ -42,20 +42,6 @@ using XtallographyUtils
 
     @test lattice_constants.a == a
     @test lattice_constants.α == α
-
-    # ------ edge cases for α
-
-    # α = 0
-    lattice_constants = RhombohedralLatticeConstants(a, 0)
-
-    @test lattice_constants.a == a
-    @test lattice_constants.α == 0
-
-    # α = π
-    lattice_constants = RhombohedralLatticeConstants(a, π)
-
-    @test lattice_constants.a == a
-    @test lattice_constants.α ≈ π
 end
 
 @testset "RhombohedralLatticeConstants constructor: invalid arguments" begin
@@ -101,6 +87,21 @@ end
 
     # ------ α
 
+    # α = 0
+    local error = nothing
+    local error_message = ""
+    try
+        lattice_constants = RhombohedralLatticeConstants(a, 0)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa ArgumentError
+
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
+    @test startswith(error_message, expected_error)
+
     # α < 0
     local error = nothing
     local error_message = ""
@@ -113,7 +114,22 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `α` must lie in the interval [0, π]"
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
+    @test startswith(error_message, expected_error)
+
+    # α = π
+    local error = nothing
+    local error_message = ""
+    try
+        lattice_constants = RhombohedralLatticeConstants(a, π)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa ArgumentError
+
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
     @test startswith(error_message, expected_error)
 
     # α > π
@@ -128,7 +144,7 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `α` must lie in the interval [0, π]"
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
     @test startswith(error_message, expected_error)
 end
 

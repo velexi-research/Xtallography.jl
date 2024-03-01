@@ -50,68 +50,6 @@ using XtallographyUtils
     @test lattice_constants.α == α
     @test lattice_constants.β == β
     @test lattice_constants.γ == γ
-
-    # ------ edge cases for angles
-
-    # α = 0
-    lattice_constants = TriclinicLatticeConstants(a, b, c, 0, β, γ)
-
-    @test lattice_constants.a == a
-    @test lattice_constants.b == b
-    @test lattice_constants.c == c
-    @test lattice_constants.α == 0
-    @test lattice_constants.β == β
-    @test lattice_constants.γ == γ
-
-    # α = π
-    lattice_constants = TriclinicLatticeConstants(a, b, c, π, β, γ)
-
-    @test lattice_constants.a == a
-    @test lattice_constants.b == b
-    @test lattice_constants.c == c
-    @test lattice_constants.α ≈ π
-    @test lattice_constants.β == β
-    @test lattice_constants.γ == γ
-
-    # β = 0
-    lattice_constants = TriclinicLatticeConstants(a, b, c, α, 0, γ)
-
-    @test lattice_constants.a == a
-    @test lattice_constants.b == b
-    @test lattice_constants.c == c
-    @test lattice_constants.α == α
-    @test lattice_constants.β == 0
-    @test lattice_constants.γ == γ
-
-    # β = π
-    lattice_constants = TriclinicLatticeConstants(a, b, c, α, π, γ)
-
-    @test lattice_constants.a == a
-    @test lattice_constants.b == b
-    @test lattice_constants.c == c
-    @test lattice_constants.α == α
-    @test lattice_constants.β ≈ π
-    @test lattice_constants.γ == γ
-
-    # γ = 0
-    lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, 0)
-
-    @test lattice_constants.a == a
-    @test lattice_constants.b == b
-    @test lattice_constants.c == c
-    @test lattice_constants.α == α
-    @test lattice_constants.β == β
-    @test lattice_constants.γ == 0
-
-    # γ = π
-    lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, π)
-
-    @test lattice_constants.a == a
-    @test lattice_constants.b == b
-    @test lattice_constants.c == c
-    @test lattice_constants.α == α
-    @test lattice_constants.β == β
-    @test lattice_constants.γ ≈ π
 end
 
 @testset "TriclinicLatticeConstants constructor: invalid arguments" begin
@@ -225,6 +163,21 @@ end
 
     # ------ α
 
+    # α = 0
+    local error = nothing
+    local error_message = ""
+    try
+        lattice_constants = TriclinicLatticeConstants(a, b, c, 0, β, γ)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa ArgumentError
+
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
+    @test startswith(error_message, expected_error)
+
     # α < 0
     local error = nothing
     local error_message = ""
@@ -237,7 +190,22 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `α` must lie in the interval [0, π]"
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
+    @test startswith(error_message, expected_error)
+
+    # α = π
+    local error = nothing
+    local error_message = ""
+    try
+        lattice_constants = TriclinicLatticeConstants(a, b, c, π, β, γ)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa ArgumentError
+
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
     @test startswith(error_message, expected_error)
 
     # α > π
@@ -252,10 +220,25 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `α` must lie in the interval [0, π]"
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
     @test startswith(error_message, expected_error)
 
     # ------ β
+
+    # β = 0
+    local error = nothing
+    local error_message = ""
+    try
+        lattice_constants = TriclinicLatticeConstants(a, b, c, α, 0, γ)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa ArgumentError
+
+    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
+    @test startswith(error_message, expected_error)
 
     # β < 0
     local error = nothing
@@ -269,7 +252,22 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `β` must lie in the interval [0, π]"
+    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
+    @test startswith(error_message, expected_error)
+
+    # β = π
+    local error = nothing
+    local error_message = ""
+    try
+        lattice_constants = TriclinicLatticeConstants(a, b, c, α, 0, γ)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa ArgumentError
+
+    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
     @test startswith(error_message, expected_error)
 
     # β > π
@@ -284,10 +282,25 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `β` must lie in the interval [0, π]"
+    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
     @test startswith(error_message, expected_error)
 
     # ------ γ
+
+    # γ = 0
+    local error = nothing
+    local error_message = ""
+    try
+        lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, 0)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa ArgumentError
+
+    expected_error = "ArgumentError: `γ` must satisfy 0 < γ < π"
+    @test startswith(error_message, expected_error)
 
     # γ < 0
     local error = nothing
@@ -301,7 +314,22 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `γ` must lie in the interval [0, π]"
+    expected_error = "ArgumentError: `γ` must satisfy 0 < γ < π"
+    @test startswith(error_message, expected_error)
+
+    # γ = π
+    local error = nothing
+    local error_message = ""
+    try
+        lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, π)
+    catch error
+        bt = catch_backtrace()
+        error_message = sprint(showerror, error, bt)
+    end
+
+    @test error isa ArgumentError
+
+    expected_error = "ArgumentError: `γ` must satisfy 0 < γ < π"
     @test startswith(error_message, expected_error)
 
     # γ > π
@@ -316,7 +344,7 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `γ` must lie in the interval [0, π]"
+    expected_error = "ArgumentError: `γ` must satisfy 0 < γ < π"
     @test startswith(error_message, expected_error)
 end
 

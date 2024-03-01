@@ -90,16 +90,16 @@ struct TriclinicLatticeConstants <: LatticeConstants{Triclinic}
             throw(ArgumentError("`c` must be positive"))
         end
 
-        if α < 0 || α > π
-            throw(ArgumentError("`α` must lie in the interval [0, π]"))
+        if α <= 0 || α >= π
+            throw(ArgumentError("`α` must satisfy 0 < α < π"))
         end
 
-        if β < 0 || β > π
-            throw(ArgumentError("`β` must lie in the interval [0, π]"))
+        if β <= 0 || β >= π
+            throw(ArgumentError("`β` must satisfy 0 < β < π"))
         end
 
-        if γ < 0 || γ > π
-            throw(ArgumentError("`γ` must lie in the interval [0, π]"))
+        if γ <= 0 || γ >= π
+            throw(ArgumentError("`γ` must satisfy 0 < γ < π"))
         end
 
         # --- Construct and return new TriclinicLatticeConstants
@@ -168,7 +168,7 @@ end
 function standardize(lattice_constants::TriclinicLatticeConstants, centering::Centering)
     # --- Check arguments
 
-    standardize_arg_checks(lattice_constants, centering)
+    standardize_check_args(lattice_constants, centering)
 
     # --- Preparations
 
@@ -404,7 +404,7 @@ end
 function conventional_cell(::Triclinic, unit_cell::UnitCell)
     # --- Check arguments
 
-    conventional_cell_arg_checks(unit_cell)
+    conventional_cell_check_args(unit_cell)
 
     # --- Preparations
 
