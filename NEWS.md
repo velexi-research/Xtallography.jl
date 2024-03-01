@@ -2,6 +2,12 @@ XtallographyUtils Release Notes
 ============================================================================================
 
 --------------------------------------------------------------------------------------------
+0.3.1 (2024-03-01)
+==================
+* Fix bugs in angle constraints for `TriclinicLatticeConstants`,
+  `MonoclinicLatticeConstants`, `RhombohedralLatticeConstants` types.
+
+--------------------------------------------------------------------------------------------
 0.3.0 (2024-02-27)
 ==================
 * Add `LatticeSystem` parameter to `LatticeConstants` and `LatticeConstantDeltas` types.
