@@ -77,8 +77,8 @@ struct MonoclinicLatticeConstants <: LatticeConstants{Monoclinic}
             throw(ArgumentError("`c` must be positive"))
         end
 
-        if β < 0 || β > π
-            throw(ArgumentError("`β` must lie in the interval [0, π]"))
+        if β <= 0 || β >= π
+            throw(ArgumentError("`β` must satisfy 0 < β < π"))
         end
 
         # --- Construct MonoclinicLatticeConstants object
