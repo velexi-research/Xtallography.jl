@@ -99,7 +99,7 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < 2π / 3"
     @test startswith(error_message, expected_error)
 
     # α < 0
@@ -114,14 +114,14 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < 2π / 3"
     @test startswith(error_message, expected_error)
 
-    # α = π
+    # α = 2π / 3
     local error = nothing
     local error_message = ""
     try
-        lattice_constants = RhombohedralLatticeConstants(a, π)
+        lattice_constants = RhombohedralLatticeConstants(a, 2π / 3)
     catch error
         bt = catch_backtrace()
         error_message = sprint(showerror, error, bt)
@@ -129,10 +129,10 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < 2π / 3"
     @test startswith(error_message, expected_error)
 
-    # α > π
+    # α > 2π / 3
     local error = nothing
     local error_message = ""
     try
@@ -144,7 +144,7 @@ end
 
     @test error isa ArgumentError
 
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
+    expected_error = "ArgumentError: `α` must satisfy 0 < α < 2π / 3"
     @test startswith(error_message, expected_error)
 end
 
