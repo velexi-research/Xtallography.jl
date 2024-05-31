@@ -90,15 +90,15 @@ struct TriclinicLatticeConstants <: LatticeConstants{Triclinic}
             throw(ArgumentError("`c` must be positive"))
         end
 
-        if α <= 0 || α >= π
+        if α <= TRICLINIC_MIN_ANGLE || α >= TRICLINIC_MAX_ANGLE
             throw(ArgumentError("`α` must satisfy 0 < α < π"))
         end
 
-        if β <= 0 || β >= π
+        if β <= TRICLINIC_MIN_ANGLE || β >= TRICLINIC_MAX_ANGLE
             throw(ArgumentError("`β` must satisfy 0 < β < π"))
         end
 
-        if γ <= 0 || γ >= π
+        if γ <= TRICLINIC_MIN_ANGLE || γ >= TRICLINIC_MAX_ANGLE
             throw(ArgumentError("`γ` must satisfy 0 < γ < π"))
         end
 

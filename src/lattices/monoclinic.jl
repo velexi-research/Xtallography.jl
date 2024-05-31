@@ -77,7 +77,7 @@ struct MonoclinicLatticeConstants <: LatticeConstants{Monoclinic}
             throw(ArgumentError("`c` must be positive"))
         end
 
-        if β <= 0 || β >= π
+        if β <= MONOCLINIC_MIN_ANGLE || β >= MONOCLINIC_MAX_ANGLE
             throw(ArgumentError("`β` must satisfy 0 < β < π"))
         end
 
