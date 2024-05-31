@@ -32,8 +32,8 @@ export MONOCLINIC_MIN_ANGLE, MONOCLINIC_MAX_ANGLE
 
 # --- Constants
 
-const MONOCLINIC_MIN_ANGLE = π / 2
-const MONOCLINIC_MAX_ANGLE = 2π / 3
+const MONOCLINIC_MIN_ANGLE = 0
+const MONOCLINIC_MAX_ANGLE = π
 
 # --- Types
 

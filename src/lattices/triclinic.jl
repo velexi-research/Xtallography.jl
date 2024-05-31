@@ -37,8 +37,8 @@ export TRICLINIC_MIN_ANGLE, TRICLINIC_MAX_ANGLE
 
 # --- Constants
 
-const TRICLINIC_MIN_ANGLE = π / 3
-const TRICLINIC_MAX_ANGLE = 2π / 3
+const TRICLINIC_MIN_ANGLE = 0
+const TRICLINIC_MAX_ANGLE = π
 
 # --- Types
 
