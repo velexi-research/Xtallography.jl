@@ -2,6 +2,13 @@ XtallographyUtils Release Notes
 ============================================================================================
 
 --------------------------------------------------------------------------------------------
+0.3.2 (2024-05-30)
+==================
+* Fix bugs in angle constraints for `TriclinicLatticeConstants`,
+  `MonoclinicLatticeConstants`, `RhombohedralLatticeConstants` types.
+* Update package infrastructure files (`Project.toml`, `CI.yaml`, `.ignore`).
+
+--------------------------------------------------------------------------------------------
 0.3.1 (2024-03-01)
 ==================
 * Fix bugs in angle constraints for `TriclinicLatticeConstants`,
