@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 """
-Types and functions that support lattice computations
+Types and functions that support unit cell computations
 """
 # --- Exports
 
