@@ -106,6 +106,7 @@ docs:
 clean:
 	@echo Removing coverage files
 	find . -name "*.jl.*.cov" -exec rm -f {} \;
+	find . -name "*.coverage" -exec rm -f {} \;
 
 ## Remove all automatically generated files and directories (e.g., coverage files, package
 ## documentation, and `Manifest.toml` files).
