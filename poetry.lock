@@ -371,6 +371,35 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "juliacall"
+version = "0.9.24"
+description = "Julia and Python in seamless harmony"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "juliacall-0.9.24-py3-none-any.whl", hash = "sha256:f1d7b718228c477aeba770290647f3b2d0052f683da891b4e9f88c1e1da0a394"},
+    {file = "juliacall-0.9.24.tar.gz", hash = "sha256:31bed223489b535e4e8db46bfff4596350c24f757b9c2d17296c07397f75948b"},
+]
+
+[package.dependencies]
+juliapkg = ">=0.1.8,<0.2.0"
+
+[[package]]
+name = "juliapkg"
+version = "0.1.16"
+description = "Julia version manager and package manager"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "juliapkg-0.1.16-py3-none-any.whl", hash = "sha256:def06f89ec1f27e290b6b4ad856290a8fdcfe257f002fbe1becdf3ba0ad4579c"},
+    {file = "juliapkg-0.1.16.tar.gz", hash = "sha256:f26cc314f2a3194428bf7492270b1c371194ce288806ffbac5baa0eb9468a120"},
+]
+
+[package.dependencies]
+filelock = ">=3.16,<4.0"
+semver = ">=3.0,<4.0"
+
+[[package]]
 name = "mando"
 version = "0.7.1"
 description = "Create Python CLI apps with little to no effort at all!"
@@ -836,6 +865,17 @@ mando = ">=0.6,<0.8"
 toml = ["tomli (>=2.0.1)"]
 
 [[package]]
+name = "semver"
+version = "3.0.4"
+description = "Python helper for Semantic Versioning (https://semver.org)"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "semver-3.0.4-py3-none-any.whl", hash = "sha256:9c824d87ba7f7ab4a1890799cec8596f15c1241cb473404ea1cb0c55e4b04746"},
+    {file = "semver-3.0.4.tar.gz", hash = "sha256:afc7d8c584a5ed0a11033af086e8af226a9c0b206f313e0301f8dd7b6b589602"},
+]
+
+[[package]]
 name = "six"
 version = "1.17.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -966,4 +1006,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "0acd872833f6738143de5c643b27cd52532ced0aaac720ab5782adfe4fa17b83"
+content-hash = "2f7cc954578b0d47c24ae92483d97d44e8cb18a917cc53f3dc6b68eb326ec021"
