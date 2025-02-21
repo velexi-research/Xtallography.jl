@@ -16,7 +16,7 @@ The rhombohedral module defines classes and methods specific to rhombohedral lat
 import math
 
 # Local packages/modules
-from . import jl
+from .. import jl
 from .core import LatticeSystem, UnitCell
 
 

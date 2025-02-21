@@ -13,7 +13,7 @@ The hexagonal module defines classes and methods specific to hexagonal lattices.
 # --- Imports
 
 # Local packages/modules
-from . import jl
+from .. import jl
 from .core import LatticeSystem, UnitCell
 
 

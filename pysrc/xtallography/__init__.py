@@ -19,4 +19,5 @@ import juliacall
 
 # --- Initialize JuliaCall
 
-jl = juliacall.newmodule("PyXtallographyTools")
+jl = juliacall.newmodule("PyXtallography")
+jl.seval("using XtallographyUtils")

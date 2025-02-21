@@ -40,7 +40,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
         Prepare for test.
         """
         # Initialize JuliaCall
-        self.jl = juliacall.newmodule("PyPxrdTest")
+        self.jl = juliacall.newmodule("PyXtallographyTest")
         self.jl.seval("using XtallographyUtils")
 
     def tearDown(self):

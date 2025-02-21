@@ -14,8 +14,6 @@ It provides implementations of lattice-specific types and methods.
 # --- Imports
 
 # Local packages/modules
-from .. import jl
-
 from .core import (
     LatticeSystem,
     Centering,
@@ -34,11 +32,6 @@ from .tetragonal import TetragonalUnitCell
 from .rhombohedral import RhombohedralUnitCell
 from .hexagonal import HexagonalUnitCell
 from .cubic import CubicUnitCell
-
-
-# --- Initialize JuliaCall
-
-jl.seval("using XtallographyUtils")
 
 
 # --- Exports

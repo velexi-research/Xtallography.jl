@@ -18,7 +18,7 @@ import unittest
 import pytest
 
 # Local packages/modules
-from xtallography.lattices import jl
+from xtallography import jl
 from xtallography.lattices import LatticeSystem, Centering, OrthorhombicUnitCell
 
 

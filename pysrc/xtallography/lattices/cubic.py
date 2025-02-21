@@ -13,7 +13,7 @@ The cubic module defines classes and methods specific to cubic lattices.
 # --- Imports
 
 # Local packages/modules
-from . import jl
+from .. import jl
 from .core import LatticeSystem, Centering, UnitCell
 
 

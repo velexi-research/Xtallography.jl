@@ -16,7 +16,7 @@ The monoclinic module defines classes and methods specific to monoclinic lattice
 import math
 
 # Local packages/modules
-from . import jl
+from .. import jl
 from .core import LatticeSystem, Centering, UnitCell
 
 

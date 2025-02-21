@@ -19,7 +19,7 @@ from enum import auto, StrEnum
 import math
 
 # Local packages/modules
-from . import jl
+from .. import jl
 
 
 # --- Types
