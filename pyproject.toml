@@ -1,14 +1,63 @@
 [tool.poetry]
-name = "XtallographyUtils"
+name = "Xtallography"
 version = "0.4.0"
 description = "Library of utility functions for analysis of 3D crystals."
 license = "Apache-2.0"
 readme = "README.md"
 authors = ["Kevin T. Chu <kevin@velexi.com>"]
+packages = [
+    { include = "pxrd", from = "pysrc" },
+]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 pre-commit = "^4"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.32.0"
+black = "^25.1.0"
+flake8 = "^7.1.2"
+pre-commit = "^4.1.0"
+radon = "^6.0.1"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+pdoc = "^15.0.1"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+coverage = "^7.6.12"
+pytest = "^8.3.4"
+pytest-cov = "^6.0.0"
+pytest-xdist = "^3.6.1"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra --doctest-modules --cov --cov-report="
+testpaths = [
+    "pysrc",
+    "pysrc/tests"
+]
+doctest_optionflags = [
+    "NORMALIZE_WHITESPACE",
+    "IGNORE_EXCEPTION_DETAIL",
+    "ALLOW_UNICODE",
+    "ALLOW_BYTES",
+]
+norecursedirs = ["docs", "extras", "spikes"]
+
+[tool.coverage.run]
+source = ["pysrc/"]
+
+[tool.coverage.report]
+omit = ["*/tests/*"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
