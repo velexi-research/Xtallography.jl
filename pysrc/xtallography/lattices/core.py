@@ -75,39 +75,39 @@ class Centering(StrEnum):
         return list(map(lambda c: c.value, cls))
 
 
-# ----- BravaisLattice
+# ----- Lattice
 
 
-BravaisLattice = namedtuple("BravaisLattice", "lattice_system centering")
+Lattice = namedtuple("Lattice", "lattice_system centering")
 
 
 # Constants
 BRAVAIS_LATTICES = (
-    BravaisLattice(LatticeSystem.TRICLINIC, Centering.PRIMITIVE),
-    BravaisLattice(LatticeSystem.MONOCLINIC, Centering.PRIMITIVE),
-    BravaisLattice(LatticeSystem.MONOCLINIC, Centering.BASE_CENTERED),
-    BravaisLattice(LatticeSystem.MONOCLINIC, Centering.BODY_CENTERED),
-    BravaisLattice(LatticeSystem.ORTHORHOMBIC, Centering.PRIMITIVE),
-    BravaisLattice(LatticeSystem.ORTHORHOMBIC, Centering.BASE_CENTERED),
-    BravaisLattice(LatticeSystem.ORTHORHOMBIC, Centering.BODY_CENTERED),
-    BravaisLattice(LatticeSystem.ORTHORHOMBIC, Centering.FACE_CENTERED),
-    BravaisLattice(LatticeSystem.TETRAGONAL, Centering.PRIMITIVE),
-    BravaisLattice(LatticeSystem.TETRAGONAL, Centering.BODY_CENTERED),
-    BravaisLattice(LatticeSystem.RHOMBOHEDRAL, Centering.PRIMITIVE),
-    BravaisLattice(LatticeSystem.HEXAGONAL, Centering.PRIMITIVE),
-    BravaisLattice(LatticeSystem.CUBIC, Centering.PRIMITIVE),
-    BravaisLattice(LatticeSystem.CUBIC, Centering.BODY_CENTERED),
-    BravaisLattice(LatticeSystem.CUBIC, Centering.FACE_CENTERED),
+    Lattice(LatticeSystem.TRICLINIC, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.MONOCLINIC, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.MONOCLINIC, Centering.BASE_CENTERED),
+    Lattice(LatticeSystem.MONOCLINIC, Centering.BODY_CENTERED),
+    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.BASE_CENTERED),
+    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.BODY_CENTERED),
+    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.FACE_CENTERED),
+    Lattice(LatticeSystem.TETRAGONAL, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.TETRAGONAL, Centering.BODY_CENTERED),
+    Lattice(LatticeSystem.RHOMBOHEDRAL, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.HEXAGONAL, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.CUBIC, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.CUBIC, Centering.BODY_CENTERED),
+    Lattice(LatticeSystem.CUBIC, Centering.FACE_CENTERED),
 )
 
 
 # Functions
-def create_bravais_lattice(
+def create_lattice(
     lattice_system: str | None = None,
     centering: str | None = None,
-) -> BravaisLattice:
+) -> Lattice:
     """
-    Create validated BravaisLattice object.
+    Create a Lattice object.
 
     Parameters
     ----------
@@ -117,7 +117,7 @@ def create_bravais_lattice(
 
     Return value
     ------------
-    lattice: BravaisLattice object with the specified `lattice_system` and `centering`
+    lattice: Lattice object with the specified `lattice_system` and `centering`
     """
     # --- Check arguments
 
@@ -139,10 +139,10 @@ def create_bravais_lattice(
     # Enforce that `centering` is lowercase
     centering = centering.lower()
 
-    # --- Construct BravaisLattice
+    # --- Construct Lattice
 
     try:
-        lattice = BravaisLattice(LatticeSystem(lattice_system), Centering(centering))
+        lattice = Lattice(LatticeSystem(lattice_system), Centering(centering))
 
     except ValueError as error:
         if "is not a valid LatticeSystem" in str(error):
@@ -160,17 +160,17 @@ def create_bravais_lattice(
     return lattice
 
 
-def standardize_bravais_lattice(lattice: BravaisLattice) -> BravaisLattice:
+def standardize_lattice(lattice: Lattice) -> Lattice:
     """
     Standardize and validate field values for `lattice`.
 
     Parameters
     ----------
-    lattice: BravaisLattice to standardize
+    lattice: Lattice to standardize
 
     Return value
     ------------
-    lattice: standardized BravaisLattice
+    lattice: standardized Lattice
     """
     # --- Validate types
 
@@ -186,9 +186,9 @@ def standardize_bravais_lattice(lattice: BravaisLattice) -> BravaisLattice:
     for field, value in zip(lattice._fields, lattice):
         standardized_field_values[field] = value.lower()
 
-    # --- Construct BravaisLattice with standardized field values
+    # --- Construct Lattice with standardized field values
 
-    lattice = create_bravais_lattice(
+    lattice = create_lattice(
         standardized_field_values["lattice_system"],
         standardized_field_values["centering"],
     )
@@ -196,13 +196,13 @@ def standardize_bravais_lattice(lattice: BravaisLattice) -> BravaisLattice:
     return lattice
 
 
-def is_bravais_lattice(lattice: BravaisLattice) -> bool:
+def is_bravais_lattice(lattice: Lattice) -> bool:
     """
     Return `True` if `lattice` is a valid Bravais lattice; return `False` otherwise.
 
     Parameters
     ----------
-    lattice: BravaisLattice to check
+    lattice: Lattice to check
     """
     return lattice in BRAVAIS_LATTICES
 
@@ -232,7 +232,7 @@ class UnitCell(ABC):
         # --- Check arguments
 
         # Validate that (lattice_system, centering) is a valid Bravais lattice
-        if not is_bravais_lattice(BravaisLattice(lattice_system, centering)):
+        if not is_bravais_lattice(Lattice(lattice_system, centering)):
             raise ValueError(
                 f"('{lattice_system}', '{centering}') is not a valid Bravais lattice."
             )
@@ -278,7 +278,7 @@ class UnitCell(ABC):
 # Functions
 # DEPRECATED
 def is_valid_unit_cell(
-    lattice: BravaisLattice, unit_cell: dict, allow_edge_cases: bool = False
+    lattice: Lattice, unit_cell: dict, allow_edge_cases: bool = False
 ) -> bool:
     """
     Return `True` if `unit_cell` defines lattice constants for `lattice`; otherwise,
@@ -290,10 +290,10 @@ def is_valid_unit_cell(
     """
     # --- Check arguments
 
-    # Check `lattice` is a `BravaisLattice` type
-    if not isinstance(lattice, BravaisLattice):
+    # Check `lattice` is a `Lattice` type
+    if not isinstance(lattice, Lattice):
         raise ValueError(
-            f"`lattice` must be a `BravaisLattice` object. (lattice={lattice})"
+            f"`lattice` must be a `Lattice` object. (lattice={lattice})"
         )
 
     # Check `lattice` is a valid Bravais lattice

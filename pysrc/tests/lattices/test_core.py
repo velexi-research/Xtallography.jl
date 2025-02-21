@@ -20,7 +20,7 @@ import unittest
 import juliacall
 import pytest
 import xtallography
-from xtallography.lattices import LatticeSystem, Centering, BravaisLattice
+from xtallography.lattices import LatticeSystem, Centering, Lattice
 
 # Local packages/modules
 
@@ -97,9 +97,9 @@ class test_xtallography_lattices_core(unittest.TestCase):
         assert self.jl.isa(centering_jl, self.jl.FaceCentered)
 
     @staticmethod
-    def test_BravaisLattice():
+    def test_Lattice():
         """
-        Test `BravaisLattice` type.
+        Test `Lattice` type.
         """
         # --- Tests
 
@@ -107,68 +107,68 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # field values provided as LatticeSystem and Centering types
         try:
-            BravaisLattice(LatticeSystem.CUBIC, Centering.PRIMITIVE)
+            Lattice(LatticeSystem.CUBIC, Centering.PRIMITIVE)
             assert True
         except Exception:
-            pytest.fail("BravaisLattice() constructor raised unexpected error")
+            pytest.fail("Lattice() constructor raised unexpected error")
 
         # field values provided as strings
         try:
-            BravaisLattice("cubic", "primitive")
+            Lattice("cubic", "primitive")
             assert True
         except Exception:
-            pytest.fail("BravaisLattice() constructor raised unexpected error")
+            pytest.fail("Lattice() constructor raised unexpected error")
 
         # ------ Invalid field values
 
         # Nonsense `system` and `centering` values
         #
-        # Note: BravaisLattice() constructor doesn't validate values
+        # Note: Lattice() constructor doesn't validate values
         try:
-            BravaisLattice("abc", "def")
+            Lattice("abc", "def")
             assert True
         except Exception:
-            pytest.fail("BravaisLattice() constructor raised unexpected error")
+            pytest.fail("Lattice() constructor raised unexpected error")
 
         # `system` value has wrong type
         #
-        # Note: BravaisLattice() constructor doesn't validate value types
+        # Note: Lattice() constructor doesn't validate value types
         try:
-            BravaisLattice(1, "def")
+            Lattice(1, "def")
             assert True
         except Exception:
-            pytest.fail("BravaisLattice() constructor raised unexpected error")
+            pytest.fail("Lattice() constructor raised unexpected error")
 
         # `centering` value has wrong type
         #
-        # Note: BravaisLattice() constructor doesn't validate value types
+        # Note: Lattice() constructor doesn't validate value types
         try:
-            BravaisLattice("abc", None)
+            Lattice("abc", None)
             assert True
         except Exception:
-            pytest.fail("BravaisLattice() constructor raised unexpected error")
+            pytest.fail("Lattice() constructor raised unexpected error")
 
     @staticmethod
-    def test_create_bravais_lattice():
+    def test_create_lattice():
         """
-        Test `create_bravais_lattice()`.
+        Test `create_lattice()`.
         """
         # --- Tests
 
         # Arguments valid and lowercase
-        lattice = xtallography.lattices.create_bravais_lattice("cubic", "primitive")
+        lattice = xtallography.lattices.create_lattice("cubic", "primitive")
 
         assert lattice.lattice_system == LatticeSystem.CUBIC
         assert lattice.centering == Centering.PRIMITIVE
 
         # Arguments valid but not lowercase
-        lattice = xtallography.lattices.create_bravais_lattice("cuBIc", "pRIMitIVe")
+        lattice = xtallography.lattices.create_lattice("cuBIc", "pRIMitIVe")
 
         assert lattice.lattice_system == LatticeSystem.CUBIC
         assert lattice.centering == Centering.PRIMITIVE
 
         # Arguments provided as keyword arguments
-        lattice = xtallography.lattices.create_bravais_lattice(
+        lattice = xtallography.lattices.create_lattice(
             lattice_system="monoclinic",
             centering="body_centered",
         )
@@ -177,7 +177,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
         assert lattice.centering == Centering.BODY_CENTERED
 
         # Arguments provided as LatticeSystem and Centering types
-        lattice = xtallography.lattices.create_bravais_lattice(
+        lattice = xtallography.lattices.create_lattice(
             LatticeSystem.CUBIC, Centering.PRIMITIVE
         )
 
@@ -185,50 +185,50 @@ class test_xtallography_lattices_core(unittest.TestCase):
         assert lattice.centering == Centering.PRIMITIVE
 
     @staticmethod
-    def test_create_bravais_lattice_invalid_args():
+    def test_create_lattice_invalid_args():
         """
-        Test argument checks for `create_bravais_lattice()`.
+        Test argument checks for `create_lattice()`.
         """
         # --- Tests
 
         # default arguments
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.create_bravais_lattice()
+            xtallography.lattices.create_lattice()
 
         expected_error = "`lattice_system` must be a string. (lattice_system=None)"
         assert expected_error in str(exception_info)
 
         # valid `system`, default `centering`
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.create_bravais_lattice("cubic")
+            xtallography.lattices.create_lattice("cubic")
 
         expected_error = "`centering` must be a string. (centering=None)"
         assert expected_error in str(exception_info)
 
         # default `system`, valid `centering` (via keyword argument)
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.create_bravais_lattice(centering="primitive")
+            xtallography.lattices.create_lattice(centering="primitive")
 
         expected_error = "`lattice_system` must be a string. (lattice_system=None)"
         assert expected_error in str(exception_info)
 
         # `system` has wrong type
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.create_bravais_lattice(1, "def")
+            xtallography.lattices.create_lattice(1, "def")
 
         expected_error = "`lattice_system` must be a string. (lattice_system=1)"
         assert expected_error in str(exception_info)
 
         # `centering` has wrong type
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.create_bravais_lattice("abc", None)
+            xtallography.lattices.create_lattice("abc", None)
 
         expected_error = "`centering` must be a string. (centering=None)"
         assert expected_error in str(exception_info)
 
         # Nonsense `system` and `centering` values
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.create_bravais_lattice("abc", "def")
+            xtallography.lattices.create_lattice("abc", "def")
 
         expected_error = (
             f"`lattice_system` must be one of "
@@ -239,7 +239,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # Nonsense `centering` value
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.create_bravais_lattice("hexagonal", "def")
+            xtallography.lattices.create_lattice("hexagonal", "def")
 
         expected_error = (
             "`centering` must be one of "
@@ -249,16 +249,16 @@ class test_xtallography_lattices_core(unittest.TestCase):
         assert expected_error in str(exception_info)
 
     @staticmethod
-    def test_standardize_bravais_lattice():
+    def test_standardize_lattice():
         """
-        Test `standardize_bravais_lattice()`.
+        Test `standardize_lattice()`.
         """
         # --- Tests
 
         # Field values are valid and already standardized
-        lattice = BravaisLattice("cubic", "primitive")
+        lattice = Lattice("cubic", "primitive")
 
-        lattice = xtallography.lattices.standardize_bravais_lattice(lattice)
+        lattice = xtallography.lattices.standardize_lattice(lattice)
 
         assert isinstance(lattice.lattice_system, LatticeSystem)
         assert lattice.lattice_system == LatticeSystem.CUBIC
@@ -267,9 +267,9 @@ class test_xtallography_lattices_core(unittest.TestCase):
         assert lattice.centering == Centering.PRIMITIVE
 
         # Field values are valid but not standardized
-        lattice = BravaisLattice("cuBIc", "pRIMitIVe")
+        lattice = Lattice("cuBIc", "pRIMitIVe")
 
-        lattice = xtallography.lattices.standardize_bravais_lattice(lattice)
+        lattice = xtallography.lattices.standardize_lattice(lattice)
 
         assert isinstance(lattice.lattice_system, LatticeSystem)
         assert lattice.lattice_system == LatticeSystem.CUBIC
@@ -278,15 +278,15 @@ class test_xtallography_lattices_core(unittest.TestCase):
         assert lattice.centering == Centering.PRIMITIVE
 
     @staticmethod
-    def test_standardize_bravais_lattice_invalid_args():
+    def test_standardize_lattice_invalid_args():
         """
-        Test argument checks for `standardize_bravais_lattice()`.
+        Test argument checks for `standardize_lattice()`.
         """
         # --- Tests
 
         # `system` has wrong type
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.standardize_bravais_lattice(BravaisLattice(1, "def"))
+            xtallography.lattices.standardize_lattice(Lattice(1, "def"))
 
         expected_error = (
             "`lattice.lattice_system` must be a string. (lattice.lattice_system=1)"
@@ -295,8 +295,8 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # `centering` has wrong type
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.standardize_bravais_lattice(
-                BravaisLattice("abc", None)
+            xtallography.lattices.standardize_lattice(
+                Lattice("abc", None)
             )
 
         expected_error = (
@@ -306,8 +306,8 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # Nonsense `system` and `centering` values
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.standardize_bravais_lattice(
-                BravaisLattice("abc", "def")
+            xtallography.lattices.standardize_lattice(
+                Lattice("abc", "def")
             )
 
         expected_error = (
@@ -319,8 +319,8 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # Nonsense `centering` value
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.standardize_bravais_lattice(
-                BravaisLattice("hexagonal", "def")
+            xtallography.lattices.standardize_lattice(
+                Lattice("hexagonal", "def")
             )
 
         expected_error = (
@@ -340,89 +340,89 @@ class test_xtallography_lattices_core(unittest.TestCase):
         # --------- triclinic
 
         # (triclinic, primitive)
-        lattice = BravaisLattice("triclinic", "primitive")
+        lattice = Lattice("triclinic", "primitive")
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # --------- monoclinic
 
         # (monoclinic, primitive)
-        lattice = BravaisLattice("monoclinic", "primitive")
+        lattice = Lattice("monoclinic", "primitive")
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # (monoclinic, body_centered)
-        lattice = BravaisLattice("monoclinic", "body_centered")
+        lattice = Lattice("monoclinic", "body_centered")
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # (monoclinic, base_centered)
-        lattice = BravaisLattice("monoclinic", "base_centered")
+        lattice = Lattice("monoclinic", "base_centered")
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # --------- orthorhombic
 
         # (orthorhombic, primitive)
-        lattice = BravaisLattice("orthorhombic", Centering.PRIMITIVE)
+        lattice = Lattice("orthorhombic", Centering.PRIMITIVE)
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # (orthorhombic, body_centered)
-        lattice = BravaisLattice(LatticeSystem.ORTHORHOMBIC, "body_centered")
+        lattice = Lattice(LatticeSystem.ORTHORHOMBIC, "body_centered")
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # (orthorhombic, base_centered)
-        lattice = BravaisLattice(LatticeSystem.ORTHORHOMBIC, Centering.BASE_CENTERED)
+        lattice = Lattice(LatticeSystem.ORTHORHOMBIC, Centering.BASE_CENTERED)
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # (orthorhombic, face_centered)
-        lattice = BravaisLattice("orthorhombic", "face_centered")
+        lattice = Lattice("orthorhombic", "face_centered")
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # --------- tetragonal
 
         # (tetragonal, primitive)
-        lattice = BravaisLattice("tetragonal", Centering.PRIMITIVE)
+        lattice = Lattice("tetragonal", Centering.PRIMITIVE)
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # (tetragonal, body_centered)
-        lattice = BravaisLattice(LatticeSystem.TETRAGONAL, Centering.BODY_CENTERED)
+        lattice = Lattice(LatticeSystem.TETRAGONAL, Centering.BODY_CENTERED)
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # --------- rhomobohedral
 
         # (rhombohedral, primitive)
-        lattice = BravaisLattice("rhombohedral", Centering.PRIMITIVE)
+        lattice = Lattice("rhombohedral", Centering.PRIMITIVE)
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # --------- hexagonal
 
         # (hexagonal, primitive)
-        lattice = BravaisLattice("hexagonal", "primitive")
+        lattice = Lattice("hexagonal", "primitive")
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # --------- cubic
 
         # (cubic, primitive)
-        lattice = BravaisLattice("cubic", "primitive")
+        lattice = Lattice("cubic", "primitive")
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # (cubic, body_centered)
-        lattice = BravaisLattice(LatticeSystem.CUBIC, "body_centered")
+        lattice = Lattice(LatticeSystem.CUBIC, "body_centered")
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
         # (cubic, face_centered)
-        lattice = BravaisLattice("cubic", "face_centered")
+        lattice = Lattice("cubic", "face_centered")
 
         assert xtallography.lattices.is_bravais_lattice(lattice)
 
@@ -436,21 +436,21 @@ class test_xtallography_lattices_core(unittest.TestCase):
         # --------- triclinic
 
         # (triclinic, body_centered)
-        lattice = BravaisLattice(LatticeSystem.TRICLINIC, Centering.BODY_CENTERED)
+        lattice = Lattice(LatticeSystem.TRICLINIC, Centering.BODY_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # (triclinic, base_centered)
-        lattice = BravaisLattice(LatticeSystem.TRICLINIC, Centering.BASE_CENTERED)
+        lattice = Lattice(LatticeSystem.TRICLINIC, Centering.BASE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # (triclinic, face_centered)
-        lattice = BravaisLattice(LatticeSystem.TRICLINIC, Centering.FACE_CENTERED)
+        lattice = Lattice(LatticeSystem.TRICLINIC, Centering.FACE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # --------- monoclinic
 
         # (monoclinic, face_centered)
-        lattice = BravaisLattice(LatticeSystem.MONOCLINIC, Centering.FACE_CENTERED)
+        lattice = Lattice(LatticeSystem.MONOCLINIC, Centering.FACE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # --------- orthorhombic
@@ -460,45 +460,45 @@ class test_xtallography_lattices_core(unittest.TestCase):
         # --------- tetragonal
 
         # (tetragonal, base_centered)
-        lattice = BravaisLattice(LatticeSystem.TETRAGONAL, Centering.BASE_CENTERED)
+        lattice = Lattice(LatticeSystem.TETRAGONAL, Centering.BASE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # (tetragonal, face_centered)
-        lattice = BravaisLattice(LatticeSystem.TETRAGONAL, Centering.FACE_CENTERED)
+        lattice = Lattice(LatticeSystem.TETRAGONAL, Centering.FACE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # --------- rhomobohedral
 
         # (rhombohedral, body_centered)
-        lattice = BravaisLattice(LatticeSystem.RHOMBOHEDRAL, Centering.BODY_CENTERED)
+        lattice = Lattice(LatticeSystem.RHOMBOHEDRAL, Centering.BODY_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # (rhombohedral, base_centered)
-        lattice = BravaisLattice(LatticeSystem.RHOMBOHEDRAL, Centering.BASE_CENTERED)
+        lattice = Lattice(LatticeSystem.RHOMBOHEDRAL, Centering.BASE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # (rhombohedral, face_centered)
-        lattice = BravaisLattice(LatticeSystem.RHOMBOHEDRAL, Centering.FACE_CENTERED)
+        lattice = Lattice(LatticeSystem.RHOMBOHEDRAL, Centering.FACE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # --------- hexagonal
 
         # (hexagonal, body_centered)
-        lattice = BravaisLattice(LatticeSystem.HEXAGONAL, Centering.BODY_CENTERED)
+        lattice = Lattice(LatticeSystem.HEXAGONAL, Centering.BODY_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # (hexagonal, base_centered)
-        lattice = BravaisLattice(LatticeSystem.HEXAGONAL, Centering.BASE_CENTERED)
+        lattice = Lattice(LatticeSystem.HEXAGONAL, Centering.BASE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # (hexagonal, face_centered)
-        lattice = BravaisLattice(LatticeSystem.HEXAGONAL, Centering.FACE_CENTERED)
+        lattice = Lattice(LatticeSystem.HEXAGONAL, Centering.FACE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
         # --------- cubic
 
         # (cubic, base_centered)
-        lattice = BravaisLattice(LatticeSystem.CUBIC, Centering.BASE_CENTERED)
+        lattice = Lattice(LatticeSystem.CUBIC, Centering.BASE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
     @unittest.skip("BROKEN")
@@ -511,7 +511,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ triclinic
 
-        lattice = xtallography.lattices.create_bravais_lattice("triclinic", "primitive")
+        lattice = xtallography.lattices.create_lattice("triclinic", "primitive")
 
         unit_cell = {"a": 1, "b": 2, "c": 3, "alpha": 80, "beta": 80, "gamma": 80}
         assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
@@ -528,7 +528,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ monoclinic
 
-        lattice = xtallography.lattices.create_bravais_lattice(
+        lattice = xtallography.lattices.create_lattice(
             "monoclinic", "primitive"
         )
 
@@ -547,7 +547,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ orthorhombic
 
-        lattice = xtallography.lattices.create_bravais_lattice(
+        lattice = xtallography.lattices.create_lattice(
             "orthorhombic", "primitive"
         )
 
@@ -566,7 +566,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ tetragonal
 
-        lattice = xtallography.lattices.create_bravais_lattice(
+        lattice = xtallography.lattices.create_lattice(
             "tetragonal", "body_centered"
         )
 
@@ -585,7 +585,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ rhombohedral
 
-        lattice = xtallography.lattices.create_bravais_lattice(
+        lattice = xtallography.lattices.create_lattice(
             "rhombohedral", "primitive"
         )
 
@@ -604,7 +604,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ hexagonal
 
-        lattice = xtallography.lattices.create_bravais_lattice("hexagonal", "primitive")
+        lattice = xtallography.lattices.create_lattice("hexagonal", "primitive")
 
         unit_cell = {"a": 1, "c": 3}
         assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
@@ -621,7 +621,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ cubic
 
-        lattice = xtallography.lattices.create_bravais_lattice("cubic", "face_centered")
+        lattice = xtallography.lattices.create_lattice("cubic", "face_centered")
 
         unit_cell = {"a": 1}
         assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
@@ -638,7 +638,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ some `unit_cell` values are edge cases, allow_edge_case=True
 
-        lattice = xtallography.lattices.create_bravais_lattice("hexagonal", "primitive")
+        lattice = xtallography.lattices.create_lattice("hexagonal", "primitive")
         unit_cell = {"a": 1, "c": 3}
 
         # some `unit_cell` values are 0
@@ -649,7 +649,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
                 lattice, test_unit_cell, allow_edge_cases=True
             )
         except Exception:
-            pytest.fail("BravaisLattice() constructor raised unexpected error")
+            pytest.fail("Lattice() constructor raised unexpected error")
 
         assert expected_error in str(exception_info)
 
@@ -661,7 +661,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
                 lattice, test_unit_cell, allow_edge_cases=True
             )
         except Exception:
-            pytest.fail("BravaisLattice() constructor raised unexpected error")
+            pytest.fail("Lattice() constructor raised unexpected error")
 
     @unittest.skip("BROKEN")
     @staticmethod
@@ -672,25 +672,25 @@ class test_xtallography_lattices_core(unittest.TestCase):
         # --- Preparations
 
         # valid arguments
-        lattice = xtallography.lattices.create_bravais_lattice(
+        lattice = xtallography.lattices.create_lattice(
             "orthorhombic", "body_centered"
         )
         unit_cell = {"a": 3, "b": 4, "c": 5}
 
         # --- Tests
 
-        # `lattice` is not a `BravaisLattice` type
+        # `lattice` is not a `Lattice` type
         invalid_lattice = "not a lattice"
         with pytest.raises(ValueError) as exception_info:
             xtallography.lattices.is_valid_unit_cell(invalid_lattice, unit_cell)
 
         expected_error = (
-            f"`lattice` must be a `BravaisLattice` object. (lattice={invalid_lattice})"
+            f"`lattice` must be a `Lattice` object. (lattice={invalid_lattice})"
         )
         assert expected_error in str(exception_info)
 
         # `lattice` is not a valid Bravais lattice
-        invalid_lattice = xtallography.lattices.create_bravais_lattice(
+        invalid_lattice = xtallography.lattices.create_lattice(
             "hexagonal", "body_centered"
         )
         with pytest.raises(ValueError) as exception_info:
