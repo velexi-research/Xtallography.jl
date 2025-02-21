@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "XtallographyUtils"
-version = "0.3.1"
+version = "0.4.0"
 description = "Library of utility functions for analysis of 3D crystals."
 license = "Apache-2.0"
 readme = "README.md"
@@ -8,7 +8,7 @@ authors = ["Kevin T. Chu <kevin@velexi.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pre-commit = "^3.2"
+pre-commit = "^4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
