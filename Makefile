@@ -4,38 +4,89 @@
 .DEFAULT_GOAL := fast-test
 
 # Package variables
-PKG_DIR=src
+JULIA_PKG_DIR=src
+PYTHON_PKG_DIR=pysrc
 
 # Julia environment
 export JULIA_PROJECT = @.
 
+# Python testing parameters
+NPROCS=auto
+PYTEST_OPTIONS=-n ${NPROCS}
+
 # --- Testing rules
 
-.PHONY: test fast-test
+.PHONY: test fast-test \
+	julia-tests julia-coverage \
+	python-tests python-coverage
 
-## Run all tests
+## Run all tests.
 test:
 	@echo Removing old coverage files
 	find . -name "*.jl.*.cov" -exec rm -f {} \;
-	@echo
-	@echo Running tests
-	jltest --code-coverage test/runtests.jl
-	@echo
-	@echo Generating code coverage report
-	@jlcoverage
+	@echo Running Julia unit tests
+	@$(MAKE) julia-tests
+	@echo Running Python unit tests
+	@$(MAKE) python-tests
+	@echo Generating code coverage reports
+	@$(MAKE) julia-coverage
+	@$(MAKE) python-coverage
+
 
 ## Run tests in fail-fast mode (i.e., stop at first failure)
 fast-test: export JLTEST_FAIL_FAST=true
 fast-test: test
 
+## Run only Julia unit tests.
+julia-tests:
+	jltest --code-coverage test/runtests.jl
+	@echo
+
+## Generate basic Julia coverage report
+julia-coverage:
+	@jlcoverage
+
+## Run only Python unit tests.
+python-tests:
+	pytest ${PYTEST_OPTIONS}
+	@make python-lint
+	@echo
+
+.coverage:
+	-make python-tests
+
+## Generate basic Python coverage report
+python-coverage: .coverage
+	coverage report -m
+
 # --- Code quality rules
 
-.PHONY: codestyle
+.PHONY: jlcodestyle python-lint
 
-## Check codestyle
-codestyle:
+## Check codestyle for Julia code.
+jlcodestyle:
 	@echo Checking code style
-	@jlcodestyle -v $(PKG_DIR)
+	@jlcodestyle -v $(JULIA_PKG_DIR)
+
+## Run codestyle and lint checks for Python code.
+python-lint:
+	@echo
+	@SHELL=/bin/bash; \
+	MESSAGE=" flake8 start "; \
+	BOOKENDS="$$(( (`tput cols` - $${#MESSAGE}) / 2))"; \
+	yes "" | head -n $$BOOKENDS | tr \\n "="; \
+	printf "$$MESSAGE"; \
+	yes "" | head -n $$BOOKENDS | tr \\n "=";
+	@echo
+	-flake8 ${PYTHON_PKG_DIR}
+	@SHELL=/bin/bash; \
+	MESSAGE=" flake8 end "; \
+	BOOKENDS="$$(( (`tput cols` - $${#MESSAGE}) / 2))"; \
+	yes "" | head -n $$BOOKENDS | tr \\n "="; \
+	printf "$$MESSAGE"; \
+	yes "" | head -n $$BOOKENDS | tr \\n "=";
+	@echo
+	@echo
 
 # --- Documentation rules
 
