@@ -1,27 +1,57 @@
 # --- Julia
 
-# Manifest
+# Environment
 Manifest.toml
-
-# Documentation
-/docs/build/
 
 # Coverage.jl
 *.jl.*.cov
 *.jl.*.mem
+
+# --- Python
+
+# testing
+htmlcov/
+.cache
+.coverage
+.coverage.*
+.pytest_cache
+__pycache__
+
+# --- Documentation
+
+/docs/build/
+
+# --- Environments
+
+# direnv
+.direnv
+.envrc
+
+# conda
+.conda
+
+# common manually-created Python virtual environments
+.venv
+
+# --- Code editors
+
+# vim
+.*.sw[po]
+
+# VS Code
+.vscode/
+
+# Pycharm
+.idea
+
+# Spyder
+.spyproject/
 
 # --- GitHub
 
 .github/secrets
 
 # --- Miscellaneous
-
-# direnv
-.direnv
-.envrc
-
-# vim
-.*.swp
 
 # macOS
 .DS_Store*
