@@ -281,11 +281,14 @@ const BRAVAIS_LATTICES = (
 # ------ Utility functions
 
 """
+    lattice_system(lattice_constants::LatticeConstants) -> LatticeSystem
+
+    lattice_system(Δlattice_constants::LatticeConstantDeltas) -> LatticeSystem
+
     lattice_system(unit_cell::UnitCell) -> LatticeSystem
 
-    lattice_system(Δunit_cell::UnitCellDeltas) -> LatticeSystem
-
-Return the lattice system for a set of `unit_cell` or `Δunit_cell`.
+Return the lattice system for a set of `lattice_constants`, `Δlattice_constants` or
+`unit_cell`.
 
 Return values
 =============
@@ -294,15 +297,14 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> lattice_system(HexagonalUnitCell(2, 4))
+julia> lattice_system(HexagonalLatticeConstants(2, 4))
 Hexagonal()
 
-julia> lattice_system(OrthorhombicUnitCell(2, 3, 4), face_centered))
-Orthorhombic()
-
-julia> lattice_system(CubicUnitCellDeltas(2))
+julia> lattice_system(CubicLatticeConstants(2))
 Cubic()
-```
+
+julia> lattice_system(UnitCell(OrthorhombicLatticeConstants(2, 3, 4), face_centered))
+Orthorhombic()
 """
 function lattice_system end
 
