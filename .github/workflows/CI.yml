@@ -132,6 +132,7 @@ jobs:
         run: |
           # source $VENV
           export JULIA_PROJECT=@.
+          export JULIA_LOAD_PATH=.
           poetry run pytest --cov-report=xml
 
       - name: Upload coverage reports to Codecov
