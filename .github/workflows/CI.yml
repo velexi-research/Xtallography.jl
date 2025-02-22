@@ -128,6 +128,10 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --with test
 
+      - name: Install Julia package dependencies
+        run: julia --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+
+      # --- Set up Python
       - name: Run tests
         run: |
           JULIA_PROJECT=@. JULIA_LOAD_PATH=src: poetry run pytest --cov-report=xml
@@ -210,7 +214,7 @@ jobs:
       - name: Build and deploy documentation
         run: |
           julia --project=docs --color=yes --compile=min -O0 docs/make.jl
-          JULIA_PROJECT=@. JULIA_LOAD_PATH=src: poetry run pdoc --math docs/xtallography -o docs/build/python
+          JULIA_PROJECT=@. JULIA_LOAD_PATH=src:docs: poetry run pdoc --math docs/xtallography -o docs/build/python
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
