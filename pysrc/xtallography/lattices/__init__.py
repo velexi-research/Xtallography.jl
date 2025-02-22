@@ -7,8 +7,8 @@
 #
 # Change License: Mozilla Public License 2.0
 """
-The `xtallography.lattices` module provides types and methods to support lattice and unit
-cell computations.
+The `xtallography.lattices` module provides support for integration with `Xtallography.jl`
+lattice/unit cell types and methods.
 """
 # --- Imports
 
