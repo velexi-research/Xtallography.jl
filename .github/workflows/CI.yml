@@ -120,7 +120,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.local
-          key: dotlocal-${{ runner.os }}-${{ runner.arch }}-${{ matrix.python-version }}-${{ hashFiles('.github/workflows/CI.yml') }}
+          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-dotlocal-${{ hashFiles('.github/workflows/CI.yml') }}
 
       - name: Install Python poetry
         uses: snok/install-poetry@v1
@@ -136,16 +136,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: venv-docs-${{ runner.os }}-${{ runner.arch }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-venv-docs-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install package dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --with docs
 
+      # --- Build and deploy documentation
+
       - name: Build and deploy documentation
         run: |
-          julia --project=docs --color=yes --compile=min -O0 docs/make.jl
-          pdoc --math pysrc/xtallography -o docs/build/python
+          poetry run make docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
