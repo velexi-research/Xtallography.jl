@@ -53,7 +53,7 @@ jobs:
 
       # --- Run Julia tests
 
-      - name: Set up Julia environment
+      - name: Set up Julia
         uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.julia-version }}
@@ -129,7 +129,7 @@ jobs:
         run: poetry install --with test
 
       - name: Install Julia package dependencies
-        run: julia --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        run: julia --project=. --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 
       # --- Set up Python
       - name: Run tests
@@ -161,7 +161,7 @@ jobs:
 
       # --- Set up Julia
 
-      - name: Set up Julia environment
+      - name: Set up Julia
         uses: julia-actions/setup-julia@v2
         with:
           version: '1.11'
@@ -171,8 +171,8 @@ jobs:
         with:
           cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ hashFiles('.github/workflows/CI.yml') }}
 
-      - name: Install Julia documentation generator dependencies
-        run: julia --project=docs --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+      - name: Build package
+        uses: julia-actions/julia-buildpkg@v1
 
       # --- Set up Python
 
@@ -180,8 +180,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.13'
-
-      # ------ Install Poetry
 
       - name: Load cached $HOME/.local
         uses: actions/cache@v4
@@ -196,8 +194,6 @@ jobs:
           virtualenvs-in-project: true
           installer-parallel: true
 
-      # ------ Install Python package dependencies
-
       - name: Load cached venv
         id: cached-poetry-dependencies
         uses: actions/cache@v4
@@ -205,11 +201,14 @@ jobs:
           path: .venv
           key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-venv-${{ hashFiles('**/poetry.lock') }}
 
-      - name: Install package dependencies
+      # --- Build and deploy documentation
+
+      - name: Install Julia documentation dependencies
+        run: julia --project=docs --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+
+      - name: Install Python documentation dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --with docs
-
-      # --- Build and deploy documentation
 
       - name: Build and deploy documentation
         run: |
