@@ -18,7 +18,7 @@ import unittest
 import pytest
 
 # Local packages/modules
-from xtallography import jl
+from xtallography import _JL
 from xtallography.lattices import LatticeSystem, Centering, OrthorhombicUnitCell
 
 
@@ -191,4 +191,4 @@ class test_xtallography_lattice_orthorhombic(unittest.TestCase):
         # --- Tests
 
         unit_cell_jl = unit_cell.to_julia()
-        assert jl.isa(unit_cell_jl, jl.OrthorhombicLatticeConstants)
+        assert _JL.isa(unit_cell_jl, _JL.OrthorhombicLatticeConstants)

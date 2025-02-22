@@ -16,7 +16,7 @@ The rhombohedral module defines classes and methods specific to rhombohedral lat
 import math
 
 # Local packages/modules
-from .. import jl
+from .. import _JL
 from .core import LatticeSystem, UnitCell
 
 
@@ -76,4 +76,4 @@ class RhombohedralUnitCell(UnitCell):
         """
         Convert RhombohedralUnitCell object to a Julia struct.
         """
-        return jl.RhombohedralLatticeConstants(self.a, self.alpha)
+        return _JL.RhombohedralLatticeConstants(self.a, self.alpha)

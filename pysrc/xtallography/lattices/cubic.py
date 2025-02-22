@@ -13,7 +13,7 @@ The cubic module defines classes and methods specific to cubic lattices.
 # --- Imports
 
 # Local packages/modules
-from .. import jl
+from .. import _JL
 from .core import LatticeSystem, Centering, UnitCell
 
 
@@ -60,4 +60,4 @@ class CubicUnitCell(UnitCell):
         """
         Convert CubicUnitCell object to a Julia struct.
         """
-        return jl.CubicLatticeConstants(self.a)
+        return _JL.CubicLatticeConstants(self.a)

@@ -19,7 +19,7 @@ from enum import auto, StrEnum
 import math
 
 # Local packages/modules
-from .. import jl
+from .. import _JL
 
 
 # --- Types
@@ -56,16 +56,16 @@ class Centering(StrEnum):
         Convert Centering object to Julia struct.
         """
         if self.value == "primitive":
-            return jl.primitive
+            return _JL.primitive
 
         elif self.value == "base_centered":
-            return jl.base_centered
+            return _JL.base_centered
 
         elif self.value == "body_centered":
-            return jl.body_centered
+            return _JL.body_centered
 
         elif self.value == "face_centered":
-            return jl.face_centered
+            return _JL.face_centered
 
     @classmethod
     def values(cls):

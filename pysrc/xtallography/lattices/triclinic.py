@@ -16,7 +16,7 @@ The triclinic module defines classes and methods specific to triclinic lattices.
 import math
 
 # Local packages/modules
-from .. import jl
+from .. import _JL
 from .core import LatticeSystem, UnitCell
 
 
@@ -128,6 +128,6 @@ class TriclinicUnitCell(UnitCell):
         """
         Convert TriclinicUnitCell object to a Julia struct.
         """
-        return jl.TriclinicLatticeConstants(
+        return _JL.TriclinicLatticeConstants(
             self.a, self.b, self.c, self.alpha, self.beta, self.gamma
         )

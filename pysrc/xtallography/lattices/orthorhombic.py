@@ -13,7 +13,7 @@ The orthorhombic module defines classes and methods specific to orthorhombic lat
 # --- Imports
 
 # Local packages/modules
-from .. import jl
+from .. import _JL
 from .core import LatticeSystem, Centering, UnitCell
 
 
@@ -84,4 +84,4 @@ class OrthorhombicUnitCell(UnitCell):
         """
         Convert OrthorhombicUnitCell object to a Julia struct.
         """
-        return jl.OrthorhombicLatticeConstants(self.a, self.b, self.c)
+        return _JL.OrthorhombicLatticeConstants(self.a, self.b, self.c)

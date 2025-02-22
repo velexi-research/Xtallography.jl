@@ -16,7 +16,7 @@ The monoclinic module defines classes and methods specific to monoclinic lattice
 import math
 
 # Local packages/modules
-from .. import jl
+from .. import _JL
 from .core import LatticeSystem, Centering, UnitCell
 
 
@@ -109,4 +109,4 @@ class MonoclinicUnitCell(UnitCell):
         """
         Convert MonoclinicUnitCell object to a Julia struct.
         """
-        return jl.MonoclinicLatticeConstants(self.a, self.b, self.c, self.beta)
+        return _JL.MonoclinicLatticeConstants(self.a, self.b, self.c, self.beta)

@@ -13,7 +13,7 @@ The tetragonal module defines classes and methods specific to tetragonal lattice
 # --- Imports
 
 # Local packages/modules
-from .. import jl
+from .. import _JL
 from .core import LatticeSystem, Centering, UnitCell
 
 
@@ -71,4 +71,4 @@ class TetragonalUnitCell(UnitCell):
         """
         Convert TetragonalUnitCell object to a Julia struct.
         """
-        return jl.TetragonalLatticeConstants(self.a, self.c)
+        return _JL.TetragonalLatticeConstants(self.a, self.c)

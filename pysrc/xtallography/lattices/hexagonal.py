@@ -13,7 +13,7 @@ The hexagonal module defines classes and methods specific to hexagonal lattices.
 # --- Imports
 
 # Local packages/modules
-from .. import jl
+from .. import _JL
 from .core import LatticeSystem, UnitCell
 
 
@@ -71,4 +71,4 @@ class HexagonalUnitCell(UnitCell):
         """
         Convert HexagonalUnitCell object to a Julia struct.
         """
-        return jl.HexagonalLatticeConstants(self.a, self.c)
+        return _JL.HexagonalLatticeConstants(self.a, self.c)

@@ -19,7 +19,7 @@ import unittest
 import pytest
 
 # Local packages/modules
-from xtallography import jl
+from xtallography import _JL
 from xtallography.lattices import LatticeSystem, Centering, TriclinicUnitCell
 
 
@@ -287,4 +287,4 @@ class test_xtallography_lattice_triclinic(unittest.TestCase):
         # --- Tests
 
         lattice_constants_jl = lattice_constants.to_julia()
-        assert jl.isa(lattice_constants_jl, jl.TriclinicLatticeConstants)
+        assert _JL.isa(lattice_constants_jl, _JL.TriclinicLatticeConstants)

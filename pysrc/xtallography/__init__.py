@@ -7,9 +7,7 @@
 #
 # Change License: Mozilla Public License 2.0
 """
-xtallography.lattices package
-
-It provides implementations of lattice-specific types and methods.
+`PyXtallography` provides a basic Python interface to the `Xtallography.jl` package.
 """
 # --- Imports
 
@@ -19,5 +17,5 @@ import juliacall
 
 # --- Initialize JuliaCall
 
-jl = juliacall.newmodule("PyXtallography")
-jl.seval("using XtallographyUtils")
+_JL = juliacall.newmodule("PyXtallography")
+_JL.seval("using XtallographyUtils")

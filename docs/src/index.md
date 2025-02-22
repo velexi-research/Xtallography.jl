@@ -1,20 +1,22 @@
 # XtallographyUtils
 
-[XtallographyUtils](https://github.com/velexi-research/XtallographyUtils.jl) defines a
-collection of basic types and miscellaneous utility functions that support crystallography
-computations. The functionality provided by this package are _not_ intended to be
-comprehensive. Rather, functionality is added on an as-needed basis to support research
-projects.
+The [Xtallography](https://github.com/velexi-research/XtallographyUtils.jl) package defines
+a collection of basic types and functions that support crystallography computations. The
+functionality provided by this package are _not_ intended to be comprehensive. Rather,
+functionality is added on an as-needed basis to support research projects.
 
-Currently, the Xtallography Utilities provides support for:
+Currently, the Xtallography provides support for:
 
 * types for defining Bravais lattice types,
 
 * basic unit cell computations (e.g., basis, volume, surface area),
 
-* standardization of lattice constants for unit cells, and
+* standardization of lattice constants for unit cells,
 
 * conversions between equivalent unit cells for a lattice.
+
+In addition, Xtallography provides a basic [Python interface](python/index.html) to
+facilitate integration with Python codebases.
 
 ## Getting Started
 
