@@ -130,7 +130,7 @@ jobs:
 
       - name: Run tests
         run: |
-          JULIA_PROJECT=@. JULIA_LOAD_PATH=src poetry run pytest --cov-report=xml
+          JULIA_PROJECT=@. JULIA_LOAD_PATH=src: poetry run pytest --cov-report=xml
 
       - name: Upload coverage reports to Codecov
         # Only run for 'main' branch running on 'Linux' with the latest version of Python
@@ -210,7 +210,7 @@ jobs:
       - name: Build and deploy documentation
         run: |
           julia --project=docs --color=yes --compile=min -O0 docs/make.jl
-          poetry run pdoc --math docs/xtallography -o docs/build/python
+          JULIA_PROJECT=@. JULIA_LOAD_PATH=src: poetry run pdoc --math docs/xtallography -o docs/build/python
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
