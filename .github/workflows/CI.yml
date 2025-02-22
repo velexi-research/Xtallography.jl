@@ -128,9 +128,8 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --with test
 
-      - name: Install Julia package dependencies
+      - name: Install PythonCall (Julia package)
         run: |
-          # julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
           julia --project=. --color=yes -e 'using Pkg; Pkg.add("PythonCall")'
 
       - name: Run Python tests
@@ -175,9 +174,8 @@ jobs:
       - name: Build package
         uses: julia-actions/julia-buildpkg@v1
 
-      - name: Install Julia package dependencies
+      - name: Install PythonCall (Julia package)
         run: |
-          # julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
           julia --project=. --color=yes -e 'using Pkg; Pkg.add("PythonCall")'
 
       # --- Set up Python
