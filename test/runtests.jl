@@ -22,7 +22,8 @@ Unit tests for XtallographyUtils package.
 using Test
 
 # External packages
-using TestTools: jltest
+using Aqua: Aqua
+using TestTools: jltest, jltest.EnhancedTestSet
 
 # XtallographyUtils
 using XtallographyUtils
@@ -30,3 +31,13 @@ using XtallographyUtils
 # --- Run tests
 
 jltest.run_tests(@__DIR__)
+
+# --- Run Aqua code quality checks
+
+println()
+print("Aqua.jl checks: ")
+@testset EnhancedTestSet "Aqua.jl code quality checks" begin
+    Aqua.test_all(
+        XtallographyUtils; deps_compat=(ignore=[:LinearAlgebra, :Logging, :Test],)
+    )
+end
