@@ -67,7 +67,7 @@ jobs:
       - name: Build package
         uses: julia-actions/julia-buildpkg@v1
 
-      - name: Run tests
+      - name: Run Julia tests
         uses: julia-actions/julia-runtest@v1
 
       - name: Process coverage data
@@ -129,10 +129,9 @@ jobs:
         run: poetry install --with test
 
       - name: Install Julia package dependencies
-        run: julia --color=yes -e 'using Pkg; Pkg.instantiate()'
+        run: julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
 
-      # --- Set up Python
-      - name: Run tests
+      - name: Run Python tests
         run: |
           JULIA_PROJECT=@. JULIA_LOAD_PATH=.: poetry run pytest --cov-report=xml
 
@@ -175,7 +174,7 @@ jobs:
         uses: julia-actions/julia-buildpkg@v1
 
       - name: Install Julia package dependencies
-        run: julia --color=yes -e 'using Pkg; Pkg.instantiate()'
+        run: julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
 
       # --- Set up Python
 
