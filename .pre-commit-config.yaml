@@ -3,7 +3,7 @@ repos:
     hooks:
     - id: jlcodestyle
       name: jlcodestyle
-      entry: jlcodestyle
+      entry: bin/jlcodestyle
       language: julia
       args: [--overwrite]
       types: [julia]
