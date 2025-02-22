@@ -3,9 +3,12 @@
 # Default rule
 .DEFAULT_GOAL := fast-test
 
-# Package variables
+# Package directories
 JULIA_PKG_DIR=src
 PYTHON_PKG_DIR=pysrc/xtallography
+
+# Documentation directory
+DOCS_DIR=docs
 
 # Julia environment
 export JULIA_PROJECT = @.
@@ -94,9 +97,9 @@ python-lint:
 
 ## Generate package documentation.
 docs:
-	julia --project=docs --color=yes -e 'using Pkg; Pkg.update()'
-	julia --project=docs --color=yes --compile=min -O0 docs/make.jl
-	pdoc --math ${PYTHON_PKG_DIR} -o docs/build/python
+	julia --project=${DOCS_DIR} --color=yes -e 'using Pkg; Pkg.update()'
+	julia --project=${DOCS_DIR} --color=yes --compile=min -O0 ${DOCS_DIR}/make.jl
+	pdoc --math ${PYTHON_PKG_DIR} -o ${DOCS_DIR}/build/python
 
 # --- Utility rules
 
