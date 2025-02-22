@@ -7,9 +7,8 @@
 #
 # Change License: Mozilla Public License 2.0
 """
-xtallography.lattices package
-
-It provides implementations of lattice-specific types and methods.
+The `xtallography.lattices` module provides types and methods to support lattice and unit
+cell computations.
 """
 # --- Imports
 
