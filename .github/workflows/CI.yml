@@ -147,7 +147,7 @@ jobs:
       - name: Build and deploy documentation
         run: |
           julia --project=docs --color=yes --compile=min -O0 docs/make.jl
-          poetry pdoc --math docs/xtallography -o docs/build/python
+          poetry run pdoc --math docs/xtallography -o docs/build/python
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
