@@ -1,7 +1,7 @@
 name = "XtallographyUtils"
 uuid = "4f49dcd8-3c92-4c49-9c92-5589c1fd49ac"
 authors = ["Kevin Chu <kevin@velexi.com> and contributors"]
-version = "0.3.2"
+version = "0.4.0"
 
 [deps]
 AngleBetweenVectors = "ec570357-d46e-52ed-9726-18773498274d"
@@ -14,10 +14,4 @@ TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 AngleBetweenVectors = "0.3"
 Combinatorics = "1"
 TOML = "1"
-julia = "1.7, 1.8, 1.9, 1.10"
-
-[extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
-[targets]
-test = ["Test"]
+julia = "1.7"

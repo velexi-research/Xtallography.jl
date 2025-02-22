@@ -25,11 +25,12 @@ const VERSION = TOML.parsefile(joinpath(pkgdir(@__MODULE__), "Project.toml"))["v
 # --- Core types and methods
 
 include("math.jl")
-include("lattice.jl")
-include("unit_cell.jl")
 
 # --- Lattice-specific types and methods
 
+include("lattices/core.jl")
+include("lattices/lattice_constants.jl")
+include("lattices/unit_cell.jl")
 include("lattices/triclinic.jl")
 include("lattices/monoclinic.jl")
 include("lattices/orthorhombic.jl")

@@ -21,9 +21,10 @@ makedocs(;
         "Examples" => "examples.md",
         "Types" => "types.md",
         "Functions" => "functions.md",
+        "Python Interface" => "python.md",
         "Index" => "docs-index.md",
     ],
-    warnonly=[:missing_docs],
+    warnonly=[:missing_docs, :cross_references],
 )
 
 deploydocs(; repo="github.com/velexi-research/XtallographyUtils.jl", devbranch="main")

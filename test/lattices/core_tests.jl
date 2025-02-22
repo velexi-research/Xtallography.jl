@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 """
-lattice_tests.jl defines tests for lattice.jl
+core_tests.jl defines tests for lattices/core.jl
 """
 # --- Imports
 

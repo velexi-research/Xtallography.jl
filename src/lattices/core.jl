@@ -13,22 +13,28 @@
 #   limitations under the License.
 
 """
-Types and functions that support lattice computations
+Lattice system types
 """
 # --- Exports
 
-# Types
+# ------ Types
+
+# LatticeSystem
 export LatticeSystem
 export Triclinic, Monoclinic, Orthorhombic, Hexagonal, Rhombohedral, Tetragonal, Cubic
-export Centering, Primitive, BaseCentered, BodyCentered, FaceCentered
-
-# Constants
-export BRAVAIS_LATTICES
 export triclinic, monoclinic, orthorhombic, hexagonal, rhombohedral, tetragonal, cubic
+
+# Centering
+export Centering, Primitive, BaseCentered, BodyCentered, FaceCentered
 export primitive, base_centered, body_centered, face_centered
 
-# Functions
-export is_bravais_lattice
+# ------ Functions/Methods
+
+export lattice_system, is_bravais_lattice
+
+# ------ Constants
+
+export BRAVAIS_LATTICES
 
 # --- Types
 
@@ -247,7 +253,6 @@ const face_centered = FaceCentered()
 
 # --- Constants
 
-# Lattice Types
 """
     BRAVAIS_LATTICES
 
@@ -272,6 +277,8 @@ const BRAVAIS_LATTICES = (
 )
 
 # --- Functions/Methods
+
+# ------ Utility functions
 
 """
     lattice_system(lattice_constants::LatticeConstants) -> LatticeSystem
@@ -298,7 +305,6 @@ Cubic()
 
 julia> lattice_system(UnitCell(OrthorhombicLatticeConstants(2, 3, 4), face_centered))
 Orthorhombic()
-```
 """
 function lattice_system end
 
