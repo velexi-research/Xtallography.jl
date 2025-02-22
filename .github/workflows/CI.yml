@@ -130,7 +130,7 @@ jobs:
 
       - name: Install Julia package dependencies
         run: |
-          julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
+          # julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
           julia --project=. --color=yes -e 'using Pkg; Pkg.add("PythonCall")'
 
       - name: Run Python tests
@@ -177,7 +177,7 @@ jobs:
 
       - name: Install Julia package dependencies
         run: |
-          julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
+          # julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
           julia --project=. --color=yes -e 'using Pkg; Pkg.add("PythonCall")'
 
       # --- Set up Python
