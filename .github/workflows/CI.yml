@@ -128,9 +128,13 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --with test
 
-      - name: Run Python tests
+      - name: Install Julia package dependencies
         run: |
           julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
+          julia --project=. --color=yes -e 'using Pkg; Pkg.add("PythonCall")'
+
+      - name: Run Python tests
+        run: |
           JULIA_PROJECT=@. JULIA_LOAD_PATH=.: poetry run pytest --cov-report=xml
 
       - name: Upload coverage reports to Codecov
@@ -172,7 +176,9 @@ jobs:
         uses: julia-actions/julia-buildpkg@v1
 
       - name: Install Julia package dependencies
-        run: julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
+        run: |
+          julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
+          julia --project=. --color=yes -e 'using Pkg; Pkg.add("PythonCall")'
 
       # --- Set up Python
 
