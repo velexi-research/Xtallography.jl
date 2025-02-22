@@ -130,10 +130,7 @@ jobs:
 
       - name: Run tests
         run: |
-          ls
-          export JULIA_PROJECT=@.
-          export JULIA_LOAD_PATH=.
-          poetry run pytest --cov-report=xml
+          JULIA_PROJECT=@. poetry run pytest --cov-report=xml
 
       - name: Upload coverage reports to Codecov
         # Only run for 'main' branch running on 'Linux' with the latest version of Python
