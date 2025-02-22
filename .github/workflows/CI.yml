@@ -130,7 +130,7 @@ jobs:
 
       - name: Run tests
         run: |
-          # source $VENV
+          ls
           export JULIA_PROJECT=@.
           export JULIA_LOAD_PATH=.
           poetry run pytest --cov-report=xml
