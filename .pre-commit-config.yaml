@@ -3,12 +3,10 @@ repos:
     hooks:
     - id: jlcodestyle
       name: jlcodestyle
-      entry: bin/jlcodestyle
-      language: julia
+      entry: jlcodestyle
+      language: system
       args: [--overwrite]
       types: [julia]
-      additional_dependencies:
-      - 'TestTools'
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
