@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-    tags: "*"
+    tags: '*'
 
   pull_request:
     branches:
@@ -17,7 +17,7 @@ concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: only if it is a pull request build.
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ startsWith(github.ref, "refs/pull/") }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
   run-tests:
@@ -30,10 +30,10 @@ jobs:
         # os: [ubuntu-latest, windows-latest, macos-latest]
         os: [ubuntu-latest]
         arch: [x64]
-        #julia-version: ["1.7", "1.8", "1.9", "1.10", "1.11"]
-        julia-version: ["1.11"]
-        # python-version: ["3.10", "3.11", "3.12", "3.13"]
-        python-version: ["3.13"]
+        #julia-version: ['1.7', '1.8', '1.9', '1.10', '1.11']
+        julia-version: ['1.11']
+        # python-version: ['3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.13']
 
     defaults:
       run:
@@ -42,10 +42,10 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     env:
-        codecov-os: "Linux"
+        codecov-os: 'Linux'
         codecov-arch: x64
-        codecov-julia-version: "1.11"
-        codecov-python-version: "1.13"
+        codecov-julia-version: '1.11'
+        codecov-python-version: '1.13'
 
     steps:
       - name: Check out code
@@ -62,7 +62,7 @@ jobs:
       - name: Set up Julia caches
         uses: julia-actions/cache@v2
         with:
-          cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ hashFiles(".github/workflows/CI.yml") }}
+          cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ hashFiles('.github/workflows/CI.yml') }}
 
       - name: Build package
         uses: julia-actions/julia-buildpkg@v1
@@ -71,9 +71,9 @@ jobs:
         uses: julia-actions/julia-runtest@v1
 
       - name: Process coverage data
-        # Only run for "main" branch running on "Linux" with the latest version of Julia
+        # Only run for 'main' branch running on 'Linux' with the latest version of Julia
         if: |
-            github.ref_name == "main" &&
+            github.ref_name == 'main' &&
             runner.os == env.codecov-os &&
             matrix.arch == env.codecov-arch &&
             matrix.julia-version == env.codecov-julia-version
@@ -83,9 +83,9 @@ jobs:
           directories: src
 
       - name: Upload code coverage data to codecov.io
-        # Only run for "main" branch running on "Linux" with the latest version of Julia
+        # Only run for 'main' branch running on 'Linux' with the latest version of Julia
         if: |
-            github.ref_name == "main" &&
+            github.ref_name == 'main' &&
             runner.os == env.codecov-os &&
             matrix.arch == env.codecov-arch &&
             matrix.julia-version == env.codecov-julia-version
@@ -108,7 +108,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.local
-          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-dotlocal-${{ hashFiles(".github/workflows/CI.yml") }}
+          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-dotlocal-${{ hashFiles('.github/workflows/CI.yml') }}
 
       - name: Install Python poetry
         uses: snok/install-poetry@v1
@@ -122,10 +122,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-venv-${{ hashFiles("**/poetry.lock") }}
+          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-venv-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install Python package dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != "true"
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --with test
 
       - name: Run tests
@@ -161,22 +161,22 @@ jobs:
       - name: Set up Julia environment
         uses: julia-actions/setup-julia@v2
         with:
-          version: "1.11"
+          version: '1.11'
 
       - name: Set up Julia caches
         uses: julia-actions/cache@v2
         with:
-          cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ hashFiles(".github/workflows/CI.yml") }}
+          cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ hashFiles('.github/workflows/CI.yml') }}
 
       - name: Install Julia documentation generator dependencies
-        run: julia --project=docs --color=yes -e "using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()"
+        run: julia --project=docs --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 
       # --- Set up Python
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.13"
+          python-version: '3.13'
 
       # ------ Install Poetry
 
@@ -184,7 +184,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.local
-          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-dotlocal-${{ hashFiles(".github/workflows/CI.yml") }}
+          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-dotlocal-${{ hashFiles('.github/workflows/CI.yml') }}
 
       - name: Install Python poetry
         uses: snok/install-poetry@v1
@@ -200,10 +200,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-venv-${{ hashFiles("**/poetry.lock") }}
+          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-venv-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install package dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != "true"
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --with docs
 
       # --- Build and deploy documentation
