@@ -109,7 +109,7 @@ jobs:
         with:
           cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ hashFiles('.github/workflows/CI.yml') }}
 
-      - name: Install Julia documentation dependencies
+      - name: Install Julia documentation generator dependencies
         run: julia --project=docs --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 
       # --- Set up Python
