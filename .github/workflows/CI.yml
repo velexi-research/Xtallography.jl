@@ -31,7 +31,6 @@ jobs:
         os: [ubuntu-latest]
         arch: [x64]
         version: ['1.7', '1.8', '1.9', '1.10', '1.11']
-        python-version: ['3.13']
 
     runs-on: ${{ matrix.os }}
 
@@ -113,6 +112,11 @@ jobs:
         run: julia --project=docs --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 
       # --- Set up Python
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.13
 
       # ------ Install Poetry
 
