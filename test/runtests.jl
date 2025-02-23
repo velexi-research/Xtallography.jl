@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 """
-Unit tests for XtallographyUtils package.
+Unit tests for Xtallography package.
 """
 
 # --- Imports
@@ -25,8 +25,8 @@ using Test
 using Aqua: Aqua
 using TestTools: jltest, jltest.EnhancedTestSet
 
-# XtallographyUtils
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # --- Run tests
 
@@ -37,7 +37,5 @@ jltest.run_tests(@__DIR__)
 println()
 print("Aqua.jl checks: ")
 @testset EnhancedTestSet "Aqua.jl code quality checks" begin
-    Aqua.test_all(
-        XtallographyUtils; deps_compat=(ignore=[:LinearAlgebra, :Logging, :Test],)
-    )
+    Aqua.test_all(Xtallography; deps_compat=(ignore=[:LinearAlgebra, :Logging, :Test],))
 end

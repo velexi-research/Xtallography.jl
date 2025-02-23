@@ -21,8 +21,8 @@ Tests for methods in lattice/triclinic.jl (except for cell standardization metho
 using Test
 using LinearAlgebra: det, norm, cross
 
-# XtallographyUtils package
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # --- Tests
 

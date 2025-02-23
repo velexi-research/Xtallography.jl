@@ -13,9 +13,9 @@
 #   limitations under the License.
 
 """
-The XtallographyUtils package provides utility functions for analysis of 3D crystals.
+The Xtallography package provides utility functions for analysis of 3D crystals.
 """
-module XtallographyUtils
+module Xtallography
 
 # --- Package Metadata
 
@@ -39,4 +39,4 @@ include("lattices/rhombohedral.jl")
 include("lattices/hexagonal.jl")
 include("lattices/cubic.jl")
 
-end  # End of XtallographyUtils module
+end  # End of Xtallography module

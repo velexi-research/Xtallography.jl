@@ -20,8 +20,8 @@ Tests for methods in lattice/tetragonal.jl (except for cell standardization meth
 # Standard library
 using Test
 
-# XtallographyUtils package
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # --- Tests
 

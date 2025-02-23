@@ -22,8 +22,8 @@ using LinearAlgebra: norm
 using Logging
 using Test
 
-# XtallographyUtils package
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # Notes
 # =====

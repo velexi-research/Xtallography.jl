@@ -21,8 +21,8 @@ Tests for the unit cell standardization methods for rhombohedral lattices
 using Logging
 using Test
 
-# XtallographyUtils package
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # Notes
 # =====

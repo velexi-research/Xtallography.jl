@@ -1,18 +1,16 @@
-using XtallographyUtils
+using Xtallography
 using Documenter
 
-DocMeta.setdocmeta!(
-    XtallographyUtils, :DocTestSetup, :(using XtallographyUtils); recursive=true
-)
+DocMeta.setdocmeta!(Xtallography, :DocTestSetup, :(using Xtallography); recursive=true)
 
 makedocs(;
-    modules=[XtallographyUtils],
+    modules=[Xtallography],
     authors="Kevin Chu <kevin@velexi.com> and contributors",
-    sitename="XtallographyUtils.jl",
+    sitename="Xtallography.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://velexi-research.github.io/XtallographyUtils.jl",
-        repolink="https://github.com/velexi-research/XtallographyUtils.jl",
+        canonical="https://velexi-research.github.io/Xtallography.jl",
+        repolink="https://github.com/velexi-research/Xtallography.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -27,4 +25,4 @@ makedocs(;
     warnonly=[:missing_docs, :cross_references],
 )
 
-deploydocs(; repo="github.com/velexi-research/XtallographyUtils.jl", devbranch="main")
+deploydocs(; repo="github.com/velexi-research/Xtallography.jl", devbranch="main")

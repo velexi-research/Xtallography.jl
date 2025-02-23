@@ -21,8 +21,8 @@ Tests for unit cell standardization methods for cubic lattices
 using Logging
 using Test
 
-# XtallographyUtils package
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # --- Tests
 

@@ -1,11 +1,11 @@
-# XtallographyUtils
+# Xtallography
 
-The [Xtallography](https://github.com/velexi-research/XtallographyUtils.jl) package defines
+The [Xtallography](https://github.com/velexi-research/Xtallography.jl) package defines
 a collection of basic types and functions that support crystallography computations. The
 functionality provided by this package are _not_ intended to be comprehensive. Rather,
 functionality is added on an as-needed basis to support research projects.
 
-Currently, the Xtallography provides support for:
+Currently, Xtallography provides support for:
 
 * types for defining Bravais lattice types,
 
@@ -27,23 +27,23 @@ facilitate integration with Python codebases.
   pkg> registry add https://github.com/velexi-research/JuliaRegistry.git
   ```
 
-  !!! note "XtallographyUtils is registered with a local Julia package registry"
+  !!! note "Xtallography is registered with a local Julia package registry"
 
-      `XtallographyUtils` is registered with the Velexi Julia package registry (not the
-      General Julia package registry), so the Pkg REPL will be able to find
-      `XtallographyUtils` only if the Velexi Julia package registry has been added to your
-      Julia installation. For more information about local registries for Julia packages,
+      `Xtallography` is registered with the Velexi Julia package registry (not the General
+      Julia package registry), so the Pkg REPL will be able to find `Xtallography` only if
+      the Velexi Julia package registry has been added to your Julia installation. For more
+      information about local registries for Julia packages,
       [LocalRegistry.jl](https://github.com/GunnarFarneback/LocalRegistry.jl).
 
   !!! tip "Only needed once"
 
       This step only needs to be performed once per Julia installation.
 
-* Install the `XtallographyUtils` package via the Pkg REPL. That's it!
+* Install the `Xtallography` package via the Pkg REPL. That's it!
 
   ```julia
   julia>  # Press ']' to enter the Pkg REPL mode.
-  pkg> add XtallographyUtils
+  pkg> add Xtallography
   ```
 
 ## Related Packages
