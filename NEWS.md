@@ -5,6 +5,7 @@ Xtallography Release Notes
 0.4.0 (2025-02-22)
 ==================
 **Enhancements:**
+- Renamed package to `Xtallography`.
 - Added Python interface.
 - Refactored lattice and unit cell code.
 - Updated package documentation.
