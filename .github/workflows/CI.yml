@@ -231,11 +231,14 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
         with:
           source_folder: 'docs/build'
+
           destination_repo: ${{ github.reopsitory }}
+          destination_branch: gh-pages
           destination_folder: 'dev'
+
           user_email: 'kevin@velexi.com'
           user_name: 'ktchu'
-          destination-branch: gh-pages
+
           commit_msg: '[GHA] Update package documentation.'
 
 #      - name: Copy new release documentation to the 'gh-pages' branch
