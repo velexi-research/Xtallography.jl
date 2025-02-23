@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   run-tests:
-    name: Julia ${{ matrix.version }} (${{ matrix.os }}, ${{ matrix.arch }})
+    name: Julia ${{ matrix.julia-version }}, Python ${{ matrix.python-version }} (${{ matrix.os }}, ${{ matrix.arch }})
 
     strategy:
       fail-fast: false
@@ -30,23 +30,33 @@ jobs:
         # os: [ubuntu-latest, windows-latest, macos-latest]
         os: [ubuntu-latest]
         arch: [x64]
-        version: ['1.7', '1.8', '1.9', '1.10', '1.11']
+        #julia-version: ['1.7', '1.8', '1.9', '1.10', '1.11']
+        julia-version: ['1.11']
+        # python-version: ['3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.13']
+
+    defaults:
+      run:
+        shell: bash
 
     runs-on: ${{ matrix.os }}
 
     env:
         codecov-os: 'Linux'
         codecov-arch: x64
-        codecov-version: '1.11'
+        codecov-julia-version: '1.11'
+        codecov-python-version: '1.13'
 
     steps:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Set up Julia environment
+      # --- Run Julia tests
+
+      - name: Set up Julia
         uses: julia-actions/setup-julia@v2
         with:
-          version: ${{ matrix.version }}
+          version: ${{ matrix.julia-version }}
           arch: ${{ matrix.arch }}
 
       - name: Set up Julia caches
@@ -57,7 +67,7 @@ jobs:
       - name: Build package
         uses: julia-actions/julia-buildpkg@v1
 
-      - name: Run tests
+      - name: Run Julia tests
         uses: julia-actions/julia-runtest@v1
 
       - name: Process coverage data
@@ -66,7 +76,7 @@ jobs:
             github.ref_name == 'main' &&
             runner.os == env.codecov-os &&
             matrix.arch == env.codecov-arch &&
-            matrix.version == env.codecov-version
+            matrix.julia-version == env.codecov-julia-version
 
         uses: julia-actions/julia-processcoverage@v1
         with:
@@ -78,7 +88,7 @@ jobs:
             github.ref_name == 'main' &&
             runner.os == env.codecov-os &&
             matrix.arch == env.codecov-arch &&
-            matrix.version == env.codecov-version
+            matrix.julia-version == env.codecov-julia-version
 
         uses: codecov/codecov-action@v5
         with:
@@ -86,6 +96,59 @@ jobs:
           files: lcov.info
           fail_ci_if_error: true
           verbose: true
+
+      # --- Run Python tests
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Load cached $HOME/.local
+        uses: actions/cache@v4
+        with:
+          path: ~/.local
+          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-dotlocal-${{ hashFiles('.github/workflows/CI.yml') }}
+
+      - name: Install Python poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-venv-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install Python package dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --with test
+
+      - name: Install PythonCall (Julia package)
+        run: |
+          julia --project=. --color=yes -e 'using Pkg; Pkg.add("PythonCall")'
+
+      - name: Run Python tests
+        run: |
+          JULIA_PROJECT=@. JULIA_LOAD_PATH=.: poetry run pytest --cov-report=xml
+
+      - name: Upload coverage reports to Codecov
+        # Only run for 'main' branch running on 'Linux' with the latest version of Python
+        if: |
+            github.ref_name == 'main' &&
+            runner.os == 'Linux' &&
+            matrix.arch == env.codecov-arch &&
+            matrix.python-version == env.codecov-python-version
+
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          fail_ci_if_error: true
 
   build-docs:
     name: Build Documentation
@@ -96,7 +159,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Set up Julia environment
+      # --- Set up Julia
+
+      - name: Set up Julia
         uses: julia-actions/setup-julia@v2
         with:
           version: '1.11'
@@ -106,11 +171,75 @@ jobs:
         with:
           cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ hashFiles('.github/workflows/CI.yml') }}
 
-      - name: Install dependencies
+      - name: Build package
+        uses: julia-actions/julia-buildpkg@v1
+
+      - name: Install PythonCall (Julia package)
+        run: |
+          julia --project=. --color=yes -e 'using Pkg; Pkg.add("PythonCall")'
+
+      # --- Set up Python
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Load cached $HOME/.local
+        uses: actions/cache@v4
+        with:
+          path: ~/.local
+          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-dotlocal-${{ hashFiles('.github/workflows/CI.yml') }}
+
+      - name: Install Python poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-venv-${{ hashFiles('**/poetry.lock') }}
+
+      # --- Build documentation
+
+      - name: Install Julia documentation dependencies
         run: julia --project=docs --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 
-      - name: Build and deploy documentation
-        run: julia --project=docs --color=yes --compile=min -O0 docs/make.jl
+      - name: Install Python documentation dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --with docs
+
+      - name: Build documentation
+        run: |
+          julia --project=docs --color=yes --compile=min -O0 docs/make.jl
+          JULIA_PROJECT=@. JULIA_LOAD_PATH=.: PDOC_ALLOW_EXEC=1 poetry run pdoc --math docs/xtallography -o docs/build/python
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+
+      - name: Copy dev documentation to the 'gh-pages' branch
+        # Only run for 'push' events to the 'main' branch
+        if: github.event_name == 'push' && github.ref_name == 'main'
+
+        uses: tuftsrt/copy-to-branch@v1
+        with:
+          destination-branch: gh-pages
+          clear-destination: "true"
+          copy: |
+            docs/build|dev
+
+      - name: Copy new release documentation to the 'gh-pages' branch
+        # Only run for 'push' events to a release tag
+        if: github.event_name == 'push' && github.ref_name != 'main'
+
+        uses: tuftsrt/copy-to-branch@v1
+        with:
+          destination-branch: gh-pages
+          clear-destination: "true"
+          copy: |
+            docs/build|${{ github.ref_name }}

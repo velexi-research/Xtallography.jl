@@ -21,7 +21,7 @@ makedocs(;
         "Examples" => "examples.md",
         "Types" => "types.md",
         "Functions" => "functions.md",
-        "Python Interface" => "python.md",
+        "Python Interface" => "python-interface.md",
         "Index" => "docs-index.md",
     ],
     warnonly=[:missing_docs, :cross_references],
