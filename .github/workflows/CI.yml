@@ -222,9 +222,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
 
-      - name: Copy documentation to 'gh-pages' branch
-        # Only run for 'push' events
-        if: github.event_name == 'push'
+      - name: Copy dev documentation to the 'gh-pages' branch
+        # Only run for 'push' events to the 'main' branch
+        if: github.event_name == 'push' && github.ref_name == 'main'
+
+        uses: tuftsrt/copy-to-branch@v1
+        with:
+          destination-branch: gh-pages
+          clear-destination: "true"
+          copy: |
+            docs/build|dev
+
+      - name: Copy new release documentation to the 'gh-pages' branch
+        # Only run for 'push' events to a release tag
+        if: github.event_name == 'push' && github.ref_name != 'main'
 
         uses: tuftsrt/copy-to-branch@v1
         with:
