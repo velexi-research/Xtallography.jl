@@ -224,8 +224,8 @@ jobs:
         # Only run for 'push' events to the 'main' branch
         if: github.event_name == 'push' && github.ref_name == 'main'
         env:
-          SRC_PATH: 'docs/build'
-          DST_PATH: 'dev'
+          SRC_PATH: 'docs/build/python'
+          DST_PATH: 'dev/python'
           TARGET_BRANCH: 'gh-pages'
           COMMIT_MSG: '[GHA] Update dev documentation'
           USER_NAME: 'ktchu'
@@ -249,7 +249,7 @@ jobs:
           git checkout $TARGET_BRANCH
 
           # Copy source directory to destination directory
-          rsync -a $SRC_PATH/ $DST_PATH
+          rsync -a --delete $SRC_PATH/ $DST_PATH
 
           # Stage destination directory for commit
           git add $DST_PATH
@@ -262,8 +262,8 @@ jobs:
         # Only run for 'push' events to a release tag
         if: github.event_name == 'push' && github.ref_name != 'main'
         env:
-          SRC_PATH: 'docs/build'
-          DST_PATH: ${{ github.ref_name }}
+          SRC_PATH: 'docs/build/python'
+          DST_PATH: ${{ github.ref_name }}/python
           TARGET_BRANCH: 'gh-pages'
           COMMIT_MSG: '[GHA] Update new release documentation'
           USER_NAME: 'ktchu'
@@ -287,7 +287,7 @@ jobs:
           git checkout $TARGET_BRANCH
 
           # Copy source directory to destination directory
-          rsync -a $SRC_PATH/ $DST_PATH
+          rsync -a --delete $SRC_PATH/ $DST_PATH
 
           # Stage destination directory for commit
           git add $DST_PATH
