@@ -26,7 +26,9 @@ PYTEST_OPTIONS=-n ${NPROCS}
 ## Run all tests.
 test:
 	@echo Removing old coverage files
-	find . -name "*.jl.*.cov" -exec rm -f {} \;
+	find . -name "*.jl.*.cov" -exec rm -f {} \;  # Julia coverage
+	find . -name "*.coverage.*" -exec rm -f {} \;  # Python coverage
+	rm -rf coverage htmlcov coverage.xml  # Python coverage
 	@echo Running Julia unit tests
 	@$(MAKE) julia-tests
 	@echo Running Python unit tests
@@ -108,9 +110,13 @@ docs:
 ## Remove files and directories automatically generated during development and testing
 ## (e.g., coverage files).
 clean:
-	@echo Removing coverage files
-	find . -name "*.jl.*.cov" -exec rm -f {} \;
-	find . -name "*.coverage" -exec rm -f {} \;
+	find . -name "*.jl.*.cov" -exec rm -f {} \;  # Julia coverage
+	find . -type d -name "__pycache__" -delete  # compiled python
+	find . -type f -name "*.py[co]" -delete  # compiled python
+	rm -rf .cache .pytest_cache  # pytest
+	find . -name "*.coverage.*" -exec rm -f {} \;  # Python coverage
+	rm -rf coverage htmlcov coverage.xml  # Python coverage
+
 
 ## Remove all automatically generated files and directories (e.g., coverage files, package
 ## documentation, and `Manifest.toml` files).
