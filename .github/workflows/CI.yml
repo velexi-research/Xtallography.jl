@@ -205,7 +205,7 @@ jobs:
           path: .venv
           key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-venv-${{ hashFiles('**/poetry.lock') }}
 
-      # --- Build and deploy documentation
+      # --- Build documentation
 
       - name: Install Julia documentation dependencies
         run: julia --project=docs --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
@@ -214,10 +214,21 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --with docs
 
-      - name: Build and deploy documentation
+      - name: Build documentation
         run: |
           julia --project=docs --color=yes --compile=min -O0 docs/make.jl
           JULIA_PROJECT=@. JULIA_LOAD_PATH=.: PDOC_ALLOW_EXEC=1 poetry run pdoc --math docs/xtallography -o docs/build/python
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+
+      - name: Copy documentation to 'gh-pages' branch
+        # Only run for 'push' events
+        if: github.event_name == 'push'
+
+        uses: tuftsrt/copy-to-branch@v1
+        with:
+          destination-branch: gh-pages
+          clear-destination: "true"
+          copy: |
+            docs/build|${{ github.ref_name }}
