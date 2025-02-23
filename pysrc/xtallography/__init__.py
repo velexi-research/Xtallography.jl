@@ -8,7 +8,7 @@
 # Change License: Mozilla Public License 2.0
 """
 The `xtallography` Python package implements a basic Python interface to the
-<a href="/XtallographyUtils.jl/">`Xtallography.jl`</a>.
+<a href="/Xtallography.jl/">`Xtallography.jl`</a>.
 """
 # --- Imports
 
@@ -19,4 +19,4 @@ import juliacall
 # --- Initialize JuliaCall
 
 _JL = juliacall.newmodule("xtallographyJuliaCall")
-_JL.seval("using XtallographyUtils")
+_JL.seval("using Xtallography")

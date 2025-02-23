@@ -20,8 +20,8 @@ Tests for methods in lattice/orthorhombic.jl (except for cell standardization me
 # Standard library
 using Test
 
-# XtallographyUtils package
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # --- Tests
 

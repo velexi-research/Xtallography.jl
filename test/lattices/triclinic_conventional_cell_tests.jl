@@ -25,8 +25,8 @@ using Test
 using Combinatorics: combinations, permutations
 using AngleBetweenVectors: angle
 
-# XtallographyUtils package
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # Notes
 # =====

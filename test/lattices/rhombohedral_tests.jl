@@ -21,8 +21,8 @@ rhombohedral_tests.jl defines tests for lattice/rhombohedral.jl
 using Test
 using LinearAlgebra: det, norm, cross
 
-# XtallographyUtils package
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # --- Tests
 

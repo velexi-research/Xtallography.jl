@@ -20,8 +20,8 @@ Tests for methods in lattice/cubic.jl (except for cell standardization methods)
 # Standard library
 using Test
 
-# XtallographyUtils package
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # --- Tests
 

@@ -1,5 +1,5 @@
 ```@meta
-CurrentModule = XtallographyUtils
+CurrentModule = Xtallography
 ```
 
 # Types

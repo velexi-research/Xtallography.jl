@@ -24,8 +24,8 @@ using Test
 # External packages
 using Combinatorics: permutations
 
-# XtallographyUtils package
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # --- Tests
 

@@ -21,8 +21,8 @@ Tests for methods in lattice/monoclinic.jl (except for cell standardization meth
 using Test
 using LinearAlgebra: det, dot, norm, cross
 
-# XtallographyUtils package
-using XtallographyUtils
+# Xtallography package
+using Xtallography
 
 # --- Tests
 

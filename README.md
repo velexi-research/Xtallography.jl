@@ -1,4 +1,4 @@
-Xtallography Utilities
+Xtallography
 ============================================================================================
 
 [------------------------------------ BADGES: BEGIN ------------------------------------]: #
@@ -7,24 +7,24 @@ Xtallography Utilities
   <tr>
     <td>Documentation</td>
     <td>
-      <a href="https://velexi-research.github.io/XtallographyUtils.jl/dev/"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/docs-dev-blue.svg"/></a>
-      <a href="https://velexi-research.github.io/XtallographyUtils.jl/stable/"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/docs-stable-blue.svg"/></a>
+      <a href="https://velexi-research.github.io/Xtallography.jl/dev/"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/docs-dev-blue.svg"/></a>
+      <a href="https://velexi-research.github.io/Xtallography.jl/stable/"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/docs-stable-blue.svg"/></a>
     </td>
   </tr>
 
   <tr>
     <td>Build Status</td>
     <td>
-      <a href="https://github.com/velexi-research/XtallographyUtils.jl/actions/workflows/CI.yml"><img style="vertical-align: bottom;" src="https://github.com/velexi-research/XtallographyUtils.jl/actions/workflows/CI.yml/badge.svg"/></a>
-      <a href="https://codecov.io/gh/velexi-research/XtallographyUtils.jl">
-        <img style="vertical-align: bottom;" src="https://codecov.io/gh/velexi-research/XtallographyUtils.jl/graph/badge.svg?token=BZKPGII992"/></a>
+      <a href="https://github.com/velexi-research/Xtallography.jl/actions/workflows/CI.yml"><img style="vertical-align: bottom;" src="https://github.com/velexi-research/Xtallography.jl/actions/workflows/CI.yml/badge.svg"/></a>
+      <a href="https://codecov.io/gh/velexi-research/Xtallography.jl">
+        <img style="vertical-align: bottom;" src="https://codecov.io/gh/velexi-research/Xtallography.jl/graph/badge.svg?token=BZKPGII992"/></a>
     </td>
   </tr>
 
   <!-- Miscellaneous Badges -->
   <tr>
     <td colspan=2 align="center">
-      <a href="https://github.com/velexi-research/XtallographyUtils.jl/issues"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"/></a>
+      <a href="https://github.com/velexi-research/Xtallography.jl/issues"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"/></a>
       <a href="https://github.com/invenia/BlueStyle"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/code%20style-blue-4495d1.svg"/></a>
     </td>
   </tr>
@@ -32,12 +32,12 @@ Xtallography Utilities
 
 [------------------------------------- BADGES: END -------------------------------------]: #
 
-The Xtallography Utilities package defines a collection of basic types and miscellaneous
-utility functions that support crystallography computations. The functionality provided by
-this package are _not_ intended to be comprehensive. Rather, functionality is added on an
-as-needed basis to support research projects.
+The Xtallography package defines a collection of basic types and functions that support
+crystallography computations. The functionality provided by this package are _not_ intended
+to be comprehensive. Rather, functionality is added on an as-needed basis to support
+research projects.
 
-Currently, the Xtallography Utilities provides support for:
+Currently, Xtallography provides support for:
 
 * types for defining Bravais lattice types,
 
@@ -58,19 +58,19 @@ Currently, the Xtallography Utilities provides support for:
 
   ___Notes___
 
-  * `XtallographyUtils` is registered with the Velexi Julia package registry (not the
-    General Julia package registry), so the Pkg REPL will be able to find
-    `XtallographyUtils` only if the Velexi Julia package registry has been added to your
-    Julia installation. For more information about local registries for Julia packages,
+  * `Xtallography` is registered with the Velexi Julia package registry (not the General
+    Julia package registry), so the Pkg REPL will be able to find `Xtallography` only if
+    the Velexi Julia package registry has been added to your Julia installation. For more
+    information about local registries for Julia packages,
     [LocalRegistry.jl](https://github.com/GunnarFarneback/LocalRegistry.jl)
 
   * This step only needs to be performed once per Julia installation.
 
-* Install the `XtallographyUtils` package via the Pkg REPL. That's it!
+* Install the `Xtallography` package via the Pkg REPL. That's it!
 
   ```julia
   julia>  # Press ']' to enter the Pkg REPL mode.
-  pkg> add XtallographyUtils
+  pkg> add Xtallography
   ```
 
 ## Examples
