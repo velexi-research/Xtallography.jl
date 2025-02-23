@@ -226,20 +226,25 @@ jobs:
         # Only run for 'push' events to the 'main' branch
         if: github.event_name == 'push' && github.ref_name == 'main'
 
-        uses: tuftsrt/copy-to-branch@v1
+        uses: datalbry/copy_folder_to_another_repo_action@1.0.0
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
         with:
+          source_folder: 'docs/build'
+          destination_repo: ${{ github.reopsitory }}
+          destination_folder: 'dev'
+          user_email: 'kevin@velexi.com'
+          user_name: 'ktchu'
           destination-branch: gh-pages
-          clear-destination: "true"
-          copy: |
-            docs/build|dev
+          commit_msg: '[GHA] Update package documentation.'
 
-      - name: Copy new release documentation to the 'gh-pages' branch
-        # Only run for 'push' events to a release tag
-        if: github.event_name == 'push' && github.ref_name != 'main'
-
-        uses: tuftsrt/copy-to-branch@v1
-        with:
-          destination-branch: gh-pages
-          clear-destination: "true"
-          copy: |
-            docs/build|${{ github.ref_name }}
+#      - name: Copy new release documentation to the 'gh-pages' branch
+#        # Only run for 'push' events to a release tag
+#        if: github.event_name == 'push' && github.ref_name != 'main'
+#
+#        uses: tuftsrt/copy-to-branch@v1
+#        with:
+#          destination-branch: gh-pages
+#          clear-destination: "true"
+#          copy: |
+#            docs/build|${{ github.ref_name }}
