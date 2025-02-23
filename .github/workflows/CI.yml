@@ -43,7 +43,7 @@ jobs:
         codecov-os: 'Linux'
         codecov-arch: x64
         codecov-julia-version: '1.11'
-        codecov-python-version: '1.13'
+        codecov-python-version: '3.13'
 
     steps:
       - name: Check out code
@@ -147,6 +147,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
           fail_ci_if_error: true
+          verbose: true
 
   build-docs:
     name: Build Documentation
