@@ -22,7 +22,6 @@ from .core import (
     create_lattice,
     standardize_lattice,
     is_bravais_lattice,
-    is_valid_unit_cell,
 )
 from .triclinic import TriclinicUnitCell
 from .monoclinic import MonoclinicUnitCell
@@ -44,7 +43,6 @@ __all__ = [
     "create_lattice",
     "standardize_lattice",
     "is_bravais_lattice",
-    "is_valid_unit_cell",
     "TriclinicUnitCell",
     "MonoclinicUnitCell",
     "OrthorhombicUnitCell",
