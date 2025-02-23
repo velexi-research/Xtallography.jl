@@ -16,7 +16,6 @@ Core types and functions that support lattice and unit cell computations
 from abc import abstractmethod, ABC
 from collections import namedtuple
 from enum import auto, StrEnum
-import math
 
 # Local packages/modules
 from .. import _JL
