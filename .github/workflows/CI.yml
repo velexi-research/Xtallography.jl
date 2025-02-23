@@ -257,28 +257,37 @@ jobs:
           git diff-index --quiet HEAD ||  git commit -am "[GHA] Update dev documentation"
           git push origin $TARGET_BRANCH
 
-#        uses: datalbry/copy_folder_to_another_repo_action@1.0.0
-#        env:
-#          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          source_folder: 'docs/build'
-#
-#          destination_repo: ${{ github.reopsitory }}
-#          destination_branch: gh-pages
-#          destination_folder: 'dev'
-#
-#          user_email: 'kevin@velexi.com'
-#          user_name: 'ktchu'
-#
-#          commit_msg: '[GHA] Update package documentation.'
+      - name: Copy new release documentation to the 'gh-pages' branch
+        # Only run for 'push' events to a release tag
+        if: github.event_name == 'push' && github.ref_name != 'main'
+        env:
+          SRC_PATH: 'docs/build'
+          DST_PATH: ${{ github.ref_name }}
+          TARGET_BRANCH: 'gh-pages'
+        run: |
+          # --- Preparations
 
-#      - name: Copy new release documentation to the 'gh-pages' branch
-#        # Only run for 'push' events to a release tag
-#        if: github.event_name == 'push' && github.ref_name != 'main'
-#
-#        uses: tuftsrt/copy-to-branch@v1
-#        with:
-#          destination-branch: gh-pages
-#          clear-destination: "true"
-#          copy: |
-#            docs/build|${{ github.ref_name }}
+          # Set up git
+          git config --global user.name 'ktchu'
+          git config --global user.email 'kevin@velexi.com'
+
+          # Update remote-tracking branches
+          git fetch
+
+          # Revert files changed by GitHub Actions job
+          git checkout .
+
+          # --- Transfer files to new branch
+
+          # Check out target branch
+          git checkout $TARGET_BRANCH
+
+          # Copy doc/build directory to destination directory
+          rsync -a --delete $SRC_PATH/ $DST_PATH
+
+          # Stage destination directory for commit
+          git add $DST_PATH
+
+          # Commit changes to the repository (ignore if no modification)
+          git diff-index --quiet HEAD ||  git commit -am "[GHA] Update dev documentation"
+          git push origin $TARGET_BRANCH
