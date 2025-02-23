@@ -225,21 +225,36 @@ jobs:
       - name: Copy dev documentation to the 'gh-pages' branch
         # Only run for 'push' events to the 'main' branch
         if: github.event_name == 'push' && github.ref_name == 'main'
-
-        uses: datalbry/copy_folder_to_another_repo_action@1.0.0
         env:
-          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          source_folder: 'docs/build'
+          SRC_FOLDER_PATH: 'docs/build'
+          DST_FOLDER_PATH: 'dev'
+          TARGET_BRANCH: 'gh-pages'
+        run: |
+          git config --global user.name 'ktchu'
+          git config --global user.email 'kevin@velexi.com'
+          git fetch
+          git checkout $TARGET_BRANCH
+          rsync -a --delete $SRC_FOLDER_PATH/ $DST_FOLDER_PATH
+          git add $DST_FOLDER_PATH
 
-          destination_repo: ${{ github.reopsitory }}
-          destination_branch: gh-pages
-          destination_folder: 'dev'
-
-          user_email: 'kevin@velexi.com'
-          user_name: 'ktchu'
-
-          commit_msg: '[GHA] Update package documentation.'
+          # commit to the repository (ignore if no modification)
+          git diff-index --quiet HEAD ||  git commit -am "[GHA] Update dev documentation"
+          git push origin $TARGET_BRANCH
+#
+#        uses: datalbry/copy_folder_to_another_repo_action@1.0.0
+#        env:
+#          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          source_folder: 'docs/build'
+#
+#          destination_repo: ${{ github.reopsitory }}
+#          destination_branch: gh-pages
+#          destination_folder: 'dev'
+#
+#          user_email: 'kevin@velexi.com'
+#          user_name: 'ktchu'
+#
+#          commit_msg: '[GHA] Update package documentation.'
 
 #      - name: Copy new release documentation to the 'gh-pages' branch
 #        # Only run for 'push' events to a release tag
