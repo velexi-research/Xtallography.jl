@@ -226,21 +226,37 @@ jobs:
         # Only run for 'push' events to the 'main' branch
         if: github.event_name == 'push' && github.ref_name == 'main'
         env:
-          SRC_FOLDER_PATH: 'docs/build'
-          DST_FOLDER_PATH: 'dev'
+          SRC_PATH: 'docs/build'
+          DST_PATH: 'dev'
           TARGET_BRANCH: 'gh-pages'
         run: |
+          # --- Preparations
+
+          # Set up git
           git config --global user.name 'ktchu'
           git config --global user.email 'kevin@velexi.com'
-          git fetch
-          git checkout $TARGET_BRANCH
-          rsync -a --delete $SRC_FOLDER_PATH/ $DST_FOLDER_PATH
-          git add $DST_FOLDER_PATH
 
-          # commit to the repository (ignore if no modification)
+          # Update remote-tracking branches
+          git fetch
+
+          # Revert files changed by GitHub Actions job
+          git checkout .
+
+          # --- Transfer files to new branch
+
+          # Check out target branch
+          git checkout $TARGET_BRANCH
+
+          # Copy doc/build directory to destination directory
+          rsync -a --delete $SRC_PATH/ $DST_PATH
+
+          # Stage destination directory for commit
+          git add $DST_PATH
+
+          # Commit changes to the repository (ignore if no modification)
           git diff-index --quiet HEAD ||  git commit -am "[GHA] Update dev documentation"
           git push origin $TARGET_BRANCH
-#
+
 #        uses: datalbry/copy_folder_to_another_repo_action@1.0.0
 #        env:
 #          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
