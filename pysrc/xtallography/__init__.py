@@ -8,7 +8,7 @@
 # Change License: Mozilla Public License 2.0
 """
 The `xtallography` Python package implements a basic Python interface to the
-<a href="/">`Xtallography.jl`</a>.
+<a href="/XtallographyUtils.jl/">`Xtallography.jl`</a>.
 """
 # --- Imports
 
