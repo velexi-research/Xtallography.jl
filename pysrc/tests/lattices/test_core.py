@@ -20,7 +20,7 @@ import unittest
 import juliacall
 import pytest
 import xtallography
-from xtallography.lattices import LatticeSystem, Centering, Lattice
+from xtallography.lattices import LatticeSystem, Centering, Lattice, UnitCell
 
 # Local packages/modules
 
@@ -295,9 +295,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # `centering` has wrong type
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.standardize_lattice(
-                Lattice("abc", None)
-            )
+            xtallography.lattices.standardize_lattice(Lattice("abc", None))
 
         expected_error = (
             "`lattice.centering` must be a string. (lattice.centering=None)"
@@ -306,9 +304,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # Nonsense `system` and `centering` values
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.standardize_lattice(
-                Lattice("abc", "def")
-            )
+            xtallography.lattices.standardize_lattice(Lattice("abc", "def"))
 
         expected_error = (
             "`lattice_system` must be one of "
@@ -319,9 +315,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # Nonsense `centering` value
         with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.standardize_lattice(
-                Lattice("hexagonal", "def")
-            )
+            xtallography.lattices.standardize_lattice(Lattice("hexagonal", "def"))
 
         expected_error = (
             "`centering` must be one of "
@@ -528,9 +522,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ monoclinic
 
-        lattice = xtallography.lattices.create_lattice(
-            "monoclinic", "primitive"
-        )
+        lattice = xtallography.lattices.create_lattice("monoclinic", "primitive")
 
         unit_cell = {"a": 1, "b": 2, "c": 3, "beta": 80}
         assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
@@ -547,9 +539,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ orthorhombic
 
-        lattice = xtallography.lattices.create_lattice(
-            "orthorhombic", "primitive"
-        )
+        lattice = xtallography.lattices.create_lattice("orthorhombic", "primitive")
 
         unit_cell = {"a": 1, "b": 2, "c": 3}
         assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
@@ -566,9 +556,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ tetragonal
 
-        lattice = xtallography.lattices.create_lattice(
-            "tetragonal", "body_centered"
-        )
+        lattice = xtallography.lattices.create_lattice("tetragonal", "body_centered")
 
         unit_cell = {"a": 1, "c": 3}
         assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
@@ -585,9 +573,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ rhombohedral
 
-        lattice = xtallography.lattices.create_lattice(
-            "rhombohedral", "primitive"
-        )
+        lattice = xtallography.lattices.create_lattice("rhombohedral", "primitive")
 
         unit_cell = {"a": 1, "alpha": 45}
         assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
@@ -663,108 +649,27 @@ class test_xtallography_lattices_core(unittest.TestCase):
         except Exception:
             pytest.fail("Lattice() constructor raised unexpected error")
 
-    @unittest.skip("BROKEN")
     @staticmethod
-    def test_is_valid_unit_cell_invalid_args():
+    def test_UnitCell_argument_checks():
         """
-        Test argument checks for `is_valid_unit_cell()`.
+        Tests for `UnitCell()` constructor argument checks.
         """
         # --- Preparations
 
-        # valid arguments
-        lattice = xtallography.lattices.create_lattice(
-            "orthorhombic", "body_centered"
-        )
-        unit_cell = {"a": 3, "b": 4, "c": 5}
+        # Define subclass that calls UnitCell constructor with string arguments
+        class TestUnitCell(UnitCell):
+            def __init__(self):
+                super().__init__("cubic", "primitive")
+
+            def to_julia(self):
+                return None
 
         # --- Tests
 
-        # `lattice` is not a `Lattice` type
-        invalid_lattice = "not a lattice"
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(invalid_lattice, unit_cell)
+        try:
+            unit_cell = TestUnitCell()
+        except Exception:
+            pytest.fail("Unexpected test failure.")
 
-        expected_error = (
-            f"`lattice` must be a `Lattice` object. (lattice={invalid_lattice})"
-        )
-        assert expected_error in str(exception_info)
-
-        # `lattice` is not a valid Bravais lattice
-        invalid_lattice = xtallography.lattices.create_lattice(
-            "hexagonal", "body_centered"
-        )
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(invalid_lattice, unit_cell)
-
-        expected_error = (
-            f"`lattice` must be a Bravais lattice. (lattice={invalid_lattice})"
-        )
-        assert expected_error in str(exception_info)
-
-        # `unit_cell` is not a dict
-        invalid_unit_cell = "not a dict"
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(lattice, invalid_unit_cell)
-
-        expected_error = f"`unit_cell` must be a dict. (unit_cell={invalid_unit_cell})"
-        assert expected_error in str(exception_info)
-
-        # `unit_cell` values are not numbers
-        invalid_unit_cell = copy.copy(unit_cell)
-        invalid_unit_cell["a"] = "not a number"
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(lattice, invalid_unit_cell)
-
-        expected_error = (
-            "`unit_cell['a']` must be a number. (unit_cell['a']=not a number)"
-        )
-
-        assert expected_error in str(exception_info)
-
-        # some `unit_cell` values are 0, allow_edge_cases = False
-        invalid_unit_cell = copy.copy(unit_cell)
-        invalid_unit_cell["a"] = 0
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(
-                lattice, invalid_unit_cell, allow_edge_cases=False
-            )
-
-        expected_error = "`unit_cell['a']` must be positive. (unit_cell['a']=0)"
-
-        assert expected_error in str(exception_info)
-
-        # some `unit_cell` values are negative, allow_edge_cases = True
-        invalid_unit_cell = copy.copy(unit_cell)
-        invalid_unit_cell["a"] = -10
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(
-                lattice, invalid_unit_cell, allow_edge_cases=True
-            )
-
-        expected_error = "`unit_cell['a']` must be nonnegative. (unit_cell['a']=-10)"
-
-        assert expected_error in str(exception_info)
-
-        # some `unit_cell` values are negative, allow_edge_cases = False
-        invalid_unit_cell = copy.copy(unit_cell)
-        invalid_unit_cell["a"] = -10
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(
-                lattice, invalid_unit_cell, allow_edge_cases=False
-            )
-
-        expected_error = "`unit_cell['a']` must be positive. (unit_cell['a']=-10)"
-
-        assert expected_error in str(exception_info)
-
-        # some `unit_cell` values are 0, allow_edge_cases = False
-        invalid_unit_cell = copy.copy(unit_cell)
-        invalid_unit_cell["a"] = math.inf
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(
-                lattice, invalid_unit_cell, allow_edge_cases=False
-            )
-
-        expected_error = "`unit_cell['a']` must be finite. (unit_cell['a']=inf)"
-
-        assert expected_error in str(exception_info)
+        assert isinstance(unit_cell.lattice_system, LatticeSystem)
+        assert isinstance(unit_cell.centering, Centering)
