@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xtallography"
-version = "0.4.0"
+version = "0.4.1"
 description = "Library of utility functions for analysis of 3D crystals."
 license = "Apache-2.0"
 readme = "README.md"
@@ -10,7 +10,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 pre-commit = "^4"
 juliacall = "^0.9.24"
 

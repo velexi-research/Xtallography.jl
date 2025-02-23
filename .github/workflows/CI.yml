@@ -30,10 +30,8 @@ jobs:
         # os: [ubuntu-latest, windows-latest, macos-latest]
         os: [ubuntu-latest]
         arch: [x64]
-        #julia-version: ['1.7', '1.8', '1.9', '1.10', '1.11']
-        julia-version: ['1.11']
-        # python-version: ['3.10', '3.11', '3.12', '3.13']
-        python-version: ['3.13']
+        julia-version: ['1.9', '1.10', '1.11']
+        python-version: ['3.11', '3.12', '3.13']
 
     defaults:
       run:
@@ -45,7 +43,7 @@ jobs:
         codecov-os: 'Linux'
         codecov-arch: x64
         codecov-julia-version: '1.11'
-        codecov-python-version: '1.13'
+        codecov-python-version: '3.13'
 
     steps:
       - name: Check out code
@@ -149,6 +147,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
           fail_ci_if_error: true
+          verbose: true
 
   build-docs:
     name: Build Documentation
@@ -226,8 +225,8 @@ jobs:
         # Only run for 'push' events to the 'main' branch
         if: github.event_name == 'push' && github.ref_name == 'main'
         env:
-          SRC_PATH: 'docs/build'
-          DST_PATH: 'dev'
+          SRC_PATH: 'docs/build/python'
+          DST_PATH: 'dev/python'
           TARGET_BRANCH: 'gh-pages'
           COMMIT_MSG: '[GHA] Update dev documentation'
           USER_NAME: 'ktchu'
@@ -264,8 +263,8 @@ jobs:
         # Only run for 'push' events to a release tag
         if: github.event_name == 'push' && github.ref_name != 'main'
         env:
-          SRC_PATH: 'docs/build'
-          DST_PATH: ${{ github.ref_name }}
+          SRC_PATH: 'docs/build/python'
+          DST_PATH: ${{ github.ref_name }}/python
           TARGET_BRANCH: 'gh-pages'
           COMMIT_MSG: '[GHA] Update new release documentation'
           USER_NAME: 'ktchu'
