@@ -230,12 +230,14 @@ jobs:
           DST_PATH: 'dev'
           TARGET_BRANCH: 'gh-pages'
           COMMIT_MSG: '[GHA] Update dev documentation'
+          USER_NAME: 'ktchu'
+          USER_EMAIL: 'kevin@velexi.com'
         run: |
           # --- Preparations
 
           # Set up git
-          git config --global user.name 'ktchu'
-          git config --global user.email 'kevin@velexi.com'
+          git config --global user.name $USER_NAME
+          git config --global user.email $USER_EMAIL
 
           # Update remote-tracking branches
           git fetch
@@ -248,7 +250,7 @@ jobs:
           # Check out target branch
           git checkout $TARGET_BRANCH
 
-          # Copy doc/build directory to destination directory
+          # Copy source directory to destination directory
           rsync -a --delete $SRC_PATH/ $DST_PATH
 
           # Stage destination directory for commit
@@ -266,12 +268,14 @@ jobs:
           DST_PATH: ${{ github.ref_name }}
           TARGET_BRANCH: 'gh-pages'
           COMMIT_MSG: '[GHA] Update new release documentation'
+          USER_NAME: 'ktchu'
+          USER_EMAIL: 'kevin@velexi.com'
         run: |
           # --- Preparations
 
           # Set up git
-          git config --global user.name 'ktchu'
-          git config --global user.email 'kevin@velexi.com'
+          git config --global user.name $USER_NAME
+          git config --global user.email $USER_EMAIL
 
           # Update remote-tracking branches
           git fetch
@@ -284,7 +288,7 @@ jobs:
           # Check out target branch
           git checkout $TARGET_BRANCH
 
-          # Copy doc/build directory to destination directory
+          # Copy source directory to destination directory
           rsync -a --delete $SRC_PATH/ $DST_PATH
 
           # Stage destination directory for commit
