@@ -117,7 +117,6 @@ clean:
 	find . -name "*.coverage.*" -exec rm -f {} \;  # Python coverage
 	rm -rf coverage htmlcov coverage.xml  # Python coverage
 
-
 ## Remove all automatically generated files and directories (e.g., coverage files, package
 ## documentation, and `Manifest.toml` files).
 spotless: clean
