@@ -15,7 +15,7 @@ Currently, Xtallography provides support for:
 
 * conversions between equivalent unit cells for a lattice.
 
-In addition, Xtallography provides a basic [Python interface](python/index.html) to
+In addition, Xtallography provides a basic [Python interface](python/) to
 facilitate integration with Python codebases.
 
 ## Getting Started
@@ -49,7 +49,7 @@ facilitate integration with Python codebases.
 ## Related Packages
 
 There are a couple of crystallography packages in the Julia ecosystem that provide support
-for various crystall and lattice computations.
+for various crystallography and lattice computations.
 
 * [Crystallography.jl](https://github.com/MineralsCloud/Crystallography.jl) and related
   packages
