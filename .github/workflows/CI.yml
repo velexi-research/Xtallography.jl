@@ -222,6 +222,8 @@ jobs:
           COMMIT_MSG: '[GHA] Update dev documentation'
           USER_NAME: 'ktchu'
           USER_EMAIL: 'kevin@velexi.com'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
         run: |
           # --- Preparations
 
@@ -260,6 +262,8 @@ jobs:
           COMMIT_MSG: '[GHA] Update new release documentation'
           USER_NAME: 'ktchu'
           USER_EMAIL: 'kevin@velexi.com'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
         run: |
           # --- Preparations
 
