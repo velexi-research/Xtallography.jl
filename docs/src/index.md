@@ -49,7 +49,7 @@ facilitate integration with Python codebases.
 ## Related Packages
 
 There are a couple of crystallography packages in the Julia ecosystem that provide support
-for various crystall and lattice computations.
+for various crystallography and lattice computations.
 
 * [Crystallography.jl](https://github.com/MineralsCloud/Crystallography.jl) and related
   packages
