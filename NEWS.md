@@ -9,7 +9,7 @@ Xtallography Release Notes
 - Bump Julia and Python version requirements to improve package reliability.
 
 **Bug Fixes**
-- Remove function from Python interface accidentally included in v0.4.0.
+- Remove function from Python interface that was accidentally included in v0.4.0.
 - Fix bugs in documentation.
 
 **Developer Updates:**
