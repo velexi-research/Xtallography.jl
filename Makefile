@@ -70,7 +70,7 @@ python-coverage: .coverage
 
 ## Check codestyle for Julia code.
 jlcodestyle:
-	@echo Checking code style
+	@echo Checking code style for Julia code
 	@jlcodestyle -v $(JULIA_PKG_DIR)
 
 ## Run codestyle and lint checks for Python code.
@@ -147,7 +147,7 @@ spotless: clean
 
 .PHONY: help
 
-## Display this list of available rules
+## Display this list of available rules.
 help:
 	@echo "$$(tput bold)Default rule:$$(tput sgr0) ${.DEFAULT_GOAL}"
 	@echo
