@@ -5,25 +5,25 @@ Xtallography Release Notes
 0.4.2 (2025-02-24)
 ==================
 **Bug Fixes**
-- Fix links to Python API in documentation.
+- Fixed links to Python API in documentation.
 
 --------------------------------------------------------------------------------------------
 0.4.1 (2025-02-23)
 ==================
 **Enhancements:**
-- Improve robustness of Makefile targets.
-- Bump Julia and Python version requirements to improve package reliability.
+- Improved robustness of Makefile targets.
+- Bumped Julia and Python version requirements to improve package reliability.
 
 **Bug Fixes**
-- Remove function from Python interface that was accidentally included in v0.4.0.
-- Fix bugs in documentation.
+- Removed function from Python interface that was accidentally included in v0.4.0.
+- Fixed bugs in documentation.
 
 **Developer Updates:**
-- Add developer notes.
-- Update unit tests.
-- Improve robustness of doc generation.
-- Update test matrix in CI workflow.
-- Fix bugs in CI workflow.
+- Added developer notes.
+- Updated unit tests.
+- Improved robustness of doc generation.
+- Updated test matrix in CI workflow.
+- Fixed bugs in CI workflow.
 - Updated pre-commit configuration.
 
 --------------------------------------------------------------------------------------------
