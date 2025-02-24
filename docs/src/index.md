@@ -15,7 +15,7 @@ Currently, Xtallography provides support for:
 
 * conversions between equivalent unit cells for a lattice.
 
-In addition, Xtallography provides a basic [Python interface](python/index.html) to
+In addition, Xtallography provides a basic [Python interface](python/) to
 facilitate integration with Python codebases.
 
 ## Getting Started
