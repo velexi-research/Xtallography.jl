@@ -2,9 +2,10 @@ name: gh-pages
 
 on:
   workflow_run:
-    workflows: [CI build-docs]
+    workflows: [CI]
     types:
       - completed
+    branches: [main]
 
 #  push:
 #    branches:
