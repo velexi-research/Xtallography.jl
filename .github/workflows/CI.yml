@@ -247,7 +247,7 @@ jobs:
           git add $DST_PATH
 
           # Commit changes to the repository (ignore if no modification)
-          git diff-index --quiet HEAD ||  git commit -am "$COMMIT_MSG"
+          git diff-index --quiet HEAD || git commit -am "$COMMIT_MSG"
           git push origin $TARGET_BRANCH
 
       - name: Copy new release documentation to the 'gh-pages' branch
@@ -285,5 +285,5 @@ jobs:
           git add $DST_PATH
 
           # Commit changes to the repository (ignore if no modification)
-          git diff-index --quiet HEAD ||  git commit -am "$COMMIT_MSG"
+          git diff-index --quiet HEAD || git commit -am "$COMMIT_MSG"
           git push origin $TARGET_BRANCH
