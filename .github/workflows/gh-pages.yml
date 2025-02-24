@@ -4,7 +4,6 @@ on:
   workflow_run:
     workflows: [CI]
     types: [completed]
-    branches: [main]
 
 #  push:
 #    branches:
@@ -30,7 +29,8 @@ jobs:
   deploy-docs:
     name: Deploy Documentation to GitHub Pages
 
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: |
+      ${{ github.event.workflow_run.conclusion == 'success' }}
 
     environment:
       name: github-pages
@@ -45,6 +45,10 @@ jobs:
       id-token: write
 
     steps:
+      - name: Debugging
+        run: |
+          echo ${{ github.event.workflow_run.referenced_workflows.ref }}
+
       - name: Check out code
         uses: actions/checkout@v4
         with:
