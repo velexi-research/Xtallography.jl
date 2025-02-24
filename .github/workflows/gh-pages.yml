@@ -47,7 +47,8 @@ jobs:
     steps:
       - name: Debugging
         run: |
-          echo ${{ github.event.workflow_run.referenced_workflows.ref }}
+          echo "REF: ${{ github.event.workflow_run.referenced_workflows.ref }}"
+          echo "PATH: ${{ github.event.workflow_run.referenced_workflows.path }}"
 
       - name: Check out code
         uses: actions/checkout@v4
