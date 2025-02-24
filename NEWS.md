@@ -7,6 +7,9 @@ Xtallography Release Notes
 **Bug Fixes**
 - Fixed links to Python API in documentation.
 
+**Developer Updates:**
+- Fixed documentation deployment bugs in GitHub Actions workflows.
+
 --------------------------------------------------------------------------------------------
 0.4.1 (2025-02-23)
 ==================
