@@ -8,11 +8,13 @@ Xtallography Release Notes
 - Improve robustness of Makefile targets.
 - Bump Julia and Python version requirements to improve package reliability.
 
-**Enhancements:**
+**Bug Fixes**
+- Remove function from Python interface accidentally included in v0.4.0.
 - Fix bugs in CI workflow.
 
 **Developer Updates:**
 - Add developer notes.
+- Update unit tests
 
 --------------------------------------------------------------------------------------------
 0.4.0 (2025-02-22)
