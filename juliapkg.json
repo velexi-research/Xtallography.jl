@@ -1,8 +1,0 @@
-{
-  "julia": "1.9",
-  "packages": {
-    "Xtallography": {
-      "uuid": "795fc1aa-9caa-44e9-84db-c49cd1f148be"
-    }
-  }
-}
