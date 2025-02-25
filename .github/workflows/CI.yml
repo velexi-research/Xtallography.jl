@@ -226,9 +226,6 @@ jobs:
           # Update remote-tracking branches
           git fetch
 
-          # Revert files changed by GitHub Actions job
-          git checkout .
-
           # --- Transfer files to new branch
 
           # Check out target branch
