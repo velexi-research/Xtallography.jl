@@ -115,7 +115,10 @@ jobs:
 
       - name: Run Python tests
         run: |
-          JULIA_PROJECT=@. JULIA_LOAD_PATH=.: poetry run pytest --cov-report=xml
+          # Use the development version of juliapkg.json
+          mv pysrc/xtallography/juliapkg-dev.json pysrc/xtallography/juliapkg.json
+          # JULIA_PROJECT=@. JULIA_LOAD_PATH=.: poetry run pytest --cov-report=xml
+          poetry run pytest --cov-report=xml
 
       # --- Upload coverage data
 
