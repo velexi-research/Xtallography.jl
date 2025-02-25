@@ -17,6 +17,11 @@ repos:
       entry: flake8
       language: python
       types: [python]
+    - id: check-juliapkg-config
+      name: check-juliapkg-config
+      entry: pysrc/bin/check-juliapkg-config.sh
+      language: system
+      files: juliapkg.json
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
