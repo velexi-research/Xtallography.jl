@@ -9,7 +9,8 @@ packages = [
     { include = "xtallography", from = "pysrc" },
 ]
 include = [
-    { path = "pysrc/xtallography/juliapkg.json", format = "wheel" }
+    { path = "pysrc/xtallography/juliapkg.json", format = ["sdist", "wheel"] },
+    { path = "src/Xtallography.jl", format = ["sdist", "wheel"] },
 ]
 
 [tool.poetry.dependencies]
