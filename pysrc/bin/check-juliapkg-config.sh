@@ -20,7 +20,7 @@ SCRIPT_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 JULIAPKG_JSON_PATH="$SCRIPT_DIR/../xtallography/juliapkg.json"
 RESULT=`grep '"dev":' $JULIAPKG_JSON_PATH | grep "true"`
 if [ ! -z "$RESULT" ]; then
-    echo "Development versions of juliapkg.json should not be committed to the repository."
+    echo "Development version of juliapkg.json should not be committed to the repository."
     exit 1
 fi
 
