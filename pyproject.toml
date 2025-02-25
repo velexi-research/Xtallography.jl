@@ -8,6 +8,9 @@ authors = ["Kevin T. Chu <kevin@velexi.com>"]
 packages = [
     { include = "xtallography", from = "pysrc" },
 ]
+exclude = [
+    { path= "pysrc/xtallography/juliapkg.json", format = "wheel" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
