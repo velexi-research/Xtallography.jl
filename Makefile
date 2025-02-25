@@ -101,6 +101,7 @@ python-lint:
 docs:
 	julia --project=${DOCS_DIR} --color=yes -e 'using Pkg; Pkg.update()'
 	julia --project=${DOCS_DIR} --color=yes --compile=min -O0 ${DOCS_DIR}/make.jl
+	@echo Generating Python documentation
 	PDOC_ALLOW_EXEC=1 pdoc --math ${PYTHON_PKG_DIR} -o ${DOCS_DIR}/build/python
 
 # --- Utility rules
