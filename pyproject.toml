@@ -10,7 +10,6 @@ packages = [
 ]
 exclude = [
     { path= "pysrc/xtallography/juliapkg-dev.json", format = "wheel" },
-#    { path= "pysrc/bin", format = "wheel" },
 ]
 
 [tool.poetry.dependencies]
