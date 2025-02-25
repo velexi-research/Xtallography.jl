@@ -113,10 +113,6 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --with test
 
-#      - name: Install PythonCall (Julia package)
-#        run: |
-#          julia --project=. --color=yes -e 'using Pkg; Pkg.add("PythonCall")'
-
       - name: Run Python tests
         run: |
           JULIA_PROJECT=@. JULIA_LOAD_PATH=.: poetry run pytest --cov-report=xml
@@ -163,10 +159,6 @@ jobs:
 
       - name: Build package
         uses: julia-actions/julia-buildpkg@v1
-
-      - name: Install PythonCall (Julia package)
-        run: |
-          julia --project=. --color=yes -e 'using Pkg; Pkg.add("PythonCall")'
 
       # --- Set up Python
 
