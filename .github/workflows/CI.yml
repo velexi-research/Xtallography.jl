@@ -199,6 +199,7 @@ jobs:
       - name: Build documentation
         run: |
           julia --project=docs --color=yes --compile=min -O0 docs/make.jl
+          echo "Generating Python documentation"
           JULIA_PROJECT=@. JULIA_LOAD_PATH=.: PDOC_ALLOW_EXEC=1 poetry run pdoc --math docs/xtallography -o docs/build/python
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
