@@ -47,6 +47,8 @@ Currently, Xtallography provides support for:
 
 * conversions between equivalent unit cells for a lattice.
 
+In addition, Xtallography provides a basic [Python interface](https://velexi-research.github.io/Xtallography.jl/stable/python-interface/) to support integration with Python codebases.
+
 ## Getting Started
 
 * Add the Velexi Julia package registry.
@@ -131,3 +133,46 @@ for various crystallography and lattice computations.
   packages
 
 * [Spglib](https://github.com/singularitti/Spglib.jl)
+
+--------------------------------------------------------------------------------------------
+
+Developer Notes
+===============
+
+## Development Process
+
+* __New Releases__. When releasing a new version of the `Xtallography` package, be sure
+  that the version matches in the following files:
+
+  * `Project.toml`
+
+  * `pyproject.toml`
+
+  * `pysrc/xtallography/juliapkg.json`
+
+* __Python Package Development__
+
+  * __`juliapkg.json` vs `juliapkg-dev.json`__
+
+    The source code for the `xtallography` Python package contains two `juliapkg`
+    configuration files: `juliapkg.json` and `juliapkg-dev.json`. The former is used when
+    packaging `xtallography` for production while the latter is intended for use during
+    development.
+
+    During development of this package, replace `juliapkg.json` with `juliapkg-dev.json` to
+    ensure that the development version of `Xtallography` is used by the development Python
+    code.
+
+    When releasing a new version of the `Xtallography` package, be sure to update the
+    `Xtallography` version in `juliapkg.json` to match the version in `Project.toml`.
+
+## Known Issues
+
+* When running in GitHub Actions, the Python unit tests occasionally and inconsistently
+  fail because the tests crash (i.e., segmentation fault). These failures appear to be
+  related to JuliaCall/PythonCall, but we have not yet tracked down the origin of the
+  bug.
+
+  The failed jobs usually pass when they are re-run.
+
+--------------------------------------------------------------------------------------------
