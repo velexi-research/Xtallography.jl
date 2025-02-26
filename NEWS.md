@@ -2,16 +2,22 @@ Xtallography Release Notes
 ============================================================================================
 
 --------------------------------------------------------------------------------------------
+0.4.4 (2025-02-25)
+==================
+**Bug Fixes**
+- No change release to fix Github Pages deployment.
+
+--------------------------------------------------------------------------------------------
 0.4.3 (2025-02-25)
 ==================
-**Enhancements:**
+**Enhancements**
 - Added installation instructions for Python interface.
 - Simplified installation of Julia dependencies for Python package.
 
 **Bug Fixes**
 - Fixed license incantations in Python source code.
 
-**Developer Updates:**
+**Developer Updates**
 - Added juliapkg.json to configure Julia dependencies of Python package.
 - Updated Python packaging configuration.
 - Updated CI workflow to use the development version of juliapkg.json.
@@ -24,13 +30,13 @@ Xtallography Release Notes
 **Bug Fixes**
 - Fixed links to Python API in documentation.
 
-**Developer Updates:**
+**Developer Updates**
 - Fixed documentation deployment bugs in GitHub Actions workflows.
 
 --------------------------------------------------------------------------------------------
 0.4.1 (2025-02-23)
 ==================
-**Enhancements:**
+**Enhancements**
 - Improved robustness of Makefile targets.
 - Bumped Julia and Python version requirements to improve package reliability.
 
@@ -38,7 +44,7 @@ Xtallography Release Notes
 - Removed function from Python interface that was accidentally included in v0.4.0.
 - Fixed bugs in documentation.
 
-**Developer Updates:**
+**Developer Updates**
 - Added developer notes.
 - Updated unit tests.
 - Improved robustness of doc generation.
@@ -49,13 +55,13 @@ Xtallography Release Notes
 --------------------------------------------------------------------------------------------
 0.4.0 (2025-02-22)
 ==================
-**Enhancements:**
+**Enhancements**
 - Renamed package to `Xtallography`.
 - Added Python interface.
 - Refactored lattice and unit cell code.
 - Updated package documentation.
 
-**Developer Updates:**
+**Developer Updates**
 - Updated `Project.toml` files.
 - Improved CI workflows.
 - Added `Aqua` checks to unit tests.
