@@ -2,6 +2,23 @@ Xtallography Release Notes
 ============================================================================================
 
 --------------------------------------------------------------------------------------------
+0.4.3 (2025-02-25)
+==================
+**Enhancements:**
+- Added installation instructions for Python interface.
+- Simplified installation of Julia dependencies for Python package.
+
+**Bug Fixes**
+- Fixed license incantations in Python source code.
+
+**Developer Updates:**
+- Added juliapkg.json to configure Julia dependencies of Python package.
+- Updated Python packaging configuration.
+- Updated CI workflow to use the development version of juliapkg.json.
+- Added pre-commit hook to check that juliapkg.json is not a development version.
+- Moved developer notes to README.
+
+--------------------------------------------------------------------------------------------
 0.4.2 (2025-02-23)
 ==================
 **Bug Fixes**

@@ -70,7 +70,7 @@ python-coverage: .coverage
 
 ## Check codestyle for Julia code.
 jlcodestyle:
-	@echo Checking code style
+	@echo Checking code style for Julia code
 	@jlcodestyle -v $(JULIA_PKG_DIR)
 
 ## Run codestyle and lint checks for Python code.
@@ -101,6 +101,7 @@ python-lint:
 docs:
 	julia --project=${DOCS_DIR} --color=yes -e 'using Pkg; Pkg.update()'
 	julia --project=${DOCS_DIR} --color=yes --compile=min -O0 ${DOCS_DIR}/make.jl
+	@echo Generating Python documentation
 	PDOC_ALLOW_EXEC=1 pdoc --math ${PYTHON_PKG_DIR} -o ${DOCS_DIR}/build/python
 
 # --- Utility rules
@@ -147,7 +148,7 @@ spotless: clean
 
 .PHONY: help
 
-## Display this list of available rules
+## Display this list of available rules.
 help:
 	@echo "$$(tput bold)Default rule:$$(tput sgr0) ${.DEFAULT_GOAL}"
 	@echo

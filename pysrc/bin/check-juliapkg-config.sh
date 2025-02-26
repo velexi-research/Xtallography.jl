@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+#------------------------------------------------------------------------------
 #   Copyright 2025 Velexi Corporation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +13,15 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-"""
-The `xtallography` Python package implements a basic Python interface to the
-<a href="/Xtallography.jl/">`Xtallography.jl`</a>.
-"""
-# --- Imports
+#------------------------------------------------------------------------------
 
-# External packages
-import juliacall
+# Check that juliapkg.json is not the development version
+SCRIPT_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+JULIAPKG_JSON_PATH="$SCRIPT_DIR/../xtallography/juliapkg.json"
+RESULT=`grep '"dev":' $JULIAPKG_JSON_PATH | grep "true"`
+if [ ! -z "$RESULT" ]; then
+    echo "Development version of juliapkg.json should not be committed to the repository."
+    exit 1
+fi
 
-
-# --- Initialize JuliaCall
-
-_JL = juliacall.newmodule("xtallographyJuliaCall")
-_JL.seval("using Xtallography")
+exit 0
