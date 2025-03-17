@@ -34,8 +34,7 @@ test:
 	@echo Running Python unit tests
 	@$(MAKE) python-tests
 	@echo Generating code coverage reports
-	@$(MAKE) julia-coverage
-	@$(MAKE) python-coverage
+	@$(MAKE) coverage
 
 
 ## Run tests in fail-fast mode (i.e., stop at first failure)
