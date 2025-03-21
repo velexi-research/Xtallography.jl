@@ -112,6 +112,49 @@ class MonoclinicUnitCell(UnitCell):
 
     def to_julia(self):
         """
-        Convert MonoclinicUnitCell object to a Julia struct.
+        Convert MonoclinicUnitCell object to a Julia UnitCell object.
         """
-        return _JL.MonoclinicLatticeConstants(self.a, self.b, self.c, self.beta)
+        return _JL.UnitCell(
+            _JL.MonoclinicLatticeConstants(self.a, self.b, self.c, self.beta),
+            self.centering.to_julia(),
+        )
+
+    @classmethod
+    def from_julia(cls, unit_cell_jl: _JL.UnitCell):
+        """
+        Convert a Julia UnitCell object to a MonoclinicUnitCell object.
+        """
+        # --- Check arguments
+
+        if not _JL.isa(unit_cell_jl, _JL.UnitCell):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` object. "
+                f"(unit_cell_jl={unit_cell_jl})."
+            )
+
+        if not _JL.isa(unit_cell_jl.lattice_constants, _JL.MonoclinicLatticeConstants):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` object for monoclinic "
+                f"unit cell. (unit_cell_jl={unit_cell_jl})."
+            )
+
+        # --- Convert unit_cell_jl to a MonoclinicUnitCell object
+
+        unit_cell = MonoclinicUnitCell(
+            unit_cell_jl.lattice_constants.a,
+            unit_cell_jl.lattice_constants.b,
+            unit_cell_jl.lattice_constants.c,
+            unit_cell_jl.lattice_constants.β,
+            centering=Centering.from_julia(unit_cell_jl.centering),
+        )
+
+        return unit_cell
+
+    def __repr__(self):
+        """
+        Return string representation of MonoclinicUnitCell.
+        """
+        return (
+            f"MonoclinicUnitCell(a={self.a},b={self.b},c={self.c},beta={self.beta},"
+            f"centering='{self.centering}')"
+        )

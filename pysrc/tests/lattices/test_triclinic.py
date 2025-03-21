@@ -25,7 +25,8 @@ import pytest
 
 # Local packages/modules
 from xtallography import _JL
-from xtallography.lattices import LatticeSystem, Centering, TriclinicUnitCell
+from xtallography.lattices import LatticeSystem, Centering
+from xtallography.lattices import TriclinicUnitCell, TetragonalUnitCell
 
 
 # --- Test Suites
@@ -280,6 +281,7 @@ class test_xtallography_lattice_triclinic(unittest.TestCase):
         """
         # --- Preparations
 
+        # lattice constants
         a = 1
         b = 2
         c = 3
@@ -287,9 +289,119 @@ class test_xtallography_lattice_triclinic(unittest.TestCase):
         beta = 0.2
         gamma = 0.3
 
-        lattice_constants = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
 
         # --- Tests
 
-        lattice_constants_jl = lattice_constants.to_julia()
-        assert _JL.isa(lattice_constants_jl, _JL.TriclinicLatticeConstants)
+        unit_cell_jl = unit_cell.to_julia()
+        assert _JL.isa(unit_cell_jl, _JL.UnitCell)
+        assert _JL.isa(unit_cell_jl.lattice_constants, _JL.TriclinicLatticeConstants)
+
+    @staticmethod
+    def test_from_julia():
+        """
+        Test `from_julia()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        b = 2
+        c = 3
+        alpha = 0.1
+        beta = 0.2
+        gamma = 0.3
+
+        # --- Tests
+
+        # basic usage
+        unit_cell_jl = _JL.UnitCell(
+            _JL.TriclinicLatticeConstants(a, b, c, alpha, beta, gamma), _JL.primitive
+        )
+        unit_cell = TriclinicUnitCell.from_julia(unit_cell_jl)
+        assert unit_cell == TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+
+    @staticmethod
+    def test_from_julia_invalid_arguments():
+        """
+        Test `from_julia()`.
+        """
+        # --- Tests
+
+        # unit_cell_jl not a Julia UnitCell object
+        unit_cell_jl_invalid = "not Julia UnitCell object"
+        with pytest.raises(ValueError) as exception_info:
+            TriclinicUnitCell.from_julia(unit_cell_jl_invalid)
+
+        expected_error = (
+            "`unit_cell_jl` must be a Julia `UnitCell` object. "
+            f"(unit_cell_jl={unit_cell_jl_invalid})."
+        )
+        assert expected_error in str(exception_info)
+
+        # unit_cell_jl is not for a triclinic unit cell
+        unit_cell_jl_invalid = _JL.UnitCell(_JL.CubicLatticeConstants(1), _JL.primitive)
+        with pytest.raises(ValueError) as exception_info:
+            TriclinicUnitCell.from_julia(unit_cell_jl_invalid)
+
+        expected_error = (
+            "`unit_cell_jl` must be a Julia `UnitCell` object for triclinic "
+            f"unit cell. (unit_cell_jl={unit_cell_jl_invalid})."
+        )
+        assert expected_error in str(exception_info)
+
+    @staticmethod
+    def test_repr():
+        """
+        Test `__repr__()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        b = 2
+        c = 3
+        alpha = 0.1
+        beta = 0.2
+        gamma = 0.3
+
+        # --- Tests
+
+        # centering = primitive
+        unit_cell = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        assert str(unit_cell) == (
+            f"TriclinicUnitCell(a={a},b={b},c={c},"
+            f"alpha={alpha},beta={beta},gamma={gamma})"
+        )
+
+    @staticmethod
+    def test_eq():
+        """
+        Test `__eq__()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        b = 2
+        c = 3
+        alpha = 0.1
+        beta = 0.2
+        gamma = 0.3
+
+        # --- Tests
+
+        # lattice constants are the same
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        assert unit_cell_1 == unit_cell_2
+
+        # lattice constants are the different
+        unit_cell_1 = TriclinicUnitCell(a + 1, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        assert unit_cell_1 != unit_cell_2
+
+        # types are different
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TetragonalUnitCell(a, c)
+        assert unit_cell_1 != unit_cell_2

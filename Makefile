@@ -19,7 +19,7 @@ PYTEST_OPTIONS=-n ${NPROCS}
 
 # --- Testing rules
 
-.PHONY: test fast-test \
+.PHONY: test fast-test coverage \
 	julia-tests julia-coverage \
 	python-tests python-coverage
 
@@ -34,13 +34,23 @@ test:
 	@echo Running Python unit tests
 	@$(MAKE) python-tests
 	@echo Generating code coverage reports
-	@$(MAKE) julia-coverage
-	@$(MAKE) python-coverage
+	@$(MAKE) coverage
 
 
 ## Run tests in fail-fast mode (i.e., stop at first failure)
 fast-test: export JLTEST_FAIL_FAST=true
 fast-test: test
+
+## Generate coverage reports.
+coverage:
+	@echo "Julia coverage"
+	@echo "--------------"
+	@echo
+	@$(MAKE) julia-coverage
+	@echo
+	@echo "Python coverage"
+	@echo "---------------"
+	@$(MAKE) python-coverage
 
 ## Run only Julia unit tests.
 julia-tests:
@@ -62,7 +72,7 @@ python-tests:
 
 ## Generate basic Python coverage report
 python-coverage: .coverage
-	coverage report -m
+	@coverage report -m
 
 # --- Code quality rules
 

@@ -24,7 +24,8 @@ import pytest
 
 # Local packages/modules
 from xtallography import _JL
-from xtallography.lattices import LatticeSystem, Centering, TetragonalUnitCell
+from xtallography.lattices import LatticeSystem, Centering
+from xtallography.lattices import TetragonalUnitCell, CubicUnitCell
 
 
 # --- Test Suites
@@ -178,4 +179,118 @@ class test_xtallography_lattice_tetragonal(unittest.TestCase):
         # --- Tests
 
         unit_cell_jl = unit_cell.to_julia()
-        assert _JL.isa(unit_cell_jl, _JL.TetragonalLatticeConstants)
+        assert _JL.isa(unit_cell_jl, _JL.UnitCell)
+        assert _JL.isa(unit_cell_jl.lattice_constants, _JL.TetragonalLatticeConstants)
+
+    @staticmethod
+    def test_from_julia():
+        """
+        Test `from_julia()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        c = 3
+
+        # --- Tests
+
+        # centering = primitive
+        unit_cell_jl = _JL.UnitCell(_JL.TetragonalLatticeConstants(a, c), _JL.primitive)
+        unit_cell = TetragonalUnitCell.from_julia(unit_cell_jl)
+        assert unit_cell == TetragonalUnitCell(a, c, centering=Centering.PRIMITIVE)
+
+        # centering = body_centered
+        unit_cell_jl = _JL.UnitCell(
+            _JL.TetragonalLatticeConstants(a, c), _JL.body_centered
+        )
+        unit_cell = TetragonalUnitCell.from_julia(unit_cell_jl)
+        assert unit_cell == TetragonalUnitCell(a, c, centering=Centering.BODY_CENTERED)
+
+    @staticmethod
+    def test_from_julia_invalid_arguments():
+        """
+        Test `from_julia()`.
+        """
+        # --- Tests
+
+        # unit_cell_jl not a Julia UnitCell object
+        unit_cell_jl_invalid = "not Julia UnitCell object"
+        with pytest.raises(ValueError) as exception_info:
+            TetragonalUnitCell.from_julia(unit_cell_jl_invalid)
+
+        expected_error = (
+            "`unit_cell_jl` must be a Julia `UnitCell` object. "
+            f"(unit_cell_jl={unit_cell_jl_invalid})."
+        )
+        assert expected_error in str(exception_info)
+
+        # unit_cell_jl is not for a tetragonal unit cell
+        unit_cell_jl_invalid = _JL.UnitCell(_JL.CubicLatticeConstants(1), _JL.primitive)
+        with pytest.raises(ValueError) as exception_info:
+            TetragonalUnitCell.from_julia(unit_cell_jl_invalid)
+
+        expected_error = (
+            "`unit_cell_jl` must be a Julia `UnitCell` object for tetragonal "
+            f"unit cell. (unit_cell_jl={unit_cell_jl_invalid})."
+        )
+        assert expected_error in str(exception_info)
+
+    @staticmethod
+    def test_repr():
+        """
+        Test `__repr__()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        c = 3
+
+        # --- Tests
+
+        # centering = primitive
+        unit_cell = TetragonalUnitCell(a, c, centering=Centering.PRIMITIVE)
+        assert (
+            str(unit_cell) == f"TetragonalUnitCell(a={a},c={c},centering='primitive')"
+        )
+
+        # centering = body_centered
+        unit_cell = TetragonalUnitCell(a, c, centering=Centering.BODY_CENTERED)
+        assert (
+            str(unit_cell)
+            == f"TetragonalUnitCell(a={a},c={c},centering='body_centered')"
+        )
+
+    @staticmethod
+    def test_eq():
+        """
+        Test `__eq__()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        c = 3
+
+        # --- Tests
+
+        # lattice constants are the same, centerings are the same
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a, c, centering="primitive")
+        assert unit_cell_1 == unit_cell_2
+
+        # lattice constants are the different, centerings are the same
+        unit_cell_1 = TetragonalUnitCell(a + 1, c)
+        unit_cell_2 = TetragonalUnitCell(a, c, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+        # lattice constants are the same, centerings are different
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a, c, centering="body_centered")
+        assert unit_cell_1 != unit_cell_2
+
+        # types are different
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = CubicUnitCell(a)
+        assert unit_cell_1 != unit_cell_2

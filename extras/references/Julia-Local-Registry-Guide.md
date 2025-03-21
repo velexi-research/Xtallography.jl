@@ -89,6 +89,8 @@ registry.
 
   * Add release notes for the initial release in the `NEWS.md` file.
 
+  * Merge all repository updates into the `main` branch.
+
 * Use the `LocalRegistry` package to register the package with the local registry.
 
   ```julia
@@ -103,8 +105,8 @@ registry.
     component). A path relative to the current working directory can be specified by
     starting the path with `./`;
 
-  * `registry` may be specfied as (1) a path (which must be an existing local path) or
-    (2) a URL to the registry's remote Git repository.
+  * `registry` should be specfied as an HTTPS URL to the registry's remote Git repository
+    so that it is readily accessible by Julia (via `add PKG_NAME`).
 
 * Complete the package release process by following the instructions in the last step of
   the ["Releasing a New Version of a Package"][#2.3] section.
@@ -117,27 +119,32 @@ registry.
 
   * Update the release notes in the `NEWS.md` file.
 
-* Use `LocalRegistry` to register a new release of the package.
+  * Merge all repository updates into the `main` branch.
+
+* From the package development directory, use `LocalRegistry` to register a new release of
+  the package.
 
   ```julia
   julia> using LocalRegistry
-  julia> register(package)
+  julia> register()
   ```
 
-  The `package` may be specified by name as a string. Alternatively, `package` may be
-  specified as (1) a module that has been imported into the REPL or (2) a path (which is
-  distinguished from a package name by having more than one path component). A path
-  relative to the current working directory can be specified by starting the path with
-  `./`.
+  __Note__. When `register()` is called without a package, the package in the currently
+  active project is registered with the registry. See the documentation for `register()`
+  for alternative methods of specifying the package.
 
 * Complete the package release process.
 
-  * Tag the registered version (from the package Git repository).
+  * Tag the registered version using one of the following two methods.
 
-    ```shell
-    $ git tag -a vX.Y.Z -m "<description of version>" <commit hash>
-    $ git push origin vX.Y.Z
-    ```
+    * Create a tag and release in GitHub.
+
+    * Create a tag manually from the package Git repository.
+
+      ```shell
+      $ git tag -a vX.Y.Z -m "<description of version>" <commit hash>
+      $ git push origin vX.Y.Z
+      ```
 
   * (Optional) Create a release in GitHub.
 

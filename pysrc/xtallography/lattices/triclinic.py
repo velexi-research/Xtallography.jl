@@ -131,8 +131,52 @@ class TriclinicUnitCell(UnitCell):
 
     def to_julia(self):
         """
-        Convert TriclinicUnitCell object to a Julia struct.
+        Convert TriclinicUnitCell object to a Julia UnitCell object.
         """
-        return _JL.TriclinicLatticeConstants(
-            self.a, self.b, self.c, self.alpha, self.beta, self.gamma
+        return _JL.UnitCell(
+            _JL.TriclinicLatticeConstants(
+                self.a, self.b, self.c, self.alpha, self.beta, self.gamma
+            ),
+            _JL.primitive,
+        )
+
+    @classmethod
+    def from_julia(cls, unit_cell_jl: _JL.UnitCell):
+        """
+        Convert a Julia UnitCell object to a TriclinicUnitCell object.
+        """
+        # --- Check arguments
+
+        if not _JL.isa(unit_cell_jl, _JL.UnitCell):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` object. "
+                f"(unit_cell_jl={unit_cell_jl})."
+            )
+
+        if not _JL.isa(unit_cell_jl.lattice_constants, _JL.TriclinicLatticeConstants):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` object for triclinic "
+                f"unit cell. (unit_cell_jl={unit_cell_jl})."
+            )
+
+        # --- Convert unit_cell_jl to a TriclinicUnitCell object
+
+        unit_cell = TriclinicUnitCell(
+            unit_cell_jl.lattice_constants.a,
+            unit_cell_jl.lattice_constants.b,
+            unit_cell_jl.lattice_constants.c,
+            unit_cell_jl.lattice_constants.α,
+            unit_cell_jl.lattice_constants.β,
+            unit_cell_jl.lattice_constants.γ,
+        )
+
+        return unit_cell
+
+    def __repr__(self):
+        """
+        Return string representation of TriclinicUnitCell.
+        """
+        return (
+            f"TriclinicUnitCell(a={self.a},b={self.b},c={self.c},"
+            f"alpha={self.alpha},beta={self.beta},gamma={self.gamma})"
         )

@@ -25,7 +25,8 @@ import pytest
 
 # Local packages/modules
 from xtallography import _JL
-from xtallography.lattices import LatticeSystem, Centering, MonoclinicUnitCell
+from xtallography.lattices import LatticeSystem, Centering
+from xtallography.lattices import MonoclinicUnitCell, TetragonalUnitCell
 
 
 # --- Test Suites
@@ -241,6 +242,7 @@ class test_xtallography_lattice_monoclinic(unittest.TestCase):
         """
         # --- Preparations
 
+        # lattice constants
         a = 1
         b = 2
         c = 3
@@ -251,4 +253,147 @@ class test_xtallography_lattice_monoclinic(unittest.TestCase):
         # --- Tests
 
         unit_cell_jl = unit_cell.to_julia()
-        assert _JL.isa(unit_cell_jl, _JL.MonoclinicLatticeConstants)
+        assert _JL.isa(unit_cell_jl, _JL.UnitCell)
+        assert _JL.isa(unit_cell_jl.lattice_constants, _JL.MonoclinicLatticeConstants)
+
+    @staticmethod
+    def test_from_julia():
+        """
+        Test `from_julia()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        b = 2
+        c = 3
+        beta = 0.1
+
+        # --- Tests
+
+        # centering = primitive
+        unit_cell_jl = _JL.UnitCell(
+            _JL.MonoclinicLatticeConstants(a, b, c, beta), _JL.primitive
+        )
+        unit_cell = MonoclinicUnitCell.from_julia(unit_cell_jl)
+        assert unit_cell == MonoclinicUnitCell(
+            a, b, c, beta, centering=Centering.PRIMITIVE
+        )
+
+        # centering = body_centered
+        unit_cell_jl = _JL.UnitCell(
+            _JL.MonoclinicLatticeConstants(a, b, c, beta), _JL.body_centered
+        )
+        unit_cell = MonoclinicUnitCell.from_julia(unit_cell_jl)
+        assert unit_cell == MonoclinicUnitCell(
+            a, b, c, beta, centering=Centering.BODY_CENTERED
+        )
+
+        # centering = base_centered
+        unit_cell_jl = _JL.UnitCell(
+            _JL.MonoclinicLatticeConstants(a, b, c, beta), _JL.base_centered
+        )
+        unit_cell = MonoclinicUnitCell.from_julia(unit_cell_jl)
+        assert unit_cell == MonoclinicUnitCell(
+            a, b, c, beta, centering=Centering.BASE_CENTERED
+        )
+
+    @staticmethod
+    def test_from_julia_invalid_arguments():
+        """
+        Test `from_julia()`.
+        """
+        # --- Tests
+
+        # unit_cell_jl not a Julia UnitCell object
+        unit_cell_jl_invalid = "not Julia UnitCell object"
+        with pytest.raises(ValueError) as exception_info:
+            MonoclinicUnitCell.from_julia(unit_cell_jl_invalid)
+
+        expected_error = (
+            "`unit_cell_jl` must be a Julia `UnitCell` object. "
+            f"(unit_cell_jl={unit_cell_jl_invalid})."
+        )
+        assert expected_error in str(exception_info)
+
+        # unit_cell_jl is not for a monoclinic unit cell
+        unit_cell_jl_invalid = _JL.UnitCell(_JL.CubicLatticeConstants(1), _JL.primitive)
+        with pytest.raises(ValueError) as exception_info:
+            MonoclinicUnitCell.from_julia(unit_cell_jl_invalid)
+
+        expected_error = (
+            "`unit_cell_jl` must be a Julia `UnitCell` object for monoclinic "
+            f"unit cell. (unit_cell_jl={unit_cell_jl_invalid})."
+        )
+        assert expected_error in str(exception_info)
+
+    @staticmethod
+    def test_repr():
+        """
+        Test `__repr__()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        b = 2
+        c = 3
+        beta = 0.1
+
+        # --- Tests
+
+        # centering = primitive
+        unit_cell = MonoclinicUnitCell(a, b, c, beta, centering=Centering.PRIMITIVE)
+        assert str(unit_cell) == (
+            f"MonoclinicUnitCell(a={a},b={b},c={c},beta={beta},"
+            f"centering='primitive')"
+        )
+
+        # centering = body_centered
+        unit_cell = MonoclinicUnitCell(a, b, c, beta, centering=Centering.BODY_CENTERED)
+        assert str(unit_cell) == (
+            f"MonoclinicUnitCell(a={a},b={b},c={c},beta={beta},"
+            f"centering='body_centered')"
+        )
+
+        # centering = base_centered
+        unit_cell = MonoclinicUnitCell(a, b, c, beta, centering=Centering.BASE_CENTERED)
+        assert str(unit_cell) == (
+            f"MonoclinicUnitCell(a={a},b={b},c={c},beta={beta},"
+            f"centering='base_centered')"
+        )
+
+    @staticmethod
+    def test_eq():
+        """
+        Test `__eq__()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        b = 2
+        c = 3
+        beta = 0.1
+
+        # --- Tests
+
+        # lattice constants are the same, centerings are the same
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b, c, beta, centering="primitive")
+        assert unit_cell_1 == unit_cell_2
+
+        # lattice constants are the different, centerings are the same
+        unit_cell_1 = MonoclinicUnitCell(a + 1, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b, c, beta, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+        # lattice constants are the same, centerings are different
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b, c, beta, centering="body_centered")
+        assert unit_cell_1 != unit_cell_2
+
+        # types are different
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = TetragonalUnitCell(a, a + 1)
+        assert unit_cell_1 != unit_cell_2

@@ -74,6 +74,42 @@ class HexagonalUnitCell(UnitCell):
 
     def to_julia(self):
         """
-        Convert HexagonalUnitCell object to a Julia struct.
+        Convert HexagonalUnitCell object to a Julia UnitCell object.
         """
-        return _JL.HexagonalLatticeConstants(self.a, self.c)
+        return _JL.UnitCell(
+            _JL.HexagonalLatticeConstants(self.a, self.c), _JL.primitive
+        )
+
+    @classmethod
+    def from_julia(cls, unit_cell_jl: _JL.UnitCell):
+        """
+        Convert a Julia UnitCell object to a HexagonalUnitCell object.
+        """
+        # --- Check arguments
+
+        if not _JL.isa(unit_cell_jl, _JL.UnitCell):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` object. "
+                f"(unit_cell_jl={unit_cell_jl})."
+            )
+
+        if not _JL.isa(unit_cell_jl.lattice_constants, _JL.HexagonalLatticeConstants):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` object for hexagonal "
+                f"unit cell. (unit_cell_jl={unit_cell_jl})."
+            )
+
+        # --- Convert unit_cell_jl to a HexagonalUnitCell object
+
+        unit_cell = HexagonalUnitCell(
+            unit_cell_jl.lattice_constants.a,
+            unit_cell_jl.lattice_constants.c,
+        )
+
+        return unit_cell
+
+    def __repr__(self):
+        """
+        Return string representation of HexagonalUnitCell.
+        """
+        return f"HexagonalUnitCell(a={self.a},c={self.c})"
