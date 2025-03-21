@@ -131,7 +131,7 @@ class TriclinicUnitCell(UnitCell):
 
     def to_julia(self):
         """
-        Convert TriclinicUnitCell object to a Julia UnitCell struct.
+        Convert TriclinicUnitCell object to a Julia UnitCell object.
         """
         return _JL.UnitCell(
             _JL.TriclinicLatticeConstants(
@@ -143,16 +143,24 @@ class TriclinicUnitCell(UnitCell):
     @classmethod
     def from_julia(cls, unit_cell_jl: _JL.UnitCell):
         """
-        Convert a Julia UnitCell struct to a TriclinicUnitCell object.
+        Convert a Julia UnitCell object to a TriclinicUnitCell object.
         """
-        # Check arguments
+        # --- Check arguments
+
         if not _JL.isa(unit_cell_jl, _JL.UnitCell):
             raise ValueError(
-                "`unit_cell_jl` must be a Julia `UnitCell` struct. "
+                "`unit_cell_jl` must be a Julia `UnitCell` object. "
                 f"(unit_cell_jl={unit_cell_jl})."
             )
 
-        # Convert unit_cell_jl to a TriclinicUnitCell object
+        if not _JL.isa(unit_cell_jl.lattice_constants, _JL.TriclinicLatticeConstants):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` object for triclinic "
+                f"unit cell. (unit_cell_jl={unit_cell_jl})."
+            )
+
+        # --- Convert unit_cell_jl to a TriclinicUnitCell object
+
         unit_cell = TriclinicUnitCell(
             unit_cell_jl.lattice_constants.a,
             unit_cell_jl.lattice_constants.b,
@@ -166,7 +174,7 @@ class TriclinicUnitCell(UnitCell):
 
     def __repr__(self):
         """
-        Return string representation of UnitCell.
+        Return string representation of TriclinicUnitCell.
         """
         return (
             f"TriclinicUnitCell(a={self.a},b={self.b},c={self.c},"

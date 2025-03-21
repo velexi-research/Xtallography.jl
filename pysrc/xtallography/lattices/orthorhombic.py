@@ -87,7 +87,7 @@ class OrthorhombicUnitCell(UnitCell):
 
     def to_julia(self):
         """
-        Convert OrthorhombicUnitCell object to a Julia struct.
+        Convert OrthorhombicUnitCell object to a Julia UnitCell object.
         """
         return _JL.UnitCell(
             _JL.OrthorhombicLatticeConstants(self.a, self.b, self.c),
@@ -97,16 +97,26 @@ class OrthorhombicUnitCell(UnitCell):
     @classmethod
     def from_julia(cls, unit_cell_jl: _JL.UnitCell):
         """
-        Convert a Julia UnitCell struct to a OrthorhombicUnitCell object.
+        Convert a Julia UnitCell object to a OrthorhombicUnitCell object.
         """
-        # Check arguments
+        # --- Check arguments
+
         if not _JL.isa(unit_cell_jl, _JL.UnitCell):
             raise ValueError(
-                "`unit_cell_jl` must be a Julia `UnitCell` struct. "
+                "`unit_cell_jl` must be a Julia `UnitCell` object. "
                 f"(unit_cell_jl={unit_cell_jl})."
             )
 
-        # Convert unit_cell_jl to a OrthorhombicUnitCell object
+        if not _JL.isa(
+            unit_cell_jl.lattice_constants, _JL.OrthorhombicLatticeConstants
+        ):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` object for orthorhombic "
+                f"unit cell. (unit_cell_jl={unit_cell_jl})."
+            )
+
+        # --- Convert unit_cell_jl to a OrthorhombicUnitCell object
+
         unit_cell = OrthorhombicUnitCell(
             unit_cell_jl.lattice_constants.a,
             unit_cell_jl.lattice_constants.b,
@@ -118,7 +128,7 @@ class OrthorhombicUnitCell(UnitCell):
 
     def __repr__(self):
         """
-        Return string representation of UnitCell.
+        Return string representation of OrthorhombicUnitCell.
         """
         return (
             f"OrthorhombicUnitCell(a={self.a},b={self.b},c={self.c},"

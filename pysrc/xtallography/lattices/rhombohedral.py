@@ -79,7 +79,7 @@ class RhombohedralUnitCell(UnitCell):
 
     def to_julia(self):
         """
-        Convert RhombohedralUnitCell object to a Julia struct.
+        Convert RhombohedralUnitCell object to a Julia UnitCell object.
         """
         return _JL.UnitCell(
             _JL.RhombohedralLatticeConstants(self.a, self.alpha), _JL.primitive
@@ -88,16 +88,26 @@ class RhombohedralUnitCell(UnitCell):
     @classmethod
     def from_julia(cls, unit_cell_jl: _JL.UnitCell):
         """
-        Convert a Julia UnitCell struct to a RhombohedralUnitCell object.
+        Convert a Julia UnitCell object to a RhombohedralUnitCell object.
         """
-        # Check arguments
+        # --- Check arguments
+
         if not _JL.isa(unit_cell_jl, _JL.UnitCell):
             raise ValueError(
-                "`unit_cell_jl` must be a Julia `UnitCell` struct. "
+                "`unit_cell_jl` must be a Julia `UnitCell` object. "
                 f"(unit_cell_jl={unit_cell_jl})."
             )
 
-        # Convert unit_cell_jl to a RhombohedralUnitCell object
+        if not _JL.isa(
+            unit_cell_jl.lattice_constants, _JL.RhombohedralLatticeConstants
+        ):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` object for rhombohedral "
+                f"unit cell. (unit_cell_jl={unit_cell_jl})."
+            )
+
+        # --- Convert unit_cell_jl to a RhombohedralUnitCell object
+
         unit_cell = RhombohedralUnitCell(
             unit_cell_jl.lattice_constants.a,
             unit_cell_jl.lattice_constants.α,
@@ -107,6 +117,6 @@ class RhombohedralUnitCell(UnitCell):
 
     def __repr__(self):
         """
-        Return string representation of UnitCell.
+        Return string representation of RhombohedralUnitCell.
         """
         return f"RhombohedralUnitCell(a={self.a},alpha={self.alpha})"

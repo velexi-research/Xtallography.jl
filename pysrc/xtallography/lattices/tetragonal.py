@@ -74,7 +74,7 @@ class TetragonalUnitCell(UnitCell):
 
     def to_julia(self):
         """
-        Convert TetragonalUnitCell object to a Julia struct.
+        Convert TetragonalUnitCell object to a Julia UnitCell object.
         """
         return _JL.UnitCell(
             _JL.TetragonalLatticeConstants(self.a, self.c), self.centering.to_julia()
@@ -83,16 +83,24 @@ class TetragonalUnitCell(UnitCell):
     @classmethod
     def from_julia(cls, unit_cell_jl: _JL.UnitCell):
         """
-        Convert a Julia UnitCell struct to a TetragonalUnitCell object.
+        Convert a Julia UnitCell object to a TetragonalUnitCell object.
         """
-        # Check arguments
+        # --- Check arguments
+
         if not _JL.isa(unit_cell_jl, _JL.UnitCell):
             raise ValueError(
-                "`unit_cell_jl` must be a Julia `UnitCell` struct. "
+                "`unit_cell_jl` must be a Julia `UnitCell` object. "
                 f"(unit_cell_jl={unit_cell_jl})."
             )
 
-        # Convert unit_cell_jl to a TetragonalUnitCell object
+        if not _JL.isa(unit_cell_jl.lattice_constants, _JL.TetragonalLatticeConstants):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` object for tetragonal "
+                f"unit cell. (unit_cell_jl={unit_cell_jl})."
+            )
+
+        # --- Convert unit_cell_jl to a TetragonalUnitCell object
+
         unit_cell = TetragonalUnitCell(
             unit_cell_jl.lattice_constants.a,
             unit_cell_jl.lattice_constants.c,
@@ -103,6 +111,6 @@ class TetragonalUnitCell(UnitCell):
 
     def __repr__(self):
         """
-        Return string representation of UnitCell.
+        Return string representation of TetragonalUnitCell.
         """
         return f"TetragonalUnitCell(a={self.a},c={self.c},centering='{self.centering}')"
