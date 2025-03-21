@@ -25,7 +25,8 @@ import pytest
 
 # Local packages/modules
 from xtallography import _JL
-from xtallography.lattices import LatticeSystem, Centering, RhombohedralUnitCell
+from xtallography.lattices import LatticeSystem, Centering
+from xtallography.lattices import RhombohedralUnitCell, TetragonalUnitCell
 
 
 # --- Test Suites
@@ -156,4 +157,70 @@ class test_xtallography_lattice_rhombohedral(unittest.TestCase):
         # --- Tests
 
         unit_cell_jl = unit_cell.to_julia()
-        assert _JL.isa(unit_cell_jl, _JL.RhombohedralLatticeConstants)
+        assert _JL.isa(unit_cell_jl, _JL.UnitCell)
+        assert _JL.isa(unit_cell_jl.lattice_constants, _JL.RhombohedralLatticeConstants)
+
+    @staticmethod
+    def test_from_julia():
+        """
+        Test `from_julia()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        alpha = 0.1
+
+        # --- Tests
+
+        # basic usage
+        unit_cell_jl = _JL.UnitCell(
+            _JL.RhombohedralLatticeConstants(a, alpha), _JL.primitive
+        )
+        unit_cell = RhombohedralUnitCell.from_julia(unit_cell_jl)
+        assert unit_cell == RhombohedralUnitCell(a, alpha)
+
+    @staticmethod
+    def test_repr():
+        """
+        Test `__repr__()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        alpha = 0.1
+
+        # --- Tests
+
+        # centering = primitive
+        unit_cell = RhombohedralUnitCell(a, alpha)
+        assert str(unit_cell) == f"RhombohedralUnitCell(a={a},alpha={alpha})"
+
+    @staticmethod
+    def test_eq():
+        """
+        Test `__eq__()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        alpha = 0.1
+
+        # --- Tests
+
+        # lattice constants are the same
+        unit_cell_1 = RhombohedralUnitCell(a, alpha)
+        unit_cell_2 = RhombohedralUnitCell(a, alpha)
+        assert unit_cell_1 == unit_cell_2
+
+        # lattice constants are the different
+        unit_cell_1 = RhombohedralUnitCell(a + 1, alpha)
+        unit_cell_2 = RhombohedralUnitCell(a, alpha)
+        assert unit_cell_1 != unit_cell_2
+
+        # types are different
+        unit_cell_1 = RhombohedralUnitCell(a, alpha)
+        unit_cell_2 = TetragonalUnitCell(a, a + 1)
+        assert unit_cell_1 != unit_cell_2

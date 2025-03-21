@@ -89,4 +89,38 @@ class OrthorhombicUnitCell(UnitCell):
         """
         Convert OrthorhombicUnitCell object to a Julia struct.
         """
-        return _JL.OrthorhombicLatticeConstants(self.a, self.b, self.c)
+        return _JL.UnitCell(
+            _JL.OrthorhombicLatticeConstants(self.a, self.b, self.c),
+            self.centering.to_julia(),
+        )
+
+    @classmethod
+    def from_julia(cls, unit_cell_jl: _JL.UnitCell):
+        """
+        Convert a Julia UnitCell struct to a OrthorhombicUnitCell object.
+        """
+        # Check arguments
+        if not _JL.isa(unit_cell_jl, _JL.UnitCell):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` struct. "
+                f"(unit_cell_jl={unit_cell_jl})."
+            )
+
+        # Convert unit_cell_jl to a OrthorhombicUnitCell object
+        unit_cell = OrthorhombicUnitCell(
+            unit_cell_jl.lattice_constants.a,
+            unit_cell_jl.lattice_constants.b,
+            unit_cell_jl.lattice_constants.c,
+            centering=Centering.from_julia(unit_cell_jl.centering),
+        )
+
+        return unit_cell
+
+    def __repr__(self):
+        """
+        Return string representation of UnitCell.
+        """
+        return (
+            f"OrthorhombicUnitCell(a={self.a},b={self.b},c={self.c},"
+            f"centering='{self.centering}')"
+        )

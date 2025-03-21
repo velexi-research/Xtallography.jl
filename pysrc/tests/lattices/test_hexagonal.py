@@ -24,7 +24,8 @@ import pytest
 
 # Local packages/modules
 from xtallography import _JL
-from xtallography.lattices import LatticeSystem, Centering, HexagonalUnitCell
+from xtallography.lattices import LatticeSystem, Centering
+from xtallography.lattices import HexagonalUnitCell, TetragonalUnitCell
 
 
 # --- Test Suites
@@ -128,4 +129,68 @@ class test_xtallography_lattice_hexagonal(unittest.TestCase):
         # --- Tests
 
         unit_cell_jl = unit_cell.to_julia()
-        assert _JL.isa(unit_cell_jl, _JL.HexagonalLatticeConstants)
+        assert _JL.isa(unit_cell_jl, _JL.UnitCell)
+        assert _JL.isa(unit_cell_jl.lattice_constants, _JL.HexagonalLatticeConstants)
+
+    @staticmethod
+    def test_from_julia():
+        """
+        Test `from_julia()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        c = 3
+
+        # --- Tests
+
+        # basic usage
+        unit_cell_jl = _JL.UnitCell(_JL.HexagonalLatticeConstants(a, c), _JL.primitive)
+        unit_cell = HexagonalUnitCell.from_julia(unit_cell_jl)
+        assert unit_cell == HexagonalUnitCell(a, c)
+
+    @staticmethod
+    def test_repr():
+        """
+        Test `__repr__()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        c = 3
+
+        # --- Tests
+
+        # centering = primitive
+        unit_cell = HexagonalUnitCell(a, c)
+        assert str(unit_cell) == f"HexagonalUnitCell(a={a},c={c})"
+
+    @staticmethod
+    def test_eq():
+        """
+        Test `__eq__()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        c = 3
+
+        # --- Tests
+
+        # lattice constants are the same
+        unit_cell_1 = HexagonalUnitCell(a, c)
+        unit_cell_2 = HexagonalUnitCell(a, c)
+        assert unit_cell_1 == unit_cell_2
+
+        # lattice constants are the different
+        unit_cell_1 = HexagonalUnitCell(a + 1, c)
+        unit_cell_2 = HexagonalUnitCell(a, c)
+        assert unit_cell_1 != unit_cell_2
+
+        # types are different
+        unit_cell_1 = HexagonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a, c)
+        assert unit_cell_1 != unit_cell_2
