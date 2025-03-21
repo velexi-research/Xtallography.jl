@@ -196,37 +196,44 @@ class test_xtallography_lattice_cubic(unittest.TestCase):
 
         # centering = primitive
         unit_cell = CubicUnitCell(a, centering=Centering.PRIMITIVE)
-        assert str(unit_cell) == "CubicUnitCell(a=1,centering='primitive')"
+        assert str(unit_cell) == f"CubicUnitCell(a={a},centering='primitive')"
 
         # centering = body_centered
         unit_cell = CubicUnitCell(a, centering=Centering.BODY_CENTERED)
-        assert str(unit_cell) == "CubicUnitCell(a=1,centering='body_centered')"
+        assert str(unit_cell) == f"CubicUnitCell(a={a},centering='body_centered')"
 
         # centering = face_centered
         unit_cell = CubicUnitCell(a, centering=Centering.FACE_CENTERED)
-        assert str(unit_cell) == "CubicUnitCell(a=1,centering='face_centered')"
+        assert str(unit_cell) == f"CubicUnitCell(a={a},centering='face_centered')"
 
     @staticmethod
     def test_eq():
         """
         Test `__eq__()`.
         """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+
         # --- Tests
 
-        # centering are the same
-        unit_cell_1 = CubicUnitCell(1)
-        unit_cell_2 = CubicUnitCell(1, centering="primitive")
-
+        # lattice constants are the same, centerings are the same
+        unit_cell_1 = CubicUnitCell(a)
+        unit_cell_2 = CubicUnitCell(a, centering="primitive")
         assert unit_cell_1 == unit_cell_2
 
-        # centering are different
-        unit_cell_1 = CubicUnitCell(1)
-        unit_cell_2 = CubicUnitCell(1, centering="face_centered")
+        # lattice constants are the different, centerings are the same
+        unit_cell_1 = CubicUnitCell(a + 1)
+        unit_cell_2 = CubicUnitCell(a, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
 
+        # lattice constants are the same, centerings are different
+        unit_cell_1 = CubicUnitCell(a)
+        unit_cell_2 = CubicUnitCell(a, centering="face_centered")
         assert unit_cell_1 != unit_cell_2
 
         # types are different
-        unit_cell_1 = CubicUnitCell(1)
-        unit_cell_2 = TetragonalUnitCell(1, 2)
-
+        unit_cell_1 = CubicUnitCell(a)
+        unit_cell_2 = TetragonalUnitCell(a, a + 1)
         assert unit_cell_1 != unit_cell_2
