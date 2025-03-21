@@ -73,34 +73,12 @@ using Xtallography
     # ------ x not in [-1, 1], x far from endpoints
 
     # |x| >> 1, x > 0
-    local error = nothing
-    local error_message = ""
-    try
-        asin_(2.0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa DomainError
-
-    expected_error = "DomainError with 2.0:\nasin(x) is not defined for |x| > 1"
-    @test startswith(error_message, expected_error)
+    expected_message = "asin(x) is not defined for |x| > 1."
+    @test_throws DomainError(2.0, expected_message) asin_(2.0)
 
     # |x| >> 1, x < 0
-    local error = nothing
-    local error_message = ""
-    try
-        asin_(-3.0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa DomainError
-
-    expected_error = "DomainError with -3.0:\nasin(x) is not defined for |x| > 1"
-    @test startswith(error_message, expected_error)
+    expected_message = "asin(x) is not defined for |x| > 1."
+    @test_throws DomainError(-3.0, expected_message) asin_(-3.0)
 end
 
 @testset "acos_()" begin
@@ -145,34 +123,12 @@ end
     # ------ x not in [-1, 1], x far from endpoints
 
     # |x| >> 1, x > 0
-    local error = nothing
-    local error_message = ""
-    try
-        acos_(2.0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa DomainError
-
-    expected_error = "DomainError with 2.0:\nacos(x) not defined for |x| > 1"
-    @test startswith(error_message, expected_error)
+    expected_message = "acos(x) not defined for |x| > 1"
+    @test_throws DomainError(2.0, expected_message) acos(2.0)
 
     # |x| >> 1, x < 0
-    local error = nothing
-    local error_message = ""
-    try
-        acos_(-3.0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa DomainError
-
-    expected_error = "DomainError with -3.0:\nacos(x) not defined for |x| > 1"
-    @test startswith(error_message, expected_error)
+    expected_message = "acos(x) not defined for |x| > 1"
+    @test_throws DomainError(-3.0, expected_message) acos(-3.0)
 end
 
 # ------ linear algebra
