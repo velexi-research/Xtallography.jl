@@ -38,26 +38,16 @@ using Xtallography
     @test iucr_unit_cell.lattice_constants == lattice_constants
     @test iucr_unit_cell.centering === primitive
 
-    # ------ Invalid centerings
+    # ------ Invalid centering
 
     for centering in (body_centered, face_centered, base_centered)
-        local error = nothing
-        local error_message = ""
-        try
-            conventional_cell(UnitCell(lattice_constants, centering))
-        catch error
-            bt = catch_backtrace()
-            error_message = sprint(showerror, error, bt)
-        end
-
-        @test error isa ArgumentError
-
-        expected_error =
-            "ArgumentError: " *
+        expected_message =
             "Invalid Bravais lattice: " *
             "(lattice_system=Hexagonal, centering=$(nameof(typeof(centering))))"
 
-        @test startswith(error_message, expected_error)
+        @test_throws ArgumentError(expected_message) conventional_cell(
+            UnitCell(lattice_constants, centering)
+        )
     end
 end
 

@@ -47,34 +47,12 @@ end
     # ------ a
 
     # a = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = CubicLatticeConstants(0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `a` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`a` must be positive"
+    @test_throws DomainError(0, expected_message) CubicLatticeConstants(0)
 
     # a < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = CubicLatticeConstants(-1.0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `a` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`a` must be positive"
+    @test_throws DomainError(-1, expected_message) CubicLatticeConstants(-1.0)
 end
 
 @testset "CubicLatticeConstantDeltas constructor" begin
@@ -158,22 +136,12 @@ end
 
     # ------ Invalid centering
 
-    local error = nothing
-    local error_message = ""
-    try
-        standardize(lattice_constants, base_centered)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error =
-        "ArgumentError: " *
+    expected_message = (
         "Invalid Bravais lattice: (lattice_system=Cubic, centering=BaseCentered)"
-
-    @test startswith(error_message, expected_error)
+    )
+    @test_throws ArgumentError(expected_message) standardize(
+        lattice_constants, base_centered
+    )
 end
 
 # ------ LatticeConstantDeltas functions
@@ -422,30 +390,14 @@ end
     # ------ `tol`
 
     # tol = 0
-    local error, error_message
-    try
-        is_supercell(lattice_constants_test, lattice_constants_ref; tol=0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `tol` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`tol` must be positive"
+    @test_throws DomainError(0, expected_message) is_supercell(
+        lattice_constants_test, lattice_constants_ref; tol=0
+    )
 
     # tol < 0
-    local error, error_message
-    try
-        is_supercell(lattice_constants_test, lattice_constants_ref; tol=-0.1)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `tol` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`tol` must be positive"
+    @test_throws DomainError(-0.1, expected_message) is_supercell(
+        lattice_constants_test, lattice_constants_ref; tol=-0.1
+    )
 end

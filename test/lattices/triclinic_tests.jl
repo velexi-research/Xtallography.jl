@@ -68,284 +68,122 @@ end
     # ------ a
 
     # a = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(0, b, c, α, β, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `a` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`a` must be positive"
+    @test_throws DomainError(0, expected_message) TriclinicLatticeConstants(
+        0, b, c, α, β, γ
+    )
 
     # a < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(-1.0, b, c, α, β, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `a` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`a` must be positive"
+    @test_throws DomainError(-10, expected_message) TriclinicLatticeConstants(
+        -10, b, c, α, β, γ
+    )
 
     # ------ b
 
     # b = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, 0, c, α, β, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `b` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`b` must be positive"
+    @test_throws DomainError(0, expected_message) TriclinicLatticeConstants(
+        a, 0, c, α, β, γ
+    )
 
     # b < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, -1.0, c, α, β, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `b` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`b` must be positive"
+    @test_throws DomainError(-1.0, expected_message) TriclinicLatticeConstants(
+        a, -1.0, c, α, β, γ
+    )
 
     # ------ c
 
     # c = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, 0, α, β, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `c` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`c` must be positive"
+    @test_throws DomainError(0, expected_message) TriclinicLatticeConstants(
+        a, b, 0, α, β, γ
+    )
 
     # c < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, -1.0, α, β, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `c` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`c` must be positive"
+    @test_throws DomainError(-1.0, expected_message) TriclinicLatticeConstants(
+        a, b, -1.0, α, β, γ
+    )
 
     # ------ α
 
     # α = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, 0, β, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`α` must satisfy 0 < α < π"
+    @test_throws DomainError(0, expected_message) TriclinicLatticeConstants(
+        a, b, c, 0, β, γ
+    )
 
     # α < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, -1.0, β, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
-    @test startswith(error_message, expected_error)
-
-    # α = π
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, π, β, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`α` must satisfy 0 < α < π"
+    @test_throws DomainError(-1, expected_message) TriclinicLatticeConstants(
+        a, b, c, -1, β, γ
+    )
 
     # α > π
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, 200, β, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
+    expected_message = "`α` must satisfy 0 < α < π"
+    @test_throws DomainError(4, expected_message) TriclinicLatticeConstants(
+        a, b, c, 4, β, γ
+    )
 
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < π"
-    @test startswith(error_message, expected_error)
+    # α = π
+    expected_message = "`α` must satisfy 0 < α < π"
+    @test_throws DomainError(π, expected_message) TriclinicLatticeConstants(
+        a, b, c, π, β, γ
+    )
 
     # ------ β
 
     # β = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, α, 0, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`β` must satisfy 0 < β < π"
+    @test_throws DomainError(0, expected_message) TriclinicLatticeConstants(
+        a, b, c, α, 0, γ
+    )
 
     # β < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, α, -1.0, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`β` must satisfy 0 < β < π"
+    @test_throws DomainError(-1, expected_message) TriclinicLatticeConstants(
+        a, b, c, α, -1, γ
+    )
 
     # β = π
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, α, 0, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`β` must satisfy 0 < β < π"
+    @test_throws DomainError(π, expected_message) TriclinicLatticeConstants(
+        a, b, c, α, π, γ
+    )
 
     # β > π
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, α, 200, γ)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`β` must satisfy 0 < β < π"
+    @test_throws DomainError(4, expected_message) TriclinicLatticeConstants(
+        a, b, c, α, 4, γ
+    )
 
     # ------ γ
 
     # γ = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, 0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `γ` must satisfy 0 < γ < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`γ` must satisfy 0 < γ < π"
+    @test_throws DomainError(0, expected_message) TriclinicLatticeConstants(
+        a, b, c, α, β, 0
+    )
 
     # γ < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, -1.0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `γ` must satisfy 0 < γ < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`γ` must satisfy 0 < γ < π"
+    @test_throws DomainError(-1, expected_message) TriclinicLatticeConstants(
+        a, b, c, α, β, -1
+    )
 
     # γ = π
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, π)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `γ` must satisfy 0 < γ < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`γ` must satisfy 0 < γ < π"
+    @test_throws DomainError(π, expected_message) TriclinicLatticeConstants(
+        a, b, c, α, β, π
+    )
 
     # γ > π
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TriclinicLatticeConstants(a, b, c, α, β, 200)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `γ` must satisfy 0 < γ < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`γ` must satisfy 0 < γ < π"
+    @test_throws DomainError(4, expected_message) TriclinicLatticeConstants(
+        a, b, c, α, β, 4
+    )
 end
 
 @testset "TriclinicLatticeConstantDeltas constructor" begin
@@ -808,23 +646,12 @@ end
     # --- Tests
 
     for centering in (body_centered, face_centered, base_centered)
-        local error = nothing
-        local error_message = ""
-        try
-            standardize(lattice_constants, centering)
-        catch error
-            bt = catch_backtrace()
-            error_message = sprint(showerror, error, bt)
-        end
-
-        @test error isa ArgumentError
-
-        expected_error =
-            "ArgumentError: " *
+        expected_message =
             "Invalid Bravais lattice: " *
             "(lattice_system=Triclinic, centering=$(nameof(typeof(centering))))"
-
-        @test startswith(error_message, expected_error)
+        @test_throws ArgumentError(expected_message) standardize(
+            lattice_constants, centering
+        )
     end
 end
 
