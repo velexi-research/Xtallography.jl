@@ -24,7 +24,8 @@ import pytest
 
 # Local packages/modules
 from xtallography import _JL
-from xtallography.lattices import LatticeSystem, Centering, CubicUnitCell
+from xtallography.lattices import LatticeSystem, Centering
+from xtallography.lattices import CubicUnitCell, TetragonalUnitCell
 
 
 # --- Test Suites
@@ -148,4 +149,84 @@ class test_xtallography_lattice_cubic(unittest.TestCase):
         # --- Tests
 
         unit_cell_jl = unit_cell.to_julia()
-        assert _JL.isa(unit_cell_jl, _JL.CubicLatticeConstants)
+        assert _JL.isa(unit_cell_jl, _JL.UnitCell)
+        assert _JL.isa(unit_cell_jl.lattice_constants, _JL.CubicLatticeConstants)
+
+    @staticmethod
+    def test_from_julia():
+        """
+        Test `from_julia()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+
+        # --- Tests
+
+        # centering = primitive
+        unit_cell_jl = _JL.UnitCell(_JL.CubicLatticeConstants(a), _JL.primitive)
+        unit_cell = CubicUnitCell.from_julia(unit_cell_jl)
+
+        assert unit_cell == CubicUnitCell(a, centering=Centering.PRIMITIVE)
+
+        # centering = body_centered
+        unit_cell_jl = _JL.UnitCell(_JL.CubicLatticeConstants(a), _JL.body_centered)
+        unit_cell = CubicUnitCell.from_julia(unit_cell_jl)
+
+        assert unit_cell == CubicUnitCell(a, centering=Centering.BODY_CENTERED)
+
+        # centering = face_centered
+        unit_cell_jl = _JL.UnitCell(_JL.CubicLatticeConstants(a), _JL.face_centered)
+        unit_cell = CubicUnitCell.from_julia(unit_cell_jl)
+
+        assert unit_cell == CubicUnitCell(a, centering=Centering.FACE_CENTERED)
+
+    @staticmethod
+    def test_repr():
+        """
+        Test `__repr__()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+
+        # --- Tests
+
+        # centering = primitive
+        unit_cell = CubicUnitCell(a, centering=Centering.PRIMITIVE)
+        assert str(unit_cell) == "CubicUnitCell(a=1,centering='primitive')"
+
+        # centering = body_centered
+        unit_cell = CubicUnitCell(a, centering=Centering.BODY_CENTERED)
+        assert str(unit_cell) == "CubicUnitCell(a=1,centering='body_centered')"
+
+        # centering = face_centered
+        unit_cell = CubicUnitCell(a, centering=Centering.FACE_CENTERED)
+        assert str(unit_cell) == "CubicUnitCell(a=1,centering='face_centered')"
+
+    @staticmethod
+    def test_eq():
+        """
+        Test `__eq__()`.
+        """
+        # --- Tests
+
+        # centering are the same
+        unit_cell_1 = CubicUnitCell(1)
+        unit_cell_2 = CubicUnitCell(1, centering="primitive")
+
+        assert unit_cell_1 == unit_cell_2
+
+        # centering are different
+        unit_cell_1 = CubicUnitCell(1)
+        unit_cell_2 = CubicUnitCell(1, centering="face_centered")
+
+        assert unit_cell_1 != unit_cell_2
+
+        # types are different
+        unit_cell_1 = CubicUnitCell(1)
+        unit_cell_2 = TetragonalUnitCell(1, 2)
+
+        assert unit_cell_1 != unit_cell_2

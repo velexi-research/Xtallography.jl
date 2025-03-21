@@ -63,6 +63,34 @@ class CubicUnitCell(UnitCell):
 
     def to_julia(self):
         """
-        Convert CubicUnitCell object to a Julia struct.
+        Convert CubicUnitCell object to a Julia UnitCell struct.
         """
-        return _JL.CubicLatticeConstants(self.a)
+        return _JL.UnitCell(
+            _JL.CubicLatticeConstants(self.a), self.centering.to_julia()
+        )
+
+    @classmethod
+    def from_julia(cls, unit_cell_jl: _JL.UnitCell):
+        """
+        Convert a Julia UnitCell struct to a UnitCell object.
+        """
+        # Check arguments
+        if not _JL.isa(unit_cell_jl, _JL.UnitCell):
+            raise ValueError(
+                "`unit_cell_jl` must be a Julia `UnitCell` struct. "
+                f"(unit_cell_jl={unit_cell_jl})."
+            )
+
+        # Convert unit_cell_jl to a CubicUnitCell object
+        unit_cell = CubicUnitCell(
+            unit_cell_jl.lattice_constants.a,
+            centering=Centering.from_julia(unit_cell_jl.centering),
+        )
+
+        return unit_cell
+
+    def __repr__(self):
+        """
+        Return string representation of UnitCell.
+        """
+        return f"CubicUnitCell(a={self.a},centering='{self.centering}')"
