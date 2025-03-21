@@ -167,19 +167,16 @@ class test_xtallography_lattice_cubic(unittest.TestCase):
         # centering = primitive
         unit_cell_jl = _JL.UnitCell(_JL.CubicLatticeConstants(a), _JL.primitive)
         unit_cell = CubicUnitCell.from_julia(unit_cell_jl)
-
         assert unit_cell == CubicUnitCell(a, centering=Centering.PRIMITIVE)
 
         # centering = body_centered
         unit_cell_jl = _JL.UnitCell(_JL.CubicLatticeConstants(a), _JL.body_centered)
         unit_cell = CubicUnitCell.from_julia(unit_cell_jl)
-
         assert unit_cell == CubicUnitCell(a, centering=Centering.BODY_CENTERED)
 
         # centering = face_centered
         unit_cell_jl = _JL.UnitCell(_JL.CubicLatticeConstants(a), _JL.face_centered)
         unit_cell = CubicUnitCell.from_julia(unit_cell_jl)
-
         assert unit_cell == CubicUnitCell(a, centering=Centering.FACE_CENTERED)
 
     @staticmethod
