@@ -57,7 +57,7 @@ class Centering(StrEnum):
 
     def to_julia(self):
         """
-        Convert Centering object to Julia struct.
+        Convert a Python Centering object to a Julia Centering object.
         """
         if self.value == "primitive":
             return _JL.primitive
@@ -70,6 +70,34 @@ class Centering(StrEnum):
 
         elif self.value == "face_centered":
             return _JL.face_centered
+
+    @classmethod
+    def from_julia(cls, centering_jl: _JL.Centering):
+        """
+        Convert a Julia Centering object to a Python Centering object.
+        """
+        # Check arguments
+        if not _JL.isa(centering_jl, _JL.Centering):
+            raise ValueError(
+                "`centering_jl` must be a Julia `Centering` object. "
+                f"(centering_jl={centering_jl})."
+            )
+
+        # Convert centering_jl to a Centering object
+        if centering_jl == _JL.primitive:
+            centering = Centering.PRIMITIVE
+        elif centering_jl == _JL.base_centered:
+            centering = Centering.BASE_CENTERED
+        elif centering_jl == _JL.body_centered:
+            centering = Centering.BODY_CENTERED
+        elif centering_jl == _JL.face_centered:
+            centering = Centering.FACE_CENTERED
+        else:
+            raise ValueError(
+                f"Unsupported Centering type. (centering_jl={centering_jl})"
+            )
+
+        return centering
 
     @classmethod
     def values(cls):
@@ -275,5 +303,31 @@ class UnitCell(ABC):
     @abstractmethod
     def to_julia(self):
         """
-        Convert UnitCell object to a Julia struct.
+        Convert Python UnitCell object to a Julia UnitCell object.
         """
+
+    @classmethod
+    def from_julia(cls, unit_cell_jl: _JL.UnitCell):
+        """
+        Convert a Julia UnitCell object to a Python UnitCell object.
+        """
+
+    @abstractmethod
+    def __repr__(self):
+        """
+        Return string representation of UnitCell.
+        """
+
+    def __eq__(self, other):
+        """
+        Return True if `self` and `other` represent the same unit cell; otherwise, returno
+        False.
+        """
+        if not isinstance(other, type(self)):
+            return False
+
+        for var in vars(self):
+            if getattr(self, var) != getattr(other, var):
+                return False
+
+        return True

@@ -25,6 +25,7 @@ import unittest
 import juliacall
 import pytest
 import xtallography
+from xtallography import _JL
 from xtallography.lattices import LatticeSystem, Centering, Lattice, UnitCell
 
 # Local packages/modules
@@ -100,6 +101,64 @@ class test_xtallography_lattices_core(unittest.TestCase):
         centering = Centering.FACE_CENTERED
         centering_jl = centering.to_julia()
         assert self.jl.isa(centering_jl, self.jl.FaceCentered)
+
+    @staticmethod
+    def test_Centering_from_julia():
+        """
+        Test `Centering.from_julia()` method.
+        """
+        # --- Tests
+
+        # primitive
+        centering_jl = _JL.primitive
+        centering = Centering.from_julia(centering_jl)
+        assert centering == Centering.PRIMITIVE
+
+        # base_centered
+        centering_jl = _JL.base_centered
+        centering = Centering.from_julia(centering_jl)
+        assert centering == Centering.BASE_CENTERED
+
+        # body_centered
+        centering_jl = _JL.body_centered
+        centering = Centering.from_julia(centering_jl)
+        assert centering == Centering.BODY_CENTERED
+
+        # face_centered
+        centering_jl = _JL.face_centered
+        centering = Centering.from_julia(centering_jl)
+        assert centering == Centering.FACE_CENTERED
+
+    @staticmethod
+    def test_Centering_from_julia_invalid_args():
+        """
+        Test argument checks for `Centering.from_julia()`.
+        """
+        # --- Tests
+
+        # ------ `centering_jl` is not a Julia Centering object
+
+        centering_jl_invalid = "not a Julia Centering object"
+        with pytest.raises(ValueError) as exception_info:
+            xtallography.lattices.Centering.from_julia(centering_jl_invalid)
+
+        expected_error = (
+            "`centering_jl` must be a Julia `Centering` object. "
+            f"(centering_jl={centering_jl_invalid})."
+        )
+        assert expected_error in str(exception_info)
+
+        # ------ `centering_jl` is an unsupported Julia Centering object
+
+        _JL.seval("struct UnsupportedCentering <: Centering end")
+        centering_jl_invalid = _JL.UnsupportedCentering()
+        with pytest.raises(ValueError) as exception_info:
+            xtallography.lattices.Centering.from_julia(centering_jl_invalid)
+
+        expected_error = (
+            f"Unsupported Centering type. (centering_jl={centering_jl_invalid})"
+        )
+        assert expected_error in str(exception_info)
 
     @staticmethod
     def test_Lattice():
@@ -668,6 +727,12 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
             def to_julia(self):
                 return None
+
+            def from_julia(self):
+                return None
+
+            def __repr__(self):
+                return "TestUnitCell()"
 
         # --- Tests
 
