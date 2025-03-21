@@ -181,6 +181,35 @@ class test_xtallography_lattice_rhombohedral(unittest.TestCase):
         assert unit_cell == RhombohedralUnitCell(a, alpha)
 
     @staticmethod
+    def test_from_julia_invalid_arguments():
+        """
+        Test `from_julia()`.
+        """
+        # --- Tests
+
+        # unit_cell_jl not a Julia UnitCell object
+        unit_cell_jl_invalid = "not Julia UnitCell object"
+        with pytest.raises(ValueError) as exception_info:
+            RhombohedralUnitCell.from_julia(unit_cell_jl_invalid)
+
+        expected_error = (
+            "`unit_cell_jl` must be a Julia `UnitCell` object. "
+            f"(unit_cell_jl={unit_cell_jl_invalid})."
+        )
+        assert expected_error in str(exception_info)
+
+        # unit_cell_jl is not for a rhombohedral unit cell
+        unit_cell_jl_invalid = _JL.UnitCell(_JL.CubicLatticeConstants(1), _JL.primitive)
+        with pytest.raises(ValueError) as exception_info:
+            RhombohedralUnitCell.from_julia(unit_cell_jl_invalid)
+
+        expected_error = (
+            "`unit_cell_jl` must be a Julia `UnitCell` object for rhombohedral "
+            f"unit cell. (unit_cell_jl={unit_cell_jl_invalid})."
+        )
+        assert expected_error in str(exception_info)
+
+    @staticmethod
     def test_repr():
         """
         Test `__repr__()`.
