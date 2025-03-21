@@ -7,8 +7,10 @@ Xtallography Release Notes
 **Enhancements**
 - Add methods for converting Julia `Centering` and `UnitCell` objects to equivalent
   Python objects.
+- Improved error messages.
 
 **Developer Updates**
+- Improve robustness of unit tests.
 - Update developer reference documents.
 
 --------------------------------------------------------------------------------------------
