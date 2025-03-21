@@ -62,160 +62,57 @@ end
     # ------ a
 
     # a = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = MonoclinicLatticeConstants(0, b, c, β)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `a` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`a` must be positive"
+    @test_throws DomainError(0, expected_message) MonoclinicLatticeConstants(0, b, c, β)
 
     # a < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = MonoclinicLatticeConstants(-1.0, b, c, β)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `a` must be positive"
-    @test startswith(error_message, expected_error)
-
+    expected_message = "`a` must be positive"
+    @test_throws DomainError(-1.0, expected_message) MonoclinicLatticeConstants(
+        -1.0, b, c, β
+    )
     # ------ b
 
     # b = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = MonoclinicLatticeConstants(a, 0, c, β)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `b` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`b` must be positive"
+    @test_throws DomainError(0, expected_message) MonoclinicLatticeConstants(a, 0, c, β)
 
     # b < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = MonoclinicLatticeConstants(a, -1.0, c, β)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `b` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`b` must be positive"
+    @test_throws DomainError(-2.0, expected_message) MonoclinicLatticeConstants(
+        a, -2.0, c, β
+    )
 
     # ------ c
 
     # c = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = MonoclinicLatticeConstants(a, b, 0, β)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `c` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`c` must be positive"
+    @test_throws DomainError(0, expected_message) MonoclinicLatticeConstants(a, b, 0, β)
 
     # c < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = MonoclinicLatticeConstants(a, b, -1.0, β)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `c` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`c` must be positive"
+    @test_throws DomainError(-3.0, expected_message) MonoclinicLatticeConstants(
+        a, b, -3.0, β
+    )
 
     # ------ β
 
     # β = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = MonoclinicLatticeConstants(a, b, c, 0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`β` must satisfy 0 < β < π"
+    @test_throws DomainError(0, expected_message) MonoclinicLatticeConstants(a, b, c, 0)
 
     # β < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = MonoclinicLatticeConstants(a, b, c, -1.0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`β` must satisfy 0 < β < π"
+    @test_throws DomainError(-1, expected_message) MonoclinicLatticeConstants(a, b, c, -1)
 
     # β > π
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = MonoclinicLatticeConstants(a, b, c, π + 1)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`β` must satisfy 0 < β < π"
+    @test_throws DomainError(π + 1, expected_message) MonoclinicLatticeConstants(
+        a, b, c, π + 1
+    )
 
     # β = π
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = MonoclinicLatticeConstants(a, b, c, π)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `β` must satisfy 0 < β < π"
-    @test startswith(error_message, expected_error)
+    expected_message = "`β` must satisfy 0 < β < π"
+    @test_throws DomainError(π, expected_message) MonoclinicLatticeConstants(a, b, c, π)
 end
 
 @testset "MonoclinicLatticeConstantDeltas constructor" begin
@@ -504,23 +401,10 @@ end
 
     # centering = face-centered
     centering = face_centered
-    local error = nothing
-    local error_message = ""
-    try
-        standardize(lattice_constants, centering)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error =
-        "ArgumentError: " *
+    expected_message =
         "Invalid Bravais lattice: " *
         "(lattice_system=Monoclinic, centering=$(nameof(typeof(centering))))"
-
-    @test startswith(error_message, expected_error)
+    @test_throws ArgumentError(expected_message) standardize(lattice_constants, centering)
 end
 
 # ------ LatticeConstantDeltas functions
@@ -1037,60 +921,28 @@ end
     # ------ `tol`
 
     # tol = 0
-    local error, error_message
-    try
-        is_supercell(lattice_constants_test, lattice_constants_ref; tol=0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `tol` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`tol` must be positive"
+    @test_throws DomainError(0, expected_message) is_supercell(
+        lattice_constants_test, lattice_constants_ref; tol=0
+    )
 
     # tol < 0
-    local error, error_message
-    try
-        is_supercell(lattice_constants_test, lattice_constants_ref; tol=-0.1)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `tol` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`tol` must be positive"
+    @test_throws DomainError(-0.1, expected_message) is_supercell(
+        lattice_constants_test, lattice_constants_ref; tol=-0.1
+    )
 
     # ------ `max_index`
 
     # max_index = 0
-    local error, error_message
-    try
-        is_supercell(lattice_constants_test, lattice_constants_ref; max_index=0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `max_index` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`max_index` must be positive"
+    @test_throws DomainError(0, expected_message) is_supercell(
+        lattice_constants_test, lattice_constants_ref; max_index=0
+    )
 
     # max_index < 0
-    local error, error_message
-    try
-        is_supercell(lattice_constants_test, lattice_constants_ref; max_index=-3)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `max_index` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`max_index` must be positive"
+    @test_throws DomainError(-3, expected_message) is_supercell(
+        lattice_constants_test, lattice_constants_ref; max_index=-3
+    )
 end

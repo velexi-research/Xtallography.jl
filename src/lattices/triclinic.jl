@@ -79,27 +79,27 @@ struct TriclinicLatticeConstants <: LatticeConstants{Triclinic}
         # --- Enforce constraints
 
         if a <= 0
-            throw(ArgumentError("`a` must be positive"))
+            throw(DomainError(a, "`a` must be positive"))
         end
 
         if b <= 0
-            throw(ArgumentError("`b` must be positive"))
+            throw(DomainError(b, "`b` must be positive"))
         end
 
         if c <= 0
-            throw(ArgumentError("`c` must be positive"))
+            throw(DomainError(c, "`c` must be positive"))
         end
 
         if α <= TRICLINIC_MIN_ANGLE || α >= TRICLINIC_MAX_ANGLE
-            throw(ArgumentError("`α` must satisfy 0 < α < π"))
+            throw(DomainError(α, "`α` must satisfy 0 < α < π"))
         end
 
         if β <= TRICLINIC_MIN_ANGLE || β >= TRICLINIC_MAX_ANGLE
-            throw(ArgumentError("`β` must satisfy 0 < β < π"))
+            throw(DomainError(β, "`β` must satisfy 0 < β < π"))
         end
 
         if γ <= TRICLINIC_MIN_ANGLE || γ >= TRICLINIC_MAX_ANGLE
-            throw(ArgumentError("`γ` must satisfy 0 < γ < π"))
+            throw(DomainError(γ, "`γ` must satisfy 0 < γ < π"))
         end
 
         # --- Construct and return new TriclinicLatticeConstants
@@ -686,7 +686,7 @@ function convert_to_mI_basis_to_lattice_constants(
 
     # Check IUCr conventions
     if m_β < π / 2
-        throw(ErrorException("m_β < π/2"))
+        throw(ErrorException("m_β be at least π/2. (m_β=$m_β)"))
     end
 
     m_lattice_constants, _ = standardize(
@@ -1492,7 +1492,7 @@ function convert_to_mC_basis_to_lattice_constants(
 
     # Check IUCr conventions
     if m_β < π / 2
-        throw(ErrorException("m_β < π/2"))
+        throw(ErrorException("m_β be at least π/2. (m_β=$m_β)"))
     end
 
     return MonoclinicLatticeConstants(m_a, m_b, m_c, m_β)

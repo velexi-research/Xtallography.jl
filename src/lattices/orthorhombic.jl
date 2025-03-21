@@ -53,15 +53,15 @@ struct OrthorhombicLatticeConstants <: LatticeConstants{Orthorhombic}
         # --- Enforce constraints
 
         if a <= 0
-            throw(ArgumentError("`a` must be positive"))
+            throw(DomainError(a, "`a` must be positive"))
         end
 
         if b <= 0
-            throw(ArgumentError("`b` must be positive"))
+            throw(DomainError(b, "`b` must be positive"))
         end
 
         if c <= 0
-            throw(ArgumentError("`c` must be positive"))
+            throw(DomainError(c, "`c` must be positive"))
         end
 
         # --- Construct and return new OrthorhombicLatticeConstants

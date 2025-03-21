@@ -62,11 +62,11 @@ struct RhombohedralLatticeConstants <: LatticeConstants{Rhombohedral}
         # --- Enforce constraints
 
         if a <= 0
-            throw(ArgumentError("`a` must be positive"))
+            throw(DomainError(a, "`a` must be positive"))
         end
 
         if α <= RHOMBOHEDRAL_MIN_ANGLE || α >= RHOMBOHEDRAL_MAX_ANGLE
-            throw(ArgumentError("`α` must satisfy 0 < α < 2π / 3"))
+            throw(DomainError(α, "`α` must satisfy 0 < α < 2π / 3"))
         end
 
         # --- Construct and return new RhombohedralLatticeConstants

@@ -44,7 +44,7 @@ struct CubicLatticeConstants <: LatticeConstants{Cubic}
         # --- Enforce constraints
 
         if a <= 0
-            throw(ArgumentError("`a` must be positive"))
+            throw(DomainError(a, "`a` must be positive"))
         end
 
         # --- Construct and return new CubicLatticeConstants
@@ -131,7 +131,7 @@ function is_supercell(
     # --- Check arguments
 
     if tol <= 0
-        throw(ArgumentError("`tol` must be positive"))
+        throw(DomainError(tol, "`tol` must be positive"))
     end
 
     # --- Compare lattice constants

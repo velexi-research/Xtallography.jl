@@ -782,11 +782,11 @@ function is_equivalent_unit_cell(
     # --- Check arguments
 
     if atol < 0
-        throw(ArgumentError("`atol` must be nonnegative"))
+        throw(DomainError(atol, "`atol` must be nonnegative"))
     end
 
     if rtol < 0
-        throw(ArgumentError("`rtol` must be nonnegative"))
+        throw(DomainError(rtol, "`rtol` must be nonnegative"))
     end
 
     # --- Compare reduced cells

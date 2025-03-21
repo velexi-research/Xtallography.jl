@@ -56,96 +56,34 @@ end
     # ------ a
 
     # a = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = RhombohedralLatticeConstants(0, α)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `a` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`a` must be positive"
+    @test_throws DomainError(0, expected_message) RhombohedralLatticeConstants(0, α)
 
     # a < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = RhombohedralLatticeConstants(-1.0, α)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `a` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`a` must be positive"
+    @test_throws DomainError(-2.0, expected_message) RhombohedralLatticeConstants(-2.0, α)
 
     # ------ α
 
     # α = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = RhombohedralLatticeConstants(a, 0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < 2π / 3"
-    @test startswith(error_message, expected_error)
+    expected_message = "`α` must satisfy 0 < α < 2π / 3"
+    @test_throws DomainError(0, expected_message) RhombohedralLatticeConstants(a, 0)
 
     # α < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = RhombohedralLatticeConstants(a, -1.0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < 2π / 3"
-    @test startswith(error_message, expected_error)
+    expected_message = "`α` must satisfy 0 < α < 2π / 3"
+    @test_throws DomainError(-1.0, expected_message) RhombohedralLatticeConstants(a, -1)
 
     # α = 2π / 3
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = RhombohedralLatticeConstants(a, 2π / 3)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < 2π / 3"
-    @test startswith(error_message, expected_error)
+    expected_message = "`α` must satisfy 0 < α < 2π / 3"
+    @test_throws DomainError(2π / 3, expected_message) RhombohedralLatticeConstants(
+        a, 2π / 3
+    )
 
     # α > 2π / 3
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = RhombohedralLatticeConstants(a, 3π / 2)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `α` must satisfy 0 < α < 2π / 3"
-    @test startswith(error_message, expected_error)
+    expected_message = "`α` must satisfy 0 < α < 2π / 3"
+    @test_throws DomainError(3π / 2, expected_message) RhombohedralLatticeConstants(
+        a, 3π / 2
+    )
 end
 
 @testset "RhombohedralLatticeConstantDeltas constructor" begin
@@ -234,23 +172,13 @@ end
     # ------ Invalid centering
 
     for centering in (body_centered, face_centered, base_centered)
-        local error = nothing
-        local error_message = ""
-        try
-            standardize(lattice_constants, centering)
-        catch error
-            bt = catch_backtrace()
-            error_message = sprint(showerror, error, bt)
-        end
-
-        @test error isa ArgumentError
-
-        expected_error =
-            "ArgumentError: " *
+        expected_message =
             "Invalid Bravais lattice: " *
             "(lattice_system=Rhombohedral, centering=$(nameof(typeof(centering))))"
 
-        @test startswith(error_message, expected_error)
+        @test_throws ArgumentError(expected_message) standardize(
+            lattice_constants, centering
+        )
     end
 end
 

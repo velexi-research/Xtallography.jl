@@ -55,66 +55,22 @@ end
     # ------ a
 
     # a = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TetragonalLatticeConstants(0, c)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `a` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`a` must be positive"
+    @test_throws DomainError(0, expected_message) TetragonalLatticeConstants(0, c)
 
     # a < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TetragonalLatticeConstants(-1.0, c)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `a` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`a` must be positive"
+    @test_throws DomainError(-1, expected_message) TetragonalLatticeConstants(-1, c)
 
     # ------ c
 
     # c = 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TetragonalLatticeConstants(a, 0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `c` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`c` must be positive"
+    @test_throws DomainError(0, expected_message) TetragonalLatticeConstants(a, 0)
 
     # c < 0
-    local error = nothing
-    local error_message = ""
-    try
-        lattice_constants = TetragonalLatticeConstants(a, -1.0)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `c` must be positive"
-    @test startswith(error_message, expected_error)
+    expected_message = "`c` must be positive"
+    @test_throws DomainError(-2.0, expected_message) TetragonalLatticeConstants(a, -2.0)
 end
 
 @testset "TetragonalLatticeConstantDeltas constructor" begin
@@ -218,23 +174,13 @@ end
     # ------ Invalid centerings
 
     for centering in (face_centered, base_centered)
-        local error = nothing
-        local error_message = ""
-        try
-            standardize(lattice_constants, centering)
-        catch error
-            bt = catch_backtrace()
-            error_message = sprint(showerror, error, bt)
-        end
-
-        @test error isa ArgumentError
-
-        expected_error =
-            "ArgumentError: " *
+        expected_message =
             "Invalid Bravais lattice: " *
             "(lattice_system=Tetragonal, centering=$(nameof(typeof(centering))))"
 
-        @test startswith(error_message, expected_error)
+        @test_throws ArgumentError(expected_message) standardize(
+            lattice_constants, centering
+        )
     end
 end
 

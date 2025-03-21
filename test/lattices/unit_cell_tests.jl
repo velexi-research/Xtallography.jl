@@ -967,34 +967,16 @@ end
     # --- Exercise functionality and check results
 
     # atol < 0
-    local error = nothing
-    local error_message = ""
-    try
-        is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=-1)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `atol` must be nonnegative"
-    @test startswith(error_message, expected_error)
+    expected_message = "`atol` must be nonnegative"
+    @test_throws DomainError(-1, expected_message) is_equivalent_unit_cell(
+        unit_cell_test, unit_cell_ref; atol=-1
+    )
 
     # rtol < 0
-    local error = nothing
-    local error_message = ""
-    try
-        is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; rtol=-1)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `rtol` must be nonnegative"
-    @test startswith(error_message, expected_error)
+    expected_message = "`rtol` must be nonnegative"
+    @test_throws DomainError(-1, expected_message) is_equivalent_unit_cell(
+        unit_cell_test, unit_cell_ref; rtol=-1
+    )
 end
 
 @testset "is_equivalent_unit_cell(::LatticeConstants): valid arguments" begin
@@ -1046,34 +1028,16 @@ end
     # --- Exercise functionality and check results
 
     # atol < 0
-    local error = nothing
-    local error_message = ""
-    try
-        is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref; atol=-1)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `atol` must be nonnegative"
-    @test startswith(error_message, expected_error)
+    expected_message = "`atol` must be nonnegative"
+    @test_throws DomainError(-1, expected_message) is_equivalent_unit_cell(
+        lattice_constants_test, lattice_constants_ref; atol=-1
+    )
 
     # rtol < 0
-    local error = nothing
-    local error_message = ""
-    try
-        is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref; rtol=-1)
-    catch error
-        bt = catch_backtrace()
-        error_message = sprint(showerror, error, bt)
-    end
-
-    @test error isa ArgumentError
-
-    expected_error = "ArgumentError: `rtol` must be nonnegative"
-    @test startswith(error_message, expected_error)
+    expected_message = "`rtol` must be nonnegative"
+    @test_throws DomainError(-1, expected_message) is_equivalent_unit_cell(
+        lattice_constants_test, lattice_constants_ref; rtol=-1
+    )
 end
 
 @testset "is_supercell(): different LatticeConstant types" begin

@@ -66,19 +66,19 @@ struct MonoclinicLatticeConstants <: LatticeConstants{Monoclinic}
         # --- Enforce constraints
 
         if a <= 0
-            throw(ArgumentError("`a` must be positive"))
+            throw(DomainError(a, "`a` must be positive"))
         end
 
         if b <= 0
-            throw(ArgumentError("`b` must be positive"))
+            throw(DomainError(b, "`b` must be positive"))
         end
 
         if c <= 0
-            throw(ArgumentError("`c` must be positive"))
+            throw(DomainError(c, "`c` must be positive"))
         end
 
         if β <= MONOCLINIC_MIN_ANGLE || β >= MONOCLINIC_MAX_ANGLE
-            throw(ArgumentError("`β` must satisfy 0 < β < π"))
+            throw(DomainError(β, "`β` must satisfy 0 < β < π"))
         end
 
         # --- Construct MonoclinicLatticeConstants object
@@ -501,11 +501,11 @@ function is_supercell(
     # --- Check arguments
 
     if tol <= 0
-        throw(ArgumentError("`tol` must be positive"))
+        throw(DomainError(tol, "`tol` must be positive"))
     end
 
     if max_index <= 0
-        throw(ArgumentError("`max_index` must be positive"))
+        throw(DomainError(max_index, "`max_index` must be positive"))
     end
 
     # --- Preparations
