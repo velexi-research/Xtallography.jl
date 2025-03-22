@@ -12,14 +12,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 """
-Unit tests for `xtallography.lattices.core` module
+Unit tests for `xtallography.lattices.core` module (excluding UnitCell tests)
 """
 # --- Imports
 
 # Standard library
-import math
 import unittest
-import sys
 
 # External packages
 import juliacall
@@ -27,7 +25,6 @@ import pytest
 import xtallography
 from xtallography import _JL
 from xtallography.lattices import LatticeSystem, Centering, Lattice
-from xtallography.lattices import UnitCell, CubicUnitCell
 
 # Local packages/modules
 
@@ -37,7 +34,7 @@ from xtallography.lattices import UnitCell, CubicUnitCell
 
 class test_xtallography_lattices_core(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattices.core` module
+    Test suite for the `xtallography.lattices.core` module (excluding UnitCell tests)
     """
 
     # --- Fixtures
@@ -65,7 +62,90 @@ class test_xtallography_lattices_core(unittest.TestCase):
         # --- Tests
 
         # Get full list of values
-        # TODO
+        values = set(LatticeSystem.values())
+        assert values == {
+            "triclinic",
+            "monoclinic",
+            "orthorhombic",
+            "tetragonal",
+            "rhombohedral",
+            "hexagonal",
+            "cubic",
+        }
+
+    @staticmethod
+    def test_LatticeSystem_from_julia():
+        """
+        Test `LatticeSystem.from_julia()` method.
+        """
+        # --- Tests
+
+        # triclinic
+        lattice_system_jl = _JL.triclinic
+        lattice_system = LatticeSystem.from_julia(lattice_system_jl)
+        assert lattice_system == LatticeSystem.TRICLINIC
+
+        # monoclinic
+        lattice_system_jl = _JL.monoclinic
+        lattice_system = LatticeSystem.from_julia(lattice_system_jl)
+        assert lattice_system == LatticeSystem.MONOCLINIC
+
+        # orthorhombic
+        lattice_system_jl = _JL.orthorhombic
+        lattice_system = LatticeSystem.from_julia(lattice_system_jl)
+        assert lattice_system == LatticeSystem.ORTHORHOMBIC
+
+        # tetragonal
+        lattice_system_jl = _JL.tetragonal
+        lattice_system = LatticeSystem.from_julia(lattice_system_jl)
+        assert lattice_system == LatticeSystem.TETRAGONAL
+
+        # rhombohedral
+        lattice_system_jl = _JL.rhombohedral
+        lattice_system = LatticeSystem.from_julia(lattice_system_jl)
+        assert lattice_system == LatticeSystem.RHOMBOHEDRAL
+
+        # hexagonal
+        lattice_system_jl = _JL.hexagonal
+        lattice_system = LatticeSystem.from_julia(lattice_system_jl)
+        assert lattice_system == LatticeSystem.HEXAGONAL
+
+        # cubic
+        lattice_system_jl = _JL.cubic
+        lattice_system = LatticeSystem.from_julia(lattice_system_jl)
+        assert lattice_system == LatticeSystem.CUBIC
+
+    @staticmethod
+    def test_LatticeSystem_from_julia_invalid_args():
+        """
+        Test argument checks for `LatticeSystem.from_julia()`.
+        """
+        # --- Tests
+
+        # ------ `lattice_system_jl` is not a Julia LatticeSystem object
+
+        lattice_system_jl_invalid = "not a Julia LatticeSystem object"
+        with pytest.raises(ValueError) as exception_info:
+            xtallography.lattices.LatticeSystem.from_julia(lattice_system_jl_invalid)
+
+        expected_error = (
+            "`lattice_system_jl` must be a Julia `LatticeSystem` object. "
+            f"(lattice_system_jl={lattice_system_jl_invalid})."
+        )
+        assert expected_error in str(exception_info)
+
+        # ------ `lattice_system_jl` is an unsupported Julia LatticeSystem object
+
+        _JL.seval("struct UnsupportedLatticeSystem <: LatticeSystem end")
+        lattice_system_jl_invalid = _JL.UnsupportedLatticeSystem()
+        with pytest.raises(ValueError) as exception_info:
+            xtallography.lattices.LatticeSystem.from_julia(lattice_system_jl_invalid)
+
+        expected_error = (
+            "Unsupported LatticeSystem type. "
+            "(lattice_system_jl=UnsupportedLatticeSystem)"
+        )
+        assert expected_error in str(exception_info)
 
     @staticmethod
     def test_Centering():
@@ -75,7 +155,13 @@ class test_xtallography_lattices_core(unittest.TestCase):
         # --- Tests
 
         # Get full list of values
-        # TODO
+        values = set(Centering.values())
+        assert values == {
+            "primitive",
+            "base_centered",
+            "body_centered",
+            "face_centered",
+        }
 
     def test_Centering_to_julia(self):
         """
@@ -157,7 +243,7 @@ class test_xtallography_lattices_core(unittest.TestCase):
             xtallography.lattices.Centering.from_julia(centering_jl_invalid)
 
         expected_error = (
-            f"Unsupported Centering type. (centering_jl={centering_jl_invalid})"
+            "Unsupported Centering type. (centering_jl=UnsupportedCentering)"
         )
         assert expected_error in str(exception_info)
 
@@ -559,96 +645,3 @@ class test_xtallography_lattices_core(unittest.TestCase):
         # (cubic, base_centered)
         lattice = Lattice(LatticeSystem.CUBIC, Centering.BASE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
-
-    @staticmethod
-    def test_UnitCell_argument_checks():
-        """
-        Tests for `UnitCell()` constructor argument checks.
-        """
-        # --- Preparations
-
-        # Define subclass that calls UnitCell constructor with string arguments
-        class TestUnitCell(UnitCell):
-            def __init__(self):
-                super().__init__("cubic", "primitive")
-
-            def to_julia(self):
-                return None
-
-            def from_julia(self):
-                return None
-
-            def __repr__(self):
-                return "TestUnitCell()"
-
-        # --- Tests
-
-        try:
-            unit_cell = TestUnitCell()
-        except Exception:
-            pytest.fail("Unexpected test failure.")
-
-        assert isinstance(unit_cell.lattice_system, LatticeSystem)
-        assert isinstance(unit_cell.centering, Centering)
-
-    @staticmethod
-    def test_isclose_default_args():
-        """
-        Test default argument cases for `UnitCell.isclose()`.
-        """
-        # --- Tests
-
-        # ------ default `atol`
-
-        # lattice constants differ by less than sqrt(eps)
-        unit_cell_1 = CubicUnitCell(1)
-        unit_cell_2 = CubicUnitCell(1 + 0.5 * math.sqrt(sys.float_info.epsilon))
-        assert unit_cell_1.isclose(unit_cell_2)
-
-        # lattice constants differ by more than sqrt(eps)
-        unit_cell_1 = CubicUnitCell(1)
-        unit_cell_2 = CubicUnitCell(1 - 2 * math.sqrt(sys.float_info.epsilon))
-        assert not unit_cell_1.isclose(unit_cell_2)
-
-        # ------ `rtol`
-
-        # atol > 0, default rtol, lattice constants differ by less than atol
-        unit_cell_1 = CubicUnitCell(1)
-        unit_cell_2 = CubicUnitCell(1 + 0.05)
-        assert unit_cell_1.isclose(unit_cell_2, atol=0.1)
-
-        # atol > 0, default rtol, lattice constants differ by more than atol
-        unit_cell_1 = CubicUnitCell(1)
-        unit_cell_2 = CubicUnitCell(1 + 0.2)
-        assert not unit_cell_1.isclose(unit_cell_2, atol=0.1)
-
-    @staticmethod
-    def test_isclose_invalid_args():
-        """
-        Test argument checks for `UnitCell.isclose()`.
-        """
-        # --- Tests
-
-        # ------ `atol`
-
-        # atol < 0
-        unit_cell_1 = CubicUnitCell(1)
-        unit_cell_2 = CubicUnitCell(1)
-        atol_invalid = -0.1
-        with pytest.raises(ValueError) as exception_info:
-            unit_cell_1.isclose(unit_cell_2, atol=atol_invalid)
-
-        expected_error = f"`atol` must be nonnegative. (atol={atol_invalid})"
-        assert expected_error in str(exception_info)
-
-        # ------ `rtol`
-
-        # rtol < 0
-        unit_cell_1 = CubicUnitCell(1)
-        unit_cell_2 = CubicUnitCell(1)
-        rtol_invalid = -0.1
-        with pytest.raises(ValueError) as exception_info:
-            unit_cell_1.isclose(unit_cell_2, rtol=rtol_invalid)
-
-        expected_error = f"`rtol` must be nonnegative. (rtol={rtol_invalid})"
-        assert expected_error in str(exception_info)

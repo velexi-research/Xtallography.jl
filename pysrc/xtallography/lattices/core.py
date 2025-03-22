@@ -45,6 +45,42 @@ class LatticeSystem(StrEnum):
     CUBIC = auto()
 
     @classmethod
+    def from_julia(cls, lattice_system_jl: _JL.LatticeSystem):
+        """
+        Convert a Julia LatticeSystem object to a Python LatticeSystem object.
+        """
+        # Check arguments
+        if not _JL.isa(lattice_system_jl, _JL.LatticeSystem):
+            raise ValueError(
+                "`lattice_system_jl` must be a Julia `LatticeSystem` object. "
+                f"(lattice_system_jl={lattice_system_jl})."
+            )
+
+        # Convert lattice_system_jl to a LatticeSystem object
+        if lattice_system_jl == _JL.triclinic:
+            lattice_system = LatticeSystem.TRICLINIC
+        elif lattice_system_jl == _JL.monoclinic:
+            lattice_system = LatticeSystem.MONOCLINIC
+        elif lattice_system_jl == _JL.orthorhombic:
+            lattice_system = LatticeSystem.ORTHORHOMBIC
+        elif lattice_system_jl == _JL.tetragonal:
+            lattice_system = LatticeSystem.TETRAGONAL
+        elif lattice_system_jl == _JL.rhombohedral:
+            lattice_system = LatticeSystem.RHOMBOHEDRAL
+        elif lattice_system_jl == _JL.hexagonal:
+            lattice_system = LatticeSystem.HEXAGONAL
+        elif lattice_system_jl == _JL.cubic:
+            lattice_system = LatticeSystem.CUBIC
+        else:
+            lattice_system_jl_type = _JL.nameof(_JL.typeof(lattice_system_jl))
+            raise ValueError(
+                "Unsupported LatticeSystem type. "
+                f"(lattice_system_jl={lattice_system_jl_type})"
+            )
+
+        return lattice_system
+
+    @classmethod
     def values(cls):
         """
         Return full list of LatticeSystem values.
@@ -96,8 +132,9 @@ class Centering(StrEnum):
         elif centering_jl == _JL.face_centered:
             centering = Centering.FACE_CENTERED
         else:
+            centering_jl_type = _JL.nameof(_JL.typeof(centering_jl))
             raise ValueError(
-                f"Unsupported Centering type. (centering_jl={centering_jl})"
+                f"Unsupported Centering type. (centering_jl={centering_jl_type})"
             )
 
         return centering
