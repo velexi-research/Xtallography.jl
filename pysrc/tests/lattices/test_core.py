@@ -17,16 +17,17 @@ Unit tests for `xtallography.lattices.core` module
 # --- Imports
 
 # Standard library
-import copy
 import math
 import unittest
+import sys
 
 # External packages
 import juliacall
 import pytest
 import xtallography
 from xtallography import _JL
-from xtallography.lattices import LatticeSystem, Centering, Lattice, UnitCell
+from xtallography.lattices import LatticeSystem, Centering, Lattice
+from xtallography.lattices import UnitCell, CubicUnitCell
 
 # Local packages/modules
 
@@ -559,160 +560,6 @@ class test_xtallography_lattices_core(unittest.TestCase):
         lattice = Lattice(LatticeSystem.CUBIC, Centering.BASE_CENTERED)
         assert not xtallography.lattices.is_bravais_lattice(lattice)
 
-    @unittest.skip("BROKEN")
-    @staticmethod
-    def test_is_valid_unit_cell():
-        """
-        Test `is_valid_unit_cell()`.
-        """
-        # --- Tests
-
-        # ------ triclinic
-
-        lattice = xtallography.lattices.create_lattice("triclinic", "primitive")
-
-        unit_cell = {"a": 1, "b": 2, "c": 3, "alpha": 80, "beta": 80, "gamma": 80}
-        assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        unit_cell = {"a": 1, "b": 2, "c": 3, "beta": 80}
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        expected_error = (
-            "`unit_cell` is not compatible with `lattice`. "
-            f"(lattice={lattice},unit_cell.keys={tuple(unit_cell.keys())})"
-        )
-        assert expected_error in str(exception_info)
-
-        # ------ monoclinic
-
-        lattice = xtallography.lattices.create_lattice("monoclinic", "primitive")
-
-        unit_cell = {"a": 1, "b": 2, "c": 3, "beta": 80}
-        assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        unit_cell = {"a": 1, "b": 2, "c": 3, "alpha": 80, "beta": 80, "gamma": 80}
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        expected_error = (
-            "`unit_cell` is not compatible with `lattice`. "
-            f"(lattice={lattice},unit_cell.keys={tuple(unit_cell.keys())})"
-        )
-        assert expected_error in str(exception_info)
-
-        # ------ orthorhombic
-
-        lattice = xtallography.lattices.create_lattice("orthorhombic", "primitive")
-
-        unit_cell = {"a": 1, "b": 2, "c": 3}
-        assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        unit_cell = {"a": 1, "b": 2, "c": 3, "alpha": 80, "beta": 80, "gamma": 80}
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        expected_error = (
-            "`unit_cell` is not compatible with `lattice`. "
-            f"(lattice={lattice},unit_cell.keys={tuple(unit_cell.keys())})"
-        )
-        assert expected_error in str(exception_info)
-
-        # ------ tetragonal
-
-        lattice = xtallography.lattices.create_lattice("tetragonal", "body_centered")
-
-        unit_cell = {"a": 1, "c": 3}
-        assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        unit_cell = {"a": 1}
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        expected_error = (
-            "`unit_cell` is not compatible with `lattice`. "
-            f"(lattice={lattice},unit_cell.keys={tuple(unit_cell.keys())})"
-        )
-        assert expected_error in str(exception_info)
-
-        # ------ rhombohedral
-
-        lattice = xtallography.lattices.create_lattice("rhombohedral", "primitive")
-
-        unit_cell = {"a": 1, "alpha": 45}
-        assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        unit_cell = {"a": 1, "c": 3}
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        expected_error = (
-            "`unit_cell` is not compatible with `lattice`. "
-            f"(lattice={lattice},unit_cell.keys={tuple(unit_cell.keys())})"
-        )
-        assert expected_error in str(exception_info)
-
-        # ------ hexagonal
-
-        lattice = xtallography.lattices.create_lattice("hexagonal", "primitive")
-
-        unit_cell = {"a": 1, "c": 3}
-        assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        unit_cell = {"a": 1, "b": 2, "c": 3, "beta": 80}
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        expected_error = (
-            "`unit_cell` is not compatible with `lattice`. "
-            f"(lattice={lattice},unit_cell.keys={tuple(unit_cell.keys())})"
-        )
-        assert expected_error in str(exception_info)
-
-        # ------ cubic
-
-        lattice = xtallography.lattices.create_lattice("cubic", "face_centered")
-
-        unit_cell = {"a": 1}
-        assert xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        unit_cell = {"a": 1, "c": 3}
-        with pytest.raises(ValueError) as exception_info:
-            xtallography.lattices.is_valid_unit_cell(lattice, unit_cell)
-
-        expected_error = (
-            "`unit_cell` is not compatible with `lattice`. "
-            f"(lattice={lattice},unit_cell.keys={tuple(unit_cell.keys())})"
-        )
-        assert expected_error in str(exception_info)
-
-        # ------ some `unit_cell` values are edge cases, allow_edge_case=True
-
-        lattice = xtallography.lattices.create_lattice("hexagonal", "primitive")
-        unit_cell = {"a": 1, "c": 3}
-
-        # some `unit_cell` values are 0
-        test_unit_cell = copy.copy(unit_cell)
-        test_unit_cell["a"] = 0
-        try:
-            assert xtallography.lattices.is_valid_unit_cell(
-                lattice, test_unit_cell, allow_edge_cases=True
-            )
-        except Exception:
-            pytest.fail("Lattice() constructor raised unexpected error")
-
-        assert expected_error in str(exception_info)
-
-        # some `unit_cell` values are inf
-        test_unit_cell = copy.copy(unit_cell)
-        test_unit_cell["a"] = math.inf
-        try:
-            assert xtallography.lattices.is_valid_unit_cell(
-                lattice, test_unit_cell, allow_edge_cases=True
-            )
-        except Exception:
-            pytest.fail("Lattice() constructor raised unexpected error")
-
     @staticmethod
     def test_UnitCell_argument_checks():
         """
@@ -743,3 +590,65 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         assert isinstance(unit_cell.lattice_system, LatticeSystem)
         assert isinstance(unit_cell.centering, Centering)
+
+    @staticmethod
+    def test_isclose_default_args():
+        """
+        Test default argument cases for `UnitCell.isclose()`.
+        """
+        # --- Tests
+
+        # ------ default `atol`
+
+        # lattice constants differ by less than sqrt(eps)
+        unit_cell_1 = CubicUnitCell(1)
+        unit_cell_2 = CubicUnitCell(1 + 0.5 * math.sqrt(sys.float_info.epsilon))
+        assert unit_cell_1.isclose(unit_cell_2)
+
+        # lattice constants differ by more than sqrt(eps)
+        unit_cell_1 = CubicUnitCell(1)
+        unit_cell_2 = CubicUnitCell(1 - 2 * math.sqrt(sys.float_info.epsilon))
+        assert not unit_cell_1.isclose(unit_cell_2)
+
+        # ------ `rtol`
+
+        # atol > 0, default rtol, lattice constants differ by less than atol
+        unit_cell_1 = CubicUnitCell(1)
+        unit_cell_2 = CubicUnitCell(1 + 0.05)
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.1)
+
+        # atol > 0, default rtol, lattice constants differ by more than atol
+        unit_cell_1 = CubicUnitCell(1)
+        unit_cell_2 = CubicUnitCell(1 + 0.2)
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.1)
+
+    @staticmethod
+    def test_isclose_invalid_args():
+        """
+        Test argument checks for `UnitCell.isclose()`.
+        """
+        # --- Tests
+
+        # ------ `atol`
+
+        # atol < 0
+        unit_cell_1 = CubicUnitCell(1)
+        unit_cell_2 = CubicUnitCell(1)
+        atol_invalid = -0.1
+        with pytest.raises(ValueError) as exception_info:
+            unit_cell_1.isclose(unit_cell_2, atol=atol_invalid)
+
+        expected_error = f"`atol` must be nonnegative. (atol={atol_invalid})"
+        assert expected_error in str(exception_info)
+
+        # ------ `rtol`
+
+        # rtol < 0
+        unit_cell_1 = CubicUnitCell(1)
+        unit_cell_2 = CubicUnitCell(1)
+        rtol_invalid = -0.1
+        with pytest.raises(ValueError) as exception_info:
+            unit_cell_1.isclose(unit_cell_2, rtol=rtol_invalid)
+
+        expected_error = f"`rtol` must be nonnegative. (rtol={rtol_invalid})"
+        assert expected_error in str(exception_info)

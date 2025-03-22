@@ -378,22 +378,135 @@ class test_xtallography_lattice_monoclinic(unittest.TestCase):
 
         # --- Tests
 
-        # lattice constants are the same, centerings are the same
+        # ------ types differ
+
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = TetragonalUnitCell(a, a + 1)
+        assert unit_cell_1 != unit_cell_2
+
+        # ------ lattice constants are the same
+
+        # centerings are the same
         unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
         unit_cell_2 = MonoclinicUnitCell(a, b, c, beta, centering="primitive")
         assert unit_cell_1 == unit_cell_2
 
-        # lattice constants are the different, centerings are the same
-        unit_cell_1 = MonoclinicUnitCell(a + 1, b, c, beta)
-        unit_cell_2 = MonoclinicUnitCell(a, b, c, beta, centering="primitive")
-        assert unit_cell_1 != unit_cell_2
-
-        # lattice constants are the same, centerings are different
+        # centerings are different
         unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
         unit_cell_2 = MonoclinicUnitCell(a, b, c, beta, centering="body_centered")
         assert unit_cell_1 != unit_cell_2
 
-        # types are different
+        # ------ lattice constants differ, centerings are the same
+
+        # `a` values differ
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a + 1, b, c, beta, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+        # `b` values differ
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b + 2, c, beta, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+        # `c` values differ
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b, c + 3, beta, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+        # `beta` values differ
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b, c, beta + 0.1, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+    @staticmethod
+    def test_isclose():
+        """
+        Test `isclose()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        b = 2
+        c = 3
+        beta = 0.1
+
+        # --- Tests
+
+        # ------ types differ
+
         unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
         unit_cell_2 = TetragonalUnitCell(a, a + 1)
-        assert unit_cell_1 != unit_cell_2
+        assert not unit_cell_1.isclose(unit_cell_2)
+
+        # ------ `a`
+
+        # `a` values differ by less than tolerance, centerings are the same
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a + 0.1, b, c, beta, centering="primitive")
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `a` values differ by less than tolerance, centerings differ
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a + 0.1, b, c, beta, centering="body_centered")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `a` values differ by more than tolerance, centerings are the same
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a + 1, b, c, beta, centering="primitive")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `b`
+
+        # `b` values differ by less than tolerance, centerings are the same
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b + 0.1, c, beta, centering="primitive")
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `b` values differ by less than tolerance, centerings differ
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(
+            a, b - 0.15, c, beta, centering="body_centered"
+        )
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `b` values differ by more than tolerance, centerings are the same
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b + 2, c, beta, centering="primitive")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `c`
+
+        # `c` values differ by less than tolerance, centerings are the same
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b, c - 0.05, beta, centering="primitive")
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `c` values differ by less than tolerance, centerings differ
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b, c + 0.1, beta, centering="body_centered")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `c` values differ by more than tolerance, centerings are the same
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b, c + 3, beta, centering="primitive")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `beta`
+
+        # `beta` values differ by less than tolerance, centerings are the same
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b, c, beta + 0.05, centering="primitive")
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `beta` values differ by less than tolerance, centerings differ
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(
+            a, b, c, beta - 0.05, centering="body_centered"
+        )
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `beta` values differ by more than tolerance, centerings are the same
+        unit_cell_1 = MonoclinicUnitCell(a, b, c, beta)
+        unit_cell_2 = MonoclinicUnitCell(a, b, c, beta + 0.25, centering="primitive")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)

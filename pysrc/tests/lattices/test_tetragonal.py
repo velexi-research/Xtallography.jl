@@ -275,22 +275,85 @@ class test_xtallography_lattice_tetragonal(unittest.TestCase):
 
         # --- Tests
 
-        # lattice constants are the same, centerings are the same
+        # ------ types differ
+
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = CubicUnitCell(a)
+        assert unit_cell_1 != unit_cell_2
+
+        # ------ lattice constants are the same
+
+        # centerings are the same
         unit_cell_1 = TetragonalUnitCell(a, c)
         unit_cell_2 = TetragonalUnitCell(a, c, centering="primitive")
         assert unit_cell_1 == unit_cell_2
 
-        # lattice constants are the different, centerings are the same
-        unit_cell_1 = TetragonalUnitCell(a + 1, c)
-        unit_cell_2 = TetragonalUnitCell(a, c, centering="primitive")
-        assert unit_cell_1 != unit_cell_2
-
-        # lattice constants are the same, centerings are different
+        # centerings are different
         unit_cell_1 = TetragonalUnitCell(a, c)
         unit_cell_2 = TetragonalUnitCell(a, c, centering="body_centered")
         assert unit_cell_1 != unit_cell_2
 
-        # types are different
+        # ------ lattice constants differ, centerings are the same
+
+        # `a` values differ
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a + 1, c, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+        # `c` values differ
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a, c + 3, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+    @staticmethod
+    def test_isclose():
+        """
+        Test `isclose()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        c = 3
+
+        # --- Tests
+
+        # ------ types differ
+
         unit_cell_1 = TetragonalUnitCell(a, c)
         unit_cell_2 = CubicUnitCell(a)
-        assert unit_cell_1 != unit_cell_2
+        assert not unit_cell_1.isclose(unit_cell_2)
+
+        # ------ `a`
+
+        # `a` values differ by less than tolerance, centerings are the same
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a + 0.1, c, centering="primitive")
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `a` values differ by less than tolerance, centerings differ
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a + 0.1, c, centering="body_centered")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `a` values differ by more than tolerance, centerings are the same
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a + 1, c, centering="primitive")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `c`
+
+        # `c` values differ by less than tolerance, centerings are the same
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a, c - 0.05, centering="primitive")
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `c` values differ by less than tolerance, centerings differ
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a, c + 0.1, centering="body_centered")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `c` values differ by more than tolerance, centerings are the same
+        unit_cell_1 = TetragonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a, c + 3, centering="primitive")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)

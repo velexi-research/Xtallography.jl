@@ -333,22 +333,108 @@ class test_xtallography_lattice_orthorhombic(unittest.TestCase):
 
         # --- Tests
 
-        # lattice constants are the same, centerings are the same
+        # ------ types differ
+
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = TetragonalUnitCell(a, a + 1)
+        assert unit_cell_1 != unit_cell_2
+
+        # ------ lattice constants are the same
+
+        # centerings are the same
         unit_cell_1 = OrthorhombicUnitCell(a, b, c)
         unit_cell_2 = OrthorhombicUnitCell(a, b, c, centering="primitive")
         assert unit_cell_1 == unit_cell_2
 
-        # lattice constants are the different, centerings are the same
-        unit_cell_1 = OrthorhombicUnitCell(a + 1, b, c)
-        unit_cell_2 = OrthorhombicUnitCell(a, b, c, centering="primitive")
-        assert unit_cell_1 != unit_cell_2
-
-        # lattice constants are the same, centerings are different
+        # centerings are different
         unit_cell_1 = OrthorhombicUnitCell(a, b, c)
         unit_cell_2 = OrthorhombicUnitCell(a, b, c, centering="body_centered")
         assert unit_cell_1 != unit_cell_2
 
-        # types are different
+        # ------ lattice constants differ, centerings are the same
+
+        # `a` values differ
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a + 1, b, c, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+        # `b` values differ
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a, b + 2, c, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+        # `c` values differ
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a, b, c + 3, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+    @staticmethod
+    def test_isclose():
+        """
+        Test `isclose()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        b = 2
+        c = 3
+
+        # --- Tests
+
+        # ------ types differ
+
         unit_cell_1 = OrthorhombicUnitCell(a, b, c)
         unit_cell_2 = TetragonalUnitCell(a, a + 1)
-        assert unit_cell_1 != unit_cell_2
+        assert not unit_cell_1.isclose(unit_cell_2)
+
+        # ------ `a`
+
+        # `a` values differ by less than tolerance, centerings are the same
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a + 0.1, b, c, centering="primitive")
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `a` values differ by less than tolerance, centerings differ
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a + 0.1, b, c, centering="body_centered")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `a` values differ by more than tolerance, centerings are the same
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a + 1, b, c, centering="primitive")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `b`
+
+        # `b` values differ by less than tolerance, centerings are the same
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a, b + 0.1, c, centering="primitive")
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `b` values differ by less than tolerance, centerings differ
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a, b - 0.15, c, centering="body_centered")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `b` values differ by more than tolerance, centerings are the same
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a, b + 2, c, centering="primitive")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `c`
+
+        # `c` values differ by less than tolerance, centerings are the same
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a, b, c - 0.05, centering="primitive")
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `c` values differ by less than tolerance, centerings differ
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a, b, c + 0.1, centering="body_centered")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `c` values differ by more than tolerance, centerings are the same
+        unit_cell_1 = OrthorhombicUnitCell(a, b, c)
+        unit_cell_2 = OrthorhombicUnitCell(a, b, c + 3, centering="primitive")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)

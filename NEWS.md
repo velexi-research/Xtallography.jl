@@ -5,8 +5,10 @@ Xtallography Release Notes
 0.5.0 (2025-03-21)
 ==================
 **Enhancements**
-- Add methods for converting Julia `Centering` and `UnitCell` objects to equivalent
-  Python objects.
+- Upgrade Python interface.
+  - Add methods for converting Julia `Centering` and `UnitCell` objects to equivalent
+    Python objects.
+  - Add comparison methods for `UnitCell` objects.
 - Improved error messages.
 
 **Developer Updates**

@@ -21,6 +21,9 @@ Core types and functions that support lattice and unit cell computations
 from abc import abstractmethod, ABC
 from collections import namedtuple
 from enum import auto, StrEnum
+import math
+import sys
+from typing import Optional
 
 # Local packages/modules
 from .. import _JL
@@ -310,6 +313,14 @@ class UnitCell(ABC):
     def from_julia(cls, unit_cell_jl: _JL.UnitCell):
         """
         Convert a Julia UnitCell object to a Python UnitCell object.
+
+        Parameters
+        ----------
+        unit_cell_jl: Julia UnitCell object
+
+        Return value
+        ------------
+        unit_cell: Python UnitCell object
         """
 
     @abstractmethod
@@ -320,8 +331,12 @@ class UnitCell(ABC):
 
     def __eq__(self, other):
         """
-        Return True if `self` and `other` represent the same unit cell; otherwise, returno
+        Return True if `self` and `other`are identical unit cells; otherwise, return
         False.
+
+        Parameters
+        ----------
+        other: UnitCell object to compare against
         """
         if not isinstance(other, type(self)):
             return False
@@ -329,5 +344,59 @@ class UnitCell(ABC):
         for var in vars(self):
             if getattr(self, var) != getattr(other, var):
                 return False
+
+        return True
+
+    def isclose(self, other, rtol: Optional[float] = None, atol: float = 0):
+        """
+        Return True if `self` and `other` are approximately equal unit cells; otherwise,
+        return False.
+
+        Parameters
+        ----------
+        other: UnitCell object to compare against
+
+        rtol: relative tolerance
+
+        atol: absolute tolerance
+
+        Note
+        ----
+        * The default values for `rtol` and `atol` are set using the same logic as the
+          Julia `isapprox()` method.
+        """
+        # --- Check arguments
+
+        if atol < 0:
+            raise ValueError(f"`atol` must be nonnegative. (atol={atol})")
+
+        if rtol is None:
+            if atol > 0:
+                rtol = 0
+            else:
+                rtol = math.sqrt(sys.float_info.epsilon)
+
+        if rtol < 0:
+            raise ValueError(f"`rtol` must be nonnegative. (rtol={rtol})")
+
+        # --- Compare UnitCell objects
+
+        # Compare types
+        if not isinstance(other, type(self)):
+            return False
+
+        # Compare lattice constants
+        for var in vars(self):
+            if var == "_lattice_system" or var == "_centering":
+                # Compare lattice_system or centering
+                if getattr(self, var) != getattr(other, var):
+                    return False
+
+            else:
+                # Compare lattice constant
+                if not math.isclose(
+                    getattr(self, var), getattr(other, var), rel_tol=rtol, abs_tol=atol
+                ):
+                    return False
 
         return True
