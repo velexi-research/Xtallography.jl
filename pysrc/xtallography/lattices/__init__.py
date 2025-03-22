@@ -35,6 +35,13 @@ from .tetragonal import TetragonalUnitCell
 from .rhombohedral import RhombohedralUnitCell
 from .hexagonal import HexagonalUnitCell
 from .cubic import CubicUnitCell
+from .unit_cell_dynamic import unit_cell_from_julia
+
+
+# --- Dynamically update UnitCell class
+
+
+setattr(UnitCell, "from_julia", classmethod(unit_cell_from_julia))
 
 
 # --- Exports
