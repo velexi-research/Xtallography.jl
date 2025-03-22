@@ -391,17 +391,141 @@ class test_xtallography_lattice_triclinic(unittest.TestCase):
 
         # --- Tests
 
-        # lattice constants are the same
+        # ------ types differ
+
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TetragonalUnitCell(a, c)
+        assert unit_cell_1 != unit_cell_2
+
+        # ------ lattice constants are the same
+
         unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
         unit_cell_2 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
         assert unit_cell_1 == unit_cell_2
 
-        # lattice constants are the different
-        unit_cell_1 = TriclinicUnitCell(a + 1, b, c, alpha, beta, gamma)
-        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        # ------ lattice constants differ
+
+        # `a` values differ
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a + 1, b, c, alpha, beta, gamma)
         assert unit_cell_1 != unit_cell_2
 
-        # types are different
+        # `b` values differ
         unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
-        unit_cell_2 = TetragonalUnitCell(a, c)
+        unit_cell_2 = TriclinicUnitCell(a, b + 2, c, alpha, beta, gamma)
         assert unit_cell_1 != unit_cell_2
+
+        # `c` values differ
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c + 3, alpha, beta, gamma)
+        assert unit_cell_1 != unit_cell_2
+
+        # `alpha` values differ
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha + 0.1, beta, gamma)
+        assert unit_cell_1 != unit_cell_2
+
+        # `beta` values differ
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha, beta + 0.2, gamma)
+        assert unit_cell_1 != unit_cell_2
+
+        # `gamma` values differ
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha, beta, gamma + 0.3)
+        assert unit_cell_1 != unit_cell_2
+
+    @staticmethod
+    def test_isclose():
+        """
+        Test `isclose()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        b = 2
+        c = 3
+        alpha = 0.1
+        beta = 0.2
+        gamma = 0.3
+
+        # --- Tests
+
+        # ------ types differ
+
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TetragonalUnitCell(a, a + 1)
+        assert not unit_cell_1.isclose(unit_cell_2)
+
+        # ------ `a`
+
+        # `a` values the equal to within tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a + 0.1, b, c, alpha, beta, gamma)
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `a` values differ by more than tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a + 1, b, c, alpha, beta, gamma)
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `b`
+
+        # `b` values the equal to within tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b + 0.1, c, alpha, beta, gamma)
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `b` values differ by more than tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b + 1, c, alpha, beta, gamma)
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `c`
+
+        # `c` values the equal to within tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c + 0.15, alpha, beta, gamma)
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `c` values differ by more than tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c + 1, alpha, beta, gamma)
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `alpha`
+
+        # `alpha` values the equal to within tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha + 0.1, beta, gamma)
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `alpha` values differ by more than tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha + 0.3, beta, gamma)
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `beta`
+
+        # `beta` values the equal to within tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha, beta - 0.1, gamma)
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `beta` values differ by more than tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha, beta + 0.3, gamma)
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `gamma`
+
+        # `gamma` values the equal to within tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha, beta, gamma - 0.1)
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `gamma` values differ by more than tolerance
+        unit_cell_1 = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell_2 = TriclinicUnitCell(a, b, c, alpha, beta, gamma - 0.21)
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)

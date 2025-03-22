@@ -209,17 +209,69 @@ class test_xtallography_lattice_hexagonal(unittest.TestCase):
 
         # --- Tests
 
-        # lattice constants are the same
+        # ------ types differ
+
+        unit_cell_1 = HexagonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a, c)
+        assert unit_cell_1 != unit_cell_2
+
+        # ------ lattice constants are the same
+
         unit_cell_1 = HexagonalUnitCell(a, c)
         unit_cell_2 = HexagonalUnitCell(a, c)
         assert unit_cell_1 == unit_cell_2
 
-        # lattice constants are the different
-        unit_cell_1 = HexagonalUnitCell(a + 1, c)
-        unit_cell_2 = HexagonalUnitCell(a, c)
+        # ------ lattice constants differ
+
+        # `a` values differ
+        unit_cell_1 = HexagonalUnitCell(a, c)
+        unit_cell_2 = HexagonalUnitCell(a + 1, c)
         assert unit_cell_1 != unit_cell_2
 
-        # types are different
+        # `c` values differ
         unit_cell_1 = HexagonalUnitCell(a, c)
-        unit_cell_2 = TetragonalUnitCell(a, c)
+        unit_cell_2 = HexagonalUnitCell(a, c + 2)
         assert unit_cell_1 != unit_cell_2
+
+    @staticmethod
+    def test_isclose():
+        """
+        Test `isclose()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+        c = 3
+
+        # --- Tests
+
+        # ------ types differ
+
+        unit_cell_1 = HexagonalUnitCell(a, c)
+        unit_cell_2 = TetragonalUnitCell(a, a + 1)
+        assert not unit_cell_1.isclose(unit_cell_2)
+
+        # ------ `a`
+
+        # `a` values the equal to within tolerance
+        unit_cell_1 = HexagonalUnitCell(a, c)
+        unit_cell_2 = HexagonalUnitCell(a + 0.1, c)
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `a` values differ by more than tolerance
+        unit_cell_1 = HexagonalUnitCell(a, c)
+        unit_cell_2 = HexagonalUnitCell(a + 1, c)
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # ------ `c`
+
+        # `c` values the equal to within tolerance
+        unit_cell_1 = HexagonalUnitCell(a, c)
+        unit_cell_2 = HexagonalUnitCell(a, c - 0.1)
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `c` values differ by more than tolerance
+        unit_cell_1 = HexagonalUnitCell(a, c)
+        unit_cell_2 = HexagonalUnitCell(a, c + 0.3)
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)

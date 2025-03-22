@@ -246,22 +246,62 @@ class test_xtallography_lattice_cubic(unittest.TestCase):
 
         # --- Tests
 
-        # lattice constants are the same, centerings are the same
+        # ------ types differ
+
+        unit_cell_1 = CubicUnitCell(a)
+        unit_cell_2 = TetragonalUnitCell(a, a + 1)
+        assert unit_cell_1 != unit_cell_2
+
+        # ------ lattice constants are the same
+
+        # centerings are the same
         unit_cell_1 = CubicUnitCell(a)
         unit_cell_2 = CubicUnitCell(a, centering="primitive")
         assert unit_cell_1 == unit_cell_2
 
-        # lattice constants are the different, centerings are the same
-        unit_cell_1 = CubicUnitCell(a + 1)
-        unit_cell_2 = CubicUnitCell(a, centering="primitive")
-        assert unit_cell_1 != unit_cell_2
-
-        # lattice constants are the same, centerings are different
+        # centerings are different
         unit_cell_1 = CubicUnitCell(a)
         unit_cell_2 = CubicUnitCell(a, centering="face_centered")
         assert unit_cell_1 != unit_cell_2
 
-        # types are different
+        # ------ lattice constants differ, centerings are the same
+
+        # `a` values differ
+        unit_cell_1 = CubicUnitCell(a)
+        unit_cell_2 = CubicUnitCell(a + 1, centering="primitive")
+        assert unit_cell_1 != unit_cell_2
+
+    @staticmethod
+    def test_isclose():
+        """
+        Test `isclose()`.
+        """
+        # --- Preparations
+
+        # lattice constants
+        a = 1
+
+        # --- Tests
+
+        # ------ types differ
+
         unit_cell_1 = CubicUnitCell(a)
         unit_cell_2 = TetragonalUnitCell(a, a + 1)
-        assert unit_cell_1 != unit_cell_2
+        assert not unit_cell_1.isclose(unit_cell_2)
+
+        # ------ `a`
+
+        # `a` values differ by less than tolerance, centerings are the same
+        unit_cell_1 = CubicUnitCell(a)
+        unit_cell_2 = CubicUnitCell(a + 0.1, centering="primitive")
+        assert unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `a` values differ by less than tolerance, centerings differ
+        unit_cell_1 = CubicUnitCell(a)
+        unit_cell_2 = CubicUnitCell(a + 0.1, centering="face_centered")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
+
+        # `a` values differ by more than tolerance, centerings are the same
+        unit_cell_1 = CubicUnitCell(a)
+        unit_cell_2 = CubicUnitCell(a + 1, centering="primitive")
+        assert not unit_cell_1.isclose(unit_cell_2, atol=0.2)
