@@ -1,7 +1,7 @@
 name = "Xtallography"
 uuid = "795fc1aa-9caa-44e9-84db-c49cd1f148be"
 authors = ["Kevin Chu <kevin@velexi.com> and contributors"]
-version = "0.5.2"
+version = "0.5.3"
 
 [deps]
 AngleBetweenVectors = "ec570357-d46e-52ed-9726-18773498274d"
