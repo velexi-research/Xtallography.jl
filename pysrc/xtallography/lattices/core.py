@@ -284,7 +284,7 @@ def is_bravais_lattice(lattice: Lattice) -> bool:
 
 class UnitCell(ABC):
     """
-    Abstract base class for unit cell classes.
+    Abstract base class for unit cell classes
     """
 
     # --- Initializer
