@@ -44,6 +44,31 @@ class LatticeSystem(StrEnum):
     HEXAGONAL = auto()
     CUBIC = auto()
 
+    def to_julia(self):
+        """
+        Convert a Python LatticeSystem object to a Julia LatticeSystem object.
+        """
+        if self.value == "triclinic":
+            return _JL.triclinic
+
+        elif self.value == "monoclinic":
+            return _JL.monoclinic
+
+        elif self.value == "orthorhombic":
+            return _JL.orthorhombic
+
+        elif self.value == "tetragonal":
+            return _JL.tetragonal
+
+        elif self.value == "rhombohedral":
+            return _JL.rhombohedral
+
+        elif self.value == "hexagonal":
+            return _JL.hexagonal
+
+        elif self.value == "cubic":
+            return _JL.cubic
+
     @classmethod
     def from_julia(cls, lattice_system_jl: _JL.LatticeSystem):
         """
@@ -359,6 +384,7 @@ class UnitCell(ABC):
         ------------
         unit_cell: Python UnitCell object
         """
+        # TODO: add logic to switch between subclass cases
 
     @abstractmethod
     def __repr__(self):

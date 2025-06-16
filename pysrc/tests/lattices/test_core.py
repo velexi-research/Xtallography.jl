@@ -73,6 +73,47 @@ class test_xtallography_lattices_core(unittest.TestCase):
             "cubic",
         }
 
+    def test_LatticeSystem_to_julia(self):
+        """
+        Test `LatticeSystem.to_julia()` method.
+        """
+        # --- Tests
+
+        # triclinic
+        lattice_system = LatticeSystem.TRICLINIC
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Triclinic)
+
+        # monoclinic
+        lattice_system = LatticeSystem.MONOCLINIC
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Monoclinic)
+
+        # orthorhombic
+        lattice_system = LatticeSystem.ORTHORHOMBIC
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Orthorhombic)
+
+        # tetragonal
+        lattice_system = LatticeSystem.TETRAGONAL
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Tetragonal)
+
+        # rhombohedral
+        lattice_system = LatticeSystem.RHOMBOHEDRAL
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Rhombohedral)
+
+        # hexagonal
+        lattice_system = LatticeSystem.HEXAGONAL
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Hexagonal)
+
+        # cubic
+        lattice_system = LatticeSystem.CUBIC
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Cubic)
+
     @staticmethod
     def test_LatticeSystem_from_julia():
         """
