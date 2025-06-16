@@ -56,7 +56,7 @@ class test_xtallography_lattices_core_LatticeSystem(unittest.TestCase):
 
     def test_to_julia(self):
         """
-        Test `LatticeSystem.to_julia()` method.
+        Test `to_julia()` method.
         """
         # --- Tests
 
@@ -98,7 +98,7 @@ class test_xtallography_lattices_core_LatticeSystem(unittest.TestCase):
     @staticmethod
     def test_from_julia():
         """
-        Test `LatticeSystem.from_julia()` method.
+        Test `from_julia()` method.
         """
         # --- Tests
 
@@ -140,7 +140,7 @@ class test_xtallography_lattices_core_LatticeSystem(unittest.TestCase):
     @staticmethod
     def test_from_julia_invalid_args():
         """
-        Test argument checks for `LatticeSystem.from_julia()`.
+        Test argument checks for `from_julia()`.
         """
         # --- Tests
 
@@ -213,7 +213,7 @@ class test_xtallography_lattices_core_Centering(unittest.TestCase):
 
     def test_to_julia(self):
         """
-        Test `Centering.to_julia()` method.
+        Test `to_julia()` method.
         """
         # --- Tests
 
@@ -240,7 +240,7 @@ class test_xtallography_lattices_core_Centering(unittest.TestCase):
     @staticmethod
     def test_from_julia():
         """
-        Test `Centering.from_julia()` method.
+        Test `from_julia()` method.
         """
         # --- Tests
 
@@ -267,7 +267,7 @@ class test_xtallography_lattices_core_Centering(unittest.TestCase):
     @staticmethod
     def test_from_julia_invalid_args():
         """
-        Test argument checks for `Centering.from_julia()`.
+        Test argument checks for `from_julia()`.
         """
         # --- Tests
 
@@ -337,7 +337,7 @@ class test_xtallography_lattices_core_Lattice(unittest.TestCase):
     @staticmethod
     def test_init():
         """
-        Test __init__().
+        Test `__init__()`.
         """
         # --- Tests
 
