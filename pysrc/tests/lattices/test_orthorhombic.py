@@ -33,7 +33,7 @@ from xtallography.lattices import OrthorhombicUnitCell, TetragonalUnitCell
 
 class test_xtallography_lattice_orthorhombic(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattice.orthorhombic` module
+    Test suite for the `OrthorhombicUnitCell` class
     """
 
     # --- Fixtures

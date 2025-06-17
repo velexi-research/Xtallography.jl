@@ -34,7 +34,7 @@ from xtallography.lattices import TriclinicUnitCell, TetragonalUnitCell
 
 class test_xtallography_lattice_triclinic(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattice.triclinic` module
+    Test suite for the `TriclinicUnitCell` class
     """
 
     # --- Fixtures

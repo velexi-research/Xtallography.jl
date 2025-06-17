@@ -33,7 +33,7 @@ from xtallography.lattices import HexagonalUnitCell, TetragonalUnitCell
 
 class test_xtallography_lattice_hexagonal(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattice.hexagonal` module
+    Test suite for the `HexagonalUnitCell` class
     """
 
     # --- Fixtures

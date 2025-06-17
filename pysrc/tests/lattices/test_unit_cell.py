@@ -45,7 +45,7 @@ from xtallography.lattices import (
 
 class test_xtallography_lattices_core_UnitCell(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattices.core.UnitCell` class
+    Test suite for the `UnitCell` class
     """
 
     # --- Fixtures

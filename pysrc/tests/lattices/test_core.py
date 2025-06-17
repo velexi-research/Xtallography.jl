@@ -33,7 +33,7 @@ from xtallography.lattices import LatticeSystem, Centering, Lattice
 
 class test_xtallography_lattices_core_LatticeSystem(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattices.core.LatticeSystem` class
+    Test suite for the `LatticeSystem` class
     """
 
     # --- Fixtures
@@ -188,7 +188,7 @@ class test_xtallography_lattices_core_LatticeSystem(unittest.TestCase):
 
 class test_xtallography_lattices_core_Centering(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattices.core.Centering` class
+    Test suite for the `Centering` class
     """
 
     # --- Fixtures
@@ -309,7 +309,7 @@ class test_xtallography_lattices_core_Centering(unittest.TestCase):
 
 class test_xtallography_lattices_core_Lattice(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattices.core.Lattice` class
+    Test suite for the `Lattice` class
     """
 
     # --- Fixtures
@@ -384,8 +384,8 @@ class test_xtallography_lattices_core_Lattice(unittest.TestCase):
 
 class test_xtallography_lattices_core_functions(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattices.core` module functions (excluding UnitCell
-    tests)
+    Test suite for the functions in the `xtallography.lattices.core` module (excluding
+    UnitCell tests)
     """
 
     # --- Fixtures

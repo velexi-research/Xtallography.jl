@@ -34,7 +34,7 @@ from xtallography.lattices import MonoclinicUnitCell, TetragonalUnitCell
 
 class test_xtallography_lattice_monoclinic(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattice.monoclinic` module
+    Test suite for the `MonoclinicUnitCell` class
     """
 
     # --- Fixtures

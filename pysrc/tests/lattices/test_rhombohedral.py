@@ -34,7 +34,7 @@ from xtallography.lattices import RhombohedralUnitCell, TetragonalUnitCell
 
 class test_xtallography_lattice_rhombohedral(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattice.rhombohedral` module
+    Test suite for the `RhombohedralUnitCell` class
     """
 
     # --- Fixtures
