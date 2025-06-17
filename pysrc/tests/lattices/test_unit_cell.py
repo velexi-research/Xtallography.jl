@@ -25,7 +25,6 @@ import sys
 import juliacall
 import pytest
 import xtallography
-from xtallography import _JL
 from xtallography.lattices import LatticeSystem, Centering
 from xtallography.lattices import (
     UnitCell,
@@ -201,8 +200,7 @@ class test_xtallography_lattices_core_UnitCell(unittest.TestCase):
         unit_cell = UnitCell.from_julia(unit_cell_jl)
         assert isinstance(unit_cell, CubicUnitCell)
 
-    @staticmethod
-    def test_from_julia_invalid_args():
+    def test_from_julia_invalid_args(self):
         """
         Test argument checks for `UnitCell.from_julia()`.
         """
@@ -222,14 +220,16 @@ class test_xtallography_lattices_core_UnitCell(unittest.TestCase):
 
         # ------ `unit_cell_jl` is an unsupported Julia UnitCell object
 
-        _JL.seval("import Xtallography: lattice_system")
-        _JL.seval("struct UnsupportedLatticeSystem <: LatticeSystem end")
-        _JL.seval("struct UnsupportedLatticeConstants <: LatticeConstants{Cubic} end")
-        _JL.seval(
+        self.jl.seval("import Xtallography: lattice_system")
+        self.jl.seval("struct UnsupportedLatticeSystem <: LatticeSystem end")
+        self.jl.seval(
+            "struct UnsupportedLatticeConstants <: LatticeConstants{Cubic} end"
+        )
+        self.jl.seval(
             "lattice_system(::UnsupportedLatticeConstants) = UnsupportedLatticeSystem()"
         )
-        unit_cell_jl_invalid = _JL.UnitCell(
-            _JL.UnsupportedLatticeConstants(), _JL.primitive
+        unit_cell_jl_invalid = self.jl.UnitCell(
+            self.jl.UnsupportedLatticeConstants(), self.jl.primitive
         )
         with pytest.raises(ValueError) as exception_info:
             xtallography.lattices.UnitCell.from_julia(unit_cell_jl_invalid)
