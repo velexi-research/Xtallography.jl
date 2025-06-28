@@ -23,7 +23,6 @@ import unittest
 import juliacall
 import pytest
 import xtallography
-from xtallography import _JL
 from xtallography.lattices import LatticeSystem, Centering, Lattice
 
 # Local packages/modules
@@ -32,9 +31,9 @@ from xtallography.lattices import LatticeSystem, Centering, Lattice
 # --- Test Suites
 
 
-class test_xtallography_lattices_core(unittest.TestCase):
+class test_xtallography_lattices_core_LatticeSystem(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattices.core` module (excluding UnitCell tests)
+    Test suite for the `LatticeSystem` class
     """
 
     # --- Fixtures
@@ -54,71 +53,91 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
     # --- Tests
 
-    @staticmethod
-    def test_LatticeSystem():
+    def test_to_julia(self):
         """
-        Basic tests for `LatticeSystem` class.
-        """
-        # --- Tests
-
-        # Get full list of values
-        values = set(LatticeSystem.values())
-        assert values == {
-            "triclinic",
-            "monoclinic",
-            "orthorhombic",
-            "tetragonal",
-            "rhombohedral",
-            "hexagonal",
-            "cubic",
-        }
-
-    @staticmethod
-    def test_LatticeSystem_from_julia():
-        """
-        Test `LatticeSystem.from_julia()` method.
+        Test `to_julia()` method.
         """
         # --- Tests
 
         # triclinic
-        lattice_system_jl = _JL.triclinic
+        lattice_system = LatticeSystem.TRICLINIC
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Triclinic)
+
+        # monoclinic
+        lattice_system = LatticeSystem.MONOCLINIC
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Monoclinic)
+
+        # orthorhombic
+        lattice_system = LatticeSystem.ORTHORHOMBIC
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Orthorhombic)
+
+        # tetragonal
+        lattice_system = LatticeSystem.TETRAGONAL
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Tetragonal)
+
+        # rhombohedral
+        lattice_system = LatticeSystem.RHOMBOHEDRAL
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Rhombohedral)
+
+        # hexagonal
+        lattice_system = LatticeSystem.HEXAGONAL
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Hexagonal)
+
+        # cubic
+        lattice_system = LatticeSystem.CUBIC
+        lattice_system_jl = lattice_system.to_julia()
+        assert self.jl.isa(lattice_system_jl, self.jl.Cubic)
+
+    def test_from_julia(self):
+        """
+        Test `from_julia()` method.
+        """
+        # --- Tests
+
+        # triclinic
+        lattice_system_jl = self.jl.triclinic
         lattice_system = LatticeSystem.from_julia(lattice_system_jl)
         assert lattice_system == LatticeSystem.TRICLINIC
 
         # monoclinic
-        lattice_system_jl = _JL.monoclinic
+        lattice_system_jl = self.jl.monoclinic
         lattice_system = LatticeSystem.from_julia(lattice_system_jl)
         assert lattice_system == LatticeSystem.MONOCLINIC
 
         # orthorhombic
-        lattice_system_jl = _JL.orthorhombic
+        lattice_system_jl = self.jl.orthorhombic
         lattice_system = LatticeSystem.from_julia(lattice_system_jl)
         assert lattice_system == LatticeSystem.ORTHORHOMBIC
 
         # tetragonal
-        lattice_system_jl = _JL.tetragonal
+        lattice_system_jl = self.jl.tetragonal
         lattice_system = LatticeSystem.from_julia(lattice_system_jl)
         assert lattice_system == LatticeSystem.TETRAGONAL
 
         # rhombohedral
-        lattice_system_jl = _JL.rhombohedral
+        lattice_system_jl = self.jl.rhombohedral
         lattice_system = LatticeSystem.from_julia(lattice_system_jl)
         assert lattice_system == LatticeSystem.RHOMBOHEDRAL
 
         # hexagonal
-        lattice_system_jl = _JL.hexagonal
+        lattice_system_jl = self.jl.hexagonal
         lattice_system = LatticeSystem.from_julia(lattice_system_jl)
         assert lattice_system == LatticeSystem.HEXAGONAL
 
         # cubic
-        lattice_system_jl = _JL.cubic
+        lattice_system_jl = self.jl.cubic
         lattice_system = LatticeSystem.from_julia(lattice_system_jl)
         assert lattice_system == LatticeSystem.CUBIC
 
-    @staticmethod
-    def test_LatticeSystem_from_julia_invalid_args():
+    def test_from_julia_invalid_args(self):
         """
-        Test argument checks for `LatticeSystem.from_julia()`.
+        Test argument checks for `from_julia()`.
         """
         # --- Tests
 
@@ -136,8 +155,8 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ `lattice_system_jl` is an unsupported Julia LatticeSystem object
 
-        _JL.seval("struct UnsupportedLatticeSystem <: LatticeSystem end")
-        lattice_system_jl_invalid = _JL.UnsupportedLatticeSystem()
+        self.jl.seval("struct UnsupportedLatticeSystem <: LatticeSystem end")
+        lattice_system_jl_invalid = self.jl.UnsupportedLatticeSystem()
         with pytest.raises(ValueError) as exception_info:
             xtallography.lattices.LatticeSystem.from_julia(lattice_system_jl_invalid)
 
@@ -148,24 +167,50 @@ class test_xtallography_lattices_core(unittest.TestCase):
         assert expected_error in str(exception_info)
 
     @staticmethod
-    def test_Centering():
+    def test_values():
         """
-        Basic tests for `Centering` class.
+        Test values() method.
         """
         # --- Tests
 
         # Get full list of values
-        values = set(Centering.values())
+        values = set(LatticeSystem.values())
         assert values == {
-            "primitive",
-            "base_centered",
-            "body_centered",
-            "face_centered",
+            "triclinic",
+            "monoclinic",
+            "orthorhombic",
+            "tetragonal",
+            "rhombohedral",
+            "hexagonal",
+            "cubic",
         }
 
-    def test_Centering_to_julia(self):
+
+class test_xtallography_lattices_core_Centering(unittest.TestCase):
+    """
+    Test suite for the `Centering` class
+    """
+
+    # --- Fixtures
+
+    def setUp(self):
         """
-        Test `Centering.to_julia()` method.
+        Prepare for test.
+        """
+        # Initialize JuliaCall
+        self.jl = juliacall.newmodule("PyXtallographyTest")
+        self.jl.seval("using Xtallography")
+
+    def tearDown(self):
+        """
+        Clean up after test.
+        """
+
+    # --- Tests
+
+    def test_to_julia(self):
+        """
+        Test `to_julia()` method.
         """
         # --- Tests
 
@@ -189,37 +234,35 @@ class test_xtallography_lattices_core(unittest.TestCase):
         centering_jl = centering.to_julia()
         assert self.jl.isa(centering_jl, self.jl.FaceCentered)
 
-    @staticmethod
-    def test_Centering_from_julia():
+    def test_from_julia(self):
         """
-        Test `Centering.from_julia()` method.
+        Test `from_julia()` method.
         """
         # --- Tests
 
         # primitive
-        centering_jl = _JL.primitive
+        centering_jl = self.jl.primitive
         centering = Centering.from_julia(centering_jl)
         assert centering == Centering.PRIMITIVE
 
         # base_centered
-        centering_jl = _JL.base_centered
+        centering_jl = self.jl.base_centered
         centering = Centering.from_julia(centering_jl)
         assert centering == Centering.BASE_CENTERED
 
         # body_centered
-        centering_jl = _JL.body_centered
+        centering_jl = self.jl.body_centered
         centering = Centering.from_julia(centering_jl)
         assert centering == Centering.BODY_CENTERED
 
         # face_centered
-        centering_jl = _JL.face_centered
+        centering_jl = self.jl.face_centered
         centering = Centering.from_julia(centering_jl)
         assert centering == Centering.FACE_CENTERED
 
-    @staticmethod
-    def test_Centering_from_julia_invalid_args():
+    def test_from_julia_invalid_args(self):
         """
-        Test argument checks for `Centering.from_julia()`.
+        Test argument checks for `from_julia()`.
         """
         # --- Tests
 
@@ -237,8 +280,8 @@ class test_xtallography_lattices_core(unittest.TestCase):
 
         # ------ `centering_jl` is an unsupported Julia Centering object
 
-        _JL.seval("struct UnsupportedCentering <: Centering end")
-        centering_jl_invalid = _JL.UnsupportedCentering()
+        self.jl.seval("struct UnsupportedCentering <: Centering end")
+        centering_jl_invalid = self.jl.UnsupportedCentering()
         with pytest.raises(ValueError) as exception_info:
             xtallography.lattices.Centering.from_julia(centering_jl_invalid)
 
@@ -248,9 +291,48 @@ class test_xtallography_lattices_core(unittest.TestCase):
         assert expected_error in str(exception_info)
 
     @staticmethod
-    def test_Lattice():
+    def test_values():
         """
-        Test `Lattice` type.
+        Test values() method.
+        """
+        # --- Tests
+
+        # Get full list of values
+        values = set(Centering.values())
+        assert values == {
+            "primitive",
+            "base_centered",
+            "body_centered",
+            "face_centered",
+        }
+
+
+class test_xtallography_lattices_core_Lattice(unittest.TestCase):
+    """
+    Test suite for the `Lattice` class
+    """
+
+    # --- Fixtures
+
+    def setUp(self):
+        """
+        Prepare for test.
+        """
+        # Initialize JuliaCall
+        self.jl = juliacall.newmodule("PyXtallographyTest")
+        self.jl.seval("using Xtallography")
+
+    def tearDown(self):
+        """
+        Clean up after test.
+        """
+
+    # --- Tests
+
+    @staticmethod
+    def test_init():
+        """
+        Test `__init__()`.
         """
         # --- Tests
 
@@ -298,6 +380,30 @@ class test_xtallography_lattices_core(unittest.TestCase):
             assert True
         except Exception:
             pytest.fail("Lattice() constructor raised unexpected error")
+
+
+class test_xtallography_lattices_core_functions(unittest.TestCase):
+    """
+    Test suite for the functions in the `xtallography.lattices.core` module (excluding
+    UnitCell tests)
+    """
+
+    # --- Fixtures
+
+    def setUp(self):
+        """
+        Prepare for test.
+        """
+        # Initialize JuliaCall
+        self.jl = juliacall.newmodule("PyXtallographyTest")
+        self.jl.seval("using Xtallography")
+
+    def tearDown(self):
+        """
+        Clean up after test.
+        """
+
+    # --- Tests
 
     @staticmethod
     def test_create_lattice():

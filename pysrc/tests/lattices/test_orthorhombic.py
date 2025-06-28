@@ -20,10 +20,10 @@ Unit tests for `xtallography.lattices.orthorhombic` module
 import unittest
 
 # External packages
+import juliacall
 import pytest
 
 # Local packages/modules
-from xtallography import _JL
 from xtallography.lattices import LatticeSystem, Centering
 from xtallography.lattices import OrthorhombicUnitCell, TetragonalUnitCell
 
@@ -33,7 +33,7 @@ from xtallography.lattices import OrthorhombicUnitCell, TetragonalUnitCell
 
 class test_xtallography_lattice_orthorhombic(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattice.orthorhombic` module
+    Test suite for the `OrthorhombicUnitCell` class
     """
 
     # --- Fixtures
@@ -42,6 +42,9 @@ class test_xtallography_lattice_orthorhombic(unittest.TestCase):
         """
         Prepare for test.
         """
+        # Initialize JuliaCall
+        self.jl = juliacall.newmodule("PyXtallographyTest")
+        self.jl.seval("using Xtallography")
 
     def tearDown(self):
         """
@@ -181,8 +184,7 @@ class test_xtallography_lattice_orthorhombic(unittest.TestCase):
         expected_error = f"`c` must be positive. (c={invalid_value})"
         assert expected_error in str(exception_info)
 
-    @staticmethod
-    def test_to_julia():
+    def test_to_julia(self):
         """
         Test `to_julia()`.
         """
@@ -197,11 +199,12 @@ class test_xtallography_lattice_orthorhombic(unittest.TestCase):
         # --- Tests
 
         unit_cell_jl = unit_cell.to_julia()
-        assert _JL.isa(unit_cell_jl, _JL.UnitCell)
-        assert _JL.isa(unit_cell_jl.lattice_constants, _JL.OrthorhombicLatticeConstants)
+        assert self.jl.isa(unit_cell_jl, self.jl.UnitCell)
+        assert self.jl.isa(
+            unit_cell_jl.lattice_constants, self.jl.OrthorhombicLatticeConstants
+        )
 
-    @staticmethod
-    def test_from_julia():
+    def test_from_julia(self):
         """
         Test `from_julia()`.
         """
@@ -215,15 +218,15 @@ class test_xtallography_lattice_orthorhombic(unittest.TestCase):
         # --- Tests
 
         # centering = primitive
-        unit_cell_jl = _JL.UnitCell(
-            _JL.OrthorhombicLatticeConstants(a, b, c), _JL.primitive
+        unit_cell_jl = self.jl.UnitCell(
+            self.jl.OrthorhombicLatticeConstants(a, b, c), self.jl.primitive
         )
         unit_cell = OrthorhombicUnitCell.from_julia(unit_cell_jl)
         assert unit_cell == OrthorhombicUnitCell(a, b, c, centering=Centering.PRIMITIVE)
 
         # centering = body_centered
-        unit_cell_jl = _JL.UnitCell(
-            _JL.OrthorhombicLatticeConstants(a, b, c), _JL.body_centered
+        unit_cell_jl = self.jl.UnitCell(
+            self.jl.OrthorhombicLatticeConstants(a, b, c), self.jl.body_centered
         )
         unit_cell = OrthorhombicUnitCell.from_julia(unit_cell_jl)
         assert unit_cell == OrthorhombicUnitCell(
@@ -231,8 +234,8 @@ class test_xtallography_lattice_orthorhombic(unittest.TestCase):
         )
 
         # centering = base_centered
-        unit_cell_jl = _JL.UnitCell(
-            _JL.OrthorhombicLatticeConstants(a, b, c), _JL.base_centered
+        unit_cell_jl = self.jl.UnitCell(
+            self.jl.OrthorhombicLatticeConstants(a, b, c), self.jl.base_centered
         )
         unit_cell = OrthorhombicUnitCell.from_julia(unit_cell_jl)
         assert unit_cell == OrthorhombicUnitCell(
@@ -240,16 +243,15 @@ class test_xtallography_lattice_orthorhombic(unittest.TestCase):
         )
 
         # centering = face_centered
-        unit_cell_jl = _JL.UnitCell(
-            _JL.OrthorhombicLatticeConstants(a, b, c), _JL.face_centered
+        unit_cell_jl = self.jl.UnitCell(
+            self.jl.OrthorhombicLatticeConstants(a, b, c), self.jl.face_centered
         )
         unit_cell = OrthorhombicUnitCell.from_julia(unit_cell_jl)
         assert unit_cell == OrthorhombicUnitCell(
             a, b, c, centering=Centering.FACE_CENTERED
         )
 
-    @staticmethod
-    def test_from_julia_invalid_arguments():
+    def test_from_julia_invalid_arguments(self):
         """
         Test `from_julia()`.
         """
@@ -267,7 +269,9 @@ class test_xtallography_lattice_orthorhombic(unittest.TestCase):
         assert expected_error in str(exception_info)
 
         # unit_cell_jl is not for a orthorhombic unit cell
-        unit_cell_jl_invalid = _JL.UnitCell(_JL.CubicLatticeConstants(1), _JL.primitive)
+        unit_cell_jl_invalid = self.jl.UnitCell(
+            self.jl.CubicLatticeConstants(1), self.jl.primitive
+        )
         with pytest.raises(ValueError) as exception_info:
             OrthorhombicUnitCell.from_julia(unit_cell_jl_invalid)
 

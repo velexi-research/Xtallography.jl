@@ -20,10 +20,10 @@ Unit tests for `xtallography.lattices.cubic` module
 import unittest
 
 # External packages
+import juliacall
 import pytest
 
 # Local packages/modules
-from xtallography import _JL
 from xtallography.lattices import LatticeSystem, Centering
 from xtallography.lattices import CubicUnitCell, TetragonalUnitCell
 
@@ -33,7 +33,7 @@ from xtallography.lattices import CubicUnitCell, TetragonalUnitCell
 
 class test_xtallography_lattice_cubic(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattice.cubic` module
+    Test suite for the `CubicUnitCell` class
     """
 
     # --- Fixtures
@@ -42,6 +42,9 @@ class test_xtallography_lattice_cubic(unittest.TestCase):
         """
         Prepare for test.
         """
+        # Initialize JuliaCall
+        self.jl = juliacall.newmodule("PyXtallographyTest")
+        self.jl.seval("using Xtallography")
 
     def tearDown(self):
         """
@@ -135,8 +138,7 @@ class test_xtallography_lattice_cubic(unittest.TestCase):
         expected_error = "('cubic', 'base-centered') is not a valid Bravais lattice."
         assert expected_error in str(exception_info)
 
-    @staticmethod
-    def test_to_julia():
+    def test_to_julia(self):
         """
         Test `to_julia()`.
         """
@@ -149,11 +151,12 @@ class test_xtallography_lattice_cubic(unittest.TestCase):
         # --- Tests
 
         unit_cell_jl = unit_cell.to_julia()
-        assert _JL.isa(unit_cell_jl, _JL.UnitCell)
-        assert _JL.isa(unit_cell_jl.lattice_constants, _JL.CubicLatticeConstants)
+        assert self.jl.isa(unit_cell_jl, self.jl.UnitCell)
+        assert self.jl.isa(
+            unit_cell_jl.lattice_constants, self.jl.CubicLatticeConstants
+        )
 
-    @staticmethod
-    def test_from_julia():
+    def test_from_julia(self):
         """
         Test `from_julia()`.
         """
@@ -165,22 +168,27 @@ class test_xtallography_lattice_cubic(unittest.TestCase):
         # --- Tests
 
         # centering = primitive
-        unit_cell_jl = _JL.UnitCell(_JL.CubicLatticeConstants(a), _JL.primitive)
+        unit_cell_jl = self.jl.UnitCell(
+            self.jl.CubicLatticeConstants(a), self.jl.primitive
+        )
         unit_cell = CubicUnitCell.from_julia(unit_cell_jl)
         assert unit_cell == CubicUnitCell(a, centering=Centering.PRIMITIVE)
 
         # centering = body_centered
-        unit_cell_jl = _JL.UnitCell(_JL.CubicLatticeConstants(a), _JL.body_centered)
+        unit_cell_jl = self.jl.UnitCell(
+            self.jl.CubicLatticeConstants(a), self.jl.body_centered
+        )
         unit_cell = CubicUnitCell.from_julia(unit_cell_jl)
         assert unit_cell == CubicUnitCell(a, centering=Centering.BODY_CENTERED)
 
         # centering = face_centered
-        unit_cell_jl = _JL.UnitCell(_JL.CubicLatticeConstants(a), _JL.face_centered)
+        unit_cell_jl = self.jl.UnitCell(
+            self.jl.CubicLatticeConstants(a), self.jl.face_centered
+        )
         unit_cell = CubicUnitCell.from_julia(unit_cell_jl)
         assert unit_cell == CubicUnitCell(a, centering=Centering.FACE_CENTERED)
 
-    @staticmethod
-    def test_from_julia_invalid_arguments():
+    def test_from_julia_invalid_arguments(self):
         """
         Test `from_julia()`.
         """
@@ -198,8 +206,8 @@ class test_xtallography_lattice_cubic(unittest.TestCase):
         assert expected_error in str(exception_info)
 
         # unit_cell_jl is not for a cubic unit cell
-        unit_cell_jl_invalid = _JL.UnitCell(
-            _JL.TetragonalLatticeConstants(1, 2), _JL.primitive
+        unit_cell_jl_invalid = self.jl.UnitCell(
+            self.jl.TetragonalLatticeConstants(1, 2), self.jl.primitive
         )
         with pytest.raises(ValueError) as exception_info:
             CubicUnitCell.from_julia(unit_cell_jl_invalid)

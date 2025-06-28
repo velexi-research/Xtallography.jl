@@ -21,10 +21,10 @@ import math
 import unittest
 
 # External packages
+import juliacall
 import pytest
 
 # Local packages/modules
-from xtallography import _JL
 from xtallography.lattices import LatticeSystem, Centering
 from xtallography.lattices import MonoclinicUnitCell, TetragonalUnitCell
 
@@ -34,7 +34,7 @@ from xtallography.lattices import MonoclinicUnitCell, TetragonalUnitCell
 
 class test_xtallography_lattice_monoclinic(unittest.TestCase):
     """
-    Test suite for the `xtallography.lattice.monoclinic` module
+    Test suite for the `MonoclinicUnitCell` class
     """
 
     # --- Fixtures
@@ -43,6 +43,9 @@ class test_xtallography_lattice_monoclinic(unittest.TestCase):
         """
         Prepare for test.
         """
+        # Initialize JuliaCall
+        self.jl = juliacall.newmodule("PyXtallographyTest")
+        self.jl.seval("using Xtallography")
 
     def tearDown(self):
         """
@@ -235,8 +238,7 @@ class test_xtallography_lattice_monoclinic(unittest.TestCase):
         )
         assert expected_error in str(exception_info)
 
-    @staticmethod
-    def test_to_julia():
+    def test_to_julia(self):
         """
         Test `to_julia()`.
         """
@@ -253,11 +255,12 @@ class test_xtallography_lattice_monoclinic(unittest.TestCase):
         # --- Tests
 
         unit_cell_jl = unit_cell.to_julia()
-        assert _JL.isa(unit_cell_jl, _JL.UnitCell)
-        assert _JL.isa(unit_cell_jl.lattice_constants, _JL.MonoclinicLatticeConstants)
+        assert self.jl.isa(unit_cell_jl, self.jl.UnitCell)
+        assert self.jl.isa(
+            unit_cell_jl.lattice_constants, self.jl.MonoclinicLatticeConstants
+        )
 
-    @staticmethod
-    def test_from_julia():
+    def test_from_julia(self):
         """
         Test `from_julia()`.
         """
@@ -272,8 +275,8 @@ class test_xtallography_lattice_monoclinic(unittest.TestCase):
         # --- Tests
 
         # centering = primitive
-        unit_cell_jl = _JL.UnitCell(
-            _JL.MonoclinicLatticeConstants(a, b, c, beta), _JL.primitive
+        unit_cell_jl = self.jl.UnitCell(
+            self.jl.MonoclinicLatticeConstants(a, b, c, beta), self.jl.primitive
         )
         unit_cell = MonoclinicUnitCell.from_julia(unit_cell_jl)
         assert unit_cell == MonoclinicUnitCell(
@@ -281,8 +284,8 @@ class test_xtallography_lattice_monoclinic(unittest.TestCase):
         )
 
         # centering = body_centered
-        unit_cell_jl = _JL.UnitCell(
-            _JL.MonoclinicLatticeConstants(a, b, c, beta), _JL.body_centered
+        unit_cell_jl = self.jl.UnitCell(
+            self.jl.MonoclinicLatticeConstants(a, b, c, beta), self.jl.body_centered
         )
         unit_cell = MonoclinicUnitCell.from_julia(unit_cell_jl)
         assert unit_cell == MonoclinicUnitCell(
@@ -290,16 +293,15 @@ class test_xtallography_lattice_monoclinic(unittest.TestCase):
         )
 
         # centering = base_centered
-        unit_cell_jl = _JL.UnitCell(
-            _JL.MonoclinicLatticeConstants(a, b, c, beta), _JL.base_centered
+        unit_cell_jl = self.jl.UnitCell(
+            self.jl.MonoclinicLatticeConstants(a, b, c, beta), self.jl.base_centered
         )
         unit_cell = MonoclinicUnitCell.from_julia(unit_cell_jl)
         assert unit_cell == MonoclinicUnitCell(
             a, b, c, beta, centering=Centering.BASE_CENTERED
         )
 
-    @staticmethod
-    def test_from_julia_invalid_arguments():
+    def test_from_julia_invalid_arguments(self):
         """
         Test `from_julia()`.
         """
@@ -317,7 +319,9 @@ class test_xtallography_lattice_monoclinic(unittest.TestCase):
         assert expected_error in str(exception_info)
 
         # unit_cell_jl is not for a monoclinic unit cell
-        unit_cell_jl_invalid = _JL.UnitCell(_JL.CubicLatticeConstants(1), _JL.primitive)
+        unit_cell_jl_invalid = self.jl.UnitCell(
+            self.jl.CubicLatticeConstants(1), self.jl.primitive
+        )
         with pytest.raises(ValueError) as exception_info:
             MonoclinicUnitCell.from_julia(unit_cell_jl_invalid)
 
