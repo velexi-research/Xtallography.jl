@@ -105,13 +105,22 @@ python-lint:
 
 # --- Documentation rules
 
-.PHONY: docs
+.PHONY: docs julia-docs python-docs
 
 ## Generate package documentation.
 docs:
+	@echo Generating Julia documentation
+	@make julia-docs
+	@echo Generating Python documentation
+	@make python-docs
+
+## Generate Julia package documentation.
+julia-docs:
 	julia --project=${DOCS_DIR} --color=yes -e 'using Pkg; Pkg.update()'
 	julia --project=${DOCS_DIR} --color=yes --compile=min -O0 ${DOCS_DIR}/make.jl
-	@echo Generating Python documentation
+
+## Generate Python package documentation.
+python-docs:
 	PDOC_ALLOW_EXEC=1 pdoc --math ${PYTHON_PKG_DIR} -o ${DOCS_DIR}/build/python
 
 # --- Utility rules
