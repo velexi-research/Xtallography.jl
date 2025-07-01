@@ -22,6 +22,7 @@ makedocs(;
         "Python Interface" => "python-interface.md",
         "Index" => "docs-index.md",
     ],
+    checkdocs=:exports,
     warnonly=[:missing_docs, :cross_references],
 )
 
