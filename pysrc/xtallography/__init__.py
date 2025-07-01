@@ -13,7 +13,7 @@
 #   limitations under the License.
 """
 The `xtallography` Python package implements a basic Python interface to the
-<a href="/Xtallography.jl/">`Xtallography.jl`</a>.
+<a href="/Xtallography.jl/">`Xtallography.jl`</a> package.
 """
 # --- Imports
 
