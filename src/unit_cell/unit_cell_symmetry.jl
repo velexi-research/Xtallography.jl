@@ -40,7 +40,7 @@ struct UnitCellSymmetry
     symmetry_elements::Vector{<:SymmetryElement}
 end
 
-# Outer constructor
+# Outer constructors
 """
     UnitCellSymmetry(
         centering::Centering;
