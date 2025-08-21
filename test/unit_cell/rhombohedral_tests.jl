@@ -163,7 +163,7 @@ end
     lattice_constants = RhombohedralLatticeConstants(1.0, 2π / 5)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, primitive
+        lattice_constants, primitive_centering
     )
 
     expected_lattice_constants = lattice_constants
@@ -171,7 +171,7 @@ end
 
     # ------ Invalid centering
 
-    for centering in (body_centered, face_centered, base_centered)
+    for centering in (body_centering, face_centering, base_centering)
         expected_message =
             "Invalid Bravais lattice: " *
             "(lattice_system=Rhombohedral, centering=$(nameof(typeof(centering))))"
@@ -299,10 +299,10 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell
-    unit_cell = UnitCell(lattice_constants, primitive)
+    unit_cell = UnitCell(lattice_constants, primitive_centering)
 
     expected_reduced_cell = reduced_cell(
-        UnitCell(LatticeConstants(basis_a, basis_b, basis_c), primitive)
+        UnitCell(LatticeConstants(basis_a, basis_b, basis_c), primitive_centering)
     )
 
     reduced_cell_ = reduced_cell(unit_cell)
@@ -322,10 +322,10 @@ end
     # --- Exercise functionality and check results
 
     # equivalent rhombohedral and triclinic unit cells
-    rhombohedral_unit_cell = UnitCell(lattice_constants, primitive)
+    rhombohedral_unit_cell = UnitCell(lattice_constants, primitive_centering)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        primitive,
+        primitive_centering,
     )
     @test is_equivalent_unit_cell(rhombohedral_unit_cell, triclinic_unit_cell)
 end

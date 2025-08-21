@@ -179,19 +179,19 @@ function conventional_cell(::Rhombohedral, unit_cell::UnitCell)
 
     # Check limiting cases
     if α ≈ π / 3
-        # cubic, face-centered, edge length `a` / sin(π/4)
+        # cubic, face-centering, edge length `a` / sin(π/4)
         @debug "hR --> cF"
-        return UnitCell(CubicLatticeConstants(a / SIN_PI_OVER_FOUR), face_centered)
+        return UnitCell(CubicLatticeConstants(a / SIN_PI_OVER_FOUR), face_centering)
 
     elseif α ≈ π / 2
-        # cubic, primitive, edge length `a`
+        # cubic, primitive-centering, edge length `a`
         @debug "hR --> cP"
-        return UnitCell(CubicLatticeConstants(a), primitive)
+        return UnitCell(CubicLatticeConstants(a), primitive_centering)
 
     elseif α ≈ ACOS_MINUS_ONE_THIRD
-        # cubic, body-centered, edge length `a` / sin(π/3)
+        # cubic, body-centering, edge length `a` / sin(π/3)
         @debug "hR --> cI"
-        return UnitCell(CubicLatticeConstants(a / SIN_PI_OVER_THREE), body_centered)
+        return UnitCell(CubicLatticeConstants(a / SIN_PI_OVER_THREE), body_centering)
     end
 
     # Not a limiting case, so return unit cell with original lattice constants

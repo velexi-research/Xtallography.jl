@@ -154,23 +154,25 @@ function conventional_cell(::Tetragonal, unit_cell::UnitCell)
     # --- Compute IUCr conventional cell
 
     # Check limiting cases
-    if centering === primitive
+    if centering === primitive_centering
         if a ≈ c
-            # cubic, primitive, edge length `a`
+            # cubic, primitive-centering, edge length `a`
             @debug "tP --> cP"
-            return conventional_cell(UnitCell(CubicLatticeConstants(a), primitive))
+            return conventional_cell(
+                UnitCell(CubicLatticeConstants(a), primitive_centering)
+            )
         end
 
-    elseif centering === body_centered
+    elseif centering === body_centering
         if a ≈ c
-            # cubic, body-centered, edge length `a`
+            # cubic, body-centering, edge length `a`
             @debug "tI --> cI"
-            return conventional_cell(UnitCell(CubicLatticeConstants(a), body_centered))
+            return conventional_cell(UnitCell(CubicLatticeConstants(a), body_centering))
 
         elseif c * SIN_PI_OVER_FOUR ≈ a
-            # cubic, face-centered, edge length `c`
+            # cubic, face-centering, edge length `c`
             @debug "tI --> cF"
-            return conventional_cell(UnitCell(CubicLatticeConstants(c), face_centered))
+            return conventional_cell(UnitCell(CubicLatticeConstants(c), face_centering))
         end
     end
 

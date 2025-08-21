@@ -290,7 +290,7 @@ function standardize(lattice_constants::TriclinicLatticeConstants, centering::Ce
         end
     end
 
-    return TriclinicLatticeConstants(a, b, c, α, β, γ), primitive
+    return TriclinicLatticeConstants(a, b, c, α, β, γ), primitive_centering
 end
 
 """
@@ -415,12 +415,14 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
 
     # --- Compute IUCr conventional cell
 
-    # Check limiting case: monoclinic, primitive
+    # Check limiting case: monoclinic, primitive-centering
     try
         monoclinic_lattice_constants = convert_to_mP(lattice_constants)
 
         @debug "aP --> mP"
-        return conventional_cell(UnitCell(monoclinic_lattice_constants, primitive))
+        return conventional_cell(
+            UnitCell(monoclinic_lattice_constants, primitive_centering)
+        )
 
     catch error
         if !(error isa ErrorException) || (
@@ -432,12 +434,12 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
         end
     end
 
-    # Check limiting case: monoclinic, body-centered
+    # Check limiting case: monoclinic, body-centering
     try
         monoclinic_lattice_constants = convert_to_mI(lattice_constants)
 
         @debug "aP --> mI"
-        return conventional_cell(UnitCell(monoclinic_lattice_constants, body_centered))
+        return conventional_cell(UnitCell(monoclinic_lattice_constants, body_centering))
 
     catch error
         if !(error isa ErrorException) || (
@@ -449,15 +451,15 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
         end
     end
 
-    # Check limiting case: monoclinic, base-centered
+    # Check limiting case: monoclinic, base-centering
     try
         monoclinic_lattice_constants = convert_to_mC(lattice_constants)
 
         @debug "aP --> mC"
         body_centered_lattice_constants, centering = standardize(
-            monoclinic_lattice_constants, base_centered
+            monoclinic_lattice_constants, base_centering
         )
-        return conventional_cell(UnitCell(body_centered_lattice_constants, body_centered))
+        return conventional_cell(UnitCell(body_centered_lattice_constants, body_centering))
 
     catch error
         if !(error isa ErrorException) || (
@@ -470,7 +472,7 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
     end
 
     # Not a limiting case, so return unit cell with standardized lattice constants
-    return UnitCell(lattice_constants, primitive)
+    return UnitCell(lattice_constants, primitive_centering)
 end
 
 """
@@ -690,7 +692,7 @@ function convert_to_mI_basis_to_lattice_constants(
     end
 
     m_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), body_centered
+        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), body_centering
     )
     return m_lattice_constants
 end

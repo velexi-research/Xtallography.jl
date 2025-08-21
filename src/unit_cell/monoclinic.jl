@@ -143,9 +143,9 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
 
     # --- Handle base-centering as a special case
 
-    if centering === base_centered
+    if centering === base_centering
         # Convert to a body-centered unit cell and standardize
-        return standardize(convert_to_body_centering(lattice_constants), body_centered)
+        return standardize(convert_to_body_centering(lattice_constants), body_centering)
     end
 
     # --- Preparations
@@ -174,7 +174,7 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
     #     conventions for a, c, and β are satisfied.
 
     # Perform reduction
-    if centering === primitive
+    if centering === primitive_centering
         while -2 * c * cos(β) >= a
 
             # Attempt to compute equivalent lattice constants with smaller value of c.
@@ -195,7 +195,7 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
                 end
             end
         end
-    elseif centering === body_centered
+    elseif centering === body_centering
         while -c * cos(β) >= a
 
             # Attempt to compute equivalent lattice constants with smaller value of c.
@@ -300,87 +300,87 @@ function conventional_cell(::Monoclinic, unit_cell::UnitCell)
     # --- Compute IUCr conventional cell
 
     # Check limiting cases
-    if centering === primitive
+    if centering === primitive_centering
         if a ≈ -2 * c * cos(β)
-            # Orthorhombic, C-centered
+            # Orthorhombic, C-centering
             @debug "mP --> oC (a = -2 * c * cos(β))"
             return conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(a, 2 * c * sin(β), b), base_centered)
+                UnitCell(OrthorhombicLatticeConstants(a, 2 * c * sin(β), b), base_centering)
             )
 
         elseif a ≈ c
-            # Orthorhombic, C-centered
+            # Orthorhombic, C-centering
             @debug "mP --> oC (a = c)"
             return conventional_cell(
                 UnitCell(
                     OrthorhombicLatticeConstants(2 * c * cos(β / 2), 2 * c * sin(β / 2), b),
-                    base_centered,
+                    base_centering,
                 ),
             )
 
         elseif β ≈ π / 2
-            # Orthorhombic, primitive
+            # Orthorhombic, primitive-centering
             @debug "mP --> oP"
             return conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(a, b, c), primitive)
+                UnitCell(OrthorhombicLatticeConstants(a, b, c), primitive_centering)
             )
         end
 
-    elseif centering === body_centered
+    elseif centering === body_centering
         if β ≈ π / 2
-            # Orthorhombic, body-centered
+            # Orthorhombic, body-centering
             @debug "mI --> oI"
             return conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(a, b, c), body_centered)
+                UnitCell(OrthorhombicLatticeConstants(a, b, c), body_centering)
             )
 
         elseif a ≈ c
-            # Orthorhombic, face-centered
+            # Orthorhombic, face-centering
             @debug "mI --> oF"
             return conventional_cell(
                 UnitCell(
                     OrthorhombicLatticeConstants(2 * a * cos(β / 2), 2 * a * sin(β / 2), b),
-                    face_centered,
+                    face_centering,
                 ),
             )
 
         elseif a ≈ -c * cos(β)
-            # Orthorhombic, C-centered
+            # Orthorhombic, C-centering
             @debug "mI --> oC"
             return conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(b, c * sin(β), a), base_centered)
+                UnitCell(OrthorhombicLatticeConstants(b, c * sin(β), a), base_centering)
             )
 
         elseif a^2 + b^2 ≈ c^2 && a^2 + a * c * cos(β) ≈ b^2
-            # Rhomohedral, primitive: α < π/3
+            # Rhomohedral, primitive-centering: α < π/3
             @debug "mI --> hR (α < π/3)"
             α = acos_(1 - 0.5 * b^2 / a^2)
             return conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(a, α), primitive)
+                UnitCell(RhombohedralLatticeConstants(a, α), primitive_centering)
             )
 
         elseif a^2 + b^2 ≈ c^2 && b^2 + a * c * cos(β) ≈ a^2
-            # Rhomohedral, primitive: π/3 < α < π/2
+            # Rhomohedral, primitive-centering: π/3 < α < π/2
             @debug "mI --> hR (π/3 < α < π/2)"
             α = acos_(1 - 0.5 * b^2 / a^2)
             return conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(a, α), primitive)
+                UnitCell(RhombohedralLatticeConstants(a, α), primitive_centering)
             )
 
         elseif c^2 + 3 * b^2 ≈ 9 * a^2 && c ≈ -3 * a * cos(β)
-            # Rhomohedral, primitive: π/2 < α < acos(-1/3)
+            # Rhomohedral, primitive-centering: π/2 < α < acos(-1/3)
             @debug "mI --> hR (π/2 < α < acos(-1/3))"
             α = acos_((c^2 / a^2 - 3) / 6)
             return conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(a, α), primitive)
+                UnitCell(RhombohedralLatticeConstants(a, α), primitive_centering)
             )
 
         elseif a^2 + 3 * b^2 ≈ 9 * c^2 && a ≈ -3 * c * cos(β)
-            # Rhomohedral, primitive: acos(-1/3) < α
+            # Rhomohedral, primitive-centering: acos(-1/3) < α
             @debug "mI --> hR (acos(-1/3) < α)"
             α = acos_((a^2 / c^2 - 3) / 6)
             return conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(c, α), primitive)
+                UnitCell(RhombohedralLatticeConstants(c, α), primitive_centering)
             )
         end
     end

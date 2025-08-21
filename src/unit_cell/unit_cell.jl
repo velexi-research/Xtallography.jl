@@ -56,7 +56,7 @@ using LinearAlgebra: norm, cross, dot
         basis_b::Vector{<:Real},
         basis_c::Vector{<:Real};
         identify_lattice_system=true,
-        centering=primitive
+        centering=primitive_centering
     ) -> LatticeConstants
 
 Construct a LatticeConstants object from a set of basis vectors
@@ -81,7 +81,7 @@ function LatticeConstants(
     basis_b::Vector{<:Real},
     basis_c::Vector{<:Real};
     identify_lattice_system=true,
-    centering=primitive,
+    centering=primitive_centering,
 )
     # Convert basis vectors to Vector{AbstractFloat}
     basis_a = convert(Vector{Float64}, basis_a)
@@ -254,15 +254,15 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> unit_cell = UnitCell(OrthorhombicLatticeConstants(3, 2, 1), primitive)
-UnitCell(OrthorhombicLatticeConstants(3.0, 2.0, 1.0), Primitive())
+julia> unit_cell = UnitCell(OrthorhombicLatticeConstants(3, 2, 1), P_centering)
+UnitCell(OrthorhombicLatticeConstants(3.0, 2.0, 1.0), PrimitiveCentering())
 julia> standardize(unit_cell)
-UnitCell(OrthorhombicLatticeConstants(1.0, 2.0, 3.0), Primitive())
+UnitCell(OrthorhombicLatticeConstants(1.0, 2.0, 3.0), PrimitiveCentering())
 
-julia> unit_cell = UnitCell(OrthorhombicLatticeConstants(3, 2, 1), base_centered)
-UnitCell(OrthorhombicLatticeConstants(3.0, 2.0, 1.0), BaseCentered())
+julia> unit_cell = UnitCell(OrthorhombicLatticeConstants(3, 2, 1), base_centering)
+UnitCell(OrthorhombicLatticeConstants(3.0, 2.0, 1.0), BaseCentering())
 julia> standardize(unit_cell)
-UnitCell(OrthorhombicLatticeConstants(2.0, 3.0, 1.0), BaseCentered())
+UnitCell(OrthorhombicLatticeConstants(2.0, 3.0, 1.0), BaseCentering())
 ```
 """
 function standardize(unit_cell::UnitCell)
@@ -299,7 +299,7 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> B = basis(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]), primitive));
+julia> B = basis(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]), P_centering));
 
 julia> B[1] ≈ [1.0, 0.0, 0.0]
 true
@@ -336,7 +336,7 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> volume(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]), primitive))
+julia> volume(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]), P_centering))
 2.0
 
 julia> volume(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]))
@@ -361,7 +361,7 @@ Return values
 Examples
 ========
 ```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2***"
-julia> surface_area(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 1]), primitive))
+julia> surface_area(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 1]), P_centering))
 7.464101615137754
 
 julia> surface_area(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 1]))
@@ -384,12 +384,12 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> unit_cell = UnitCell(LatticeConstants([1, 1, 0], [1, -1, 0], [0, 1, 1]), primitive);
+julia> unit_cell = UnitCell(LatticeConstants([1, 1, 0], [1, -1, 0], [0, 1, 1]), P_centering);
 
 julia> lattice_system(unit_cell.lattice_constants)
 Triclinic()
 
-julia> conventional_cell(unit_cell) ≈ UnitCell(CubicLatticeConstants(2.0), FaceCentered())
+julia> conventional_cell(unit_cell) ≈ UnitCell(CubicLatticeConstants(2.0), F_centering)
 true
 ```
 """
@@ -447,8 +447,8 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> reduced_cell(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [0, 0, 2]), primitive))
-UnitCell(TetragonalLatticeConstants(1.0, 2.0), Primitive())
+julia> reduced_cell(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [0, 0, 2]), P_centering))
+UnitCell(TetragonalLatticeConstants(1.0, 2.0), PrimitiveCentering())
 ```
 """
 function reduced_cell(unit_cell::UnitCell)
@@ -458,13 +458,13 @@ function reduced_cell(unit_cell::UnitCell)
     basis_a, basis_b, basis_c = basis(unit_cell.lattice_constants)
 
     # Construct primitive cell basis for centering
-    if unit_cell.centering == base_centered
+    if unit_cell.centering == base_centering
         basis_a = 0.5 * (basis_a + basis_b)
 
-    elseif unit_cell.centering == body_centered
+    elseif unit_cell.centering == body_centering
         basis_c = 0.5 * (basis_a + basis_b + basis_c)
 
-    elseif unit_cell.centering == face_centered
+    elseif unit_cell.centering == face_centering
         basis_a_primitive = 0.5 * (basis_a + basis_b)
         basis_b_primitive = 0.5 * (basis_a - basis_b)
         basis_c_primitive = 0.5 * (basis_a + basis_c)
@@ -730,7 +730,7 @@ function reduced_cell(unit_cell::UnitCell)
 
     return UnitCell(
         standardize(LatticeConstants(reduced_basis_a, reduced_basis_b, reduced_basis_c)),
-        primitive,
+        primitive_centering,
     )
 end
 
@@ -763,11 +763,11 @@ Examples
 ```jldoctest
 julia> lattice_constants_ref = LatticeConstants([1, 0, 0], [1, 1, 0], [0, 0, 2]);
 
-julia> unit_cell_ref = UnitCell(lattice_constants_ref, body_centered);
+julia> unit_cell_ref = UnitCell(lattice_constants_ref, body_centering);
 
 julia> lattice_constants_test = TetragonalLatticeConstants(1.0, 2.0);
 
-julia> unit_cell_test = UnitCell(lattice_constants_test, body_centered);
+julia> unit_cell_test = UnitCell(lattice_constants_test, body_centering);
 
 julia> is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 true
@@ -833,8 +833,8 @@ function is_equivalent_unit_cell(
 )
     # Compare primitive unit cells
     return is_equivalent_unit_cell(
-        UnitCell(lattice_constants_test, primitive),
-        UnitCell(lattice_constants_ref, primitive);
+        UnitCell(lattice_constants_test, primitive_centering),
+        UnitCell(lattice_constants_ref, primitive_centering);
         atol=atol,
         rtol=rtol,
     )

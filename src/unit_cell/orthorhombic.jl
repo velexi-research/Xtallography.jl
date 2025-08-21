@@ -128,8 +128,8 @@ function standardize(lattice_constants::OrthorhombicLatticeConstants, centering:
 
     # --- Standardize lattice constants
 
-    if centering === base_centered
-        return OrthorhombicLatticeConstants(sort([a, b])..., c), base_centered
+    if centering === base_centering
+        return OrthorhombicLatticeConstants(sort([a, b])..., c), base_centering
     end
 
     # all other centerings
@@ -195,56 +195,68 @@ function conventional_cell(::Orthorhombic, unit_cell::UnitCell)
     # --- Compute IUCr conventional cell
 
     # Check limiting cases
-    if centering === primitive
-        # Tetragonal, primitive
+    if centering === primitive_centering
+        # Tetragonal, primitive-centering
         if a ≈ b
             @debug "oP --> tP"
-            return conventional_cell(UnitCell(TetragonalLatticeConstants(a, c), primitive))
+            return conventional_cell(
+                UnitCell(TetragonalLatticeConstants(a, c), primitive_centering)
+            )
         elseif b ≈ c
             @debug "oP --> tP"
-            return conventional_cell(UnitCell(TetragonalLatticeConstants(c, a), primitive))
+            return conventional_cell(
+                UnitCell(TetragonalLatticeConstants(c, a), primitive_centering)
+            )
         end
 
-    elseif centering === body_centered
-        # Tetragonal, body-centered
+    elseif centering === body_centering
+        # Tetragonal, body-centering
         if a ≈ b
             @debug "oI --> tI"
             return conventional_cell(
-                UnitCell(TetragonalLatticeConstants(a, c), body_centered)
+                UnitCell(TetragonalLatticeConstants(a, c), body_centering)
             )
         elseif b ≈ c
             @debug "oI --> tI"
             return conventional_cell(
-                UnitCell(TetragonalLatticeConstants(c, a), body_centered)
+                UnitCell(TetragonalLatticeConstants(c, a), body_centering)
             )
         end
 
-    elseif centering === face_centered
-        # Tetragonal, body-centered
+    elseif centering === face_centering
+        # Tetragonal, body-centering
         if a ≈ b
             @debug "oF --> tI"
             return conventional_cell(
-                UnitCell(TetragonalLatticeConstants(a * SIN_PI_OVER_FOUR, c), body_centered)
+                UnitCell(
+                    TetragonalLatticeConstants(a * SIN_PI_OVER_FOUR, c), body_centering
+                ),
             )
         elseif b ≈ c
             @debug "oF --> tI"
             return conventional_cell(
-                UnitCell(TetragonalLatticeConstants(c * SIN_PI_OVER_FOUR, a), body_centered)
+                UnitCell(
+                    TetragonalLatticeConstants(c * SIN_PI_OVER_FOUR, a), body_centering
+                ),
             )
         end
 
-    elseif centering === base_centered
+    elseif centering === base_centering
         if a ≈ b
-            # Tetragonal, primitive
+            # Tetragonal, primitive-centering
             @debug "oC --> tP"
             return conventional_cell(
-                UnitCell(TetragonalLatticeConstants(a * SIN_PI_OVER_FOUR, c), primitive)
+                UnitCell(
+                    TetragonalLatticeConstants(a * SIN_PI_OVER_FOUR, c), primitive_centering
+                ),
             )
 
         elseif b ≈ 2 * a * SIN_PI_OVER_THREE
-            # Hexagonal, primitive
+            # Hexagonal, primitive-centering
             @debug "oC --> hP"
-            return conventional_cell(UnitCell(HexagonalLatticeConstants(a, c), primitive))
+            return conventional_cell(
+                UnitCell(HexagonalLatticeConstants(a, c), primitive_centering)
+            )
         end
     end
 

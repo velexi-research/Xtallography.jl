@@ -33,14 +33,14 @@ using Xtallography
 
     lattice_constants = HexagonalLatticeConstants(1.0, 2.0)
 
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive_centering))
 
     @test iucr_unit_cell.lattice_constants == lattice_constants
-    @test iucr_unit_cell.centering === primitive
+    @test iucr_unit_cell.centering === primitive_centering
 
     # ------ Invalid centering
 
-    for centering in (body_centered, face_centered, base_centered)
+    for centering in (body_centering, face_centering, base_centering)
         expected_message =
             "Invalid Bravais lattice: " *
             "(lattice_system=Hexagonal, centering=$(nameof(typeof(centering))))"
@@ -64,9 +64,9 @@ end
     basis_a, basis_b, basis_c = basis(lattice_constants)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, primitive)
+    expected_unit_cell = UnitCell(lattice_constants, primitive_centering)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa HexagonalLatticeConstants
     @debug "chain of limiting cases: aP --> mP --> oC --> hP"
@@ -82,9 +82,9 @@ end
     basis_a, basis_b, basis_c = basis(lattice_constants)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, primitive)
+    expected_unit_cell = UnitCell(lattice_constants, primitive_centering)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa HexagonalLatticeConstants
     @debug "chain of limiting cases: aP --> mP --> oC --> hP"
@@ -100,9 +100,9 @@ end
         LatticeConstants(
             basis_a, basis_b, basis_c + basis_a; identify_lattice_system=false
         ),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, primitive)
+    expected_unit_cell = UnitCell(lattice_constants, primitive_centering)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa HexagonalLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oC --> hP"

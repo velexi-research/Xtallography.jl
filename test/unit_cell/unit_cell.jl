@@ -18,7 +18,7 @@ lattices_tests.jl defines tests for lattices.jl
 # --- Imports
 
 # Standard library
-using LinearAlgebra: dot, qr, I
+using LinearAlgebra: qr, I
 using Test
 
 # External packages
@@ -65,7 +65,7 @@ function test_basis_rotations_and_permutations(
 
     for rotation in rotations
         # Generate bases to check
-        if centering == BaseCentered()
+        if centering == base_centering
             # Do not permute basis vectors for base-centering
             bases_to_test = ([basis_a, basis_b, basis_c],)
         else
@@ -114,7 +114,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (Primitive(), BodyCentered(), FaceCentered())
+    for centering in (primitive_centering, body_centering, face_centering)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -151,7 +151,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (Primitive(), BodyCentered())
+    for centering in (primitive_centering, body_centering)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -179,7 +179,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (Primitive(), BodyCentered())
+    for centering in (primitive_centering, body_centering)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -213,9 +213,9 @@ end
         rotations, expected_lattice_constants, basis_a, basis_b, basis_c
     )
 
-    # centering = primitive, body-centered, or face-centered
+    # centering = primitive-centering, body-centering, or face-centering
     expected_lattice_constants = OrthorhombicLatticeConstants(a, b, c)
-    for centering in (Primitive(), BodyCentered(), FaceCentered())
+    for centering in (primitive_centering, body_centering, face_centering)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -226,7 +226,7 @@ end
         )
     end
 
-    # centering = base-centered; a, b < c
+    # centering = base-centering; a, b < c
     a = 5
     b = 8
     c = 10
@@ -243,10 +243,10 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=BaseCentered(),
+        centering=base_centering,
     )
 
-    # centering = base-centered; a < c < b
+    # centering = base-centering; a < c < b
     a = 5
     b = 10
     c = 8
@@ -262,10 +262,10 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=BaseCentered(),
+        centering=base_centering,
     )
 
-    # centering = base-centered; b < c < a
+    # centering = base-centering; b < c < a
     a = 10
     b = 5
     c = 8
@@ -281,7 +281,7 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=BaseCentered(),
+        centering=base_centering,
     )
 end
 
@@ -312,7 +312,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (Primitive(),)
+    for centering in (primitive_centering,)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -349,7 +349,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (Primitive(),)
+    for centering in (primitive_centering,)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -377,7 +377,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (Primitive(),)
+    for centering in (primitive_centering,)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -405,7 +405,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (Primitive(),)
+    for centering in (primitive_centering,)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -433,7 +433,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (Primitive(),)
+    for centering in (primitive_centering,)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -476,12 +476,12 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=Primitive(),
+        centering=primitive_centering,
     )
 
-    # centering = body-centered
+    # centering = body-centering
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(a, b, c, β), BodyCentered()
+        MonoclinicLatticeConstants(a, b, c, β), body_centering
     )
     test_basis_rotations_and_permutations(
         rotations,
@@ -489,12 +489,12 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=BodyCentered(),
+        centering=body_centering,
     )
 
-    # centering = base-centered
+    # centering = base-centering
     expected_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(a, b, c, β), BaseCentered()
+        MonoclinicLatticeConstants(a, b, c, β), base_centering
     )
     test_basis_rotations_and_permutations(
         rotations,
@@ -502,7 +502,7 @@ end
         basis_a,
         basis_b,
         basis_c;
-        centering=BaseCentered(),
+        centering=base_centering,
     )
 end
 
@@ -544,7 +544,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (Primitive(),)
+    for centering in (primitive_centering,)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -578,7 +578,7 @@ end
     )
 
     # centering keyword argument provided
-    for centering in (Primitive(),)
+    for centering in (primitive_centering,)
         test_basis_rotations_and_permutations(
             rotations,
             expected_lattice_constants,
@@ -616,7 +616,7 @@ end
 
     lattice_constants = CubicLatticeConstants(1)
 
-    for centering in (Primitive(), BodyCentered(), FaceCentered())
+    for centering in (primitive_centering, body_centering, face_centering)
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -627,7 +627,7 @@ end
 
     lattice_constants = TetragonalLatticeConstants(1, 2)
 
-    for centering in (Primitive(), BodyCentered())
+    for centering in (primitive_centering, body_centering)
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -638,7 +638,7 @@ end
 
     lattice_constants = OrthorhombicLatticeConstants(1, 2, 3)
 
-    for centering in (Primitive(), BodyCentered(), FaceCentered(), BaseCentered())
+    for centering in (primitive_centering, body_centering, face_centering, base_centering)
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -649,7 +649,7 @@ end
 
     lattice_constants = HexagonalLatticeConstants(1, 2)
 
-    for centering in (Primitive(),)
+    for centering in (primitive_centering,)
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -660,7 +660,7 @@ end
 
     lattice_constants = RhombohedralLatticeConstants(1, π / 3)
 
-    for centering in (Primitive(),)
+    for centering in (primitive_centering,)
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -671,7 +671,7 @@ end
 
     lattice_constants = MonoclinicLatticeConstants(1, 2, 3, 3π / 5)
 
-    for centering in (Primitive(), BodyCentered(), BaseCentered())
+    for centering in (primitive_centering, body_centering, base_centering)
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -682,7 +682,7 @@ end
 
     lattice_constants = TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5)
 
-    for centering in (Primitive(),)
+    for centering in (primitive_centering,)
         unit_cell = UnitCell(lattice_constants, centering)
 
         @test unit_cell.lattice_constants == lattice_constants
@@ -695,8 +695,8 @@ end
 @testset "lattice_system(::UnitCell)" begin
     # --- Tests
 
-    @test lattice_system(UnitCell(CubicLatticeConstants(1), primitive)) == cubic
-    @test lattice_system(UnitCell(TetragonalLatticeConstants(1, 2), base_centered)) ==
+    @test lattice_system(UnitCell(CubicLatticeConstants(1), primitive_centering)) == cubic
+    @test lattice_system(UnitCell(TetragonalLatticeConstants(1, 2), base_centering)) ==
         tetragonal
 end
 
@@ -704,73 +704,81 @@ end
     # --- Tests
 
     # Cubic
-    @test is_bravais_lattice(UnitCell(CubicLatticeConstants(1), Primitive()))
-    @test is_bravais_lattice(UnitCell(CubicLatticeConstants(1), BodyCentered()))
-    @test is_bravais_lattice(UnitCell(CubicLatticeConstants(1), FaceCentered()))
-    @test !is_bravais_lattice(UnitCell(CubicLatticeConstants(1), BaseCentered()))
+    @test is_bravais_lattice(UnitCell(CubicLatticeConstants(1), primitive_centering))
+    @test is_bravais_lattice(UnitCell(CubicLatticeConstants(1), body_centering))
+    @test is_bravais_lattice(UnitCell(CubicLatticeConstants(1), face_centering))
+    @test !is_bravais_lattice(UnitCell(CubicLatticeConstants(1), base_centering))
 
     # Tetragonal
-    @test is_bravais_lattice(UnitCell(TetragonalLatticeConstants(1, 2), Primitive()))
-    @test is_bravais_lattice(UnitCell(TetragonalLatticeConstants(1, 2), BodyCentered()))
-    @test !is_bravais_lattice(UnitCell(TetragonalLatticeConstants(1, 2), FaceCentered()))
-    @test !is_bravais_lattice(UnitCell(TetragonalLatticeConstants(1, 2), BaseCentered()))
+    @test is_bravais_lattice(
+        UnitCell(TetragonalLatticeConstants(1, 2), primitive_centering)
+    )
+    @test is_bravais_lattice(UnitCell(TetragonalLatticeConstants(1, 2), body_centering))
+    @test !is_bravais_lattice(UnitCell(TetragonalLatticeConstants(1, 2), face_centering))
+    @test !is_bravais_lattice(UnitCell(TetragonalLatticeConstants(1, 2), base_centering))
 
     # Orthorhombic
-    @test is_bravais_lattice(UnitCell(OrthorhombicLatticeConstants(1, 2, 3), Primitive()))
     @test is_bravais_lattice(
-        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), BodyCentered())
+        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), primitive_centering)
     )
     @test is_bravais_lattice(
-        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), FaceCentered())
+        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), body_centering)
     )
     @test is_bravais_lattice(
-        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), BaseCentered())
+        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), face_centering)
+    )
+    @test is_bravais_lattice(
+        UnitCell(OrthorhombicLatticeConstants(1, 2, 3), base_centering)
     )
 
     # Hexagonal
-    @test is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), Primitive()))
-    @test !is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), BodyCentered()))
-    @test !is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), FaceCentered()))
-    @test !is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), BaseCentered()))
+    @test is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), primitive_centering))
+    @test !is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), body_centering))
+    @test !is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), face_centering))
+    @test !is_bravais_lattice(UnitCell(HexagonalLatticeConstants(1, 2), base_centering))
 
     # Rhombohedral
-    @test is_bravais_lattice(UnitCell(RhombohedralLatticeConstants(1, π / 3), Primitive()))
-    @test !is_bravais_lattice(
-        UnitCell(RhombohedralLatticeConstants(1, π / 3), BodyCentered())
+    @test is_bravais_lattice(
+        UnitCell(RhombohedralLatticeConstants(1, π / 3), primitive_centering)
     )
     @test !is_bravais_lattice(
-        UnitCell(RhombohedralLatticeConstants(1, π / 3), FaceCentered())
+        UnitCell(RhombohedralLatticeConstants(1, π / 3), body_centering)
     )
     @test !is_bravais_lattice(
-        UnitCell(RhombohedralLatticeConstants(1, π / 3), BaseCentered())
+        UnitCell(RhombohedralLatticeConstants(1, π / 3), face_centering)
+    )
+    @test !is_bravais_lattice(
+        UnitCell(RhombohedralLatticeConstants(1, π / 3), base_centering)
     )
 
     # Monoclinic
     @test is_bravais_lattice(
-        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), Primitive())
+        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), primitive_centering)
     )
     @test is_bravais_lattice(
-        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), BodyCentered())
+        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), body_centering)
     )
     @test !is_bravais_lattice(
-        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), FaceCentered())
+        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), face_centering)
     )
     @test is_bravais_lattice(
-        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), BaseCentered())
+        UnitCell(MonoclinicLatticeConstants(1, 2, 3, 3π / 5), base_centering)
     )
 
     # Triclinic
     @test is_bravais_lattice(
-        UnitCell(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), Primitive())
+        UnitCell(
+            TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), primitive_centering
+        ),
     )
     @test !is_bravais_lattice(
-        UnitCell(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), BodyCentered())
+        UnitCell(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), body_centering)
     )
     @test !is_bravais_lattice(
-        UnitCell(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), FaceCentered())
+        UnitCell(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), face_centering)
     )
     @test !is_bravais_lattice(
-        UnitCell(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), BaseCentered())
+        UnitCell(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), base_centering)
     )
 end
 
@@ -795,11 +803,11 @@ end
 
     # Check sequence of method calls works
     unit_cell = UnitCell(
-        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), Primitive()
+        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), primitive_centering
     )
     standardized_unit_cell = standardize(unit_cell)
     expected_standardized_unit_cell = UnitCell(
-        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 2π / 5, π / 5), Primitive()
+        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 2π / 5, π / 5), primitive_centering
     )
     @test standardized_unit_cell ≈ expected_standardized_unit_cell
 end
@@ -810,7 +818,7 @@ end
     # Check that no centering is returned
     lattice_constants = TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5)
     expected_standardized_lattice_constants, _ = standardize(
-        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), Primitive()
+        TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5), primitive_centering
     )
 
     @test standardize(TriclinicLatticeConstants(1, 2, 3, 2π / 5, 3π / 5, 4π / 5)) ≈
@@ -838,20 +846,20 @@ end
 @testset "isapprox(::UnitCell)" begin
     # --- Preparations
 
-    x = UnitCell(CubicLatticeConstants(1), Primitive())
+    x = UnitCell(CubicLatticeConstants(1), primitive_centering)
 
     # --- Exercise functionality and check results
 
     # x.centering != y.centering
-    y = UnitCell(CubicLatticeConstants(1), BodyCentered())
+    y = UnitCell(CubicLatticeConstants(1), body_centering)
     @test x ≉ y
 
     # x.lattice_constants ≈ (x.lattice_constants + delta)
-    y = UnitCell(CubicLatticeConstants(1 + 1e-8), Primitive())
+    y = UnitCell(CubicLatticeConstants(1 + 1e-8), primitive_centering)
     @test x ≈ y
 
     # x.lattice_constants ≉ y.lattice_constants
-    y = UnitCell(CubicLatticeConstants(2), Primitive())
+    y = UnitCell(CubicLatticeConstants(2), primitive_centering)
     @test x ≉ y
 end
 
@@ -860,7 +868,7 @@ end
 
     a = 2
     c = 5
-    unit_cell = UnitCell(HexagonalLatticeConstants(a, c), Primitive())
+    unit_cell = UnitCell(HexagonalLatticeConstants(a, c), primitive_centering)
     basis_a, basis_b, basis_c = basis(unit_cell)
 
     # Check results
@@ -872,14 +880,14 @@ end
 @testset "volume(::UnitCell)" begin
     # --- Tests
 
-    unit_cell = UnitCell(OrthorhombicLatticeConstants(1, 2, 3), Primitive())
+    unit_cell = UnitCell(OrthorhombicLatticeConstants(1, 2, 3), primitive_centering)
     @test volume(unit_cell) ≈ 6
 end
 
 @testset "surface_area(::UnitCell)" begin
     # --- Tests
 
-    unit_cell = UnitCell(OrthorhombicLatticeConstants(1, 2, 3), Primitive())
+    unit_cell = UnitCell(OrthorhombicLatticeConstants(1, 2, 3), primitive_centering)
     @test surface_area(unit_cell) ≈ 22
 end
 
@@ -889,7 +897,7 @@ end
     lattice_constants = TriclinicLatticeConstants(
         sqrt(6), sqrt(8), sqrt(8), π / 3, acos(sqrt(3) / 6), acos(sqrt(3) / 4)
     )
-    centering = Primitive()
+    centering = primitive_centering
     unit_cell = UnitCell(lattice_constants, centering)
 
     # --- Exercise functionality
@@ -905,7 +913,7 @@ end
     @test isapprox(reduced_cell_.lattice_constants.α, 104.47 * π / 180; atol=0.0005)
     @test isapprox(reduced_cell_.lattice_constants.β, 106.78 * π / 180; atol=0.0005)
     @test isapprox(reduced_cell_.lattice_constants.γ, 115.66 * π / 180; atol=0.0005)
-    @test reduced_cell_.centering == Primitive()
+    @test reduced_cell_.centering == primitive_centering
 end
 
 @testset "is_equivalent_unit_cell(::UnitCell): valid arguments" begin
@@ -916,9 +924,9 @@ end
     c = 3
     β = 3π / 5
     a = -2 * c * cos(β)
-    unit_cell_ref = UnitCell(MonoclinicLatticeConstants(a, b, c, β), Primitive())
+    unit_cell_ref = UnitCell(MonoclinicLatticeConstants(a, b, c, β), primitive_centering)
     unit_cell_test = UnitCell(
-        OrthorhombicLatticeConstants(a, 2 * c * sin(β), b), BaseCentered()
+        OrthorhombicLatticeConstants(a, 2 * c * sin(β), b), base_centering
     )
 
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
@@ -927,9 +935,9 @@ end
     a = 1
     b = 2
     c = 3
-    unit_cell_ref = UnitCell(OrthorhombicLatticeConstants(a, b, c), Primitive())
+    unit_cell_ref = UnitCell(OrthorhombicLatticeConstants(a, b, c), primitive_centering)
     unit_cell_test = UnitCell(
-        OrthorhombicLatticeConstants(a + 2, b - 1, c + 5), Primitive()
+        OrthorhombicLatticeConstants(a + 2, b - 1, c + 5), primitive_centering
     )
     @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
     @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=4)
@@ -939,9 +947,9 @@ end
     a = 1
     b = 2
     c = 3
-    unit_cell_ref = UnitCell(OrthorhombicLatticeConstants(a, b, c), Primitive())
+    unit_cell_ref = UnitCell(OrthorhombicLatticeConstants(a, b, c), primitive_centering)
     unit_cell_test = UnitCell(
-        OrthorhombicLatticeConstants(a + 2, b - 1, c + 5), Primitive()
+        OrthorhombicLatticeConstants(a + 2, b - 1, c + 5), primitive_centering
     )
     @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
     @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=0, rtol=0.5)
@@ -952,8 +960,8 @@ end
     c = 3
     β = 3π / 5
     a = -2 * c * cos(β)
-    unit_cell_ref = UnitCell(MonoclinicLatticeConstants(a, b, c, β), Primitive())
-    unit_cell_test = UnitCell(CubicLatticeConstants(a), FaceCentered())
+    unit_cell_ref = UnitCell(MonoclinicLatticeConstants(a, b, c, β), primitive_centering)
+    unit_cell_test = UnitCell(CubicLatticeConstants(a), face_centering)
 
     @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 end
@@ -961,8 +969,8 @@ end
 @testset "is_equivalent_unit_cell(::UnitCell): invalid arguments" begin
     # --- Preparations
 
-    unit_cell_ref = UnitCell(CubicLatticeConstants(1.0), Primitive())
-    unit_cell_test = UnitCell(CubicLatticeConstants(1.0), Primitive())
+    unit_cell_ref = UnitCell(CubicLatticeConstants(1.0), primitive_centering)
+    unit_cell_test = UnitCell(CubicLatticeConstants(1.0), primitive_centering)
 
     # --- Exercise functionality and check results
 
@@ -1013,8 +1021,10 @@ end
     c = 3
     β = 3π / 5
     a = -2 * c * cos(β)
-    lattice_constants_ref = UnitCell(MonoclinicLatticeConstants(a, b, c, β), Primitive())
-    lattice_constants_test = UnitCell(CubicLatticeConstants(a), FaceCentered())
+    lattice_constants_ref = UnitCell(
+        MonoclinicLatticeConstants(a, b, c, β), primitive_centering
+    )
+    lattice_constants_test = UnitCell(CubicLatticeConstants(a), face_centering)
 
     @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
 end

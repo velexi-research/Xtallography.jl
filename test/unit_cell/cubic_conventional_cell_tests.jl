@@ -33,7 +33,7 @@ using Xtallography
 
     lattice_constants = CubicLatticeConstants(1.0)
 
-    for centering in (primitive, body_centered, face_centered)
+    for centering in (primitive_centering, body_centering, face_centering)
         unit_cell = UnitCell(lattice_constants, centering)
 
         iucr_unit_cell = conventional_cell(unit_cell)
@@ -45,11 +45,11 @@ using Xtallography
 
     # centering = face-centered
     expected_message = (
-        "Invalid Bravais lattice: (lattice_system=Cubic, centering=BaseCentered)"
+        "Invalid Bravais lattice: (lattice_system=Cubic, centering=BaseCentering)"
     )
 
     @test_throws ArgumentError(expected_message) conventional_cell(
-        UnitCell(lattice_constants, base_centered)
+        UnitCell(lattice_constants, base_centering)
     )
 end
 
@@ -69,9 +69,9 @@ end
 
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, primitive)
+    expected_unit_cell = UnitCell(lattice_constants, primitive_centering)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mP --> oP --> tP --> cP " *
@@ -84,9 +84,9 @@ end
         LatticeConstants(
             basis_a, basis_a + basis_b, basis_c; identify_lattice_system=false
         ),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, primitive)
+    expected_unit_cell = UnitCell(lattice_constants, primitive_centering)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mP --> oC --> tP --> cP"
@@ -108,9 +108,9 @@ end
         LatticeConstants(
             basis_a, basis_b + basis_c, basis_a + basis_c; identify_lattice_system=false
         ),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, primitive)
+    expected_unit_cell = UnitCell(lattice_constants, primitive_centering)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oC --> tP --> cP " *
@@ -126,9 +126,9 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, body_centered)
+    expected_unit_cell = UnitCell(lattice_constants, body_centering)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oI --> tI --> cI"
@@ -148,9 +148,9 @@ end
             0.5 * (-basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, body_centered)
+    expected_unit_cell = UnitCell(lattice_constants, body_centering)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oF --> tI --> cI " *
@@ -171,9 +171,9 @@ end
             0.5 * (basis_c + basis_a);
             identify_lattice_system=false,
         ),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, face_centered)
+    expected_unit_cell = UnitCell(lattice_constants, face_centering)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oI --> tI --> cF " *
@@ -192,9 +192,9 @@ end
             0.5 * (basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, face_centered)
+    expected_unit_cell = UnitCell(lattice_constants, face_centering)
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
     @debug "chain of limiting cases: aP --> mI --> oF --> tI --> cF " *

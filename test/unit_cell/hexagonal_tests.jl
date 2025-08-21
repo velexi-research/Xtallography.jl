@@ -151,17 +151,17 @@ end
     lattice_constants = HexagonalLatticeConstants(1.0, 2.0)
 
     standardized_lattice_constants, standardized_centering = standardize(
-        lattice_constants, primitive
+        lattice_constants, primitive_centering
     )
 
     expected_lattice_constants = lattice_constants
     @test standardized_lattice_constants ≈ expected_lattice_constants
 
-    @test standardized_centering === primitive
+    @test standardized_centering === primitive_centering
 
     # ------ Invalid centerings
 
-    for centering in (body_centered, face_centered, base_centered)
+    for centering in (body_centering, face_centering, base_centering)
         expected_message =
             "Invalid Bravais lattice: " *
             "(lattice_system=Hexagonal, centering=$(nameof(typeof(centering))))"
@@ -284,12 +284,12 @@ end
     # --- Exercise functionality and check results
 
     # primitive unit cell defined by [basis_a, basis_b, basis_c]
-    unit_cell = UnitCell(lattice_constants, primitive)
+    unit_cell = UnitCell(lattice_constants, primitive_centering)
 
     expected_reduced_cell = reduced_cell(
         UnitCell(
             LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-            primitive,
+            primitive_centering,
         ),
     )
 
@@ -300,9 +300,11 @@ end
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ π / 3
-    unit_cell = UnitCell(LatticeConstants(basis_a + basis_b, basis_b, basis_c), primitive)
+    unit_cell = UnitCell(
+        LatticeConstants(basis_a + basis_b, basis_b, basis_c), primitive_centering
+    )
 
-    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive))
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive_centering))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa HexagonalLatticeConstants
@@ -311,9 +313,11 @@ end
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ 2π / 3
-    unit_cell = UnitCell(LatticeConstants(basis_a - basis_b, basis_b, basis_c), primitive)
+    unit_cell = UnitCell(
+        LatticeConstants(basis_a - basis_b, basis_b, basis_c), primitive_centering
+    )
 
-    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive))
+    expected_reduced_cell = reduced_cell(UnitCell(lattice_constants, primitive_centering))
 
     reduced_cell_ = reduced_cell(unit_cell)
     @test reduced_cell_.lattice_constants isa HexagonalLatticeConstants
@@ -332,26 +336,26 @@ end
     # --- Exercise functionality and check results
 
     # equivalent hexagonal and triclinic unit cells
-    hexagonal_unit_cell = UnitCell(lattice_constants, primitive)
+    hexagonal_unit_cell = UnitCell(lattice_constants, primitive_centering)
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        primitive,
+        primitive_centering,
     )
     @test is_equivalent_unit_cell(hexagonal_unit_cell, triclinic_unit_cell)
 
     # equivalent unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ π / 3
-    unit_cell_ref = UnitCell(lattice_constants, primitive)
+    unit_cell_ref = UnitCell(lattice_constants, primitive_centering)
     unit_cell_test = UnitCell(
-        LatticeConstants(basis_a + basis_b, basis_b, basis_c), primitive
+        LatticeConstants(basis_a + basis_b, basis_b, basis_c), primitive_centering
     )
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 
     # equivalent unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ 2π / 3
-    unit_cell_ref = UnitCell(lattice_constants, primitive)
+    unit_cell_ref = UnitCell(lattice_constants, primitive_centering)
     unit_cell_test = UnitCell(
-        LatticeConstants(basis_a - basis_b, basis_b, basis_c), primitive
+        LatticeConstants(basis_a - basis_b, basis_b, basis_c), primitive_centering
     )
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 end

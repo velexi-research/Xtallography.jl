@@ -40,7 +40,7 @@ using Xtallography
 
 # --- Tests
 
-@testset "conventional_cell():monoclinic: limiting cases, centering = primitive" begin
+@testset "conventional_cell():monoclinic: limiting cases, centering = primitive_centering" begin
     # --- Preparations
 
     # Construct basis for orthorhombic unit cell
@@ -64,11 +64,11 @@ using Xtallography
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive_centering))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈ OrthorhombicLatticeConstants(o_a, o_b, o_c)
-    @test iucr_unit_cell.centering === primitive
+    @test iucr_unit_cell.centering === primitive_centering
 
     # ------ a = -2 * c * cos(β)
 
@@ -77,7 +77,7 @@ using Xtallography
     basis_b = 0.5 * (o_basis_a + o_basis_b)
     basis_c = o_basis_c
     lattice_constants, _ = standardize(
-        LatticeConstants(basis_a, basis_b, basis_c), primitive
+        LatticeConstants(basis_a, basis_b, basis_c), primitive_centering
     )
 
     # Check test conditions
@@ -85,14 +85,14 @@ using Xtallography
     @test lattice_constants.a ≈ -2 * lattice_constants.c * cos(lattice_constants.β)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive_centering))
 
     # Check results
     standardized_lattice_constants, _ = standardize(
-        expected_orthorhombic_lattice_constants, base_centered
+        expected_orthorhombic_lattice_constants, base_centering
     )
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering === base_centered
+    @test iucr_unit_cell.centering === base_centering
 
     # ------ a = c, basis_b = o_basis_c
 
@@ -112,14 +112,14 @@ using Xtallography
     @test lattice_constants.a ≈ lattice_constants.c
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive_centering))
 
     # Check results
     standardized_lattice_constants, _ = standardize(
-        expected_orthorhombic_lattice_constants, base_centered
+        expected_orthorhombic_lattice_constants, base_centering
     )
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering === base_centered
+    @test iucr_unit_cell.centering === base_centering
 
     # ------ monoclinic unit cell is not equivalent to an orthorhombic unit cell
 
@@ -131,12 +131,12 @@ using Xtallography
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive_centering))
 
     # Check results
-    standardized_lattice_constants, _ = standardize(lattice_constants, primitive)
+    standardized_lattice_constants, _ = standardize(lattice_constants, primitive_centering)
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering === primitive
+    @test iucr_unit_cell.centering === primitive_centering
 end
 
 @testset "conventional_cell():monoclinic: limiting cases, centering = body, orthorhombic limits" begin
@@ -163,11 +163,11 @@ end
     lattice_constants = MonoclinicLatticeConstants(a, b, c, β)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈ OrthorhombicLatticeConstants(a, b, c)
-    @test iucr_unit_cell.centering === body_centered
+    @test iucr_unit_cell.centering === body_centering
 
     # ------ a = -c cos(β), basis_b = o_basis_a
 
@@ -187,14 +187,14 @@ end
     @test lattice_constants.a ≈ -lattice_constants.c * cos(lattice_constants.β)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
 
     # Check results
     standardized_lattice_constants, _ = standardize(
-        expected_orthorhombic_lattice_constants, base_centered
+        expected_orthorhombic_lattice_constants, base_centering
     )
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering === base_centered
+    @test iucr_unit_cell.centering === base_centering
 
     # ------ a = -c cos(β), basis_b = o_basis_b
 
@@ -214,14 +214,14 @@ end
     @test lattice_constants.a ≈ -lattice_constants.c * cos(lattice_constants.β)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
 
     # Check results
     standardized_lattice_constants, _ = standardize(
-        expected_orthorhombic_lattice_constants, base_centered
+        expected_orthorhombic_lattice_constants, base_centering
     )
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering === base_centered
+    @test iucr_unit_cell.centering === base_centering
 
     # ------ a = c
 
@@ -241,14 +241,14 @@ end
     @test lattice_constants.a ≈ lattice_constants.c
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
 
     # Check results
     standardized_lattice_constants, _ = standardize(
-        expected_orthorhombic_lattice_constants, face_centered
+        expected_orthorhombic_lattice_constants, face_centering
     )
     @test iucr_unit_cell.lattice_constants ≈ standardized_lattice_constants
-    @test iucr_unit_cell.centering === face_centered
+    @test iucr_unit_cell.centering === face_centering
 end
 
 @testset "conventional_cell():monoclinic: limiting cases, centering = body, rhombohedral limit cases" begin
@@ -283,12 +283,12 @@ end
         lattice_constants.b^2
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈
         standardize(expected_rhombohedral_lattice_constants)
-    @test iucr_unit_cell.centering === primitive
+    @test iucr_unit_cell.centering === primitive_centering
 
     # ------ π/3 < r_α < π/2: a^2 + b^2 = c^2, b^2 + a c cos(β) = a^2
 
@@ -319,12 +319,12 @@ end
         lattice_constants.a^2
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈
         standardize(expected_rhombohedral_lattice_constants)
-    @test iucr_unit_cell.centering === primitive
+    @test iucr_unit_cell.centering === primitive_centering
 
     # ------ π/2 < r_α < acos(-1/3):  a^2 + b^2 = c^2, b^2 + a c cos(β) = a^2
 
@@ -353,12 +353,12 @@ end
     @test lattice_constants.c ≈ -3 * lattice_constants.a * cos(lattice_constants.β)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈
         standardize(expected_rhombohedral_lattice_constants)
-    @test iucr_unit_cell.centering === primitive
+    @test iucr_unit_cell.centering === primitive_centering
 
     # ------ r_α > acos(-1/3): a^2 + 3 b^2 = 9 c^2, a = -3 c cos(β)
 
@@ -387,12 +387,12 @@ end
     @test lattice_constants.a ≈ -3 * lattice_constants.c * cos(lattice_constants.β)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
 
     # Check results
     @test iucr_unit_cell.lattice_constants ≈
         standardize(expected_rhombohedral_lattice_constants)
-    @test iucr_unit_cell.centering === primitive
+    @test iucr_unit_cell.centering === primitive_centering
 end
 
 @testset "conventional_cell():monoclinic: limiting cases, centering = body, non-limit cases" begin
@@ -427,14 +427,14 @@ end
     @test lattice_constants isa MonoclinicLatticeConstants
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centered))
+    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
 
     # Check results
     expected_lattice_constants = MonoclinicLatticeConstants(a_ref, b_ref, c_ref, β_ref)
 
     @test iucr_unit_cell.lattice_constants isa MonoclinicLatticeConstants
     @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering === body_centered
+    @test iucr_unit_cell.centering === body_centering
 end
 
 @testset "conventional_cell():monoclinic: invalid arguments" begin
@@ -451,8 +451,8 @@ end
 
     # ------ Invalid centering
 
-    # centering = face-centered
-    centering = face_centered
+    # centering = face-centering
+    centering = face_centering
     expected_message =
         "Invalid Bravais lattice: " *
         "(lattice_system=Monoclinic, centering=$(nameof(typeof(centering))))"
@@ -478,9 +478,9 @@ end
     # primitive unit cell: aP --> mP
     triclinic_unit_cell = UnitCell(
         LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(m_lattice_constants, primitive))
+    expected_unit_cell = standardize(UnitCell(m_lattice_constants, primitive_centering))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
     @debug "chain of limiting cases: aP --> mP"
@@ -496,9 +496,9 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(m_lattice_constants, body_centered))
+    expected_unit_cell = standardize(UnitCell(m_lattice_constants, body_centering))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
     @debug "chain of limiting cases: aP --> mI"
@@ -514,9 +514,9 @@ end
             0.5 * (basis_a + basis_b + basis_c);
             identify_lattice_system=false,
         ),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(m_lattice_constants, body_centered))
+    expected_unit_cell = standardize(UnitCell(m_lattice_constants, body_centering))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
     @debug "chain of limiting cases: aP --> mI"
@@ -529,9 +529,9 @@ end
         LatticeConstants(
             basis_a, 0.5 * (basis_a + basis_b), basis_c; identify_lattice_system=false
         ),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(m_lattice_constants, base_centered))
+    expected_unit_cell = standardize(UnitCell(m_lattice_constants, base_centering))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
@@ -546,9 +546,9 @@ end
             0.5 * (basis_a + basis_b) + basis_c;
             identify_lattice_system=false,
         ),
-        primitive,
+        primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(m_lattice_constants, base_centered))
+    expected_unit_cell = standardize(UnitCell(m_lattice_constants, base_centering))
     @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
     @test expected_unit_cell.lattice_constants isa MonoclinicLatticeConstants
     @debug "chain of limiting cases: aP --> mC"

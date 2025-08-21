@@ -133,11 +133,11 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> standardize(OrthorhombicLatticeConstants(3, 2, 1), primitive)
-(OrthorhombicLatticeConstants(1.0, 2.0, 3.0), Primitive())
+julia> standardize(OrthorhombicLatticeConstants(3, 2, 1), primitive_centering)
+(OrthorhombicLatticeConstants(1.0, 2.0, 3.0), PrimitiveCentering())
 
-julia> standardize(OrthorhombicLatticeConstants(3, 2, 1), base_centered)
-(OrthorhombicLatticeConstants(2.0, 3.0, 1.0), BaseCentered())
+julia> standardize(OrthorhombicLatticeConstants(3, 2, 1), base_centering)
+(OrthorhombicLatticeConstants(2.0, 3.0, 1.0), BaseCentering())
 ```
 """
 function standardize(lattice_constants::LatticeConstants, centering::Centering)
@@ -169,10 +169,10 @@ OrthorhombicLatticeConstants(1.0, 2.0, 3.0)
 function standardize(lattice_constants::LatticeConstants)
     # --- Check arguments
 
-    standardize_check_args(lattice_constants, primitive)
+    standardize_check_args(lattice_constants, primitive_centering)
 
     # Return standardized lattice constants for primitive unit cell
-    standardized_lattice_constants, _ = standardize(lattice_constants, primitive)
+    standardized_lattice_constants, _ = standardize(lattice_constants, primitive_centering)
     return standardized_lattice_constants
 end
 
