@@ -22,12 +22,8 @@ Symmetry types
 export SymmetryElement
 export GlidePlane
 export ScrewAxis
-export UnitCellSymmetry
 
 # ------ Constants
-
-# UnitCellSymmetry
-export primitive_unit_cell_symmetry
 
 # Glide planes
 export b_perp_a, c_perp_a, n_perp_a, d_perp_a
@@ -35,6 +31,7 @@ export a_perp_b, c_perp_b, n_perp_b, d_perp_b
 export a_perp_c, b_perp_c, n_perp_c, d_perp_c
 export c_perp_110, c_perp_120, d_perp_110
 
+# Screw axes
 export a_2_1, a_4_1, a_4_2, a_4_3
 export b_2_1, b_4_1, b_4_2, b_4_3
 export c_2_1, c_4_1, c_4_2, c_4_3
@@ -141,67 +138,3 @@ const c_6_2 = ScrewAxis("0,0,1", 6, 2)
 const c_6_3 = ScrewAxis("0,0,1", 6, 3)
 const c_6_4 = ScrewAxis("0,0,1", 6, 4)
 const c_6_5 = ScrewAxis("0,0,1", 6, 5)
-
-# ------ UnitCellSymmetry
-
-using Xtallography: Centering, primitive_centering
-
-"""
-    UnitCellSymmetry
-
-Type representing the symmetry of a unit cell
-"""
-struct UnitCellSymmetry
-    # Fields
-    centering::Centering
-    symmetry_elements::Vector{<:SymmetryElement}
-end
-
-# Outer constructor
-"""
-    UnitCellSymmetry(
-        centering::Centering;
-        symmetry_elements::Union{Vector{<:SymmetryElement},Nothing}=nothing
-    )
-
-
-Construct a `UnitCellSymmetry` object with the specified `centering` and
-`symmetry_elements`.
-"""
-function UnitCellSymmetry(
-    centering::Centering; symmetry_elements::Union{Vector,Nothing}=nothing
-)
-
-    # Check arguments
-    if isnothing(symmetry_elements)
-        symmetry_elements = []
-    end
-
-    # Construct UnitCellSymmetry object
-    return UnitCellSymmetry(centering, Vector{SymmetryElement}(symmetry_elements))
-end
-
-"""
-    UnitCellSymmetry()
-
-Construct a `UnitCellSymmetry` object representing a primitive unit cell with no
-additional symmetry elements.
-"""
-function UnitCellSymmetry()
-    return UnitCellSymmetry(primitive_centering)
-end
-
-"""
-    primitive_unit_cell_symmetry
-
-`UnitCellSymmetry` object representing a primitive unit cell with no additional symmetry
-elements.
-"""
-const primitive_unit_cell_symmetry = UnitCellSymmetry()
-
-# Methods
-function Base.:(==)(x::UnitCellSymmetry, y::UnitCellSymmetry)
-    return (
-        x.centering === y.centering && Set(x.symmetry_elements) == Set(y.symmetry_elements)
-    )
-end
