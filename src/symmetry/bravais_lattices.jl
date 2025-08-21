@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 """
-Bravais lattices
+Bravais lattice constants and functions
 """
 # --- Exports
 

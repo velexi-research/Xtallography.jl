@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 """
-Lattice system and symmetry types
+Centering types and functions
 """
 # --- Exports
 

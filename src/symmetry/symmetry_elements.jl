@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 """
-Symmetry types
+Symmetry element types and functions
 """
 # --- Exports
 
