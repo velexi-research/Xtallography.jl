@@ -178,7 +178,7 @@ Hexagonal()
 julia> lattice_system(CubicLatticeConstants(2))
 Cubic()
 
-julia> lattice_system(UnitCell(OrthorhombicLatticeConstants(2, 3, 4), face_centered))
+julia> lattice_system(UnitCell(OrthorhombicLatticeConstants(2, 3, 4), F_centering))
 Orthorhombic()
 ```
 """
