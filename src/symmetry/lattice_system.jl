@@ -19,26 +19,15 @@ Lattice system and symmetry types
 
 # ------ Types
 
-# LatticeSystem
 export LatticeSystem
 export Triclinic, Monoclinic, Orthorhombic, Hexagonal, Rhombohedral, Tetragonal, Cubic
 export triclinic, monoclinic, orthorhombic, hexagonal, rhombohedral, tetragonal, cubic
 
-# Centering
-export Centering, Primitive, BaseCentered, BodyCentered, FaceCentered
-export primitive, base_centered, body_centered, face_centered
-
 # ------ Functions/Methods
 
-export lattice_system, is_bravais_lattice
-
-# ------ Constants
-
-export BRAVAIS_LATTICES
+export lattice_system
 
 # --- Types
-
-# ------ Lattice systems
 
 """
     LatticeSystem
@@ -164,121 +153,7 @@ The singleton instance of type [`Cubic`](@ref)
 """
 const cubic = Cubic()
 
-# ------ Lattice centerings
-
-"""
-    Centering
-
-Supertype for the four lattice centerings in 3D
-
-Subtypes
-========
-[`Primitive`](@ref), [`BaseCentered`](@ref), [`BodyCentered`](@ref), [`FaceCentered`](@ref)
-"""
-abstract type Centering end
-
-"""
-    Primitive
-
-Type representing no centering that is the type of [`primitive`](@ref)
-
-Supertype: [`Centering`](@ref)
-"""
-struct Primitive <: Centering end
-
-"""
-    primitive
-
-The singleton instance of type [`Primitive`](@ref)
-"""
-const primitive = Primitive()
-
-"""
-    BaseCentered
-
-Type representing base centering that is the type of [`base_centered`](@ref)
-
-!!! note
-
-    By convention, base-centering is
-
-    * on the C-face of the unit cell for orthorhombic lattice systems
-
-    and
-
-    * on the B-face of the unit cell for monoclinic lattice systems.
-
-Supertype: [`Centering`](@ref)
-"""
-struct BaseCentered <: Centering end
-
-"""
-    base_centered
-
-The singleton instance of type [`BaseCentered`](@ref)
-"""
-const base_centered = BaseCentered()
-
-"""
-    BodyCentered
-
-Type representing body centering that is the type of [`body_centered`](@ref)
-
-Supertype: [`Centering`](@ref)
-"""
-struct BodyCentered <: Centering end
-
-"""
-    body_centered
-
-The singleton instance of type [`BodyCentered`](@ref)
-"""
-const body_centered = BodyCentered()
-
-"""
-    FaceCentered
-
-Type representing face centering that is the type of [`face_centered`](@ref)
-
-Supertype: [`Centering`](@ref)
-"""
-struct FaceCentered <: Centering end
-
-"""
-    face_centered
-
-The singleton instance of type [`FaceCentered`](@ref)
-"""
-const face_centered = FaceCentered()
-
-# --- Constants
-
-"""
-    BRAVAIS_LATTICES
-
-List of valid Bravais lattices.
-"""
-const BRAVAIS_LATTICES = (
-    (lattice_system=triclinic, centering=primitive),
-    (lattice_system=monoclinic, centering=primitive),
-    (lattice_system=monoclinic, centering=body_centered),
-    (lattice_system=monoclinic, centering=base_centered),
-    (lattice_system=orthorhombic, centering=primitive),
-    (lattice_system=orthorhombic, centering=body_centered),
-    (lattice_system=orthorhombic, centering=face_centered),
-    (lattice_system=orthorhombic, centering=base_centered),
-    (lattice_system=tetragonal, centering=primitive),
-    (lattice_system=tetragonal, centering=body_centered),
-    (lattice_system=rhombohedral, centering=primitive),
-    (lattice_system=hexagonal, centering=primitive),
-    (lattice_system=cubic, centering=primitive),
-    (lattice_system=cubic, centering=body_centered),
-    (lattice_system=cubic, centering=face_centered),
-)
-
 # --- Functions/Methods
-
-# ------ Utility functions
 
 """
     lattice_system(lattice_constants::LatticeConstants) -> LatticeSystem
@@ -307,36 +182,3 @@ julia> lattice_system(UnitCell(OrthorhombicLatticeConstants(2, 3, 4), face_cente
 Orthorhombic()
 """
 function lattice_system end
-
-"""
-    is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering) -> Bool
-
-    is_bravais_lattice(unit_cell::UnitCell) -> Bool
-
-Determine if the unit cell defined by `unit_cell` or `lattice_system` and `centering` is
-a valid Bravais lattice type.
-
-Return values
-=============
-- `true` if `lattice_system` and `centering` define a valid Bravais lattice type; `false`
-  otherwise
-
-Examples
-========
-```jldoctest
-julia> is_bravais_lattice(cubic, body_centered)
-true
-
-julia> is_bravais_lattice(cubic, base_centered)
-false
-
-julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), primitive))
-true
-
-julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), face_centered))
-false
-```
-"""
-function is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering)
-    return (lattice_system=lattice_system, centering=centering) in BRAVAIS_LATTICES
-end
