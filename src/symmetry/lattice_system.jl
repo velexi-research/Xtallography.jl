@@ -180,5 +180,6 @@ Cubic()
 
 julia> lattice_system(UnitCell(OrthorhombicLatticeConstants(2, 3, 4), face_centered))
 Orthorhombic()
+```
 """
 function lattice_system end
