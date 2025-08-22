@@ -55,10 +55,7 @@ const BRAVAIS_LATTICES = (
 """
     is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering) -> Bool
 
-    is_bravais_lattice(unit_cell::UnitCell) -> Bool
-
-Determine if the unit cell defined by `unit_cell` or `lattice_system` and `centering` is
-a valid Bravais lattice type.
+Determine if `lattice_system` and `centering` define a valid Bravais lattice type.
 
 Return values
 =============
@@ -72,12 +69,6 @@ julia> is_bravais_lattice(cubic, body_centering)
 true
 
 julia> is_bravais_lattice(cubic, base_centering)
-false
-
-julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), primitive_centering))
-true
-
-julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), face_centering))
 false
 ```
 """
