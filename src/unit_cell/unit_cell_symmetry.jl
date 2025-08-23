@@ -21,6 +21,10 @@ UnitCellSymmetry type and functions
 
 export UnitCellSymmetry
 
+# ------ Functions/Methods
+
+export centering, symmetry_elements
+
 # ------ Constants
 
 export primitive_unit_cell_symmetry
@@ -47,6 +51,11 @@ end
         symmetry_elements::Union{Vector{<:SymmetryElement},Nothing}=nothing
     )
 
+    UnitCellSymmetry(;
+        centering::Centering=primitive_centering,
+        symmetry_elements::Union{Vector{<:SymmetryElement},Nothing}=nothing
+    )
+
 
 Construct a `UnitCellSymmetry` object with the specified `centering` and
 `symmetry_elements`.
@@ -63,15 +72,11 @@ function UnitCellSymmetry(
     # Construct UnitCellSymmetry object
     return UnitCellSymmetry(centering, Vector{SymmetryElement}(symmetry_elements))
 end
-
-"""
-    UnitCellSymmetry()
-
-Construct a `UnitCellSymmetry` object representing a primitive unit cell with no
-additional symmetry elements.
-"""
-function UnitCellSymmetry()
-    return UnitCellSymmetry(primitive_centering)
+function UnitCellSymmetry(;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Vector,Nothing}=nothing,
+)
+    return UnitCellSymmetry(centering; symmetry_elements=symmetry_elements)
 end
 
 """
@@ -82,9 +87,39 @@ elements.
 """
 const primitive_unit_cell_symmetry = UnitCellSymmetry()
 
-# Methods
+# --- Functions/Methods
+
+import Base.:(==)
+
 function Base.:(==)(x::UnitCellSymmetry, y::UnitCellSymmetry)
     return (
-        x.centering === y.centering && Set(x.symmetry_elements) == Set(y.symmetry_elements)
+        centering(x) === centering(y) &&
+        Set(symmetry_elements(x)) == Set(symmetry_elements(y))
     )
+end
+
+"""
+    centering(symmetry::UnitCellSymmetry) -> Centering
+
+Return the centering of `symmetry`.
+
+Return values
+=============
+* centering
+"""
+@inline function centering(symmetry::UnitCellSymmetry)
+    return symmetry.centering
+end
+
+"""
+    symmetry_elements(symmetry::UnitCellSymmetry) -> Vector{SymmetryElement}
+
+Return the symmetry elements of `symmetry`.
+
+Return values
+=============
+* symmetry elements
+"""
+@inline function symmetry_elements(symmetry::UnitCellSymmetry)
+    return symmetry.symmetry_elements
 end
