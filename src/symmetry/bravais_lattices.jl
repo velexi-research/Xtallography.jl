@@ -72,6 +72,6 @@ julia> is_bravais_lattice(cubic, base_centering)
 false
 ```
 """
-function is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering)
+@inline function is_bravais_lattice(lattice_system::LatticeSystem, centering::Centering)
     return (lattice_system=lattice_system, centering=centering) in BRAVAIS_LATTICES
 end
