@@ -133,6 +133,8 @@ end
 
 # ------ geometry
 
+using LinearAlgebra: det
+
 """
     volume(v1::Vector{Real}, v2::Vector{Real}, v3::Vector{Real}) -> Float64
 
