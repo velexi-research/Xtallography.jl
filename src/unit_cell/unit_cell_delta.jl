@@ -21,6 +21,7 @@ Unit cell delta type and functions
 export UnitCellDelta
 
 # Functions
+export Δlattice_constants, lattice_constant_deltas
 export isapprox
 
 # --- Types
@@ -61,6 +62,25 @@ import Base.isapprox
 
 function lattice_system(unit_cell::UnitCellDelta{T}) where {T<:LatticeSystem}
     return T()
+end
+
+"""
+    Δlattice_constants(unit_cell::UnitCell) -> NamedTuple
+
+    lattice_constant_deltas(unit_cell::UnitCell) -> NamedTuple
+
+Return the lattice constant deltas for `unit_cell`.
+
+Return values
+=============
+* lattice constant deltas
+"""
+@inline function Δlattice_constants(unit_cell_delta::UnitCellDelta)
+    return unit_cell_delta.Δlattice_constants
+end
+
+@inline function lattice_constant_deltas(unit_cell_delta::UnitCellDelta)
+    return Δlattice_constants(unit_cell_delta)
 end
 
 function isapprox(
