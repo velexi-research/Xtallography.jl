@@ -30,7 +30,7 @@ using Xtallography
 
     # empty symmetry elements
     centering = face_centering
-    symmetry_elements = Vector{SymmetryElement}()
+    symmetry_elements = Set{SymmetryElement}()
 
     unit_cell_symmetry = UnitCellSymmetry(centering, symmetry_elements)
 
@@ -39,7 +39,7 @@ using Xtallography
 
     # non-empty symmetry elements
     centering = body_centering
-    symmetry_elements = Vector{SymmetryElement}()
+    symmetry_elements = Set{SymmetryElement}()
     push!(symmetry_elements, c_perp_a)
     push!(symmetry_elements, c_4_1)
     push!(symmetry_elements, d_perp_c)
@@ -50,17 +50,20 @@ using Xtallography
     @test Set(unit_cell_symmetry.symmetry_elements) == Set(symmetry_elements)
 end
 
-@testset "UnitCellSymmetry outer constructor: UnitCellSymmetry(::centering;::Union{Vector,Nothing})" begin
+@testset "UnitCellSymmetry outer constructor: UnitCellSymmetry(::centering; ::Union{Set,Vector,Nothing})" begin
     # --- Tests
 
-    # default symmetry elements
+    # ------ default keyword arguments
+
     centering = face_centering
 
     unit_cell_symmetry = UnitCellSymmetry(centering)
 
     @test unit_cell_symmetry.centering == centering
-    @test unit_cell_symmetry.symmetry_elements isa Vector
+    @test unit_cell_symmetry.symmetry_elements isa Set{SymmetryElement}
     @test isempty(unit_cell_symmetry.symmetry_elements)
+
+    # ------ non-default keyword arguments
 
     # symmetry_elements = nothing
     centering = face_centering
@@ -69,22 +72,76 @@ end
     unit_cell_symmetry = UnitCellSymmetry(centering; symmetry_elements=symmetry_elements)
 
     @test unit_cell_symmetry.centering == centering
-    @test unit_cell_symmetry.symmetry_elements isa Vector
+    @test unit_cell_symmetry.symmetry_elements isa Set{SymmetryElement}
     @test isempty(unit_cell_symmetry.symmetry_elements)
 
-    # non-default, non-nothing symmetry_elements
+    # symmetry_elements is a Set
+    centering = base_centering
+    symmetry_elements = Set([c_perp_a, c_4_1, d_perp_c])
+
+    unit_cell_symmetry = UnitCellSymmetry(centering; symmetry_elements=symmetry_elements)
+
+    @test unit_cell_symmetry.centering == centering
+    @test unit_cell_symmetry.symmetry_elements == symmetry_elements
+
+    # symmetry_elements is a Vector
     centering = base_centering
     symmetry_elements = [c_perp_a, c_4_1, d_perp_c]
 
     unit_cell_symmetry = UnitCellSymmetry(centering; symmetry_elements=symmetry_elements)
 
     @test unit_cell_symmetry.centering == centering
-    @test Set(unit_cell_symmetry.symmetry_elements) == Set(symmetry_elements)
+    @test unit_cell_symmetry.symmetry_elements == Set(symmetry_elements)
 end
 
-@testset "UnitCellSymmetry outer constructor: UnitCellSymmetry()" begin
+@testset "UnitCellSymmetry outer constructor: UnitCellSymmetry(; ::centering, ::Union{Set,Vector,Nothing})" begin
+    # --- Tests
+
+    # ------ default keyword arguments
+
     unit_cell_symmetry = UnitCellSymmetry()
+
     @test unit_cell_symmetry == primitive_unit_cell_symmetry
+
+    # ------ non-default keyword arguments
+
+    # non-default centering
+    centering = face_centering
+    unit_cell_symmetry = UnitCellSymmetry(; centering=centering)
+
+    @test unit_cell_symmetry.centering == centering
+    @test unit_cell_symmetry.symmetry_elements isa Set{SymmetryElement}
+    @test isempty(unit_cell_symmetry.symmetry_elements)
+
+    # symmetry_elements = nothing
+    symmetry_elements = nothing
+    unit_cell_symmetry = UnitCellSymmetry(; symmetry_elements=symmetry_elements)
+
+    @test unit_cell_symmetry.centering == primitive_centering
+    @test unit_cell_symmetry.symmetry_elements isa Set{SymmetryElement}
+    @test isempty(unit_cell_symmetry.symmetry_elements)
+
+    # symmetry_elements is a Set
+    centering = base_centering
+    symmetry_elements = Set([c_perp_a, c_4_1, d_perp_c])
+
+    unit_cell_symmetry = UnitCellSymmetry(;
+        centering=centering, symmetry_elements=symmetry_elements
+    )
+
+    @test unit_cell_symmetry.centering == centering
+    @test unit_cell_symmetry.symmetry_elements == symmetry_elements
+
+    # symmetry_elements is a Vector
+    centering = base_centering
+    symmetry_elements = [c_perp_a, c_4_1, d_perp_c]
+
+    unit_cell_symmetry = UnitCellSymmetry(;
+        centering=centering, symmetry_elements=symmetry_elements
+    )
+
+    @test unit_cell_symmetry.centering == centering
+    @test unit_cell_symmetry.symmetry_elements == Set(symmetry_elements)
 end
 
 @testset "UnitCellSymmetry constants" begin

@@ -41,40 +41,40 @@ Type representing the symmetry of a unit cell
 struct UnitCellSymmetry
     # Fields
     centering::Centering
-    symmetry_elements::Vector{<:SymmetryElement}
+    symmetry_elements::Set{<:SymmetryElement}
 end
 
 # Outer constructors
 """
     UnitCellSymmetry(
         centering::Centering;
-        symmetry_elements::Union{Vector{<:SymmetryElement},Nothing}=nothing
+        symmetry_elements::Union{Set,Vector,Nothing}=nothing
     )
 
     UnitCellSymmetry(;
         centering::Centering=primitive_centering,
-        symmetry_elements::Union{Vector{<:SymmetryElement},Nothing}=nothing
+        symmetry_elements::Union{Set,Vector,Nothing}=nothing
     )
 
 
 Construct a `UnitCellSymmetry` object with the specified `centering` and
 `symmetry_elements`.
 """
-function UnitCellSymmetry(
-    centering::Centering; symmetry_elements::Union{Vector,Nothing}=nothing
+@inline function UnitCellSymmetry(
+    centering::Centering; symmetry_elements::Union{Set,Vector,Nothing}=nothing
 )
-
     # Check arguments
     if isnothing(symmetry_elements)
         symmetry_elements = []
     end
 
     # Construct UnitCellSymmetry object
-    return UnitCellSymmetry(centering, Vector{SymmetryElement}(symmetry_elements))
+    return UnitCellSymmetry(centering, Set{SymmetryElement}(symmetry_elements))
 end
-function UnitCellSymmetry(;
+
+@inline function UnitCellSymmetry(;
     centering::Centering=primitive_centering,
-    symmetry_elements::Union{Vector,Nothing}=nothing,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
 )
     return UnitCellSymmetry(centering; symmetry_elements=symmetry_elements)
 end
@@ -112,7 +112,7 @@ Return values
 end
 
 """
-    symmetry_elements(symmetry::UnitCellSymmetry) -> Vector{SymmetryElement}
+    symmetry_elements(symmetry::UnitCellSymmetry) -> Set{SymmetryElement}
 
 Return the symmetry elements of `symmetry`.
 
