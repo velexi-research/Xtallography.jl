@@ -74,6 +74,7 @@ struct UnitCellDelta{T<:LatticeSystem}
 
         return new(Δlattice_constants)
     end
+
     function UnitCellDelta{Triclinic}(Δlattice_constants::NamedTuple)
 
         # --- Check arguments
