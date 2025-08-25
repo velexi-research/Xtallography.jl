@@ -67,7 +67,7 @@ end
 
 # ------ Methods
 
-@testset "lattice_system(::TriclinicConstantDelta)" begin
+@testset "lattice_system(::TriclinicUnitCellDelta)" begin
     # --- Tests
 
     Δlattice_constants = TriclinicUnitCellDelta(1, 2, 3, π / 5, 2π / 5, 3π / 5)
