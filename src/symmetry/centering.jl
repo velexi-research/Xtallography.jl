@@ -25,6 +25,7 @@ export primitive_centering, P_centering
 export base_centering
 export body_centering, I_centering
 export face_centering, F_centering
+export CENTERINGS
 
 # --- Types
 
@@ -119,3 +120,10 @@ The singleton instance of type [`FaceCentering`](@ref)
 """
 const face_centering = FaceCentering()
 const F_centering = face_centering
+
+"""
+    CENTERINGS
+
+List of valid lattice centerings in 3D
+"""
+const CENTERINGS = (primitive_centering, base_centering, body_centering, face_centering)

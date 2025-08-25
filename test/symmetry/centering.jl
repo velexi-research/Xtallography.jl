@@ -47,4 +47,7 @@ end
 
     @test face_centering === FaceCentering()
     @test F_centering === FaceCentering()
+
+    @test CENTERINGS ==
+        (primitive_centering, base_centering, body_centering, face_centering)
 end
