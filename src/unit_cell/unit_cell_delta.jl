@@ -43,12 +43,51 @@ struct UnitCellDelta{T<:LatticeSystem}
     # Fields
     Δlattice_constants::NamedTuple
 
-    # Constructor
+    # Constructors
     function UnitCellDelta{T}(Δlattice_constants::NamedTuple) where {T<:LatticeSystem}
 
         # --- Check arguments
 
         # TODO: check that lattice constants is consistent with LatticeSystem
+
+        # --- Return new UnitCellDelta
+
+        return new(Δlattice_constants)
+    end
+
+    function UnitCellDelta{Cubic}(Δlattice_constants::NamedTuple)
+
+        # --- Check arguments
+
+        if Set(keys(Δlattice_constants)) != Set((:Δa,))
+            throw(
+                ArgumentError(
+                    "Invalid Δlattice_constants argument passed to " *
+                    "UnitCellDelta{Cubic} constructor. " *
+                    "Expected keys: (:Δa,). " *
+                    "Provided keys: $(keys(Δlattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCellDelta
+
+        return new(Δlattice_constants)
+    end
+    function UnitCellDelta{Triclinic}(Δlattice_constants::NamedTuple)
+
+        # --- Check arguments
+
+        if Set(keys(Δlattice_constants)) != Set((:Δa, :Δb, :Δc, :Δα, :Δβ, :Δγ))
+            throw(
+                ArgumentError(
+                    "Invalid Δlattice_constants argument passed to " *
+                    "UnitCellDelta{Triclinic} constructor. " *
+                    "Expected keys: (:Δa, :Δb, :Δc, :Δα, :Δβ, :Δγ). " *
+                    "Provided keys: $(keys(Δlattice_constants)).",
+                ),
+            )
+        end
 
         # --- Return new UnitCellDelta
 

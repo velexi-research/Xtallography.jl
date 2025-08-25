@@ -27,6 +27,25 @@ using Xtallography
 
 # ------ Constructors
 
+@testset "CubicUnitCellDelta inner constructor" begin
+    # --- Tests
+
+    # Valid arguments
+    Δlattice_constants_ = (Δa=1,)
+    unit_cell_delta = CubicUnitCellDelta(Δlattice_constants_)
+
+    @test Δlattice_constants(unit_cell_delta).Δa == Δlattice_constants_.Δa
+
+    # Invalid arguments
+    Δlattice_constants_ = (Δa=1, Δb=3)
+    expected_message = (
+        "Invalid Δlattice_constants argument passed to UnitCellDelta{Cubic} " *
+        "constructor. Expected keys: (:Δa,). " *
+        "Provided keys: $(keys(Δlattice_constants_))."
+    )
+    @test_throws ArgumentError(expected_message) CubicUnitCellDelta(Δlattice_constants_)
+end
+
 @testset "CubicUnitCellDelta outer constructor" begin
     # --- Tests
 
