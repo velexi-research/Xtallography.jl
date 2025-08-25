@@ -34,7 +34,7 @@ using Xtallography
     Δlattice_constants_ = (Δa=1,)
     unit_cell_delta = CubicUnitCellDelta(Δlattice_constants_)
 
-    @test Δlattice_constants(unit_cell_delta).Δa == Δlattice_constants_.Δa
+    @test Δlattice_constants(unit_cell_delta) == Δlattice_constants_
 
     # Invalid arguments
     Δlattice_constants_ = (Δa=1, Δb=3)
