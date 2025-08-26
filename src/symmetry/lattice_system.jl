@@ -20,8 +20,8 @@ Lattice system types and functions
 # ------ Types
 
 export LatticeSystem
-export Triclinic, Monoclinic, Orthorhombic, Hexagonal, Rhombohedral, Tetragonal, Cubic
-export triclinic, monoclinic, orthorhombic, hexagonal, rhombohedral, tetragonal, cubic
+export Triclinic, Monoclinic, Orthorhombic, Tetragonal, Rhombohedral, Hexagonal, Cubic
+export triclinic, monoclinic, orthorhombic, tetragonal, rhombohedral, hexagonal, cubic
 
 # ------ Functions/Methods
 
@@ -36,8 +36,8 @@ Supertype for the seven lattice systems in 3D
 
 Subtypes
 ========
-[`Triclinic`](@ref), [`Monoclinic`](@ref), [`Orthorhombic`](@ref),
-[`Hexagonal`](@ref), [`Rhombohedral`](@ref), [`Tetragonal`](@ref), [`Cubic`](@ref)
+[`Triclinic`](@ref), [`Monoclinic`](@ref), [`Orthorhombic`](@ref), [`Tetragonal`](@ref),
+[`Rhombohedral`](@ref), [`Hexagonal`](@ref), [`Cubic`](@ref)
 """
 abstract type LatticeSystem end
 
@@ -90,20 +90,20 @@ The singleton instance of type [`Orthorhombic`](@ref)
 const orthorhombic = Orthorhombic()
 
 """
-    Hexagonal
+    Tetragonal
 
-Type representing the hexagonal lattice system that is the type of [`hexagonal`](@ref)
+Type representing the tetragonal lattice system that is the type of [`tetragonal`](@ref)
 
 Supertype: [`LatticeSystem`](@ref)
 """
-struct Hexagonal <: LatticeSystem end
+struct Tetragonal <: LatticeSystem end
 
 """
-    hexagonal
+    tetragonal
 
-The singleton instance of type [`Hexagonal`](@ref)
+The singleton instance of type [`Tetragonal`](@ref)
 """
-const hexagonal = Hexagonal()
+const tetragonal = Tetragonal()
 
 """
     Rhombohedral
@@ -122,20 +122,20 @@ The singleton instance of type [`Rhombohedral`](@ref)
 const rhombohedral = Rhombohedral()
 
 """
-    Tetragonal
+    Hexagonal
 
-Type representing the tetragonal lattice system that is the type of [`tetragonal`](@ref)
+Type representing the hexagonal lattice system that is the type of [`hexagonal`](@ref)
 
 Supertype: [`LatticeSystem`](@ref)
 """
-struct Tetragonal <: LatticeSystem end
+struct Hexagonal <: LatticeSystem end
 
 """
-    tetragonal
+    hexagonal
 
-The singleton instance of type [`Tetragonal`](@ref)
+The singleton instance of type [`Hexagonal`](@ref)
 """
-const tetragonal = Tetragonal()
+const hexagonal = Hexagonal()
 
 """
     Cubic
@@ -156,11 +156,11 @@ const cubic = Cubic()
 # --- Functions/Methods
 
 """
-    lattice_system(lattice_constants::LatticeConstants) -> LatticeSystem
-
-    lattice_system(Δlattice_constants::LatticeConstantDeltas) -> LatticeSystem
+TODO: split docstring by arg type
 
     lattice_system(unit_cell::UnitCell) -> LatticeSystem
+
+    lattice_system(Δunit_cell::UnitCellDelta) -> LatticeSystem
 
 Return the lattice system for a set of `lattice_constants`, `Δlattice_constants` or
 `unit_cell`.
