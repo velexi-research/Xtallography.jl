@@ -49,17 +49,6 @@ struct UnitCellDelta{T<:LatticeSystem}
     # - For efficiency of argument checking, a separate constructor is provided for each
     #   lattice system.
 
-    function UnitCellDelta{T}(Δlattice_constants::NamedTuple) where {T<:LatticeSystem}
-
-        # --- Check arguments
-
-        # TODO: check that lattice constants is consistent with LatticeSystem
-
-        # --- Return new UnitCellDelta
-
-        return new(Δlattice_constants)
-    end
-
     function UnitCellDelta{Triclinic}(Δlattice_constants::NamedTuple)
 
         # --- Check arguments
