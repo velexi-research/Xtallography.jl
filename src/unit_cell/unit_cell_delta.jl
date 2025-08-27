@@ -40,35 +40,20 @@ Type Aliases
 """
 #abstract type UnitCellDelta{T<:LatticeSystem} end
 struct UnitCellDelta{T<:LatticeSystem}
-    # Fields
+    # --- Fields
+
     Δlattice_constants::NamedTuple
 
-    # Constructors
+    # --- Constructors
+    #
+    # - For efficiency of argument checking, a separate constructor is provided for each
+    #   lattice system.
+
     function UnitCellDelta{T}(Δlattice_constants::NamedTuple) where {T<:LatticeSystem}
 
         # --- Check arguments
 
         # TODO: check that lattice constants is consistent with LatticeSystem
-
-        # --- Return new UnitCellDelta
-
-        return new(Δlattice_constants)
-    end
-
-    function UnitCellDelta{Cubic}(Δlattice_constants::NamedTuple)
-
-        # --- Check arguments
-
-        if Set(keys(Δlattice_constants)) != Set((:Δa,))
-            throw(
-                ArgumentError(
-                    "Invalid Δlattice_constants argument passed to " *
-                    "UnitCellDelta{Cubic} constructor. " *
-                    "Expected keys: (:Δa,). " *
-                    "Provided keys: $(keys(Δlattice_constants)).",
-                ),
-            )
-        end
 
         # --- Return new UnitCellDelta
 
@@ -85,6 +70,126 @@ struct UnitCellDelta{T<:LatticeSystem}
                     "Invalid Δlattice_constants argument passed to " *
                     "UnitCellDelta{Triclinic} constructor. " *
                     "Expected keys: (:Δa, :Δb, :Δc, :Δα, :Δβ, :Δγ). " *
+                    "Provided keys: $(keys(Δlattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCellDelta
+
+        return new(Δlattice_constants)
+    end
+
+    function UnitCellDelta{Monoclinic}(Δlattice_constants::NamedTuple)
+
+        # --- Check arguments
+
+        if Set(keys(Δlattice_constants)) != Set((:Δa, :Δb, :Δc, :Δβ))
+            throw(
+                ArgumentError(
+                    "Invalid Δlattice_constants argument passed to " *
+                    "UnitCellDelta{Monoclinic} constructor. " *
+                    "Expected keys: (:Δa, :Δb, :Δc, :Δβ). " *
+                    "Provided keys: $(keys(Δlattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCellDelta
+
+        return new(Δlattice_constants)
+    end
+
+    function UnitCellDelta{Orthorhombic}(Δlattice_constants::NamedTuple)
+
+        # --- Check arguments
+
+        if Set(keys(Δlattice_constants)) != Set((:Δa, :Δb, :Δc))
+            throw(
+                ArgumentError(
+                    "Invalid Δlattice_constants argument passed to " *
+                    "UnitCellDelta{Orthorhombic} constructor. " *
+                    "Expected keys: (:Δa, :Δb, :Δc). " *
+                    "Provided keys: $(keys(Δlattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCellDelta
+
+        return new(Δlattice_constants)
+    end
+
+    function UnitCellDelta{Tetragonal}(Δlattice_constants::NamedTuple)
+
+        # --- Check arguments
+
+        if Set(keys(Δlattice_constants)) != Set((:Δa, :Δc))
+            throw(
+                ArgumentError(
+                    "Invalid Δlattice_constants argument passed to " *
+                    "UnitCellDelta{Tetragonal} constructor. " *
+                    "Expected keys: (:Δa, :Δc). " *
+                    "Provided keys: $(keys(Δlattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCellDelta
+
+        return new(Δlattice_constants)
+    end
+
+    function UnitCellDelta{Rhombohedral}(Δlattice_constants::NamedTuple)
+
+        # --- Check arguments
+
+        if Set(keys(Δlattice_constants)) != Set((:Δa, :Δα))
+            throw(
+                ArgumentError(
+                    "Invalid Δlattice_constants argument passed to " *
+                    "UnitCellDelta{Rhombohedral} constructor. " *
+                    "Expected keys: (:Δa, :Δα). " *
+                    "Provided keys: $(keys(Δlattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCellDelta
+
+        return new(Δlattice_constants)
+    end
+
+    function UnitCellDelta{Hexagonal}(Δlattice_constants::NamedTuple)
+
+        # --- Check arguments
+
+        if Set(keys(Δlattice_constants)) != Set((:Δa, :Δc))
+            throw(
+                ArgumentError(
+                    "Invalid Δlattice_constants argument passed to " *
+                    "UnitCellDelta{Hexagonal} constructor. " *
+                    "Expected keys: (:Δa, :Δc). " *
+                    "Provided keys: $(keys(Δlattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCellDelta
+
+        return new(Δlattice_constants)
+    end
+
+    function UnitCellDelta{Cubic}(Δlattice_constants::NamedTuple)
+
+        # --- Check arguments
+
+        if Set(keys(Δlattice_constants)) != Set((:Δa,))
+            throw(
+                ArgumentError(
+                    "Invalid Δlattice_constants argument passed to " *
+                    "UnitCellDelta{Cubic} constructor. " *
+                    "Expected keys: (:Δa,). " *
                     "Provided keys: $(keys(Δlattice_constants)).",
                 ),
             )
