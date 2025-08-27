@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 """
-Types and functions that support unit cell computations
+Unit cell type and functions
 """
 # --- Exports
 
@@ -21,50 +21,241 @@ Types and functions that support unit cell computations
 export UnitCell
 
 # Functions
-export isapprox
+export lattice_system
+export lattice_constants, symmetry, centering, symmetry_elements
+export is_bravais_lattice
 export standardize
 export basis, volume, surface_area
 export conventional_cell, reduced_cell
 export is_equivalent_unit_cell, is_supercell
+export isapprox
 
 # --- Types
 
 """
-    UnitCell
+    UnitCell{T<:LatticeSystem}
 
-Unit cell for a lattice
+Unit cell for the lattice system `T`
 
-Fields
-======
-* `lattice_constants`: lattice constants of unit cell
-* `centering`: centering of unit cell
+Type Aliases
+============
+[`TriclinicUnitCell`](@ref), [`MonoclinicUnitCell`](@ref), [`OrthorhombicUnitCell`](@ref),
+[`HexagonalUnitCell`](@ref), [`RhombohedralUnitCell`](@ref), [`TetragonalUnitCell`](@ref),
+[`CubicUnitCell`](@ref)
 """
-struct UnitCell
-    # Fields
-    lattice_constants::LatticeConstants
-    centering::Centering
+struct UnitCell{T<:LatticeSystem}
+    # --- Fields
 
-    # TODO: add standardization of lattice constants?
+    lattice_constants::NamedTuple
+    symmetry::UnitCellSymmetry
+
+    # --- Constructors
+    #
+    # Notes
+    # -----
+    # - For efficiency of argument checking, a separate constructor is provided for each
+    #   lattice system.
+
+    function UnitCell{Triclinic}(lattice_constants::NamedTuple, symmetry::UnitCellSymmetry)
+
+        # --- Check arguments
+
+        if Set(keys(lattice_constants)) != Set((:a, :b, :c, :α, :β, :γ))
+            throw(
+                ArgumentError(
+                    "Invalid lattice_constants argument passed to " *
+                    "UnitCell{Triclinic} constructor. " *
+                    "Expected keys: (:a, :b, :c, :α, :β, :γ). " *
+                    "Provided keys: $(keys(lattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCell
+
+        return new(lattice_constants, symmetry)
+    end
+
+    function UnitCell{Monoclinic}(lattice_constants::NamedTuple, symmetry::UnitCellSymmetry)
+
+        # --- Check arguments
+
+        if Set(keys(lattice_constants)) != Set((:a, :b, :c, :β))
+            throw(
+                ArgumentError(
+                    "Invalid lattice_constants argument passed to " *
+                    "UnitCell{Monoclinic} constructor. " *
+                    "Expected keys: (:a, :b, :c, :β). " *
+                    "Provided keys: $(keys(lattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCell
+
+        return new(lattice_constants, symmetry)
+    end
+
+    function UnitCell{Orthorhombic}(
+        lattice_constants::NamedTuple, symmetry::UnitCellSymmetry
+    )
+
+        # --- Check arguments
+
+        if Set(keys(lattice_constants)) != Set((:a, :b, :c))
+            throw(
+                ArgumentError(
+                    "Invalid lattice_constants argument passed to " *
+                    "UnitCell{Orthorhombic} constructor. " *
+                    "Expected keys: (:a, :b, :c). " *
+                    "Provided keys: $(keys(lattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCell
+
+        return new(lattice_constants, symmetry)
+    end
+
+    function UnitCell{Tetragonal}(lattice_constants::NamedTuple, symmetry::UnitCellSymmetry)
+
+        # --- Check arguments
+
+        if Set(keys(lattice_constants)) != Set((:a, :c))
+            throw(
+                ArgumentError(
+                    "Invalid lattice_constants argument passed to " *
+                    "UnitCell{Tetragonal} constructor. " *
+                    "Expected keys: (:a, :c). " *
+                    "Provided keys: $(keys(lattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCell
+
+        return new(lattice_constants, symmetry)
+    end
+
+    function UnitCell{Rhombohedral}(
+        lattice_constants::NamedTuple, symmetry::UnitCellSymmetry
+    )
+
+        # --- Check arguments
+
+        if Set(keys(lattice_constants)) != Set((:a, :α))
+            throw(
+                ArgumentError(
+                    "Invalid lattice_constants argument passed to " *
+                    "UnitCell{Rhombohedral} constructor. " *
+                    "Expected keys: (:a, :α). " *
+                    "Provided keys: $(keys(lattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCell
+
+        return new(lattice_constants, symmetry)
+    end
+
+    function UnitCell{Hexagonal}(lattice_constants::NamedTuple, symmetry::UnitCellSymmetry)
+
+        # --- Check arguments
+
+        if Set(keys(lattice_constants)) != Set((:a, :c))
+            throw(
+                ArgumentError(
+                    "Invalid lattice_constants argument passed to " *
+                    "UnitCell{Hexagonal} constructor. " *
+                    "Expected keys: (:a, :c). " *
+                    "Provided keys: $(keys(lattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCell
+
+        return new(lattice_constants, symmetry)
+    end
+
+    function UnitCell{Cubic}(lattice_constants::NamedTuple, symmetry::UnitCellSymmetry)
+
+        # --- Check arguments
+
+        if Set(keys(lattice_constants)) != Set((:a,))
+            throw(
+                ArgumentError(
+                    "Invalid lattice_constants argument passed to " *
+                    "UnitCell{Cubic} constructor. " *
+                    "Expected keys: (:a,). " *
+                    "Provided keys: $(keys(lattice_constants)).",
+                ),
+            )
+        end
+
+        # --- Return new UnitCell
+
+        return new(lattice_constants, symmetry)
+    end
 end
 
-# Outer constructor
+# ------ Outer constructors
+
 using AngleBetweenVectors: angle
 using LinearAlgebra: norm, cross, dot
+
 """
-    LatticeConstants(
+    UnitCell{T}(
+        lattice_constants::NamedTuple;
+        centering::Centering=primitive_centering,
+        symmetry_elements::Union{Set,Vector,Nothing}=nothing
+    ) -> UnitCell{T}
+
+Construct a UnitCell from a set of lattice constants. The lattice system `T` must be
+consistent with the fields present in `lattice_constants`.
+
+Keyword Arguments
+=================
+- `centering`: centering of unit cell
+
+- `symmetry_elements`: symmetry elements of crystal
+"""
+@inline function UnitCell{T}(
+    lattice_constants::NamedTuple;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+) where {T<:LatticeSystem}
+    return UnitCell{T}(
+        lattice_constants, UnitCellSymmetry(centering; symmetry_elements=symmetry_elements)
+    )
+end
+
+"""
+    UnitCell(unit_cell::UnitCell{T}) -> UnitCell{T}
+
+Copy constructor. Construct a copy of `unit_cell.`
+"""
+@inline function UnitCell(unit_cell::UnitCell{T}) where {T<:LatticeSystem}
+    return UnitCell{T}(lattice_constants(unit_cell), symmetry(unit_cell))
+end
+
+"""
+    UnitCell(
         basis_a::Vector{<:Real},
         basis_b::Vector{<:Real},
         basis_c::Vector{<:Real};
         identify_lattice_system=true,
         centering=primitive_centering
-    ) -> LatticeConstants
+    ) -> UnitCell
 
-Construct a LatticeConstants object from a set of basis vectors
+Construct a UnitCell from a set of basis vectors.
 
 Keyword Arguments
 =================
-- `identify_lattice_system`: if set to `true`, return a LatticeConstants object for the
-  highest symmetry lattice system that is consistent with the basis. Otherwise, return a
+- `identify_lattice_system`: if set to `true`, return a UnitCell with the highest symmetry
+  lattice system that is consistent with the basis. Otherwise, return a
   TriclinicLatticeConstants object.
 
 - `centering`: centering of unit cell
@@ -76,7 +267,7 @@ julia> LatticeConstants([1, 0, 0], [0, 2, 0], [0, 0, 1])
 TetragonalLatticeConstants(1.0, 2.0)
 ```
 """
-function LatticeConstants(
+function UnitCell(
     basis_a::Vector{<:Real},
     basis_b::Vector{<:Real},
     basis_c::Vector{<:Real};
@@ -97,8 +288,8 @@ function LatticeConstants(
     γ = angle(basis_a, basis_b)
 
     if identify_lattice_system
-        # Construct LatticeConstants object for the highest symmetry lattice system that
-        # is consistent with the basis
+        # Construct a UnitCell object for the highest symmetry lattice system that is
+        # consistent with the basis
 
         if α ≈ β ≈ γ
             # --- Case: orthorhombic, tetragonal, cubic, or rhombohedral
@@ -108,8 +299,9 @@ function LatticeConstants(
 
                 if a ≈ b ≈ c
                     # Case: cubic
-                    return CubicLatticeConstants(a)
-
+                    return CubicUnitCell(a)
+                end
+                #=
                 elseif a ≈ b
                     # Case: tetragonal
                     return TetragonalLatticeConstants(a, c)
@@ -129,14 +321,16 @@ function LatticeConstants(
                     )
                     return lattice_constants
                 end
-            else
+                else
                 if a ≈ b ≈ c
                     # Case: rhombohedral
                     return RhombohedralLatticeConstants(a, α)
                 end
+                =#
             end
 
         else
+            #=
             # --- Case: hexagonal, monoclinic, or triclinic
 
             if a ≈ b && α ≈ β ≈ π / 2 && (γ ≈ 2π / 3 || γ ≈ π / 3)
@@ -172,29 +366,102 @@ function LatticeConstants(
                 )
                 return lattice_constants
             end
+            =#
         end
     end
 
     # Case: triclinic
-    return standardize(TriclinicLatticeConstants(a, b, c, α, β, γ))
+    return standardize(TriclinicUnitCell(a, b, c, α, β, γ))
 end
 
 # --- Functions/Methods
 
-# ------ Utility functions
+import Base.isapprox
+using LinearAlgebra: dot
+using Combinatorics: combinations
 
-function lattice_system(unit_cell::UnitCell)
-    return lattice_system(unit_cell.lattice_constants)
-end
-
-function is_bravais_lattice(unit_cell::UnitCell)
-    return is_bravais_lattice(
-        lattice_system(unit_cell.lattice_constants), unit_cell.centering
-    )
+@inline function lattice_system(unit_cell::UnitCell{T}) where {T<:LatticeSystem}
+    return T()
 end
 
 """
-    standardize(unit_cell::UnitCell) -> LatticeConstants
+    lattice_constants(unit_cell::UnitCell) -> NamedTuple
+
+Return the lattice constants for `unit_cell`.
+
+Return values
+=============
+* lattice constants
+"""
+@inline function lattice_constants(unit_cell::UnitCell)
+    return unit_cell.lattice_constants
+end
+
+"""
+    symmetry(unit_cell::UnitCell) -> UnitCellSymmetry
+
+Return the symmetry for `unit_cell`.
+
+Return values
+=============
+* symmetry
+"""
+@inline function symmetry(unit_cell::UnitCell)
+    return unit_cell.symmetry
+end
+
+"""
+    centering(unit_cell::UnitCell) -> Centering
+
+Return the centering of `unit_cell`.
+
+Return values
+=============
+* centering
+"""
+@inline function centering(unit_cell::UnitCell)
+    return centering(unit_cell.symmetry)
+end
+
+"""
+    symmetry_elements(unit_cell::UnitCell) -> Vector{SymmetryElement}
+
+Return the symmetry elements of `unit_cell`.
+
+Return values
+=============
+* symmetry elements
+"""
+@inline function symmetry_elements(unit_cell::UnitCell)
+    return symmetry_elements(unit_cell.symmetry)
+end
+
+"""
+    is_bravais_lattice(unit_cell::UnitCell) -> Bool
+
+Determine if the unit cell defined by `unit_cell` is a valid Bravais lattice type.
+
+Return values
+=============
+- `true` if the lattice system and centering of `unit_cell` define a valid Bravais lattice
+  type; `false` otherwise
+
+Examples
+========
+```jldoctest
+julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), primitive_centering))
+true
+
+julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), face_centering))
+false
+```
+"""
+@inline function is_bravais_lattice(unit_cell::UnitCell)
+    return is_bravais_lattice(lattice_system(unit_cell), centering(unit_cell))
+end
+
+"""
+    standardize(unit_cell::UnitCell) -> UnitCell
 
 Standardize the lattice constants and centering for `unit_cell`.
 
@@ -266,31 +533,33 @@ UnitCell(OrthorhombicLatticeConstants(2.0, 3.0, 1.0), BaseCentering())
 ```
 """
 function standardize(unit_cell::UnitCell)
-    return UnitCell(standardize(unit_cell.lattice_constants, unit_cell.centering)...)
+    # --- Check arguments
+
+    standardize_check_args(unit_cell)
+
+    # --- By default, no standardization is performed
+
+    return unit_cell
 end
 
-# --- UnitCell methods
+function standardize_check_args(unit_cell::UnitCell)
+    # --- Check arguments
 
-import Base.isapprox
-using LinearAlgebra: dot
-using Combinatorics: combinations
-
-function isapprox(x::UnitCell, y::UnitCell; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps())
-    return (
-        x.centering == y.centering &&
-        isapprox(x.lattice_constants, y.lattice_constants; atol=atol, rtol=rtol)
-    )
+    if !is_bravais_lattice(lattice_system(unit_cell), centering(unit_cell))
+        throw(
+            ArgumentError(
+                "Invalid Bravais lattice: " *
+                "(lattice_system=$(nameof(typeof(lattice_system(unit_cell)))), " *
+                "centering=$(nameof(typeof(centering(unit_cell)))))",
+            ),
+        )
+    end
 end
 
 """
     basis(unit_cell::UnitCell) -> (Vector{Float64}, Vector{Float64}, Vector{Float64})
 
-    basis(
-        lattice_constants::LatticeConstants
-    ) -> (Vector{Float64}, Vector{Float64}, Vector{Float64})
-
-Return a set of basis vectors ``\\vec{a}, \\vec{b}, \\vec{c}`` for the unit cell defined by
-`unit_cell` or `lattice_constants`.
+Return a set of basis vectors ``\\vec{a}, \\vec{b}, \\vec{c}`` for `unit_ cell`.
 
 Return values
 =============
@@ -299,16 +568,7 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> B = basis(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]), P_centering));
-
-julia> B[1] ≈ [1.0, 0.0, 0.0]
-true
-julia> B[2] ≈ [1.0, 1.0, 0.0]
-true
-julia> B[3] ≈ [1.0, 0.0, 2.0]
-true
-
-julia> B = basis(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]));
+julia> B = basis(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]); centering=P_centering));
 
 julia> B[1] ≈ [1.0, 0.0, 0.0]
 true
@@ -318,16 +578,12 @@ julia> B[3] ≈ [1.0, 0.0, 2.0]
 true
 ```
 """
-function basis(unit_cell::UnitCell)
-    return basis(unit_cell.lattice_constants)
-end
+function basis end
 
 """
     volume(unit_cell::UnitCell) -> Float64
 
-    volume(lattice_constants::LatticeConstants) -> Float64
-
-Compute the volume of the unit cell defined by `unit_cell` or `lattice_constants`.
+Compute the volume of the unit cell defined by `unit_cell`.
 
 Return values
 =============
@@ -336,23 +592,16 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> volume(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]), P_centering))
-2.0
-
-julia> volume(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]))
+julia> volume(UnitCell([1, 0, 0], [1, 1, 0], [1, 0, 2]; centering=P_centering))
 2.0
 ```
 """
-function volume(unit_cell::UnitCell)
-    return volume(unit_cell.lattice_constants)
-end
+function volume end
 
 """
     surface_area(unit_cell::UnitCell) -> Float64
 
-    surface_area(lattice_constants::LatticeConstants) -> Float64
-
-Compute the surface area of the unit cell defined by `unit_cell` or `lattice_constants`.
+Compute the surface area of the unit cell defined by `unit_cell`.
 
 Return values
 =============
@@ -361,16 +610,11 @@ Return values
 Examples
 ========
 ```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2***"
-julia> surface_area(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 1]), P_centering))
-7.464101615137754
-
-julia> surface_area(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 1]))
+julia> surface_area(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 1]); centering=P_centering))
 7.464101615137754
 ```
 """
-function surface_area(unit_cell::UnitCell)
-    return surface_area(unit_cell.lattice_constants)
-end
+function surface_area end
 
 """
     conventional_cell(unit_cell::UnitCell) -> UnitCell
@@ -384,12 +628,12 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> unit_cell = UnitCell(LatticeConstants([1, 1, 0], [1, -1, 0], [0, 1, 1]), P_centering);
+julia> unit_cell = UnitCell(([1, 1, 0], [1, -1, 0], [0, 1, 1]); centering=P_centering);
 
-julia> lattice_system(unit_cell.lattice_constants)
+julia> lattice_system(unit_cell)
 Triclinic()
 
-julia> conventional_cell(unit_cell) ≈ UnitCell(CubicLatticeConstants(2.0), F_centering)
+julia> conventional_cell(unit_cell) ≈ CubicUnitCell(2.0; centering=F_centering)
 true
 ```
 """
@@ -401,7 +645,7 @@ function conventional_cell(unit_cell::UnitCell)
     # --- Compute IUCr conventional cells for lattice systems with limiting cases that
     #     change the Bravais lattice type
 
-    lattice_system_ = lattice_system(unit_cell.lattice_constants)
+    lattice_system_ = lattice_system(unit_cell)
     if lattice_system_ === triclinic
         return conventional_cell(triclinic, unit_cell)
     elseif lattice_system_ === monoclinic
@@ -419,16 +663,17 @@ function conventional_cell(unit_cell::UnitCell)
     return unit_cell
 end
 
+# TODO: Is this necessary?
 function conventional_cell_check_args(unit_cell::UnitCell)
     # --- Check arguments
 
-    if !is_bravais_lattice(lattice_system(unit_cell.lattice_constants), unit_cell.centering)
+    if !is_bravais_lattice(unit_cell)
         throw(
             ArgumentError(
                 "Invalid Bravais lattice: " *
                 "(lattice_system=" *
-                "$(nameof(typeof(lattice_system(unit_cell.lattice_constants)))), " *
-                "centering=$(nameof(typeof(unit_cell.centering))))",
+                "$(nameof(typeof(lattice_system(unit_cell)))), " *
+                "centering=$(nameof(typeof(centering(unit_cell))))",
             ),
         )
     end
@@ -447,7 +692,7 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> reduced_cell(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [0, 0, 2]), P_centering))
+julia> reduced_cell(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [0, 0, 2]); centering=P_centering))
 UnitCell(TetragonalLatticeConstants(1.0, 2.0), PrimitiveCentering())
 ```
 """
@@ -455,16 +700,16 @@ function reduced_cell(unit_cell::UnitCell)
     # --- Preparations
 
     # Get basis of unit cell
-    basis_a, basis_b, basis_c = basis(unit_cell.lattice_constants)
+    basis_a, basis_b, basis_c = basis(unit_cell)
 
     # Construct primitive cell basis for centering
-    if unit_cell.centering == base_centering
+    if centering(unit_cell) == base_centering
         basis_a = 0.5 * (basis_a + basis_b)
 
-    elseif unit_cell.centering == body_centering
+    elseif centering(unit_cell) == body_centering
         basis_c = 0.5 * (basis_a + basis_b + basis_c)
 
-    elseif unit_cell.centering == face_centering
+    elseif centering(unit_cell) == face_centering
         basis_a_primitive = 0.5 * (basis_a + basis_b)
         basis_b_primitive = 0.5 * (basis_a - basis_b)
         basis_c_primitive = 0.5 * (basis_a + basis_c)
@@ -728,9 +973,10 @@ function reduced_cell(unit_cell::UnitCell)
 
     # --- Return standardized primitive unit cell defined by reduced basis
 
-    return UnitCell(
-        standardize(LatticeConstants(reduced_basis_a, reduced_basis_b, reduced_basis_c)),
-        primitive_centering,
+    return standardize(
+        UnitCell(
+            reduced_basis_a, reduced_basis_b, reduced_basis_c; centering=primitive_centering
+        ),
     )
 end
 
@@ -796,6 +1042,7 @@ function is_equivalent_unit_cell(
     )
 end
 
+#=
 """
     is_equivalent_unit_cell(
         lattice_constants_test::LatticeConstants,
@@ -839,7 +1086,9 @@ function is_equivalent_unit_cell(
         rtol=rtol,
     )
 end
+=#
 
+#=
 """
     is_supercell(
         lattice_constants_test::LatticeConstants,
@@ -887,4 +1136,39 @@ function is_supercell(::LatticeConstants, ::LatticeConstants)
     # Default is_supercell() implementation to allow comparison between lattice constants
     # of different lattice systems.
     return false
+end
+=#
+
+function isapprox(x::UnitCell, y::UnitCell; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps())
+    # Default isapprox() implementation to allow comparison between unit cells for
+    # different lattice systems.
+    return false
+end
+
+function isapprox(
+    x::UnitCell{T}, y::UnitCell{T}; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps()
+) where {T<:LatticeSystem}
+    return (
+        centering(x) == centering(y) && all(
+            isapprox(
+                getfield(x.lattice_constants, name),
+                getfield(y.lattice_constants, name);
+                atol=atol,
+                rtol=rtol,
+            ) for name in fieldnames(typeof(x.lattice_constants))
+        )
+    )
+end
+
+using DataStructures: OrderedDict
+function -(x::UnitCell{T}, y::UnitCell{T}) where {T<:LatticeSystem}
+    Δlattice_constants = OrderedDict([
+        (
+            Symbol("Δ$name"),
+            getfield(x.lattice_constants, name) - getfield(y.lattice_constants, name),
+        ) for name in fieldnames(typeof(x.lattice_constants))
+    ])
+    return UnitCellDelta{T}(
+        NamedTuple{Tuple(keys(Δlattice_constants))}(values(Δlattice_constants))
+    )
 end
