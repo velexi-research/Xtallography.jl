@@ -25,6 +25,14 @@ using Xtallography
 
 # --- Tests
 
+# Note: the following methods are tested in lattice-specific test suites
+#
+# * UnitCellDelta{T}(::NamedTuple)
+# * lattice_system(::UnitCellDelta)
+# * Δlattice_constants(::UnitCellDelta)
+# * lattice_constants_deltas(::UnitCellDelta)
+# * isapprox(::UnitCell)
+
 @testset "lattice_system(::UnitCellDelta)" begin
     for lattice_system_ in
         (Triclinic, Monoclinic, Orthorhombic, Tetragonal, Hexagonal, Rhombohedral, Cubic)
@@ -68,11 +76,3 @@ end
     y = TetragonalUnitCellDelta(1, 2)
     @test x ≉ y
 end
-
-# --- Lattice-specific tests
-#
-# * constructors
-# * lattice_system(::UnitCellDelta)
-# * Δlattice_constants(::UnitCellDelta)
-# * lattice_constants_deltas(::UnitCellDelta)
-# * isapprox(::UnitCell)
