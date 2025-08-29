@@ -73,7 +73,7 @@ using Xtallography
     end
 end
 
-# ------ UnitCell methods
+# ------ Methods
 
 @testset "reduced_cell(): minimum sum of length squared not unique" begin
     # --- Preparations
@@ -108,7 +108,20 @@ end
 @testset "is_equivalent_unit_cell(::UnitCell): valid arguments" begin
     # --- Tests
 
-    # equivalent unit cells, default atol and rtol
+    # equivalent unit cells with the same lattice system, default atol and rtol
+    a = 1
+    b = 2
+    c = 3
+    β = 3π / 5
+    unit_cell_ref = MonoclinicUnitCell(a, b, c, β)
+
+    c_alt = sqrt(a^2 + c^2 + 2 * a * c * cos(β))
+    β_alt = π - asin(sin(β) / c_alt * c)
+    unit_cell_test = MonoclinicUnitCell(a, b, c_alt, β_alt)
+
+    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+
+    # equivalent unit cells with different lattice systems, default atol and rtol
     b = 2
     c = 3
     β = 3π / 5
@@ -142,7 +155,7 @@ end
     @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=0, rtol=0.5)
     @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=0, rtol=1)
 
-    # unit cells for different lattice systems
+    # nonequivalent unit cells, case #1
     b = 2
     c = 3
     β = 3π / 5
@@ -151,64 +164,10 @@ end
     unit_cell_test = CubicUnitCell(a; centering=face_centering)
 
     @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
-end
 
-@testset "is_equivalent_unit_cell(::UnitCell): invalid arguments" begin
-    # --- Preparations
-
-    unit_cell_ref = CubicUnitCell(1.0; centering=primitive_centering)
-    unit_cell_test = CubicUnitCell(1.0; centering=primitive_centering)
-
-    # --- Exercise functionality and check results
-
-    # atol < 0
-    expected_message = "`atol` must be nonnegative"
-    @test_throws DomainError(-1, expected_message) is_equivalent_unit_cell(
-        unit_cell_test, unit_cell_ref; atol=-1
-    )
-
-    # rtol < 0
-    expected_message = "`rtol` must be nonnegative"
-    @test_throws DomainError(-1, expected_message) is_equivalent_unit_cell(
-        unit_cell_test, unit_cell_ref; rtol=-1
-    )
-end
-
-@testset "is_equivalent_unit_cell(::UnitCell): valid arguments" begin
-    # --- Tests
-
-    # ------ equivalent unit cells
-
+    # nonequivalent unit cells, case #2
     a = 1
-    b = 2
-    c = 3
-    β = 3π / 5
-    unit_cell_ref = MonoclinicUnitCell(a, b, c, β)
-
-    c_alt = sqrt(a^2 + c^2 + 2 * a * c * cos(β))
-    β_alt = π - asin(sin(β) / c_alt * c)
-    unit_cell_test = MonoclinicUnitCell(a, b, c_alt, β_alt)
-
-    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
-
-    # ------ nonequivalent unit cells
-
-    # Case #1
-    b = 2
-    c = 3
-    β = 3π / 5
-    a = -2 * c * cos(β)
-    unit_cell_ref = MonoclinicUnitCell(a, b, c, β)
-    unit_cell_test = OrthorhombicUnitCell(a, 2 * c * sin(β), b)
-
-    @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
-
-    # Case #2
-    b = 2
-    c = 3
-    β = 3π / 5
-    a = -2 * c * cos(β)
-    unit_cell_ref = MonoclinicUnitCell(a, b, c, β; centering=primitive_centering)
+    unit_cell_ref = CubicUnitCell(a; centering=primitive_centering)
     unit_cell_test = CubicUnitCell(a; centering=face_centering)
 
     @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
