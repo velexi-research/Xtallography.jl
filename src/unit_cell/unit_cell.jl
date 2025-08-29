@@ -24,9 +24,8 @@ export UnitCell
 export lattice_system
 export lattice_constants, symmetry, centering, symmetry_elements
 export is_bravais_lattice
-export standardize
 export basis, volume, surface_area
-export conventional_cell, reduced_cell
+export standardize, conventional_cell, reduced_cell
 export is_equivalent_unit_cell, is_supercell
 export isapprox
 
@@ -256,23 +255,23 @@ Keyword Arguments
 =================
 - `identify_lattice_system`: if set to `true`, return a UnitCell with the highest symmetry
   lattice system that is consistent with the basis. Otherwise, return a
-  TriclinicLatticeConstants object.
+  TriclinicUnitCell object.
 
 - `centering`: centering of unit cell
 
 Examples
 ========
 ```jldoctest
-julia> LatticeConstants([1, 0, 0], [0, 2, 0], [0, 0, 1])
-TetragonalLatticeConstants(1.0, 2.0)
+julia> UnitCell([1, 0, 0], [0, 2, 0], [0, 0, 1])
+TetragonalUnitCell(1.0, 2.0)
 ```
 """
 function UnitCell(
     basis_a::Vector{<:Real},
     basis_b::Vector{<:Real},
     basis_c::Vector{<:Real};
-    identify_lattice_system=true,
-    centering=primitive_centering,
+    identify_lattice_system::Bool=true,
+    centering::Centering=primitive_centering,
 )
     # Convert basis vectors to Vector{AbstractFloat}
     basis_a = convert(Vector{Float64}, basis_a)
@@ -300,73 +299,58 @@ function UnitCell(
                 if a ≈ b ≈ c
                     # Case: cubic
                     return CubicUnitCell(a)
-                end
-                #=
+
                 elseif a ≈ b
                     # Case: tetragonal
-                    return TetragonalLatticeConstants(a, c)
+                    return TetragonalUnitCell(a, c)
 
                 elseif b ≈ c
                     # Case: tetragonal
-                    return TetragonalLatticeConstants(b, a)
+                    return TetragonalUnitCell(b, a)
 
                 elseif c ≈ a
                     # Case: tetragonal
-                    return TetragonalLatticeConstants(c, b)
+                    return TetragonalUnitCell(c, b)
 
                 else
                     # Case: orthorhombic
-                    lattice_constants, _ = standardize(
-                        OrthorhombicLatticeConstants(a, b, c), centering
-                    )
-                    return lattice_constants
+                    return standardize(OrthorhombicUnitCell(a, b, c; centering=centering))
                 end
-                else
+
+            else
                 if a ≈ b ≈ c
                     # Case: rhombohedral
-                    return RhombohedralLatticeConstants(a, α)
+                    return RhombohedralUnitCell(a, α)
                 end
-                =#
             end
 
         else
-            #=
             # --- Case: hexagonal, monoclinic, or triclinic
 
             if a ≈ b && α ≈ β ≈ π / 2 && (γ ≈ 2π / 3 || γ ≈ π / 3)
                 # Case: hexagonal
-                return HexagonalLatticeConstants(a, c)
+                return HexagonalUnitCell(a, c)
 
             elseif b ≈ c && β ≈ γ ≈ π / 2 && (α ≈ 2π / 3 || α ≈ π / 3)
                 # Case: hexagonal
-                return HexagonalLatticeConstants(b, a)
+                return HexagonalUnitCell(b, a)
 
             elseif c ≈ a && γ ≈ α ≈ π / 2 && (β ≈ 2π / 3 || β ≈ π / 3)
                 # Case: hexagonal
-                return HexagonalLatticeConstants(c, b)
+                return HexagonalUnitCell(c, b)
 
             elseif α ≈ γ ≈ π / 2
                 # Case: monoclinic
-                lattice_constants, _ = standardize(
-                    MonoclinicLatticeConstants(a, b, c, β), centering
-                )
-                return lattice_constants
+                return standardize(MonoclinicUnitCell(a, b, c, β; centering=centering))
 
             elseif β ≈ α ≈ π / 2
                 # Case: monoclinic
-                lattice_constants, _ = standardize(
-                    MonoclinicLatticeConstants(b, c, a, γ), centering
-                )
-                return lattice_constants
+                return standardize(MonoclinicUnitCell(b, c, a, γ; centering=centering))
 
             elseif γ ≈ β ≈ π / 2
                 # Case: monoclinic
-                lattice_constants, _ = standardize(
-                    MonoclinicLatticeConstants(c, a, b, α), centering
-                )
-                return lattice_constants
+                return standardize(MonoclinicUnitCell(c, a, b, α; centering=centering))
             end
-            =#
         end
     end
 
@@ -449,16 +433,76 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), primitive_centering))
+julia> is_bravais_lattice(TetragonalUnitCell(2, 3); centering=primitive_centering)
 true
 
-julia> is_bravais_lattice(UnitCell(TetragonalLatticeConstants(2, 3), face_centering))
+julia> is_bravais_lattice(TetragonalUnitCell(2, 3); centering=face_centering)
 false
 ```
 """
 @inline function is_bravais_lattice(unit_cell::UnitCell)
     return is_bravais_lattice(lattice_system(unit_cell), centering(unit_cell))
 end
+
+"""
+    basis(unit_cell::UnitCell) -> (Vector{Float64}, Vector{Float64}, Vector{Float64})
+
+Return a set of basis vectors ``\\vec{a}, \\vec{b}, \\vec{c}`` for `unit_ cell`.
+
+Return values
+=============
+- basis vectors ``\\vec{a}``, ``\\vec{b}``, ``\\vec{c}``
+
+Examples
+========
+```jldoctest
+julia> B = basis(UnitCell([1, 0, 0], [1, 1, 0], [1, 0, 2]; centering=P_centering));
+
+julia> B[1] ≈ [1.0, 0.0, 0.0]
+true
+julia> B[2] ≈ [1.0, 1.0, 0.0]
+true
+julia> B[3] ≈ [1.0, 0.0, 2.0]
+true
+```
+"""
+function basis end
+
+"""
+    volume(unit_cell::UnitCell) -> Float64
+
+Compute the volume of the unit cell defined by `unit_cell`.
+
+Return values
+=============
+- volume of the unit cell
+
+Examples
+========
+```jldoctest
+julia> volume(UnitCell([1, 0, 0], [1, 1, 0], [1, 0, 2]; centering=P_centering))
+2.0
+```
+"""
+function volume end
+
+"""
+    surface_area(unit_cell::UnitCell) -> Float64
+
+Compute the surface area of the unit cell defined by `unit_cell`.
+
+Return values
+=============
+- surface area of the unit cell
+
+Examples
+========
+```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2***"
+julia> surface_area(UnitCell([1, 0, 0], [1, 1, 0], [1, 0, 1]; centering=P_centering))
+7.464101615137754
+```
+"""
+function surface_area end
 
 """
     standardize(unit_cell::UnitCell) -> UnitCell
@@ -521,15 +565,15 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> unit_cell = UnitCell(OrthorhombicLatticeConstants(3, 2, 1), P_centering)
-UnitCell(OrthorhombicLatticeConstants(3.0, 2.0, 1.0), PrimitiveCentering())
+julia> unit_cell = OrthorhombicUnitCell(3, 2, 1); centering=P_centering)
+OrthorhombicUnitCell(3.0, 2.0, 1.0), PrimitiveCentering()
 julia> standardize(unit_cell)
-UnitCell(OrthorhombicLatticeConstants(1.0, 2.0, 3.0), PrimitiveCentering())
+OrthorhombicUnitCell(1.0, 2.0, 3.0), PrimitiveCentering())
 
-julia> unit_cell = UnitCell(OrthorhombicLatticeConstants(3, 2, 1), base_centering)
-UnitCell(OrthorhombicLatticeConstants(3.0, 2.0, 1.0), BaseCentering())
+julia> unit_cell = OrthorhombicUnitCell(3, 2, 1; centering=base_centering)
+OrthorhombicUnitCell(3.0, 2.0, 1.0), BaseCentering())
 julia> standardize(unit_cell)
-UnitCell(OrthorhombicLatticeConstants(2.0, 3.0, 1.0), BaseCentering())
+OrthorhombicUnitCell(2.0, 3.0, 1.0), BaseCentering())
 ```
 """
 function standardize(unit_cell::UnitCell)
@@ -555,66 +599,6 @@ function standardize_check_args(unit_cell::UnitCell)
         )
     end
 end
-
-"""
-    basis(unit_cell::UnitCell) -> (Vector{Float64}, Vector{Float64}, Vector{Float64})
-
-Return a set of basis vectors ``\\vec{a}, \\vec{b}, \\vec{c}`` for `unit_ cell`.
-
-Return values
-=============
-- basis vectors ``\\vec{a}``, ``\\vec{b}``, ``\\vec{c}``
-
-Examples
-========
-```jldoctest
-julia> B = basis(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 2]); centering=P_centering));
-
-julia> B[1] ≈ [1.0, 0.0, 0.0]
-true
-julia> B[2] ≈ [1.0, 1.0, 0.0]
-true
-julia> B[3] ≈ [1.0, 0.0, 2.0]
-true
-```
-"""
-function basis end
-
-"""
-    volume(unit_cell::UnitCell) -> Float64
-
-Compute the volume of the unit cell defined by `unit_cell`.
-
-Return values
-=============
-- volume of the unit cell
-
-Examples
-========
-```jldoctest
-julia> volume(UnitCell([1, 0, 0], [1, 1, 0], [1, 0, 2]; centering=P_centering))
-2.0
-```
-"""
-function volume end
-
-"""
-    surface_area(unit_cell::UnitCell) -> Float64
-
-Compute the surface area of the unit cell defined by `unit_cell`.
-
-Return values
-=============
-- surface area of the unit cell
-
-Examples
-========
-```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2***"
-julia> surface_area(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [1, 0, 1]); centering=P_centering))
-7.464101615137754
-```
-"""
-function surface_area end
 
 """
     conventional_cell(unit_cell::UnitCell) -> UnitCell
@@ -663,7 +647,6 @@ function conventional_cell(unit_cell::UnitCell)
     return unit_cell
 end
 
-# TODO: Is this necessary?
 function conventional_cell_check_args(unit_cell::UnitCell)
     # --- Check arguments
 
@@ -673,7 +656,7 @@ function conventional_cell_check_args(unit_cell::UnitCell)
                 "Invalid Bravais lattice: " *
                 "(lattice_system=" *
                 "$(nameof(typeof(lattice_system(unit_cell)))), " *
-                "centering=$(nameof(typeof(centering(unit_cell))))",
+                "centering=$(nameof(typeof(centering(unit_cell)))))",
             ),
         )
     end
@@ -692,8 +675,8 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> reduced_cell(UnitCell(LatticeConstants([1, 0, 0], [1, 1, 0], [0, 0, 2]); centering=P_centering))
-UnitCell(TetragonalLatticeConstants(1.0, 2.0), PrimitiveCentering())
+julia> reduced_cell(UnitCell([1, 0, 0], [1, 1, 0], [0, 0, 2]; centering=P_centering))
+TetragonalUnitCell(1.0, 2.0, PrimitiveCentering())
 ```
 """
 function reduced_cell(unit_cell::UnitCell)
@@ -1007,13 +990,9 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> lattice_constants_ref = LatticeConstants([1, 0, 0], [1, 1, 0], [0, 0, 2]);
+julia> unit_cell_ref = UnitCell([1, 0, 0], [1, 1, 0], [0, 0, 2]; centering=body_centering);
 
-julia> unit_cell_ref = UnitCell(lattice_constants_ref, body_centering);
-
-julia> lattice_constants_test = TetragonalLatticeConstants(1.0, 2.0);
-
-julia> unit_cell_test = UnitCell(lattice_constants_test, body_centering);
+julia> unit_cell_test = TetragonalUnitCell((1.0, 2.0); centering=body_centering);
 
 julia> is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 true
@@ -1042,63 +1021,16 @@ function is_equivalent_unit_cell(
     )
 end
 
-#=
-"""
-    is_equivalent_unit_cell(
-        lattice_constants_test::LatticeConstants,
-        lattice_constants_ref::LatticeConstants;
-        atol::Real=1e-3,
-        rtol::Real=atol > 0 ? 0 : 1e-3,
-    ) -> Bool
-
-Check if the primitive unit cell defined by `lattice_constants_test` is equivalent to the
-unit cell defined by `lattice_constants_ref`.
-
-Keyword Arguments
-=================
-- `tol`: absolute tolerance of the deviation between the reduced unit cells defined by
-  `lattice_constants_test` and `lattice_constants_ref`.
-
-Return values
-=============
-- `true` if the test unit cell is equivalent to the reference unit cell; `false` otherwise
-
-Examples
-========
-```jldoctest
-julia> lattice_constants_ref = LatticeConstants([1, 0, 0], [1, 1, 0], [0, 0, 2]);
-
-julia> is_equivalent_unit_cell(TetragonalLatticeConstants(1.0, 2.0), lattice_constants_ref)
-true
-```
-"""
-function is_equivalent_unit_cell(
-    lattice_constants_test::LatticeConstants,
-    lattice_constants_ref::LatticeConstants;
-    atol::Real=1e-3,
-    rtol::Real=atol > 0 ? 0 : 1e-3,
-)
-    # Compare primitive unit cells
-    return is_equivalent_unit_cell(
-        UnitCell(lattice_constants_test, primitive_centering),
-        UnitCell(lattice_constants_ref, primitive_centering);
-        atol=atol,
-        rtol=rtol,
-    )
-end
-=#
-
-#=
 """
     is_supercell(
-        lattice_constants_test::LatticeConstants,
-        lattice_constants_ref::LatticeConstants;
+        unit_cell_test::UnitCell,
+        unit_cell_ref::UnitCell;
         tol::Real=1e-3,
         max_index::Integer=3
     ) -> Bool
 
-Check if the unit cell defined by `lattice_constants_test` is a supercell of the unit cell
-defined by `lattice_constants_ref`.
+Check if the unit cell defined by `unit_cell_test` is a supercell of the unit cell
+defined by `unit_cell_ref`.
 
 Keyword Arguments
 =================
@@ -1119,25 +1051,23 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> lattice_constants_ref = LatticeConstants([1, 0, 0], [0, 1, 0], [0, 0, 1]);
+julia> unit_cell_ref = UnitCell([1, 0, 0], [0, 1, 0], [0, 0, 1]);
 
-julia> is_supercell(CubicLatticeConstants(2), lattice_constants_ref)
+julia> is_supercell(CubicUnitCell(2), unit_cell_ref)
 true
 
-julia> is_supercell(CubicLatticeConstants(2.5), lattice_constants_ref)
+julia> is_supercell(CubicUnitCell(2.5), unit_cell_ref)
 false
 
-julia> is_supercell(LatticeConstants([1, 0, 0], [0, 2, 0], [0, 0, 3]),
-                    lattice_constants_ref)
+julia> is_supercell(UnitCell([1, 0, 0], [0, 2, 0], [0, 0, 3]), unit_cell_ref)
 false
 ```
 """
-function is_supercell(::LatticeConstants, ::LatticeConstants)
+function is_supercell(::UnitCell, ::UnitCell)
     # Default is_supercell() implementation to allow comparison between lattice constants
     # of different lattice systems.
     return false
 end
-=#
 
 function isapprox(x::UnitCell, y::UnitCell; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps())
     # Default isapprox() implementation to allow comparison between unit cells for
@@ -1149,7 +1079,7 @@ function isapprox(
     x::UnitCell{T}, y::UnitCell{T}; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps()
 ) where {T<:LatticeSystem}
     return (
-        centering(x) == centering(y) && all(
+        symmetry(x) == symmetry(y) && all(
             isapprox(
                 getfield(x.lattice_constants, name),
                 getfield(y.lattice_constants, name);

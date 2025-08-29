@@ -12,12 +12,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 """
-Functions that support computations specific to triclinic lattices
+Triclinic unit cell types and functions
 """
 # --- Imports
-
-# Standard library
-using Logging
 
 # External packages
 using AngleBetweenVectors: angle
@@ -26,7 +23,7 @@ using Combinatorics: permutations
 # --- Exports
 
 # Types
-export TriclinicLatticeConstants, TriclinicLatticeConstantDeltas
+export TriclinicUnitCell, TriclinicUnitCellDelta
 
 # Functions
 export satisfies_triclinic_angle_constraints, is_triclinic_type_I_cell
@@ -42,74 +39,105 @@ const TRICLINIC_MAX_ANGLE = π
 
 # --- Types
 
-"""
-    TriclinicLatticeConstants
+# ------ TriclinicUnitCell
 
-Lattice constants for a triclinic unit cell
+"""
+    TriclinicUnitCell
+
+Lattice constants and symmetry for a triclinic unit cell
 
 Fields
 ======
 * `a`, `b`, `c`: lengths of the edges of the unit cell
 
-* `α`, `β`, `γ`: angles between edges of the unit cell in the planes of the faces of the
+* `α`, `β`, `γ`: angles between edges of the unit cell
   unit cell
+
+* `symmetry`: unit cell symmetry
+"""
+const TriclinicUnitCell = UnitCell{Triclinic}
+
+# Outer constructor
+"""
+    TriclinicUnitCell(
+        a::Real, b::Real, c::Real, α::Real, β::Real, γ::Real;
+        centering::Centering=primitive_centering,
+        symmetry_elements::Union{Set,Vector,Nothing}=nothing
+    )
+
+Construct a TriclinicUnitCell object from a set of lattice constants.
 
 !!! note
 
     The constraints that valid triclinic unit cell angles must satisfy are _not_ enforced
-    by the constructor. It is acceptable to construct `TriclinicLatticeConstants` with
+    by the constructor. It is acceptable to construct `TriclinicUnitCell` with
     invalid values for `α`, `β`, and `γ`.
 
-Supertype: [`LatticeConstants`](@ref)
+!!! note
+
+    No constraints are imposed on `centering`. The unit cell does _not_ to be a valid
+    Bravais lattice.
+
+Keyword Arguments
+=================
+- `centering`: centering of unit cell
+
+- `symmetry_elements`: symmetry elements of crystal
 """
-struct TriclinicLatticeConstants <: LatticeConstants{Triclinic}
-    # Fields
-    a::Float64
-    b::Float64
-    c::Float64
-    α::Float64  # radians
-    β::Float64  # radians
-    γ::Float64  # radians
+function TriclinicUnitCell(
+    a::Real,
+    b::Real,
+    c::Real,
+    α::Real,
+    β::Real,
+    γ::Real;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+)
 
-    """
-    Construct a set of triclinic lattice constants.
-    """
-    function TriclinicLatticeConstants(a::Real, b::Real, c::Real, α::Real, β::Real, γ::Real)
+    # --- Check arguments
 
-        # --- Enforce constraints
-
-        if a <= 0
-            throw(DomainError(a, "`a` must be positive"))
-        end
-
-        if b <= 0
-            throw(DomainError(b, "`b` must be positive"))
-        end
-
-        if c <= 0
-            throw(DomainError(c, "`c` must be positive"))
-        end
-
-        if α <= TRICLINIC_MIN_ANGLE || α >= TRICLINIC_MAX_ANGLE
-            throw(DomainError(α, "`α` must satisfy 0 < α < π"))
-        end
-
-        if β <= TRICLINIC_MIN_ANGLE || β >= TRICLINIC_MAX_ANGLE
-            throw(DomainError(β, "`β` must satisfy 0 < β < π"))
-        end
-
-        if γ <= TRICLINIC_MIN_ANGLE || γ >= TRICLINIC_MAX_ANGLE
-            throw(DomainError(γ, "`γ` must satisfy 0 < γ < π"))
-        end
-
-        # --- Construct and return new TriclinicLatticeConstants
-
-        return new(a, b, c, α, β, γ)
+    # lattice constants
+    if a <= 0
+        throw(DomainError(a, "`a` must be positive"))
     end
+
+    if b <= 0
+        throw(DomainError(b, "`b` must be positive"))
+    end
+
+    if c <= 0
+        throw(DomainError(c, "`c` must be positive"))
+    end
+
+    if α <= TRICLINIC_MIN_ANGLE || α >= TRICLINIC_MAX_ANGLE
+        throw(DomainError(α, "`α` must satisfy 0 < α < π"))
+    end
+
+    if β <= TRICLINIC_MIN_ANGLE || β >= TRICLINIC_MAX_ANGLE
+        throw(DomainError(β, "`β` must satisfy 0 < β < π"))
+    end
+
+    if γ <= TRICLINIC_MIN_ANGLE || γ >= TRICLINIC_MAX_ANGLE
+        throw(DomainError(γ, "`γ` must satisfy 0 < γ < π"))
+    end
+
+    # symmetry elements
+    # TODO
+
+    # --- Construct and return TriclinicUnitCell object
+
+    return TriclinicUnitCell(
+        (a=a, b=b, c=c, α=α, β=β, γ=γ);
+        centering=centering,
+        symmetry_elements=symmetry_elements,
+    )
 end
 
+# ------ TriclinicUnitCellDelta
+
 """
-    TriclinicLatticeConstantDeltas
+    TriclinicUnitCellDelta
 
 Lattice constant deltas for a triclinic unit cell
 
@@ -117,73 +145,47 @@ Fields
 ======
 * `Δa`, `Δb`, `Δc`: deltas of the lengths of the edges of the unit cell
 
-* `Δα`, `Δβ`, `Δγ`: deltas of the angles between edges of the unit cell in the planes of
-  the faces of the unit cell
-
-Supertype: [`LatticeConstantDeltas`](@ref)
+* `Δα`, `Δβ`, `Δγ`: deltas of the angles between edges of the unit cell
 """
-struct TriclinicLatticeConstantDeltas <: LatticeConstantDeltas{Triclinic}
-    # Fields
-    Δa::Float64
-    Δb::Float64
-    Δc::Float64
-    Δα::Float64
-    Δβ::Float64
-    Δγ::Float64
+const TriclinicUnitCellDelta = UnitCellDelta{Triclinic}
 
-    """
-    Construct a set of triclinic lattice constant deltas.
-    """
-    function TriclinicLatticeConstantDeltas(
-        Δa::Real, Δb::Real, Δc::Real, Δα::Real, Δβ::Real, Δγ::Real
-    )
-        return new(Δa, Δb, Δc, Δα, Δβ, Δγ)
-    end
+# Outer constructors
+"""
+    TriclinicUnitCellDelta(Δa::Real, Δb::Real, Δc::Real, Δα::Real, Δβ::Real, Δγ::Real)
+
+Construct a TriclinicUnitCellDelta object from a set of lattice constant deltas.
+"""
+function TriclinicUnitCellDelta(Δa::Real, Δb::Real, Δc::Real, Δα::Real, Δβ::Real, Δγ::Real)
+    Δlattice_constants = (Δa=Δa, Δb=Δb, Δc=Δc, Δα=Δα, Δβ=Δβ, Δγ=Δγ)
+    return TriclinicUnitCellDelta(Δlattice_constants)
 end
 
 # --- Functions/Methods
 
-# ------ LatticeConstants functions
+# ------ UnitCell methods
 
-function isapprox(
-    x::TriclinicLatticeConstants,
-    y::TriclinicLatticeConstants;
-    atol::Real=0,
-    rtol::Real=atol > 0 ? 0 : √eps(),
-)
-    return isapprox(x.a, y.a; atol=atol, rtol=rtol) &&
-           isapprox(x.b, y.b; atol=atol, rtol=rtol) &&
-           isapprox(x.c, y.c; atol=atol, rtol=rtol) &&
-           isapprox(x.α, y.α; atol=atol, rtol=rtol) &&
-           isapprox(x.β, y.β; atol=atol, rtol=rtol) &&
-           isapprox(x.γ, y.γ; atol=atol, rtol=rtol)
-end
+using LinearAlgebra: dot
 
-function -(x::TriclinicLatticeConstants, y::TriclinicLatticeConstants)
-    return TriclinicLatticeConstantDeltas(
-        x.a - y.a, x.b - y.b, x.c - y.c, x.α - y.α, x.β - y.β, x.γ - y.γ
-    )
-end
-
-function standardize(lattice_constants::TriclinicLatticeConstants, centering::Centering)
+function standardize(unit_cell::TriclinicUnitCell)
     # --- Check arguments
 
-    standardize_check_args(lattice_constants, centering)
+    standardize_check_args(unit_cell)
 
     # --- Preparations
 
     # Extract lattice constants
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    α = lattice_constants_.α
+    β = lattice_constants_.β
+    γ = lattice_constants_.γ
 
     # --- Standardize lattice constants
 
     # Shift origin of basis to "homogeneous corner"
-    if is_triclinic_type_I_cell(lattice_constants)
+    if is_triclinic_type_I_cell(unit_cell)
         # Type I
 
         if α > π / 2
@@ -290,68 +292,18 @@ function standardize(lattice_constants::TriclinicLatticeConstants, centering::Ce
         end
     end
 
-    return TriclinicLatticeConstants(a, b, c, α, β, γ), primitive_centering
+    return TriclinicUnitCell(a, b, c, α, β, γ; centering=primitive_centering)
 end
 
-"""
-    satisfies_triclinic_angle_constraints(α::Real, β::Real, γ::Real) -> Bool
-
-Determine whether `α`, `β`, and `γ` satisfy the angle constraints for triclinic lattices:
-
-* ``0 <  α + β + γ < 2π``
-* ``0 <  α + β - γ < 2π``
-* ``0 <  α - β + γ < 2π``
-* ``0 < -α + β + γ < 2π``
-
-Return values
-=============
-- `true` if (`α`, `β`, `γ`) form a valid triple of angles for a triclinic unit cell;
-  `false` otherwise
-
-Examples
-========
-```jldoctest
-julia> satisfies_triclinic_angle_constraints(π/4, π/5, π/6)
-true
-julia> satisfies_triclinic_angle_constraints(3π/4, 4π/5, 5π/6)
-false
-```
-"""
-function satisfies_triclinic_angle_constraints(α::Real, β::Real, γ::Real)
-    return (0 < α + β + γ < 2π) &&
-           (0 < α + β - γ < 2π) &&
-           (0 < α - β + γ < 2π) &&
-           (0 < -α + β + γ < 2π)
-end
-
-# ------ LatticeConstantDeltas functions
-
-function isapprox(
-    x::TriclinicLatticeConstantDeltas,
-    y::TriclinicLatticeConstantDeltas;
-    atol::Real=0,
-    rtol::Real=atol > 0 ? 0 : √eps(),
-)
-    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
-           isapprox(x.Δb, y.Δb; atol=atol, rtol=rtol) &&
-           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol) &&
-           isapprox(x.Δα, y.Δα; atol=atol, rtol=rtol) &&
-           isapprox(x.Δβ, y.Δβ; atol=atol, rtol=rtol) &&
-           isapprox(x.Δγ, y.Δγ; atol=atol, rtol=rtol)
-end
-
-# ------ Unit cell computations
-
-using LinearAlgebra: dot
-
-function basis(lattice_constants::TriclinicLatticeConstants)
+function basis(unit_cell::TriclinicUnitCell)
     # Get lattice constants
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    α = lattice_constants_.α
+    β = lattice_constants_.β
+    γ = lattice_constants_.γ
 
     # Construct basis
     basis_a = Vector{Float64}([a, 0, 0])
@@ -370,14 +322,15 @@ function basis(lattice_constants::TriclinicLatticeConstants)
     return basis_a, basis_b, basis_c
 end
 
-function volume(lattice_constants::TriclinicLatticeConstants)
+function volume(unit_cell::TriclinicUnitCell)
     # Get lattice constants
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    α = lattice_constants_.α
+    β = lattice_constants_.β
+    γ = lattice_constants_.γ
 
     # Compute volume
     return (2 * a * b * c) * sqrt(
@@ -388,14 +341,15 @@ function volume(lattice_constants::TriclinicLatticeConstants)
     )
 end
 
-function surface_area(lattice_constants::TriclinicLatticeConstants)
+function surface_area(unit_cell::TriclinicUnitCell)
     # Get lattice constants
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    α = lattice_constants_.α
+    β = lattice_constants_.β
+    γ = lattice_constants_.γ
 
     # Compute surface area
     return 2 * (a * b * sin(γ) + b * c * sin(α) + c * a * sin(β))
@@ -408,26 +362,22 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
 
     # --- Preparations
 
-    # Get standardized lattice constants and centering
-    lattice_constants, centering = standardize(
-        unit_cell.lattice_constants, unit_cell.centering
-    )
+    # Standardize unit cell
+    unit_cell = standardize(unit_cell)
 
     # --- Compute IUCr conventional cell
 
     # Check limiting case: monoclinic, primitive-centering
     try
-        monoclinic_lattice_constants = convert_to_mP(lattice_constants)
+        monoclinic_unit_cell = convert_to_mP(unit_cell)
 
         @debug "aP --> mP"
-        return conventional_cell(
-            UnitCell(monoclinic_lattice_constants, primitive_centering)
-        )
+        return conventional_cell(monoclinic_unit_cell)
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic unit cell defined by `lattice_constants` is not equivalent " *
+            "The triclinic unit cell defined by `unit_cell` is not equivalent " *
             "to a primitive monoclinic unit cell."
         )
             rethrow(error)
@@ -436,15 +386,15 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
 
     # Check limiting case: monoclinic, body-centering
     try
-        monoclinic_lattice_constants = convert_to_mI(lattice_constants)
+        monoclinic_unit_cell = convert_to_mI(unit_cell)
 
         @debug "aP --> mI"
-        return conventional_cell(UnitCell(monoclinic_lattice_constants, body_centering))
+        return conventional_cell(UnitCell(monoclinic_unit_cell, body_centering))
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic unit cell defined by `lattice_constants` is not equivalent " *
+            "The triclinic unit cell defined by `unit_cell` is not equivalent " *
             "to a body-centered monoclinic unit cell."
         )
             rethrow(error)
@@ -453,18 +403,18 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
 
     # Check limiting case: monoclinic, base-centering
     try
-        monoclinic_lattice_constants = convert_to_mC(lattice_constants)
+        monoclinic_unit_cell = convert_to_mC(unit_cell)
 
         @debug "aP --> mC"
-        body_centered_lattice_constants, centering = standardize(
-            monoclinic_lattice_constants, base_centering
+        body_centered_unit_cell, centering = standardize(
+            monoclinic_unit_cell, base_centering
         )
-        return conventional_cell(UnitCell(body_centered_lattice_constants, body_centering))
+        return conventional_cell(UnitCell(body_centered_unit_cell, body_centering))
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic unit cell defined by `lattice_constants` is not equivalent " *
+            "The triclinic unit cell defined by `unit_cell` is not equivalent " *
             "to a base-centered monoclinic unit cell."
         )
             rethrow(error)
@@ -472,79 +422,75 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
     end
 
     # Not a limiting case, so return unit cell with standardized lattice constants
-    return UnitCell(lattice_constants, primitive_centering)
+    return UnitCell(unit_cell)
 end
 
 """
-    convert_to_mP(
-        lattice_constants::TriclinicLatticeConstants
-    ) -> MonoclinicLatticeConstants
+    convert_to_mP(unit_cell::TriclinicUnitCell) -> MonoclinicUnitCell
 
-Attempt to convert the triclinic unit cell defined by `lattice_constants` to an equivalent
+Attempt to convert the triclinic unit cell defined by `unit_cell` to an equivalent
 primitive monoclinic unit cell.
 
 Return values
 =============
-- lattice constants for the equivalent primitive monoclinic unit cell if one exists
+- unit cell for the equivalent primitive monoclinic unit cell if one exists
 
 Exceptions
 ==========
-Throws an `ErrorException` if the triclinic unit cell defined by `lattice_constants` is not
+Throws an `ErrorException` if the triclinic unit cell defined by `unit_cell` is not
 equivalent to a primitive monoclinic unit cell.
 """
-function convert_to_mP(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mP(unit_cell::TriclinicUnitCell)
     # --- Preparations
 
     # Get lattice constants
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    α = lattice_constants_.α
+    β = lattice_constants_.β
+    γ = lattice_constants_.γ
 
     # --- Attempt to convert the triclinic unit cell to a primitive monoclinic unit cell
 
     if β ≈ π / 2 && γ ≈ π / 2
         # `a` is the unique symmetry direction of the monoclinic unit cell
-        return standardize(MonoclinicLatticeConstants(b, a, c, α))
+        return standardize(MonoclinicUnitCell(b, a, c, α; centering=primitive_centering))
 
     elseif α ≈ π / 2 && γ ≈ π / 2
         # `b` is the unique symmetry direction of the monoclinic unit cell
-        return standardize(MonoclinicLatticeConstants(a, b, c, β))
+        return standardize(MonoclinicUnitCell(a, b, c, β; centering=primitive_centering))
 
     elseif α ≈ π / 2 && β ≈ π / 2
         # `c` is the unique symmetry direction of the monoclinic unit cell
-        return standardize(MonoclinicLatticeConstants(a, c, b, γ))
+        return standardize(MonoclinicUnitCell(a, c, b, γ; centering=primitive_centering))
     end
 
     throw(
         ErrorException(
-            "The triclinic unit cell defined by `lattice_constants` is not equivalent " *
+            "The triclinic unit cell defined by `unit_cell` is not equivalent " *
             "to a primitive monoclinic unit cell.",
         ),
     )
 end
 
 """
-    convert_to_mI(
-        lattice_constants::TriclinicLatticeConstants
-    ) -> MonoclinicLatticeConstants
+    convert_to_mI(unit_cell::TriclinicUnitCell) -> MonoclinicUnitCell
 
-Attempt to convert the triclinic unit cell defined by `lattice_constants` to an equivalent
+Attempt to convert the triclinic unit cell defined by `unit_cell` to an equivalent
 body-centered monoclinic unit cell.
 
 Return values
 =============
-- lattice constants for the equivalent body-centered monoclinic unit cell if one exists;
-  `nothing` otherwise
+- unit cell for the equivalent body-centered monoclinic unit cell if one exists
 
 Exceptions
 ==========
-Throws an `ErrorException` if the triclinic unit cell defined by `lattice_constants` is not
+Throws an `ErrorException` if the triclinic unit cell defined by `unit_cell` is not
 equivalent to a body-centered monoclinic unit cell.
 """
-function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mI(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # This method adopts the following variable conventions.
@@ -570,15 +516,15 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
     # Case: triclinic basis contains unique monoclinic symmetry direction
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_1(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_1(unit_cell)
 
         @debug "aP --> mI (case 1)"
-        return convert_to_mI_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
+        return convert_to_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "include the unique monoclinic symmetry direction, one other monoclinic " *
             "basis vector, and one body-centered lattice vector."
         )
@@ -589,15 +535,15 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
     # Case: triclinic basis does not contain unique monoclinic symmetry direction
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_2(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_2(unit_cell)
 
         @debug "aP --> mI (case 2)"
-        return convert_to_mI_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
+        return convert_to_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "include two monoclinic basis vectors in the B-face and one " *
             "body-centered lattice vector."
         )
@@ -611,15 +557,15 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
     # Case: triclinic basis contains the unique monoclinic symmetry direction
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_3(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_3(unit_cell)
 
         @debug "aP --> mI (case 3)"
-        return convert_to_mI_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
+        return convert_to_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "include the unique monoclinic symmetry direction and two body-centered " *
             "lattice vectors."
         )
@@ -630,15 +576,15 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
     # Case: triclinic basis contains the unique monoclinic symmetry direction
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4(unit_cell)
 
         @debug "aP --> mI (case 4)"
-        return convert_to_mI_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
+        return convert_to_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "include one monoclinic basis vector in the B-face and two body-centered " *
             "lattice vectors."
         )
@@ -650,15 +596,15 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_5(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_5(unit_cell)
 
         @debug "aP --> mI (case 5)"
-        return convert_to_mI_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
+        return convert_to_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "include three body-centered lattice vectors."
         )
             rethrow(error)
@@ -670,14 +616,14 @@ function convert_to_mI(lattice_constants::TriclinicLatticeConstants)
     if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
         throw(
             ErrorException(
-                "The triclinic unit cell defined by `lattice_constants` is not " *
+                "The triclinic unit cell defined by `unit_cell` is not " *
                 "equivalent to a body-centered monoclinic unit cell.",
             ),
         )
     end
 end
 
-function convert_to_mI_basis_to_lattice_constants(
+function convert_to_mI_basis_to_unit_cell(
     m_basis_a::Vector{<:Real}, m_basis_b::Vector{<:Real}, m_basis_c::Vector{<:Real}
 )
     # Compute monoclinic lattice constants
@@ -692,12 +638,12 @@ function convert_to_mI_basis_to_lattice_constants(
     end
 
     m_lattice_constants, _ = standardize(
-        MonoclinicLatticeConstants(m_a, m_b, m_c, m_β), body_centering
+        MonoclinicUnitCell(m_a, m_b, m_c, m_β), body_centering
     )
     return m_lattice_constants
 end
 
-function convert_to_mI_case_1(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mI_case_1(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -716,7 +662,7 @@ function convert_to_mI_case_1(lattice_constants::TriclinicLatticeConstants)
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -757,14 +703,14 @@ function convert_to_mI_case_1(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not include " *
+            "The triclinic basis vectors defined by `unit_cell` do not include " *
             "the unique monoclinic symmetry direction, one other monoclinic basis " *
             "vector, and one body-centered lattice vector.",
         ),
     )
 end
 
-function convert_to_mI_case_2(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mI_case_2(unit_cell::TriclinicUnitCell)
     # --- Preparations
 
     # Initialize monoclinic basis vectors
@@ -776,13 +722,13 @@ function convert_to_mI_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_2a(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_2a(unit_cell)
         @debug "aP --> mI (case 2a)"
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 2a."
         )
             rethrow(error)
@@ -791,13 +737,13 @@ function convert_to_mI_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_2b(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_2b(unit_cell)
         @debug "aP --> mI (case 2b)"
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 2b."
         )
             rethrow(error)
@@ -809,7 +755,7 @@ function convert_to_mI_case_2(lattice_constants::TriclinicLatticeConstants)
     if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
         throw(
             ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
+                "The triclinic basis vectors defined by `unit_cell` do not " *
                 "include two monoclinic basis vectors in the B-face and one " *
                 "body-centered lattice vector.",
             ),
@@ -819,7 +765,7 @@ function convert_to_mI_case_2(lattice_constants::TriclinicLatticeConstants)
     return m_basis_a, m_basis_b, m_basis_c
 end
 
-function convert_to_mI_case_2a(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mI_case_2a(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -845,7 +791,7 @@ function convert_to_mI_case_2a(lattice_constants::TriclinicLatticeConstants)
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -888,13 +834,13 @@ function convert_to_mI_case_2a(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not satisfy " *
+            "The triclinic basis vectors defined by `unit_cell` do not satisfy " *
             "conditions for case 2a.",
         ),
     )
 end
 
-function convert_to_mI_case_2b(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mI_case_2b(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -920,7 +866,7 @@ function convert_to_mI_case_2b(lattice_constants::TriclinicLatticeConstants)
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -963,13 +909,13 @@ function convert_to_mI_case_2b(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not satisfy " *
+            "The triclinic basis vectors defined by `unit_cell` do not satisfy " *
             "conditions for case 2b.",
         ),
     )
 end
 
-function convert_to_mI_case_3(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mI_case_3(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -984,7 +930,7 @@ function convert_to_mI_case_3(lattice_constants::TriclinicLatticeConstants)
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -1021,14 +967,14 @@ function convert_to_mI_case_3(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "include the unique monoclinic symmetry direction and two body-centered " *
             "lattice vectors.",
         ),
     )
 end
 
-function convert_to_mI_case_4(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mI_case_4(unit_cell::TriclinicUnitCell)
     # --- Preparations
 
     # Initialize monoclinic basis vectors
@@ -1040,13 +986,13 @@ function convert_to_mI_case_4(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4a(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4a(unit_cell)
         @debug "aP --> mI (case 4a)"
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 4a."
         )
             rethrow(error)
@@ -1055,13 +1001,13 @@ function convert_to_mI_case_4(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4b(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4b(unit_cell)
         @debug "aP --> mI (case 4b)"
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 4b."
         )
             rethrow(error)
@@ -1070,12 +1016,12 @@ function convert_to_mI_case_4(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4c(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4c(unit_cell)
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 4c."
         )
             rethrow(error)
@@ -1087,7 +1033,7 @@ function convert_to_mI_case_4(lattice_constants::TriclinicLatticeConstants)
     if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
         throw(
             ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
+                "The triclinic basis vectors defined by `unit_cell` do not " *
                 "include one monoclinic basis vector in the B-face and two body-centered " *
                 "lattice vectors.",
             ),
@@ -1097,7 +1043,7 @@ function convert_to_mI_case_4(lattice_constants::TriclinicLatticeConstants)
     return m_basis_a, m_basis_b, m_basis_c
 end
 
-function convert_to_mI_case_4a(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mI_case_4a(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -1118,7 +1064,7 @@ function convert_to_mI_case_4a(lattice_constants::TriclinicLatticeConstants)
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -1176,13 +1122,13 @@ function convert_to_mI_case_4a(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not satisfy " *
+            "The triclinic basis vectors defined by `unit_cell` do not satisfy " *
             "conditions for case 4a.",
         ),
     )
 end
 
-function convert_to_mI_case_4b(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mI_case_4b(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -1205,7 +1151,7 @@ function convert_to_mI_case_4b(lattice_constants::TriclinicLatticeConstants)
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -1242,13 +1188,13 @@ function convert_to_mI_case_4b(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not satisfy " *
+            "The triclinic basis vectors defined by `unit_cell` do not satisfy " *
             "conditions for case 4b.",
         ),
     )
 end
 
-function convert_to_mI_case_4c(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mI_case_4c(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -1270,7 +1216,7 @@ function convert_to_mI_case_4c(lattice_constants::TriclinicLatticeConstants)
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -1308,13 +1254,13 @@ function convert_to_mI_case_4c(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not satisfy " *
+            "The triclinic basis vectors defined by `unit_cell` do not satisfy " *
             "conditions for case 4c.",
         ),
     )
 end
 
-function convert_to_mI_case_5(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mI_case_5(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -1330,7 +1276,7 @@ function convert_to_mI_case_5(lattice_constants::TriclinicLatticeConstants)
     #
     # - This method adopts the same variable conventions as convert_to_mI().
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -1383,7 +1329,7 @@ function convert_to_mI_case_5(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not include " *
+            "The triclinic basis vectors defined by `unit_cell` do not include " *
             "three body-centered lattice vectors.",
         ),
     )
@@ -1391,10 +1337,10 @@ end
 
 """
     convert_to_mC(
-        lattice_constants::TriclinicLatticeConstants
-    ) -> MonoclinicLatticeConstants
+        unit_cell::TriclinicUnitCell
+    ) -> MonoclinicUnitCell
 
-Attempt to convert the triclinic unit cell defined by `lattice_constants` to an equivalent
+Attempt to convert the triclinic unit cell defined by `unit_cell` to an equivalent
 base-centered monoclinic unit cell.
 
 Return values
@@ -1408,10 +1354,10 @@ Return values
 
 Exceptions
 ==========
-Throws an `ErrorException` if the triclinic unit cell defined by `lattice_constants` is not
+Throws an `ErrorException` if the triclinic unit cell defined by `unit_cell` is not
 equivalent to a base-centered monoclinic unit cell.
 """
-function convert_to_mC(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # This method adopts the following variable conventions.
@@ -1437,13 +1383,13 @@ function convert_to_mC(lattice_constants::TriclinicLatticeConstants)
     # Case: triclinic basis contains m_basis_a and m_basis_c
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1(lattice_constants)
-        return convert_to_mC_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1(unit_cell)
+        return convert_to_mC_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "include the mononclinic basis vectors that are not the unique " *
             "monoclinic symmetry direction and one base-centered lattice vector."
         )
@@ -1457,13 +1403,13 @@ function convert_to_mC(lattice_constants::TriclinicLatticeConstants)
     # Case: triclinic basis contains the m_basis_a
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2(lattice_constants)
-        return convert_to_mC_basis_to_lattice_constants(m_basis_a, m_basis_b, m_basis_c)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2(unit_cell)
+        return convert_to_mC_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "include the mononclinic basis vector that is the intersection of the " *
             "B-face and C-face and two base-centered lattice vectors."
         )
@@ -1476,14 +1422,14 @@ function convert_to_mC(lattice_constants::TriclinicLatticeConstants)
     if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
         throw(
             ErrorException(
-                "The triclinic unit cell defined by `lattice_constants` is not " *
+                "The triclinic unit cell defined by `unit_cell` is not " *
                 "equivalent to a base-centered monoclinic unit cell.",
             ),
         )
     end
 end
 
-function convert_to_mC_basis_to_lattice_constants(
+function convert_to_mC_basis_to_unit_cell(
     m_basis_a::Vector{<:Real}, m_basis_b::Vector{<:Real}, m_basis_c::Vector{<:Real}
 )
     # Compute monoclinic lattice constants
@@ -1497,10 +1443,10 @@ function convert_to_mC_basis_to_lattice_constants(
         throw(ErrorException("m_β be at least π/2. (m_β=$m_β)"))
     end
 
-    return MonoclinicLatticeConstants(m_a, m_b, m_c, m_β)
+    return MonoclinicUnitCell(m_a, m_b, m_c, m_β)
 end
 
-function convert_to_mC_case_1(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_1(unit_cell::TriclinicUnitCell)
     # --- Preparations
 
     # Initialize monoclinic basis vectors
@@ -1512,13 +1458,13 @@ function convert_to_mC_case_1(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1a(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1a(unit_cell)
         @debug "aP --> mC (case 1a)"
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 1a."
         )
             rethrow(error)
@@ -1527,13 +1473,13 @@ function convert_to_mC_case_1(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1b(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1b(unit_cell)
         @debug "aP --> mC (case 1b)"
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 1b."
         )
             rethrow(error)
@@ -1545,7 +1491,7 @@ function convert_to_mC_case_1(lattice_constants::TriclinicLatticeConstants)
     if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
         throw(
             ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
+                "The triclinic basis vectors defined by `unit_cell` do not " *
                 "include the mononclinic basis vectors that are not the unique " *
                 "monoclinic symmetry direction and one base-centered lattice vector.",
             ),
@@ -1555,7 +1501,7 @@ function convert_to_mC_case_1(lattice_constants::TriclinicLatticeConstants)
     return m_basis_a, m_basis_b, m_basis_c
 end
 
-function convert_to_mC_case_1a(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_1a(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -1576,7 +1522,7 @@ function convert_to_mC_case_1a(lattice_constants::TriclinicLatticeConstants)
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -1616,13 +1562,13 @@ function convert_to_mC_case_1a(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 1a.",
         ),
     )
 end
 
-function convert_to_mC_case_1b(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_1b(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -1645,7 +1591,7 @@ function convert_to_mC_case_1b(lattice_constants::TriclinicLatticeConstants)
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -1714,13 +1660,13 @@ function convert_to_mC_case_1b(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 1b.",
         ),
     )
 end
 
-function convert_to_mC_case_2(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2(unit_cell::TriclinicUnitCell)
     # --- Preparations
 
     # Initialize monoclinic basis vectors
@@ -1732,13 +1678,13 @@ function convert_to_mC_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2a(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2a(unit_cell)
         @debug "aP --> mC (case 2a)"
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 2a."
         )
             rethrow(error)
@@ -1747,13 +1693,13 @@ function convert_to_mC_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2b(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2b(unit_cell)
         @debug "aP --> mC (case 2b)"
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 2b."
         )
             rethrow(error)
@@ -1762,13 +1708,13 @@ function convert_to_mC_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2c(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2c(unit_cell)
         @debug "aP --> mC (case 2c)"
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 2c."
         )
             rethrow(error)
@@ -1777,13 +1723,13 @@ function convert_to_mC_case_2(lattice_constants::TriclinicLatticeConstants)
 
     try
         # Compute monoclinic basis vectors
-        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2d(lattice_constants)
+        m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2d(unit_cell)
         @debug "aP --> mC (case 2d)"
 
     catch error
         if !(error isa ErrorException) || (
             error.msg !=
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 2d."
         )
             rethrow(error)
@@ -1795,7 +1741,7 @@ function convert_to_mC_case_2(lattice_constants::TriclinicLatticeConstants)
     if isnothing(m_basis_a) || isnothing(m_basis_b) || isnothing(m_basis_c)
         throw(
             ErrorException(
-                "The triclinic basis vectors defined by `lattice_constants` do not " *
+                "The triclinic basis vectors defined by `unit_cell` do not " *
                 "include the mononclinic basis vector that is the intersection of the " *
                 "B-face and C-face and two base-centered lattice vectors.",
             ),
@@ -1805,7 +1751,7 @@ function convert_to_mC_case_2(lattice_constants::TriclinicLatticeConstants)
     return m_basis_a, m_basis_b, m_basis_c
 end
 
-function convert_to_mC_case_2a(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2a(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -1824,7 +1770,7 @@ function convert_to_mC_case_2a(lattice_constants::TriclinicLatticeConstants)
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -1860,13 +1806,13 @@ function convert_to_mC_case_2a(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 2a.",
         ),
     )
 end
 
-function convert_to_mC_case_2b(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2b(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -1885,7 +1831,7 @@ function convert_to_mC_case_2b(lattice_constants::TriclinicLatticeConstants)
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -1921,13 +1867,13 @@ function convert_to_mC_case_2b(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 2b.",
         ),
     )
 end
 
-function convert_to_mC_case_2c(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2c(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -1946,7 +1892,7 @@ function convert_to_mC_case_2c(lattice_constants::TriclinicLatticeConstants)
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -1982,13 +1928,13 @@ function convert_to_mC_case_2c(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 2c.",
         ),
     )
 end
 
-function convert_to_mC_case_2d(lattice_constants::TriclinicLatticeConstants)
+function convert_to_mC_case_2d(unit_cell::TriclinicUnitCell)
     # Notes
     # =====
     # - Case
@@ -2007,7 +1953,7 @@ function convert_to_mC_case_2d(lattice_constants::TriclinicLatticeConstants)
 
     # --- Attempt to convert the triclinic unit cell to a base-centered monoclinic unit cell
 
-    for (basis_a, basis_b, basis_c) in permutations(basis(lattice_constants))
+    for (basis_a, basis_b, basis_c) in permutations(basis(unit_cell))
         # Initialize monoclinic basis vectors
         m_basis_a = nothing
         m_basis_b = nothing
@@ -2043,16 +1989,16 @@ function convert_to_mC_case_2d(lattice_constants::TriclinicLatticeConstants)
 
     throw(
         ErrorException(
-            "The triclinic basis vectors defined by `lattice_constants` do not " *
+            "The triclinic basis vectors defined by `unit_cell` do not " *
             "satisfy conditions for case 2d.",
         ),
     )
 end
 
 """
-    is_triclinic_type_I_cell(lattice_constants::TriclinicLatticeConstants) -> Bool
+    is_triclinic_type_I_cell(unit_cell::TriclinicUnitCell) -> Bool
 
-Determine whether the unit cell defined by `lattice_constants` is a Type I or Type II cell.
+Determine whether the unit cell defined by `unit_cell` is a Type I or Type II cell.
 
 A triclinic unit cell is Type I if the product of the dot products of all pairs of basis
 vectors for unit cell is positive:
@@ -2065,13 +2011,46 @@ Otherwise, the triclinic unit cell is Type II.
 
 Return values
 =============
-- `true` if `lattice_constants` defines a Type I cell; `false` if `lattice_constants`
-  defines a Type II cell.
+- `true` if `unit_cell` defines a Type I cell; `false` if `unit_cell` defines a Type II
+  cell
 """
-function is_triclinic_type_I_cell(lattice_constants::TriclinicLatticeConstants)
-    α = lattice_constants.α
-    β = lattice_constants.β
-    γ = lattice_constants.γ
+function is_triclinic_type_I_cell(unit_cell::TriclinicUnitCell)
+    # Extract lattice angles
+    lattice_constants_ = lattice_constants(unit_cell)
+    α = lattice_constants_.α
+    β = lattice_constants_.β
+    γ = lattice_constants_.γ
 
     return cos(α) * cos(β) * cos(γ) >= 0 || abs(cos(α) * cos(β) * cos(γ)) < COS_APPROX_ZERO
+end
+
+"""
+    satisfies_triclinic_angle_constraints(α::Real, β::Real, γ::Real) -> Bool
+
+Determine whether `α`, `β`, and `γ` satisfy the angle constraints for triclinic lattices:
+
+* ``0 <  α + β + γ < 2π``
+* ``0 <  α + β - γ < 2π``
+* ``0 <  α - β + γ < 2π``
+* ``0 < -α + β + γ < 2π``
+
+Return values
+=============
+- `true` if (`α`, `β`, `γ`) form a valid triple of angles for a triclinic unit cell;
+  `false` otherwise
+
+Examples
+========
+```jldoctest
+julia> satisfies_triclinic_angle_constraints(π/4, π/5, π/6)
+true
+julia> satisfies_triclinic_angle_constraints(3π/4, 4π/5, 5π/6)
+false
+```
+"""
+function satisfies_triclinic_angle_constraints(α::Real, β::Real, γ::Real)
+    return (0 < α + β + γ < 2π) &&
+           (0 < α + β - γ < 2π) &&
+           (0 < α - β + γ < 2π) &&
+           (0 < -α + β + γ < 2π)
 end

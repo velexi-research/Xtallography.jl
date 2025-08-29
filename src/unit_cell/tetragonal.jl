@@ -12,130 +12,125 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 """
-Functions that support computations specific to tetragonal lattices
+Tetragonal unit cell types and functions
 """
-# --- Imports
-
-# Standard library
-using Logging
-
 # --- Exports
 
 # Types
-export TetragonalLatticeConstants, TetragonalLatticeConstantDeltas
-
-# Functions
+export TetragonalUnitCell, TetragonalUnitCellDelta
 
 # --- Types
 
-"""
-    TetragonalLatticeConstants
+# ------ TetragonalUnitCell
 
-Lattice constants for a tetragonal unit cell
+"""
+    TetragonalUnitCell
+
+Lattice constants and symmetry for a tetragonal unit cell
 
 Fields
 ======
 * `a`, `c`: lengths of the edges of the unit cell
 
-Supertype: [`LatticeConstants`](@ref)
+* `symmetry`: unit cell symmetry
 """
-struct TetragonalLatticeConstants <: LatticeConstants{Tetragonal}
-    # Fields
-    a::Float64
-    c::Float64
+const TetragonalUnitCell = UnitCell{Tetragonal}
 
-    """
-    Construct a set of tetragonal lattice constants.
-    """
-    function TetragonalLatticeConstants(a::Real, c::Real)
+# Outer constructor
+"""
+    TetragonalUnitCell(
+        a::Real, c::Real;
+        centering::Centering=primitive_centering,
+        symmetry_elements::Union{Set,Vector,Nothing}=nothing
+    )
 
-        # --- Enforce constraints
+Construct a TetragonalUnitCell object from a set of lattice constants.
 
-        if a <= 0
-            throw(DomainError(a, "`a` must be positive"))
-        end
+!!! note
 
-        if c <= 0
-            throw(DomainError(c, "`c` must be positive"))
-        end
+    No constraints are imposed on `centering`. The unit cell does _not_ to be a valid
+    Bravais lattice.
 
-        # --- Construct and return new TetragonalLatticeConstants
+Keyword Arguments
+=================
+- `centering`: centering of unit cell
 
-        return new(a, c)
+- `symmetry_elements`: symmetry elements of crystal
+"""
+function TetragonalUnitCell(
+    a::Real,
+    c::Real;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+)
+
+    # --- Check arguments
+
+    # lattice constants
+    if a <= 0
+        throw(DomainError(a, "`a` must be positive"))
     end
+
+    if c <= 0
+        throw(DomainError(c, "`c` must be positive"))
+    end
+
+    # symmetry elements
+    # TODO
+
+    # --- Construct and return TetragonalUnitCell object
+
+    return TetragonalUnitCell(
+        (a=a, c=c); centering=centering, symmetry_elements=symmetry_elements
+    )
 end
 
+# ------ TetragonalUnitCellDelta
+
 """
-    TetragonalLatticeConstantDeltas
+    TetragonalUnitCellDelta
 
 Lattice constant deltas for a tetragonal unit cell
 
 Fields
 ======
 * `Δa`, `Δc`: deltas of the lengths of the edges of the unit cell
-
-Supertype: [`LatticeConstantDeltas`](@ref)
 """
-struct TetragonalLatticeConstantDeltas <: LatticeConstantDeltas{Tetragonal}
-    # Fields
-    Δa::Float64
-    Δc::Float64
+const TetragonalUnitCellDelta = UnitCellDelta{Tetragonal}
 
-    """
-    Construct a set of tetragonal lattice constant deltas.
-    """
-    function TetragonalLatticeConstantDeltas(Δa::Real, Δc::Real)
-        return new(Δa, Δc)
-    end
+# Outer constructors
+"""
+    TetragonalUnitCellDelta(Δa::Real, Δc::Real)
+
+Construct a TetragonalUnitCellDelta object from a set of lattice constant deltas.
+"""
+function TetragonalUnitCellDelta(Δa::Real, Δc::Real)
+    Δlattice_constants = (Δa=Δa, Δc=Δc)
+    return TetragonalUnitCellDelta(Δlattice_constants)
 end
 
 # --- Functions/Methods
 
-# ------ LatticeConstants functions
+# ------ UnitCell methods
 
-function isapprox(
-    x::TetragonalLatticeConstants,
-    y::TetragonalLatticeConstants;
-    atol::Real=0,
-    rtol::Real=atol > 0 ? 0 : √eps(),
-)
-    return isapprox(x.a, y.a; atol=atol, rtol=rtol) &&
-           isapprox(x.c, y.c; atol=atol, rtol=rtol)
-end
-
-function -(x::TetragonalLatticeConstants, y::TetragonalLatticeConstants)
-    return TetragonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
-end
-
-# ------ LatticeConstantDeltas functions
-
-function isapprox(
-    x::TetragonalLatticeConstantDeltas,
-    y::TetragonalLatticeConstantDeltas;
-    atol::Real=0,
-    rtol::Real=atol > 0 ? 0 : √eps(),
-)
-    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
-           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol)
-end
-
-# ------ Unit cell computations
-
-function basis(lattice_constants::TetragonalLatticeConstants)
+function basis(unit_cell::TetragonalUnitCell)
     # Construct basis
-    basis_a = Vector{Float64}([lattice_constants.a, 0, 0])
-    basis_b = Vector{Float64}([0, lattice_constants.a, 0])
-    basis_c = Vector{Float64}([0, 0, lattice_constants.c])
+    lattice_constants_ = lattice_constants(unit_cell)
+    basis_a = Vector{Float64}([lattice_constants_.a, 0, 0])
+    basis_b = Vector{Float64}([0, lattice_constants_.a, 0])
+    basis_c = Vector{Float64}([0, 0, lattice_constants_.c])
 
     return basis_a, basis_b, basis_c
 end
 
-function volume(lattice_constants::TetragonalLatticeConstants)
-    return lattice_constants.a^2 * lattice_constants.c
+function volume(unit_cell::TetragonalUnitCell)
+    lattice_constants_ = lattice_constants(unit_cell)
+    return lattice_constants_.a^2 * lattice_constants_.c
 end
 
-function surface_area(lattice_constants::TetragonalLatticeConstants)
-    return 2 * lattice_constants.a^2 + 4 * lattice_constants.a * lattice_constants.c
+function surface_area(unit_cell::TetragonalUnitCell)
+    lattice_constants_ = lattice_constants(unit_cell)
+    return 2 * lattice_constants_.a^2 + 4 * lattice_constants_.a * lattice_constants_.c
 end
 
 function conventional_cell(::Tetragonal, unit_cell::UnitCell)
@@ -146,8 +141,9 @@ function conventional_cell(::Tetragonal, unit_cell::UnitCell)
     # --- Preparations
 
     # Get lattice constants and centering
-    a = unit_cell.lattice_constants.a
-    c = unit_cell.lattice_constants.c
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = unit_cell.lattice_constants_.a
+    c = unit_cell.lattice_constants_.c
 
     centering = unit_cell.centering
 
@@ -158,24 +154,22 @@ function conventional_cell(::Tetragonal, unit_cell::UnitCell)
         if a ≈ c
             # cubic, primitive-centering, edge length `a`
             @debug "tP --> cP"
-            return conventional_cell(
-                UnitCell(CubicLatticeConstants(a), primitive_centering)
-            )
+            return conventional_cell(CubicUnitCell(a; centering=primitive_centering))
         end
 
     elseif centering === body_centering
         if a ≈ c
             # cubic, body-centering, edge length `a`
             @debug "tI --> cI"
-            return conventional_cell(UnitCell(CubicLatticeConstants(a), body_centering))
+            return conventional_cell(CubicUnitCell(a; centering=body_centering))
 
         elseif c * SIN_PI_OVER_FOUR ≈ a
             # cubic, face-centering, edge length `c`
             @debug "tI --> cF"
-            return conventional_cell(UnitCell(CubicLatticeConstants(c), face_centering))
+            return conventional_cell(CubicUnitCell(c; centering=face_centering))
         end
     end
 
     # Not a limiting case, so return unit cell with original lattice constants
-    return UnitCell(unit_cell.lattice_constants, centering)
+    return UnitCell(unit_cell)
 end

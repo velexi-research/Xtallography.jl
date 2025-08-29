@@ -12,112 +12,112 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 """
-Functions that support computations specific to hexagonal lattices
+Hexagonal unit cell types and functions
 """
 # --- Exports
 
 # Types
-export HexagonalLatticeConstants, HexagonalLatticeConstantDeltas
+export HexagonalUnitCell, HexagonalUnitCellDelta
 
 # --- Types
 
-"""
-    HexagonalLatticeConstants
+# ------ HexagonalUnitCell
 
-Lattice constants for a hexagonal unit cell
+"""
+    HexagonalUnitCell
+
+Lattice constants and symmetry for a hexagonal unit cell
 
 Fields
 ======
 * `a`, `c`: lengths of the edges of the unit cell
 
-Supertype: [`LatticeConstants`](@ref)
+* `symmetry`: unit cell symmetry
 """
-struct HexagonalLatticeConstants <: LatticeConstants{Hexagonal}
-    # Fields
-    a::Float64
-    c::Float64
+const HexagonalUnitCell = UnitCell{Hexagonal}
 
-    """
-    Construct a set of hexagonal lattice constants.
-    """
-    function HexagonalLatticeConstants(a::Real, c::Real)
+# Outer constructor
+"""
+    HexagonalUnitCell(
+        a::Real, c::Real;
+        centering::Centering=primitive_centering,
+        symmetry_elements::Union{Set,Vector,Nothing}=nothing
+    )
 
-        # --- Enforce constraints
+Construct a HexagonalUnitCell object from a set of lattice constants.
 
-        if a <= 0
-            throw(DomainError(a, "`a` must be positive"))
-        end
+!!! note
 
-        if c <= 0
-            throw(DomainError(c, "`c` must be positive"))
-        end
+    No constraints are imposed on `centering`. The unit cell does _not_ to be a valid
+    Bravais lattice.
 
-        # --- Construct and return new HexagonalLatticeConstants
+Keyword Arguments
+=================
+- `centering`: centering of unit cell
 
-        return new(a, c)
+- `symmetry_elements`: symmetry elements of crystal
+"""
+function HexagonalUnitCell(
+    a::Real,
+    c::Real;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+)
+
+    # --- Check arguments
+
+    # lattice constants
+    if a <= 0
+        throw(DomainError(a, "`a` must be positive"))
     end
+
+    if c <= 0
+        throw(DomainError(c, "`c` must be positive"))
+    end
+
+    # symmetry elements
+    # TODO
+
+    # --- Construct and return HexagonalUnitCell object
+
+    return HexagonalUnitCell(
+        (a=a, c=c); centering=centering, symmetry_elements=symmetry_elements
+    )
 end
 
+# ------ HexagonalUnitCellDelta
+
 """
-    HexagonalLatticeConstantDeltas
+    HexagonalUnitCellDelta
 
 Lattice constant deltas for a hexagonal unit cell
 
 Fields
 ======
 * `Δa`, `Δc`: deltas of the lengths of the edges of the unit cell
-
-Supertype: [`LatticeConstantDeltas`](@ref)
 """
-struct HexagonalLatticeConstantDeltas <: LatticeConstantDeltas{Hexagonal}
-    # Fields
-    Δa::Float64
-    Δc::Float64
+const HexagonalUnitCellDelta = UnitCellDelta{Hexagonal}
 
-    """
-    Construct a set of hexagonal lattice constant deltas.
-    """
-    function HexagonalLatticeConstantDeltas(Δa::Real, Δc::Real)
-        return new(Δa, Δc)
-    end
+# Outer constructors
+"""
+    HexagonalUnitCellDelta(Δa::Real, Δc::Real)
+
+Construct a HexagonalUnitCellDelta object from a set of lattice constant deltas.
+"""
+function HexagonalUnitCellDelta(Δa::Real, Δc::Real)
+    Δlattice_constants = (Δa=Δa, Δc=Δc)
+    return HexagonalUnitCellDelta(Δlattice_constants)
 end
 
 # --- Functions/Methods
 
-# ------ LatticeConstants functions
+# ------ UnitCell methods
 
-function isapprox(
-    x::HexagonalLatticeConstants,
-    y::HexagonalLatticeConstants;
-    atol::Real=0,
-    rtol::Real=atol > 0 ? 0 : √eps(),
-)
-    return isapprox(x.a, y.a; atol=atol, rtol=rtol) &&
-           isapprox(x.c, y.c; atol=atol, rtol=rtol)
-end
-
-function -(x::HexagonalLatticeConstants, y::HexagonalLatticeConstants)
-    return HexagonalLatticeConstantDeltas(x.a - y.a, x.c - y.c)
-end
-
-# ------ LatticeConstantDeltas functions
-
-function isapprox(
-    x::HexagonalLatticeConstantDeltas,
-    y::HexagonalLatticeConstantDeltas;
-    atol::Real=0,
-    rtol::Real=atol > 0 ? 0 : √eps(),
-)
-    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
-           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol)
-end
-
-# ------ Unit cell computations
-
-function basis(lattice_constants::HexagonalLatticeConstants)
+function basis(unit_cell::HexagonalUnitCell)
     # Get lattice constants
-    a = lattice_constants.a
-    c = lattice_constants.c
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    c = lattice_constants_.c
 
     # Construct basis
     basis_a = Vector{Float64}([a, 0, 0])
@@ -127,19 +127,21 @@ function basis(lattice_constants::HexagonalLatticeConstants)
     return basis_a, basis_b, basis_c
 end
 
-function volume(lattice_constants::HexagonalLatticeConstants)
+function volume(unit_cell::HexagonalUnitCell)
     # Get lattice constants
-    a = lattice_constants.a
-    c = lattice_constants.c
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    c = lattice_constants_.c
 
     # Compute volume
     return a^2 * SIN_PI_OVER_THREE * c
 end
 
-function surface_area(lattice_constants::HexagonalLatticeConstants)
+function surface_area(unit_cell::HexagonalUnitCell)
     # Get lattice constants
-    a = lattice_constants.a
-    c = lattice_constants.c
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    c = lattice_constants_.c
 
     # Compute surface area
     return 4 * a * c + 2 * a^2 * SIN_PI_OVER_THREE

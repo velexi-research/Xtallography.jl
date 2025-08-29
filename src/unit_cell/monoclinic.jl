@@ -12,17 +12,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 """
-Functions that support computations specific to monoclinic lattices
+Monoclinic unit cell types and functions
 """
-# --- Imports
-
-# Standard library
-using Logging
-
 # --- Exports
 
 # Types
-export MonoclinicLatticeConstants, MonoclinicLatticeConstantDeltas
+export MonoclinicUnitCell, MonoclinicUnitCellDelta
 
 # Functions
 export convert_to_body_centering, convert_to_base_centering
@@ -37,8 +32,10 @@ const MONOCLINIC_MAX_ANGLE = π
 
 # --- Types
 
+# ------ MonoclinicUnitCell
+
 """
-    MonoclinicLatticeConstants
+    MonoclinicUnitCell
 
 Lattice constants for a monoclinic unit cell
 
@@ -49,46 +46,71 @@ Fields
 * `β`: angle between edges of the unit cell in the plane of the face of the unit cell
   where the edges are not orthogonal
 
-Supertype: [`LatticeConstants`](@ref)
+* `symmetry`: unit cell symmetry
 """
-struct MonoclinicLatticeConstants <: LatticeConstants{Monoclinic}
-    # Fields
-    a::Float64  # arbitrary units
-    b::Float64  # arbitrary units
-    c::Float64  # arbitrary units
-    β::Float64  # radians
+const MonoclinicUnitCell = UnitCell{Monoclinic}
 
-    """
-    Construct a set of monoclinic lattice constants.
-    """
-    function MonoclinicLatticeConstants(a::Real, b::Real, c::Real, β::Real)
+# Outer constructor
+"""
+    MonoclinicUnitCell(
+        a::Real, b::Real, c::Real, β::Real;
+        centering::Centering=primitive_centering,
+        symmetry_elements::Union{Set,Vector,Nothing}=nothing
+    )
 
-        # --- Enforce constraints
+Construct a MonoclinicUnitCell object from a set of lattice constants.
 
-        if a <= 0
-            throw(DomainError(a, "`a` must be positive"))
-        end
+!!! note
 
-        if b <= 0
-            throw(DomainError(b, "`b` must be positive"))
-        end
+    No constraints are imposed on `centering`. The unit cell does _not_ to be a valid
+    Bravais lattice.
 
-        if c <= 0
-            throw(DomainError(c, "`c` must be positive"))
-        end
+Keyword Arguments
+=================
+- `centering`: centering of unit cell
 
-        if β <= MONOCLINIC_MIN_ANGLE || β >= MONOCLINIC_MAX_ANGLE
-            throw(DomainError(β, "`β` must satisfy 0 < β < π"))
-        end
+- `symmetry_elements`: symmetry elements of crystal
+"""
+function MonoclinicUnitCell(
+    a::Real,
+    b::Real,
+    c::Real,
+    β::Real;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+)
+    # --- Check arguments
 
-        # --- Construct MonoclinicLatticeConstants object
-
-        return new(a, b, c, β)
+    if a <= 0
+        throw(DomainError(a, "`a` must be positive"))
     end
+
+    if b <= 0
+        throw(DomainError(b, "`b` must be positive"))
+    end
+
+    if c <= 0
+        throw(DomainError(c, "`c` must be positive"))
+    end
+
+    if β <= MONOCLINIC_MIN_ANGLE || β >= MONOCLINIC_MAX_ANGLE
+        throw(DomainError(β, "`β` must satisfy 0 < β < π"))
+    end
+
+    # symmetry elements
+    # TODO
+
+    # --- Construct and return MonoclinicUnitCell object
+
+    return MonoclinicUnitCell(
+        (a=a, b=b, c=c, β=β); centering=centering, symmetry_elements=symmetry_elements
+    )
 end
 
+# ------ MonoclinicUnitCellDelta
+
 """
-    MonoclinicLatticeConstantDeltas
+    MonoclinicUnitCellDelta
 
 Lattice constant deltas for a monoclinic unit cell
 
@@ -98,63 +120,47 @@ Fields
 
 * `Δβ`: delta of the angle between edges of the unit cell in the plane of the face of the
   unit cell where the edges are not orthogonal
-
-Supertype: [`LatticeConstantDeltas`](@ref)
 """
-struct MonoclinicLatticeConstantDeltas <: LatticeConstantDeltas{Monoclinic}
-    # Fields
-    Δa::Float64
-    Δb::Float64
-    Δc::Float64
-    Δβ::Float64
+const MonoclinicUnitCellDelta = UnitCellDelta{Monoclinic}
 
-    """
-    Construct a set of monoclinic lattice constant deltas.
-    """
-    function MonoclinicLatticeConstantDeltas(Δa::Real, Δb::Real, Δc::Real, Δβ::Real)
-        return new(Δa, Δb, Δc, Δβ)
-    end
+# Outer constructors
+"""
+    MonoclinicUnitCellDelta(Δa::Real, Δb::Real, Δc::Real, Δβ::Real)
+
+Construct a MonoclinicUnitCellDelta object from a set of lattice constant deltas.
+"""
+function MonoclinicUnitCellDelta(Δa::Real, Δb::Real, Δc::Real, Δβ::Real)
+    Δlattice_constants = (Δa=Δa, Δb=Δb, Δc=Δc, Δβ=Δβ)
+    return MonoclinicUnitCellDelta(Δlattice_constants)
 end
 
 # --- Functions/Methods
 
-# ------ LatticeConstants functions
+# ------ UnitCell methods
 
-function isapprox(
-    x::MonoclinicLatticeConstants,
-    y::MonoclinicLatticeConstants;
-    atol::Real=0,
-    rtol::Real=atol > 0 ? 0 : √eps(),
-)
-    return isapprox(x.a, y.a; atol=atol, rtol=rtol) &&
-           isapprox(x.b, y.b; atol=atol, rtol=rtol) &&
-           isapprox(x.c, y.c; atol=atol, rtol=rtol) &&
-           isapprox(x.β, y.β; atol=atol, rtol=rtol)
-end
-
-function -(x::MonoclinicLatticeConstants, y::MonoclinicLatticeConstants)
-    return MonoclinicLatticeConstantDeltas(x.a - y.a, x.b - y.b, x.c - y.c, x.β - y.β)
-end
-
-function standardize(lattice_constants::MonoclinicLatticeConstants, centering::Centering)
+function standardize(unit_cell::MonoclinicUnitCell)
     # --- Check arguments
 
-    standardize_check_args(lattice_constants, centering)
-
-    # --- Handle base-centering as a special case
-
-    if centering === base_centering
-        # Convert to a body-centered unit cell and standardize
-        return standardize(convert_to_body_centering(lattice_constants), body_centering)
-    end
+    standardize_check_args(unit_cell)
 
     # --- Preparations
 
     # Extract lattice constants
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    β = lattice_constants.β
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    β = lattice_constants_.β
+
+    # Extract centering
+    centering_ = centering(unit_cell)
+
+    # --- Handle base-centering as a special case
+
+    if centering_ === base_centering
+        # Convert to a body-centered unit cell and standardize
+        return standardize(convert_to_body_centering(unit_cell))
+    end
 
     # --- Standardize lattice constants
 
@@ -174,7 +180,7 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
     #     conventions for a, c, and β are satisfied.
 
     # Perform reduction
-    if centering === primitive_centering
+    if centering_ === primitive_centering
         while -2 * c * cos(β) >= a
 
             # Attempt to compute equivalent lattice constants with smaller value of c.
@@ -195,7 +201,7 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
                 end
             end
         end
-    elseif centering === body_centering
+    elseif centering_ === body_centering
         while -c * cos(β) >= a
 
             # Attempt to compute equivalent lattice constants with smaller value of c.
@@ -217,33 +223,16 @@ function standardize(lattice_constants::MonoclinicLatticeConstants, centering::C
         end
     end
 
-    return MonoclinicLatticeConstants(a, b, c, β), centering
+    return MonoclinicUnitCell(a, b, c, β; centering=centering_)
 end
 
-# ------ LatticeConstantDeltas functions
-
-function isapprox(
-    x::MonoclinicLatticeConstantDeltas,
-    y::MonoclinicLatticeConstantDeltas;
-    atol::Real=0,
-    rtol::Real=atol > 0 ? 0 : √eps(),
-)
-    return isapprox(x.Δa, y.Δa; atol=atol, rtol=rtol) &&
-           isapprox(x.Δb, y.Δb; atol=atol, rtol=rtol) &&
-           isapprox(x.Δc, y.Δc; atol=atol, rtol=rtol) &&
-           isapprox(x.Δβ, y.Δβ; atol=atol, rtol=rtol)
-end
-
-# ------ Unit cell computations
-
-using LinearAlgebra: det
-
-function basis(lattice_constants::MonoclinicLatticeConstants)
+function basis(unit_cell::MonoclinicUnitCell)
     # Get lattice constants
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    β = lattice_constants.β
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    β = lattice_constants_.β
 
     # Construct basis
     basis_a = Vector{Float64}([a, 0, 0])
@@ -253,26 +242,28 @@ function basis(lattice_constants::MonoclinicLatticeConstants)
     return basis_a, basis_b, basis_c
 end
 
-function volume(lattice_constants::MonoclinicLatticeConstants)
+function volume(unit_cell::MonoclinicUnitCell)
     # Get lattice constants
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    β = lattice_constants.β
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    β = lattice_constants_.β
 
     # Compute volume
     return a * b * c * sin(β)
 end
 
-function surface_area(lattice_constants::MonoclinicLatticeConstants)
+function surface_area(unit_cell::MonoclinicUnitCell)
     # Get lattice constants
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    β = lattice_constants.β
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    β = lattice_constants_.β
 
     # Compute surface area
-    return 2 * (a * b + b * c + c * a * sin(lattice_constants.β))
+    return 2 * (a * b + b * c + c * a * sin(β))
 end
 
 function conventional_cell(::Monoclinic, unit_cell::UnitCell)
@@ -282,39 +273,35 @@ function conventional_cell(::Monoclinic, unit_cell::UnitCell)
 
     # --- Preparations
 
-    # Get standardized lattice constants and centering
-    lattice_constants, centering = standardize(
-        unit_cell.lattice_constants, unit_cell.centering
-    )
+    # Standardize unit cell
+    unit_cell = standardize(unit_cell)
 
     # Get lattice constants and centering
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    β = lattice_constants.β
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    β = lattice_constants_.β
 
-    # Initialize return values to the standardized monoclinic lattice constants
-    iucr_lattice_constants = lattice_constants
-    iucr_centering = centering
+    centering_ = centering(unit_cell)
 
     # --- Compute IUCr conventional cell
 
     # Check limiting cases
-    if centering === primitive_centering
+    if centering_ === primitive_centering
         if a ≈ -2 * c * cos(β)
             # Orthorhombic, C-centering
             @debug "mP --> oC (a = -2 * c * cos(β))"
             return conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(a, 2 * c * sin(β), b), base_centering)
+                OrthorhombicUnitCell(a, 2 * c * sin(β), b; centering=base_centering)
             )
 
         elseif a ≈ c
             # Orthorhombic, C-centering
             @debug "mP --> oC (a = c)"
             return conventional_cell(
-                UnitCell(
-                    OrthorhombicLatticeConstants(2 * c * cos(β / 2), 2 * c * sin(β / 2), b),
-                    base_centering,
+                OrthorhombicUnitCell(
+                    2 * c * cos(β / 2), 2 * c * sin(β / 2), b; centering=base_centering
                 ),
             )
 
@@ -322,25 +309,24 @@ function conventional_cell(::Monoclinic, unit_cell::UnitCell)
             # Orthorhombic, primitive-centering
             @debug "mP --> oP"
             return conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(a, b, c), primitive_centering)
+                OrthorhombicUnitCell(a, b, c; centering=primitive_centering)
             )
         end
 
-    elseif centering === body_centering
+    elseif centering_ === body_centering
         if β ≈ π / 2
             # Orthorhombic, body-centering
             @debug "mI --> oI"
             return conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(a, b, c), body_centering)
+                OrthorhombicUnitCell(a, b, c; centering=body_centering)
             )
 
         elseif a ≈ c
             # Orthorhombic, face-centering
             @debug "mI --> oF"
             return conventional_cell(
-                UnitCell(
-                    OrthorhombicLatticeConstants(2 * a * cos(β / 2), 2 * a * sin(β / 2), b),
-                    face_centering,
+                OrthorhombicUnitCell(
+                    2 * a * cos(β / 2), 2 * a * sin(β / 2), b; centering=face_centering
                 ),
             )
 
@@ -348,7 +334,7 @@ function conventional_cell(::Monoclinic, unit_cell::UnitCell)
             # Orthorhombic, C-centering
             @debug "mI --> oC"
             return conventional_cell(
-                UnitCell(OrthorhombicLatticeConstants(b, c * sin(β), a), base_centering)
+                OrthorhombicUnitCell(b, c * sin(β), a; centering=base_centering)
             )
 
         elseif a^2 + b^2 ≈ c^2 && a^2 + a * c * cos(β) ≈ b^2
@@ -356,7 +342,7 @@ function conventional_cell(::Monoclinic, unit_cell::UnitCell)
             @debug "mI --> hR (α < π/3)"
             α = acos_(1 - 0.5 * b^2 / a^2)
             return conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(a, α), primitive_centering)
+                RhombohedralUnitCell(a, α; centering=primitive_centering)
             )
 
         elseif a^2 + b^2 ≈ c^2 && b^2 + a * c * cos(β) ≈ a^2
@@ -364,7 +350,7 @@ function conventional_cell(::Monoclinic, unit_cell::UnitCell)
             @debug "mI --> hR (π/3 < α < π/2)"
             α = acos_(1 - 0.5 * b^2 / a^2)
             return conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(a, α), primitive_centering)
+                RhombohedralUnitCell(a, α; centering=primitive_centering)
             )
 
         elseif c^2 + 3 * b^2 ≈ 9 * a^2 && c ≈ -3 * a * cos(β)
@@ -372,7 +358,7 @@ function conventional_cell(::Monoclinic, unit_cell::UnitCell)
             @debug "mI --> hR (π/2 < α < acos(-1/3))"
             α = acos_((c^2 / a^2 - 3) / 6)
             return conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(a, α), primitive_centering)
+                RhombohedralUnitCell(a, α; centering=primitive_centering)
             )
 
         elseif a^2 + 3 * b^2 ≈ 9 * c^2 && a ≈ -3 * c * cos(β)
@@ -380,7 +366,7 @@ function conventional_cell(::Monoclinic, unit_cell::UnitCell)
             @debug "mI --> hR (acos(-1/3) < α)"
             α = acos_((a^2 / c^2 - 3) / 6)
             return conventional_cell(
-                UnitCell(RhombohedralLatticeConstants(c, α), primitive_centering)
+                RhombohedralUnitCell(c, α; centering=primitive_centering)
             )
         end
     end
@@ -390,43 +376,42 @@ function conventional_cell(::Monoclinic, unit_cell::UnitCell)
 end
 
 """
-    convert_to_body_centering(
-        lattice_constants::MonoclinicLatticeConstants
-    ) -> MonoclinicLatticeConstants
+    convert_to_body_centering(unit_cell::MonoclinicUnitCell) -> MonoclinicUnitCell
 
 Convert a base-centered monoclinic unit cell to body-centered monoclinic unit cell.
 
 Return values
 =============
-- lattice constants for equivalent body-centered unit cell
+- unit cell of equivalent body-centered unit cell
 
 Examples
 ========
 ```jldoctest
-julia> lattice_constants = MonoclinicLatticeConstants(1.0, 2.0, 3.0, 3π / 5);
+julia> unit_cell = MonoclinicUnitCell(1.0, 2.0, 3.0, 3π / 5);
 
-julia> body_centered_lattice_constants = convert_to_body_centering(lattice_constants);
+julia> body_centered_unit_cell = convert_to_body_centering(unit_cell);
 
-julia> body_centered_lattice_constants.a ≈ 2.8541019662496847
+julia> body_centered_unit_cell.a ≈ 2.8541019662496847
 true
 
-julia> body_centered_lattice_constants.b ≈ 2
+julia> body_centered_unit_cell.b ≈ 2
 true
 
-julia> body_centered_lattice_constants.c ≈ 3
+julia> body_centered_unit_cell.c ≈ 3
 true
 
-julia> body_centered_lattice_constants.β ≈ 2.8018712454717734
+julia> body_centered_unit_cell.β ≈ 2.8018712454717734
 true
 ```
 """
-function convert_to_body_centering(lattice_constants::MonoclinicLatticeConstants)
+function convert_to_body_centering(unit_cell::MonoclinicUnitCell)
 
     # Get lattice constants
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    β = lattice_constants.β
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    β = lattice_constants_.β
 
     # Compute lattice constants for base-centered unit cell
     a_base = sqrt(a^2 + c^2 - 2 * a * c * abs(cos(β)))
@@ -434,16 +419,14 @@ function convert_to_body_centering(lattice_constants::MonoclinicLatticeConstants
     c_base = c
 
     if a_base < c_base
-        return MonoclinicLatticeConstants(a_base, b, c_base, β_base)
+        return MonoclinicUnitCell(a_base, b, c_base, β_base; centering=body_centering)
     else
-        return MonoclinicLatticeConstants(c_base, b, a_base, β_base)
+        return MonoclinicUnitCell(c_base, b, a_base, β_base; centering=body_centering)
     end
 end
 
 """
-    convert_to_base_centering(
-        lattice_constants::MonoclinicLatticeConstants
-    ) -> MonoclinicLatticeConstants
+    convert_to_base_centering(unit_cell::MonoclinicUnitCell) -> MonoclinicUnitCell
 
 Convert a body-centered monoclinic unit cell to base-centered monoclinic unit cell.
 
@@ -454,30 +437,31 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> lattice_constants = MonoclinicLatticeConstants(1.0, 2.0, 3.0, 3π / 5);
+julia> unit_cell = MonoclinicUnitCell(1.0, 2.0, 3.0, 3π / 5);
 
-julia> base_centered_lattice_constants = convert_to_base_centering(lattice_constants);
+julia> base_centered_unit_cell = convert_to_base_centering(unit_cell);
 
-julia> base_centered_lattice_constants.a ≈ 2.8541019662496847
+julia> base_centered_unit_cell.a ≈ 2.8541019662496847
 true
 
-julia> base_centered_lattice_constants.b ≈ 2
+julia> base_centered_unit_cell.b ≈ 2
 true
 
-julia> base_centered_lattice_constants.c ≈ 1
+julia> base_centered_unit_cell.c ≈ 1
 true
 
-julia> base_centered_lattice_constants.β ≈ 1.5963584695539381
+julia> base_centered_unit_cell.β ≈ 1.5963584695539381
 true
 ```
 """
-function convert_to_base_centering(lattice_constants::MonoclinicLatticeConstants)
+function convert_to_base_centering(unit_cell::MonoclinicUnitCell)
 
     # Get lattice constants
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
-    β = lattice_constants.β
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    β = lattice_constants_.β
 
     # Compute lattice constants for base-centered unit cell
     a_base = sqrt(a^2 + c^2 - 2 * a * c * abs(cos(β)))
@@ -489,12 +473,14 @@ function convert_to_base_centering(lattice_constants::MonoclinicLatticeConstants
         β_base = π - asin_(sin(β) / a_base * a)
     end
 
-    return MonoclinicLatticeConstants(a_base, b, c_base, β_base)
+    return MonoclinicUnitCell(a_base, b, c_base, β_base; centering=base_centering)
 end
 
+using LinearAlgebra: det
+
 function is_supercell(
-    lattice_constants_test::MonoclinicLatticeConstants,
-    lattice_constants_ref::MonoclinicLatticeConstants;
+    unit_cell_test::MonoclinicUnitCell,
+    unit_cell_ref::MonoclinicUnitCell;
     tol::Real=1e-3,
     max_index::Integer=3,
 )
@@ -511,11 +497,13 @@ function is_supercell(
     # --- Preparations
 
     # Extract lattice constants
+    lattice_constants_test = lattice_constants(unit_cell_test)
     a_test = lattice_constants_test.a
     b_test = lattice_constants_test.b
     c_test = lattice_constants_test.c
     β_test = lattice_constants_test.β
 
+    lattice_constants_ref = lattice_constants(unit_cell_ref)
     a_ref = lattice_constants_ref.a
     b_ref = lattice_constants_ref.b
     c_ref = lattice_constants_ref.c
