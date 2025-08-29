@@ -124,7 +124,7 @@ end
     @test Set(symmetry_elements(unit_cell)) == Set(symmetry_elements_)
 end
 
-@testset "HexagonalUnitCell(::NamedTuple;::Centering,::Set) outer constructor: invalid arguments" begin
+@testset "HexagonalUnitCell(::Real,::Real;::Centering,::Set) outer constructor: invalid arguments" begin
     # --- Preparations
 
     # Valid arguments
