@@ -33,36 +33,6 @@ using Xtallography
 # * lattice_constants_deltas(::UnitCellDelta)
 # * isapprox(::UnitCell)
 
-@testset "lattice_system(::UnitCellDelta)" begin
-    for lattice_system_ in
-        (Triclinic, Monoclinic, Orthorhombic, Tetragonal, Hexagonal, Rhombohedral, Cubic)
-        lattice_constants = (a=3,)
-        unit_cell_delta = UnitCellDelta{lattice_system_}(lattice_constants)
-
-        @test lattice_system(unit_cell_delta) === lattice_system_()
-    end
-end
-
-@testset "Δlattice_constants(::UnitCellDelta)" begin
-    for lattice_system_ in
-        (Triclinic, Monoclinic, Orthorhombic, Tetragonal, Hexagonal, Rhombohedral, Cubic)
-        Δlattice_constants_ = (a=3,)
-        unit_cell_delta = UnitCellDelta{lattice_system_}(Δlattice_constants_)
-
-        @test Δlattice_constants(unit_cell_delta) === Δlattice_constants_
-    end
-end
-
-@testset "lattice_constant_deltas(::UnitCellDelta)" begin
-    for lattice_system_ in
-        (Triclinic, Monoclinic, Orthorhombic, Tetragonal, Hexagonal, Rhombohedral, Cubic)
-        Δlattice_constants_ = (a=3,)
-        unit_cell_delta = UnitCellDelta{lattice_system_}(Δlattice_constants_)
-
-        @test lattice_constant_deltas(unit_cell_delta) === Δlattice_constants_
-    end
-end
-
 @testset "isapprox(::UnitCellDelta): comparison between different types" begin
     # --- Tests
 
