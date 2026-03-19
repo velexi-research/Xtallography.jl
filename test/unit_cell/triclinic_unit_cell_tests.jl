@@ -936,6 +936,32 @@ end
     @test !is_equivalent_unit_cell(unit_cell, reference_unit_cell)
 end
 
+@testset ":(==)(::TriclinicUnitCell)" begin
+    # --- Exercise functionality and check results
+
+    # unit cells are equal
+    @test TriclinicUnitCell(1, 2, 3, 1.5, 1.5, 1.5) ==
+        TriclinicUnitCell(1, 2, 3, 1.5, 1.5, 1.5)
+
+    # lattice constants are not equal
+    @test TriclinicUnitCell(1, 2, 3, 1.5, 1.5, 1.5) !=
+        TriclinicUnitCell(1, 2, 3, 1.5, 1.5, 1.6)
+
+    # centerings are not equal
+    @test (
+        TriclinicUnitCell(1, 2, 3, 1.5, 1.5, 1.5; centering=primitive_centering) !=
+        TriclinicUnitCell(1, 2, 3, 1.5, 1.5, 1.5; centering=body_centering)
+    )
+
+    # symmetry elements are not equal
+    @test (
+        TriclinicUnitCell(1, 2, 3, 1.5, 1.5, 1.5; symmetry_elements=Set()) !=
+        TriclinicUnitCell(
+            1, 2, 3, 1.5, 1.5, 1.5; symmetry_elements=Set([a_2_1, d_perp_110])
+        )
+    )
+end
+
 @testset "isapprox(::TriclinicUnitCell)" begin
     # --- Preparations
 

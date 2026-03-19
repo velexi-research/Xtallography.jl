@@ -533,6 +533,28 @@ end
     @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
 end
 
+@testset ":(==)(::TetragonalUnitCell)" begin
+    # --- Exercise functionality and check results
+
+    # unit cells are equal
+    @test TetragonalUnitCell(1, 2) == TetragonalUnitCell(1, 2)
+
+    # lattice constants are not equal
+    @test TetragonalUnitCell(1, 2) != TetragonalUnitCell(1, 4)
+
+    # centerings are not equal
+    @test (
+        TetragonalUnitCell(1, 2; centering=primitive_centering) !=
+        TetragonalUnitCell(1, 2; centering=body_centering)
+    )
+
+    # symmetry elements are not equal
+    @test (
+        TetragonalUnitCell(1, 2; symmetry_elements=Set()) !=
+        TetragonalUnitCell(1, 2; symmetry_elements=Set([a_2_1, d_perp_110]))
+    )
+end
+
 @testset "isapprox(::TetragonalUnitCell)" begin
     # --- Preparations
 

@@ -677,6 +677,28 @@ end
     @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
 end
 
+@testset ":(==)(::OrthorhombicUnitCell)" begin
+    # --- Exercise functionality and check results
+
+    # unit cells are equal
+    @test OrthorhombicUnitCell(1, 2, 3) == OrthorhombicUnitCell(1, 2, 3)
+
+    # lattice constants are not equal
+    @test OrthorhombicUnitCell(1, 2, 3) != OrthorhombicUnitCell(1, 2, 4)
+
+    # centerings are not equal
+    @test (
+        OrthorhombicUnitCell(1, 2, 3; centering=primitive_centering) !=
+        OrthorhombicUnitCell(1, 2, 3; centering=body_centering)
+    )
+
+    # symmetry elements are not equal
+    @test (
+        OrthorhombicUnitCell(1, 2, 3; symmetry_elements=Set()) !=
+        OrthorhombicUnitCell(1, 2, 3; symmetry_elements=Set([a_2_1, d_perp_110]))
+    )
+end
+
 @testset "isapprox(::OrthorhombicUnitCell)" begin
     # --- Preparations
 

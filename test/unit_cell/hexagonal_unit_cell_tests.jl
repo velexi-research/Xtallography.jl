@@ -554,6 +554,28 @@ end
     @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
 end
 
+@testset ":(==)(::HexagonalUnitCell)" begin
+    # --- Exercise functionality and check results
+
+    # unit cells are equal
+    @test HexagonalUnitCell(1, 0.5) == HexagonalUnitCell(1, 0.5)
+
+    # lattice constants are not equal
+    @test HexagonalUnitCell(1, 0.5) != HexagonalUnitCell(2, 0.5)
+
+    # centerings are not equal
+    @test (
+        HexagonalUnitCell(1, 0.5; centering=primitive_centering) !=
+        HexagonalUnitCell(1, 0.5; centering=body_centering)
+    )
+
+    # symmetry elements are not equal
+    @test (
+        HexagonalUnitCell(1, 0.5; symmetry_elements=Set()) !=
+        HexagonalUnitCell(1, 0.5; symmetry_elements=Set([a_2_1, d_perp_110]))
+    )
+end
+
 @testset "isapprox(::HexagonalUnitCell)" begin
     # --- Preparations
 

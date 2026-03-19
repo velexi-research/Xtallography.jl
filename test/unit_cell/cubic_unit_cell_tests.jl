@@ -521,6 +521,28 @@ end
     )
 end
 
+@testset ":(==)(::CubicUnitCell)" begin
+    # --- Exercise functionality and check results
+
+    # unit cells are equal
+    @test CubicUnitCell(1.0) == CubicUnitCell(1.0)
+
+    # lattice constants are not equal
+    @test CubicUnitCell(1.0) != CubicUnitCell(2.0)
+
+    # centerings are not equal
+    @test (
+        CubicUnitCell(1.0; centering=primitive_centering) !=
+        CubicUnitCell(1.0; centering=body_centering)
+    )
+
+    # symmetry elements are not equal
+    @test (
+        CubicUnitCell(1.0; symmetry_elements=Set()) !=
+        CubicUnitCell(1.0; symmetry_elements=Set([a_2_1, d_perp_110]))
+    )
+end
+
 @testset "isapprox(::CubicUnitCell)" begin
     # --- Preparations
 

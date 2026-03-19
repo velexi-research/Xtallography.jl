@@ -1029,6 +1029,28 @@ end
     )
 end
 
+@testset ":(==)(::MonoclinicUnitCell)" begin
+    # --- Exercise functionality and check results
+
+    # unit cells are equal
+    @test MonoclinicUnitCell(1, 2, 3, 1.5) == MonoclinicUnitCell(1, 2, 3, 1.5)
+
+    # lattice constants are not equal
+    @test MonoclinicUnitCell(1, 2, 3, 1.5) != MonoclinicUnitCell(1, 2, 3, 1.6)
+
+    # centerings are not equal
+    @test (
+        MonoclinicUnitCell(1, 2, 3, 1.5; centering=primitive_centering) !=
+        MonoclinicUnitCell(1, 2, 3, 1.5; centering=body_centering)
+    )
+
+    # symmetry elements are not equal
+    @test (
+        MonoclinicUnitCell(1, 2, 3, 1.5; symmetry_elements=Set()) !=
+        MonoclinicUnitCell(1, 2, 3, 1.5; symmetry_elements=Set([a_2_1, d_perp_110]))
+    )
+end
+
 @testset "isapprox(::MonoclinicUnitCell)" begin
     # --- Preparations
 

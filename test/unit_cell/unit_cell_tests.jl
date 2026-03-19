@@ -52,6 +52,7 @@ using Xtallography
 #
 # * is_equivalent_cell(::UnitCell)
 # * is_supercell(::UnitCell)
+# * :(==)(::UnitCell)
 # * isapprox(::UnitCell)
 #
 # * -(::UnitCell,::UnitCell)
@@ -201,6 +202,13 @@ end
     orthorhombic_unit_cell = OrthorhombicUnitCell(1.0, 2.0, 3.0)
 
     @test !is_supercell(cubic_unit_cell, orthorhombic_unit_cell)
+end
+
+@testset ":(==)(::UnitCell): comparison between different types" begin
+    # x != y
+    x = CubicUnitCell(1)
+    y = TetragonalUnitCell(1, 2)
+    @test x != y
 end
 
 @testset "isapprox(::UnitCell): comparison between different types" begin
