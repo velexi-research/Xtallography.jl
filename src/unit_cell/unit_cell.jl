@@ -360,6 +360,7 @@ end
 
 # --- Functions/Methods
 
+import Base.:(==)
 import Base.isapprox
 using LinearAlgebra: dot
 using Combinatorics: combinations
@@ -636,10 +637,10 @@ function conventional_cell(unit_cell::UnitCell)
         return conventional_cell(monoclinic, unit_cell)
     elseif lattice_system_ === orthorhombic
         return conventional_cell(orthorhombic, unit_cell)
-    elseif lattice_system_ === tetragonal
-        return conventional_cell(tetragonal, unit_cell)
     elseif lattice_system_ === rhombohedral
         return conventional_cell(rhombohedral, unit_cell)
+    elseif lattice_system_ === tetragonal
+        return conventional_cell(tetragonal, unit_cell)
     end
 
     # --- By default, the unit cell is unchanged
@@ -1067,6 +1068,21 @@ function is_supercell(::UnitCell, ::UnitCell)
     # Default is_supercell() implementation to allow comparison between lattice constants
     # of different lattice systems.
     return false
+end
+
+function Base.:(==)(x::UnitCell, y::UnitCell)
+    # Default :(==) implementation to allow comparison between unit cells for different
+    # lattice systems.
+    return false
+end
+
+function Base.:(==)(x::UnitCell{T}, y::UnitCell{T}) where {T<:LatticeSystem}
+    return (
+        symmetry(x) == symmetry(y) && all(
+            getfield(x.lattice_constants, name) == getfield(y.lattice_constants, name) for
+            name in fieldnames(typeof(x.lattice_constants))
+        )
+    )
 end
 
 function isapprox(x::UnitCell, y::UnitCell; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps())
