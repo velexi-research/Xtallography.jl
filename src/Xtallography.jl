@@ -34,9 +34,10 @@ include("symmetry/symmetry_elements.jl")
 include("symmetry/bravais_lattices.jl")
 
 # --- Unit cell types and methods
-include("unit_cell/lattice_constants.jl")
+
 include("unit_cell/unit_cell_symmetry.jl")
 include("unit_cell/unit_cell.jl")
+include("unit_cell/unit_cell_delta.jl")
 include("unit_cell/triclinic.jl")
 include("unit_cell/monoclinic.jl")
 include("unit_cell/orthorhombic.jl")
