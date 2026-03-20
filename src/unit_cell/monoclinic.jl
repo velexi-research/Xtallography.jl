@@ -371,8 +371,8 @@ function conventional_cell(::Monoclinic, unit_cell::UnitCell)
         end
     end
 
-    # Not a limiting case, so return unit cell with standardized lattice constants
-    return UnitCell(lattice_constants, centering)
+    # Not a limiting case, so return standardized unit cell
+    return unit_cell
 end
 
 """

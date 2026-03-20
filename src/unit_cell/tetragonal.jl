@@ -142,22 +142,22 @@ function conventional_cell(::Tetragonal, unit_cell::UnitCell)
 
     # Get lattice constants and centering
     lattice_constants_ = lattice_constants(unit_cell)
-    a = unit_cell.lattice_constants_.a
-    c = unit_cell.lattice_constants_.c
+    a = lattice_constants_.a
+    c = lattice_constants_.c
 
-    centering = unit_cell.centering
+    centering_ = centering(unit_cell)
 
     # --- Compute IUCr conventional cell
 
     # Check limiting cases
-    if centering === primitive_centering
+    if centering_ === primitive_centering
         if a ≈ c
             # cubic, primitive-centering, edge length `a`
             @debug "tP --> cP"
             return conventional_cell(CubicUnitCell(a; centering=primitive_centering))
         end
 
-    elseif centering === body_centering
+    elseif centering_ === body_centering
         if a ≈ c
             # cubic, body-centering, edge length `a`
             @debug "tI --> cI"
@@ -171,5 +171,5 @@ function conventional_cell(::Tetragonal, unit_cell::UnitCell)
     end
 
     # Not a limiting case, so return unit cell with original lattice constants
-    return UnitCell(unit_cell)
+    return unit_cell
 end

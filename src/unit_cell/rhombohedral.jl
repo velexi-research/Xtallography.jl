@@ -165,8 +165,8 @@ function conventional_cell(::Rhombohedral, unit_cell::UnitCell)
 
     # Get lattice constants
     lattice_constants_ = lattice_constants(unit_cell)
-    a = unit_cell.lattice_constants_.a
-    α = unit_cell.lattice_constants_.α
+    a = lattice_constants_.a
+    α = lattice_constants_.α
 
     # --- Compute IUCr conventional cell
 

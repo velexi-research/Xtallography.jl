@@ -389,7 +389,7 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
         monoclinic_unit_cell = convert_to_mI(unit_cell)
 
         @debug "aP --> mI"
-        return conventional_cell(UnitCell(monoclinic_unit_cell, body_centering))
+        return conventional_cell(monoclinic_unit_cell)
 
     catch error
         if !(error isa ErrorException) || (
@@ -406,10 +406,8 @@ function conventional_cell(::Triclinic, unit_cell::UnitCell)
         monoclinic_unit_cell = convert_to_mC(unit_cell)
 
         @debug "aP --> mC"
-        body_centered_unit_cell, centering = standardize(
-            monoclinic_unit_cell, base_centering
-        )
-        return conventional_cell(UnitCell(body_centered_unit_cell, body_centering))
+        body_centered_unit_cell = standardize(monoclinic_unit_cell)
+        return conventional_cell(body_centered_unit_cell)
 
     catch error
         if !(error isa ErrorException) || (
@@ -637,10 +635,7 @@ function convert_to_mI_basis_to_unit_cell(
         throw(ErrorException("m_β be at least π/2. (m_β=$m_β)"))
     end
 
-    m_lattice_constants, _ = standardize(
-        MonoclinicUnitCell(m_a, m_b, m_c, m_β), body_centering
-    )
-    return m_lattice_constants
+    return MonoclinicUnitCell(m_a, m_b, m_c, m_β; centering=body_centering)
 end
 
 function convert_to_mI_case_1(unit_cell::TriclinicUnitCell)
@@ -1443,7 +1438,7 @@ function convert_to_mC_basis_to_unit_cell(
         throw(ErrorException("m_β be at least π/2. (m_β=$m_β)"))
     end
 
-    return MonoclinicUnitCell(m_a, m_b, m_c, m_β)
+    return MonoclinicUnitCell(m_a, m_b, m_c, m_β; centering=base_centering)
 end
 
 function convert_to_mC_case_1(unit_cell::TriclinicUnitCell)

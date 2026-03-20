@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 """
-Tests for unit cell standardization methods for cubic lattices
+Tests for conventional_cell() and supporting methods in unit_cell/cubic.jl
 """
 # --- Imports
 
@@ -26,39 +26,43 @@ using Xtallography
 
 # --- Tests
 
-@testset "conventional_cell():cubic: limiting cases" begin
-    # --- Tests
-
-    # ------ Cubic lattices have no limiting cases for primitive, body, and face centerings
-
-    lattice_constants = CubicLatticeConstants(1.0)
-
-    for centering in (primitive_centering, body_centering, face_centering)
-        unit_cell = UnitCell(lattice_constants, centering)
-
-        iucr_unit_cell = conventional_cell(unit_cell)
-
-        @test iucr_unit_cell == unit_cell
-    end
-
+@testset "conventional_cell(::CubicUnitCell): invalid arguments" begin
     # ------ Invalid centering
 
-    # centering = face-centered
+    # centering = base_centering
     expected_message = (
         "Invalid Bravais lattice: (lattice_system=Cubic, centering=BaseCentering)"
     )
 
     @test_throws ArgumentError(expected_message) conventional_cell(
-        UnitCell(lattice_constants, base_centering)
+        CubicUnitCell(1; centering=base_centering)
     )
 end
 
-@testset "conventional_cell():cubic: chain of limiting cases" begin
+@testset "conventional_cell(::CubicUnitCell)): limiting cases" begin
+    # --- Tests
+
+    # ------ Cubic lattices have no limiting cases for primitive, body, and face centerings
+
+    for centering_ in (primitive_centering, body_centering, face_centering)
+        unit_cell = CubicUnitCell(1.0; centering=centering_)
+
+        # Check test conditions
+        @test unit_cell isa CubicUnitCell
+        @test centering(unit_cell) === centering_
+
+        # Exercise functionality and check results
+        iucr_unit_cell = conventional_cell(unit_cell)
+        @test iucr_unit_cell == unit_cell
+    end
+end
+
+@testset "conventional_cell()::CubicUnitCell: chain of limiting cases" begin
     # --- Preparations
 
-    a = 5
-    lattice_constants = CubicLatticeConstants(a)
-    basis_a, basis_b, basis_c = basis(lattice_constants)
+    c_a = 5
+    primitive_cubic_unit_cell = CubicUnitCell(c_a)
+    basis_a, basis_b, basis_c = basis(primitive_cubic_unit_cell)
 
     # --- Exercise functionality and check results
 
@@ -68,12 +72,19 @@ end
     #       mP --> oC limiting cases are equivalent when β = π / 2 and a = c.
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        primitive_centering,
+        basis_a,
+        basis_b,
+        basis_c;
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, primitive_centering)
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
+
+    expected_unit_cell = CubicUnitCell(c_a; centering=primitive_centering)
+
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa CubicUnitCell
+    @test centering(expected_unit_cell) === primitive_centering
+
     @debug "chain of limiting cases: aP --> mP --> oP --> tP --> cP " *
         "(presents as equivalent chain aP --> mP --> oC --> tP --> cP)"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
@@ -81,14 +92,19 @@ end
     # ------ primitive unit cell: aP --> mP --> oC --> tP --> cP
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a, basis_a + basis_b, basis_c; identify_lattice_system=false
-        ),
-        primitive_centering,
+        basis_a,
+        basis_a + basis_b,
+        basis_c;
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, primitive_centering)
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
+
+    expected_unit_cell = CubicUnitCell(c_a; centering=primitive_centering)
+
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa CubicUnitCell
+    @test centering(expected_unit_cell) === primitive_centering
+
     @debug "chain of limiting cases: aP --> mP --> oC --> tP --> cP"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
@@ -105,14 +121,19 @@ end
     #         (hR: π/2 < α < acos(-1/3)
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a, basis_b + basis_c, basis_a + basis_c; identify_lattice_system=false
-        ),
-        primitive_centering,
+        basis_a,
+        basis_b + basis_c,
+        basis_a + basis_c;
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, primitive_centering)
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
+
+    expected_unit_cell = CubicUnitCell(c_a; centering=primitive_centering)
+
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa CubicUnitCell
+    @test centering(expected_unit_cell) === primitive_centering
+
     @debug "chain of limiting cases: aP --> mI --> oC --> tP --> cP " *
         "(equivalent to the case aP --> mI --> hR --> cP)"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
@@ -120,17 +141,19 @@ end
     # ------ body-centered unit cell: aP --> mI --> oI --> tI --> cI
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a,
-            basis_b,
-            0.5 * (basis_a + basis_b + basis_c);
-            identify_lattice_system=false,
-        ),
-        primitive_centering,
+        basis_a,
+        basis_b,
+        0.5 * (basis_a + basis_b + basis_c);
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, body_centering)
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
+
+    expected_unit_cell = CubicUnitCell(c_a; centering=body_centering)
+
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa CubicUnitCell
+    @test centering(expected_unit_cell) === body_centering
+
     @debug "chain of limiting cases: aP --> mI --> oI --> tI --> cI"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
@@ -142,17 +165,19 @@ end
     #           c^2 + 3 * b^2 = 9 * a^2 and c = -3 * a * cos(β)
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            0.5 * (basis_a + basis_b - basis_c),
-            0.5 * (basis_a - basis_b + basis_c),
-            0.5 * (-basis_a + basis_b + basis_c);
-            identify_lattice_system=false,
-        ),
-        primitive_centering,
+        0.5 * (basis_a + basis_b - basis_c),
+        0.5 * (basis_a - basis_b + basis_c),
+        0.5 * (-basis_a + basis_b + basis_c);
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, body_centering)
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
+
+    expected_unit_cell = CubicUnitCell(c_a; centering=body_centering)
+
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa CubicUnitCell
+    @test centering(expected_unit_cell) === body_centering
+
     @debug "chain of limiting cases: aP --> mI --> oF --> tI --> cI " *
         "(equivalent to the case aP --> mI --> hR --> cI)"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
@@ -165,17 +190,19 @@ end
     #         a^2 + b^2 = c^2 && a^2 + a * c * cos(β) = b^2
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            0.5 * (basis_a + basis_b),
-            0.5 * (basis_b + basis_c),
-            0.5 * (basis_c + basis_a);
-            identify_lattice_system=false,
-        ),
-        primitive_centering,
+        0.5 * (basis_a + basis_b),
+        0.5 * (basis_b + basis_c),
+        0.5 * (basis_c + basis_a);
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, face_centering)
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
+
+    expected_unit_cell = CubicUnitCell(c_a; centering=face_centering)
+
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa CubicUnitCell
+    @test centering(expected_unit_cell) === face_centering
+
     @debug "chain of limiting cases: aP --> mI --> oI --> tI --> cF " *
         "(equivalent to the case aP --> mI --> hR --> cF)"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
@@ -186,17 +213,19 @@ end
     #       mP --> oI limiting cases are equivalent when β = π / 2 and a = c.
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a,
-            0.5 * (basis_a + basis_b),
-            0.5 * (basis_b + basis_c);
-            identify_lattice_system=false,
-        ),
-        primitive_centering,
+        basis_a,
+        0.5 * (basis_a + basis_b),
+        0.5 * (basis_b + basis_c);
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = UnitCell(lattice_constants, face_centering)
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa CubicLatticeConstants
+
+    expected_unit_cell = CubicUnitCell(c_a; centering=face_centering)
+
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa CubicUnitCell
+    @test centering(expected_unit_cell) === face_centering
+
     @debug "chain of limiting cases: aP --> mI --> oF --> tI --> cF " *
         "(presents as equivalent chain aP --> mI --> oI --> tI --> cF)"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell

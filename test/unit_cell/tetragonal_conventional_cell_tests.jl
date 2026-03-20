@@ -26,168 +26,191 @@ using Xtallography
 
 # --- Tests
 
-@testset "conventional_cell():tetragonal: limiting cases, centering = primitive_centering" begin
+@testset "conventional_cell(::TetragonalUnitCell): invalid arguments" begin
+    # --- Preparations
+
+    # Construct lattice constants for tetragonal unit cell
+    a = 1.0
+    c = 3.0
+
     # --- Tests
 
-    # ------ a = b = c
+    # ------ Invalid centering
 
-    a = 5.0
-    c = a
-    lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive_centering))
+    for centering_ in (face_centering, base_centering)
+        expected_message =
+            "Invalid Bravais lattice: " *
+            "(lattice_system=Tetragonal, centering=$(nameof(typeof(centering_))))"
 
-    @test iucr_unit_cell.lattice_constants ≈ CubicLatticeConstants(a)
-    @test iucr_unit_cell.centering === primitive_centering
+        @test_throws ArgumentError(expected_message) conventional_cell(
+            TetragonalUnitCell(a, c; centering=centering_)
+        )
+    end
+end
 
-    # ------ tetragonal unit cell is not equivalent to a cubic unit cell
+@testset "conventional_cell(::TetragonalUnitCell): non-limiting cases" begin
+    # tetragonal unit cells that are not equivalent to any higher symmetry unit cell
+
+    # --- centering = primitive_centering
 
     a = 5.0
     c = 10.0
-    lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive_centering))
+    unit_cell = TetragonalUnitCell(a, c)
 
-    @test iucr_unit_cell.lattice_constants ≈ lattice_constants
-    @test iucr_unit_cell.centering === primitive_centering
+    # Check test conditions
+    @test unit_cell isa TetragonalUnitCell
+    @test centering(unit_cell) === primitive_centering
+
+    # Exercise functionality
+    iucr_unit_cell = conventional_cell(unit_cell)
+
+    # Check results
+    expected_unit_cell = standardize(unit_cell)
+    @test iucr_unit_cell == expected_unit_cell
+
+    # --- centering = body_centering
+
+    a = 5.0
+    c = 10.0
+    unit_cell = TetragonalUnitCell(a, c; centering=body_centering)
+
+    # Check test conditions
+    @test unit_cell isa TetragonalUnitCell
+    @test centering(unit_cell) === body_centering
+
+    # Exercise functionality
+    iucr_unit_cell = conventional_cell(unit_cell)
+
+    # Check results
+    expected_unit_cell = standardize(unit_cell)
+    @test iucr_unit_cell == expected_unit_cell
 end
 
-@testset "conventional_cell():tetragonal: limiting cases, centering = body" begin
+@testset "conventional_cell(::TetragonalUnitCell): limiting cases - tP --> cP" begin
     # --- Tests
 
     # ------ a = b = c
 
     a = 5.0
     c = a
-    lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
+    unit_cell = TetragonalUnitCell(a, c; centering=primitive_centering)
 
-    @test iucr_unit_cell.lattice_constants ≈ CubicLatticeConstants(a)
-    @test iucr_unit_cell.centering === body_centering
+    iucr_unit_cell = conventional_cell(unit_cell)
+
+    @test iucr_unit_cell ≈ CubicUnitCell(a; centering=primitive_centering)
+end
+
+@testset "conventional_cell(::TetragonalUnitCell): limiting cases - tI --> cI" begin
+    # --- Tests
+
+    # ------ a = b = c
+
+    a = 5.0
+    c = a
+    unit_cell = TetragonalUnitCell(a, c; centering=body_centering)
+
+    iucr_unit_cell = conventional_cell(unit_cell)
+
+    @test iucr_unit_cell ≈ CubicUnitCell(a; centering=body_centering)
 
     # ------ c = a √2
 
     a = 5.0
     c = a * sqrt(2)
-    lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
+    unit_cell = TetragonalUnitCell(a, c; centering=body_centering)
 
-    @test iucr_unit_cell.lattice_constants ≈ CubicLatticeConstants(c)
-    @test iucr_unit_cell.centering === face_centering
+    iucr_unit_cell = conventional_cell(unit_cell)
 
-    # ------ tetragonal unit cell is not equivalent to a cubic unit cell
-
-    a = 5.0
-    c = 10.0
-    lattice_constants = TetragonalLatticeConstants(a, c)
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
-
-    @test iucr_unit_cell.lattice_constants ≈ lattice_constants
-    @test iucr_unit_cell.centering === body_centering
+    @test iucr_unit_cell ≈ CubicUnitCell(c; centering=face_centering)
 end
 
-@testset "conventional_cell():tetragonal: chain of limiting cases" begin
+@testset "conventional_cell()::TetragonalUnitCell: chain of limiting cases" begin
     # --- Preparations
 
     a = 5
     c = 9
-    lattice_constants = TetragonalLatticeConstants(a, c)
-    basis_a, basis_b, basis_c = basis(lattice_constants)
+    primitive_tetragonal_unit_cell = TetragonalUnitCell(a, c)
+    basis_a, basis_b, basis_c = basis(primitive_tetragonal_unit_cell)
 
     # --- Exercise functionality and check results
 
     # ------ primitive unit cell: aP --> mP --> oP --> tP
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        primitive_centering,
+        basis_a,
+        basis_b,
+        basis_c;
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, primitive_centering))
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
+    expected_unit_cell = standardize(primitive_tetragonal_unit_cell)
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa TetragonalUnitCell
+    @test centering(expected_unit_cell) === primitive_centering
     @debug "chain of limiting cases: aP --> mP --> oP --> tP"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ primitive unit cell: aP --> mP --> oC --> tP
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a, basis_a + basis_b, basis_c; identify_lattice_system=false
-        ),
-        primitive_centering,
+        basis_a,
+        basis_a + basis_b,
+        basis_c;
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, primitive_centering))
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
+    expected_unit_cell = standardize(primitive_tetragonal_unit_cell)
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa TetragonalUnitCell
+    @test centering(expected_unit_cell) === primitive_centering
     @debug "chain of limiting cases: aP --> mP --> oC --> tP"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ primitive unit cell: aP --> mI --> oC --> tP
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a, basis_b + basis_a, basis_c + basis_b; identify_lattice_system=false
-        ),
-        primitive_centering,
+        basis_a,
+        basis_b + basis_a,
+        basis_c + basis_b;
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, primitive_centering))
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
+    expected_unit_cell = standardize(primitive_tetragonal_unit_cell)
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa TetragonalUnitCell
+    @test centering(expected_unit_cell) === primitive_centering
     @debug "chain of limiting cases: aP --> mI --> oC --> tP"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ body-centered unit cell: aP --> mI --> oI --> tI
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a,
-            basis_b,
-            0.5 * (basis_a + basis_b + basis_c);
-            identify_lattice_system=false,
-        ),
-        primitive_centering,
+        basis_a,
+        basis_b,
+        0.5 * (basis_a + basis_b + basis_c);
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, body_centering))
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
+    expected_unit_cell = standardize(TetragonalUnitCell(a, c; centering=body_centering))
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa TetragonalUnitCell
+    @test centering(expected_unit_cell) === body_centering
     @debug "chain of limiting cases: aP --> mI --> oI --> tI"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # ------ body-centered unit cell: aP --> mI --> oF --> tI
 
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a,
-            0.5 * (basis_a + basis_b + basis_c),
-            0.5 * (basis_a + basis_b - basis_c);
-            identify_lattice_system=false,
-        ),
-        primitive_centering,
+        basis_a,
+        0.5 * (basis_a + basis_b + basis_c),
+        0.5 * (basis_a + basis_b - basis_c);
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, body_centering))
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa TetragonalLatticeConstants
+    expected_unit_cell = standardize(TetragonalUnitCell(a, c; centering=body_centering))
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa TetragonalUnitCell
+    @test centering(expected_unit_cell) === body_centering
     @debug "chain of limiting cases: aP --> mI --> oF --> tI"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
-end
-
-@testset "conventional_cell():tetragonal: invalid arguments" begin
-    # --- Preparations
-
-    # Construct lattice constants for tetragonal unit cell
-    a = 1.0
-    c = 3.0
-    lattice_constants = TetragonalLatticeConstants(a, c)
-
-    # --- Tests
-
-    # ------ Invalid centering
-
-    for centering in (face_centering, base_centering)
-        expected_message =
-            "Invalid Bravais lattice: " *
-            "(lattice_system=Tetragonal, centering=$(nameof(typeof(centering))))"
-
-        @test_throws ArgumentError(expected_message) conventional_cell(
-            UnitCell(lattice_constants, centering)
-        )
-    end
 end

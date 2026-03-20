@@ -40,10 +40,70 @@ using Xtallography
 
 # --- Tests
 
-@testset "conventional_cell():orthorhombic: limiting cases, centering = primitive_centering" begin
+@testset "conventional_cell(::OrthorhombicUnitCell): non-limiting cases" begin
+    # orthorhombic unit cells that are not equivalent to any higher symmetry unit cell
+
+    # --- centering = primitive
+
+    # Construct orthorhombic unit cell
+    a = 2.0
+    b = 1.0
+    c = 3.0
+    unit_cell = OrthorhombicUnitCell(a, b, c; centering=primitive_centering)
+
+    # Exercise functionality
+    iucr_unit_cell = conventional_cell(unit_cell)
+
+    # Check results
+    @test iucr_unit_cell ≈ standardize(unit_cell)
+
+    # --- centering = body-centering
+
+    # Construct orthorhombic unit cell
+    a = 2.0
+    b = 1.0
+    c = 3.0
+    unit_cell = OrthorhombicUnitCell(a, b, c; centering=body_centering)
+
+    # Exercise functionality
+    iucr_unit_cell = conventional_cell(unit_cell)
+
+    # Check results
+    @test iucr_unit_cell ≈ standardize(unit_cell)
+
+    # --- centering = face_centering
+
+    # Construct orthorhombic unit cell
+    a = 2.0
+    b = 1.0
+    c = 3.0
+    unit_cell = OrthorhombicUnitCell(a, b, c; centering=face_centering)
+
+    # Exercise functionality
+    iucr_unit_cell = conventional_cell(unit_cell)
+
+    # Check results
+    @test iucr_unit_cell ≈ standardize(unit_cell)
+
+    # --- centering = base_centering
+
+    # Construct orthorhombic unit cell
+    a = 2.0
+    b = 1.0
+    c = 3.0
+    unit_cell = OrthorhombicUnitCell(a, b, c; centering=base_centering)
+
+    # Exercise functionality
+    iucr_unit_cell = conventional_cell(unit_cell)
+
+    # Check results
+    @test iucr_unit_cell ≈ standardize(unit_cell)
+end
+
+@testset "conventional_cell(::OrthorhombicUnitCell): limiting cases - oP --> tP" begin
     # --- Preparations
 
-    # Construct lattice constants for tetragonal unit cell
+    # Construct tetragonal unit cell
     t_a = 1.0
     t_c = 3.0
 
@@ -51,62 +111,47 @@ using Xtallography
 
     # ------ a = b
 
-    # Construct lattice constants for orthorhombic unit cell
+    # Construct orthorhombic unit cell
     a = t_a
     b = t_a
     c = t_c
-    lattice_constants = OrthorhombicLatticeConstants(a, b, c)
+    unit_cell = OrthorhombicUnitCell(a, b, c; centering=primitive_centering)
 
     # Check test conditions
-    @test lattice_constants isa OrthorhombicLatticeConstants
-    @test lattice_constants.a ≈ lattice_constants.b
+    @test unit_cell isa OrthorhombicUnitCell
+    @test centering(unit_cell) === primitive_centering
+    @test lattice_constants(unit_cell).a ≈ lattice_constants(unit_cell).b
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive_centering))
+    iucr_unit_cell = conventional_cell(unit_cell)
 
     # Check results
-    @test iucr_unit_cell.lattice_constants ≈ TetragonalLatticeConstants(t_a, t_c)
-    @test iucr_unit_cell.centering === primitive_centering
+    @test iucr_unit_cell ≈ TetragonalUnitCell(t_a, t_c; centering=primitive_centering)
 
     # ------ b = c
 
-    # Construct lattice constants for monoclinic unit cell
+    # Construct orthorhombic unit cell
     a = t_a
     b = t_c
     c = t_c
-    lattice_constants = OrthorhombicLatticeConstants(a, b, c)
+    unit_cell = OrthorhombicUnitCell(a, b, c; centering=primitive_centering)
 
     # Check test conditions
-    @test lattice_constants isa OrthorhombicLatticeConstants
-    @test lattice_constants.b ≈ lattice_constants.c
+    @test unit_cell isa OrthorhombicUnitCell
+    @test centering(unit_cell) === primitive_centering
+    @test lattice_constants(unit_cell).b ≈ lattice_constants(unit_cell).c
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive_centering))
+    iucr_unit_cell = conventional_cell(unit_cell)
 
     # Check results
-    @test iucr_unit_cell.lattice_constants ≈ TetragonalLatticeConstants(t_c, t_a)
-    @test iucr_unit_cell.centering === primitive_centering
-
-    # ------ orthorhombic unit cell is not equivalent to a tetragonal unit cell
-
-    # Construct lattice constants for orthorhombic unit cell
-    a = 2.0
-    b = 1.0
-    c = 3.0
-    lattice_constants = OrthorhombicLatticeConstants(a, b, c)
-
-    # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, primitive_centering))
-
-    # Check results
-    @test iucr_unit_cell.lattice_constants ≈ standardize(lattice_constants)
-    @test iucr_unit_cell.centering === primitive_centering
+    @test iucr_unit_cell ≈ TetragonalUnitCell(t_c, t_a; centering=primitive_centering)
 end
 
-@testset "conventional_cell():orthorhombic: limiting cases, centering = body" begin
+@testset "conventional_cell(::OrthorhombicUnitCell): limiting cases - oI --> tI" begin
     # --- Preparations
 
-    # Construct lattice constants for tetragonal unit cell
+    # Construct tetragonal unit cell
     t_a = 1.0
     t_c = 3.0
 
@@ -114,60 +159,46 @@ end
 
     # ------ a = b
 
-    # Construct lattice constants for orthorhombic unit cell
+    # Construct orthorhombic unit cell
     a = t_a
     b = t_a
     c = t_c
-    lattice_constants = OrthorhombicLatticeConstants(a, b, c)
+    unit_cell = OrthorhombicUnitCell(a, b, c; centering=body_centering)
 
     # Check test conditions
-    @test lattice_constants isa OrthorhombicLatticeConstants
-    @test lattice_constants.a ≈ lattice_constants.b
+    @test unit_cell isa OrthorhombicUnitCell
+    @test centering(unit_cell) === body_centering
+    @test lattice_constants(unit_cell).a ≈ lattice_constants(unit_cell).b
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
+    iucr_unit_cell = conventional_cell(unit_cell)
 
     # Check results
-    @test iucr_unit_cell.lattice_constants ≈ TetragonalLatticeConstants(t_a, t_c)
-    @test iucr_unit_cell.centering === body_centering
+    expected_unit_cell = TetragonalUnitCell(t_a, t_c; centering=body_centering)
+    @test iucr_unit_cell ≈ expected_unit_cell
 
     # ------ b = c
 
-    # Construct lattice constants for monoclinic unit cell
+    # Construct orthorhombic unit cell
     a = t_a
     b = t_c
     c = t_c
-    lattice_constants = OrthorhombicLatticeConstants(a, b, c)
+    unit_cell = OrthorhombicUnitCell(a, b, c; centering=body_centering)
 
     # Check test conditions
-    @test lattice_constants isa OrthorhombicLatticeConstants
-    @test lattice_constants.b ≈ lattice_constants.c
+    @test unit_cell isa OrthorhombicUnitCell
+    @test centering(unit_cell) === body_centering
+    @test lattice_constants(unit_cell).b ≈ lattice_constants(unit_cell).c
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
+    iucr_unit_cell = conventional_cell(unit_cell)
 
     # Check results
-    @test iucr_unit_cell.lattice_constants ≈ TetragonalLatticeConstants(t_c, t_a)
-    @test iucr_unit_cell.centering === body_centering
-
-    # ------ orthorhombic unit cell is not equivalent to a tetragonal unit cell
-
-    # Construct lattice constants for orthorhombic unit cell
-    a = 2.0
-    b = 1.0
-    c = 3.0
-    lattice_constants = OrthorhombicLatticeConstants(a, b, c)
-
-    # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, body_centering))
-
-    # Check results
-    expected_lattice_constants, _ = standardize(lattice_constants, body_centering)
-    @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering === body_centering
+    expected_unit_cell = TetragonalUnitCell(t_c, t_a; centering=body_centering)
+    @test iucr_unit_cell ≈ expected_unit_cell
 end
 
-@testset "conventional_cell():orthorhombic: limiting cases, centering = face" begin
+@testset "conventional_cell(::OrthorhombicUnitCell): limiting cases - oF --> tI" begin
     # --- Tests
 
     # ------ a = b
@@ -175,246 +206,223 @@ end
     # Construct basis for tetragonal unit cell
     t_a = 1.0
     t_c = 3.0
-    t_basis_a, t_basis_b, t_basis_c = basis(TetragonalLatticeConstants(t_a, t_c))
+    t_basis_a, t_basis_b, t_basis_c = basis(TetragonalUnitCell(t_a, t_c))
 
-    # Construct lattice constants for orthorhombic unit cell
+    # Construct orthorhombic unit cell
     basis_a = t_basis_a - t_basis_b
     basis_b = t_basis_a + t_basis_b
     basis_c = t_basis_c
-    lattice_constants = OrthorhombicLatticeConstants(
-        norm(basis_a), norm(basis_b), norm(basis_c)
+    unit_cell = OrthorhombicUnitCell(
+        norm(basis_a), norm(basis_b), norm(basis_c); centering=face_centering
     )
 
     # Check test conditions
-    @test lattice_constants isa OrthorhombicLatticeConstants
-    @test lattice_constants.a ≈ lattice_constants.b
+    @test unit_cell isa OrthorhombicUnitCell
+    @test centering(unit_cell) === face_centering
+    @test lattice_constants(unit_cell).a ≈ lattice_constants(unit_cell).b
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, face_centering))
+    iucr_unit_cell = conventional_cell(unit_cell)
 
     # Check results
-    @test iucr_unit_cell.lattice_constants ≈ TetragonalLatticeConstants(t_a, t_c)
-    @test iucr_unit_cell.centering === body_centering
+    expected_unit_cell = TetragonalUnitCell(t_a, t_c; centering=body_centering)
+    @test iucr_unit_cell ≈ expected_unit_cell
 
     # ------ b = c
 
     # Construct basis for tetragonal unit cell
     t_a = 3.0
     t_c = 1.0
-    t_basis_a, t_basis_b, t_basis_c = basis(TetragonalLatticeConstants(t_a, t_c))
+    t_basis_a, t_basis_b, t_basis_c = basis(TetragonalUnitCell(t_a, t_c))
 
-    # Construct lattice constants for monoclinic unit cell
+    # Construct orthorhombic unit cell
     basis_a = t_basis_c
     basis_b = t_basis_a - t_basis_b
     basis_c = t_basis_a + t_basis_b
-    lattice_constants = OrthorhombicLatticeConstants(
-        norm(basis_a), norm(basis_b), norm(basis_c)
+    unit_cell = OrthorhombicUnitCell(
+        norm(basis_a), norm(basis_b), norm(basis_c); centering=face_centering
     )
 
     # Check test conditions
-    @test lattice_constants isa OrthorhombicLatticeConstants
-    @test lattice_constants.b ≈ lattice_constants.c
+    @test unit_cell isa OrthorhombicUnitCell
+    @test centering(unit_cell) === face_centering
+    @test lattice_constants(unit_cell).b ≈ lattice_constants(unit_cell).c
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, face_centering))
+    iucr_unit_cell = conventional_cell(unit_cell)
 
     # Check results
-    @test iucr_unit_cell.lattice_constants ≈ TetragonalLatticeConstants(t_a, t_c)
-    @test iucr_unit_cell.centering === body_centering
-
-    # ------ orthorhombic unit cell is not equivalent to a tetragonal unit cell
-
-    # Construct lattice constants for orthorhombic unit cell
-    a = 2.0
-    b = 1.0
-    c = 3.0
-    lattice_constants = OrthorhombicLatticeConstants(a, b, c)
-
-    # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, face_centering))
-
-    # Check results
-    expected_lattice_constants, _ = standardize(lattice_constants, face_centering)
-    @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering === face_centering
+    expected_unit_cell = TetragonalUnitCell(t_a, t_c; centering=body_centering)
+    @test iucr_unit_cell ≈ expected_unit_cell
 end
 
-@testset "conventional_cell():orthorhombic: limiting cases, centering = base" begin
+@testset "conventional_cell(::OrthorhombicUnitCell): limiting cases - oC --> tP,hP" begin
     # --- Preparations
 
     # Construct basis for tetragonal unit cell
     t_a = 1.0
     t_c = 3.0
-    t_basis_a, t_basis_b, t_basis_c = basis(TetragonalLatticeConstants(t_a, t_c))
+    t_basis_a, t_basis_b, t_basis_c = basis(TetragonalUnitCell(t_a, t_c))
 
     # --- Tests
 
     # ------ a = b < c
 
-    # Construct lattice constants for orthorhombic unit cell
+    # Construct orthorhombic unit cell
     a = 1.0
     b = a
     c = 2 * a
-    lattice_constants, _ = standardize(
-        OrthorhombicLatticeConstants(a, b, c), base_centering
-    )
+    unit_cell = standardize(OrthorhombicUnitCell(a, b, c; centering=base_centering))
 
     # Check test conditions
-    @test lattice_constants isa OrthorhombicLatticeConstants
-    @test lattice_constants.a ≈ lattice_constants.b
+    @test unit_cell isa OrthorhombicUnitCell
+    @test centering(unit_cell) === base_centering
+    @test lattice_constants(unit_cell).a ≈ lattice_constants(unit_cell).b
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, base_centering))
+    iucr_unit_cell = conventional_cell(unit_cell)
 
     # Check results
-    @test iucr_unit_cell.lattice_constants ≈ TetragonalLatticeConstants(a / sqrt(2), c)
-    @test iucr_unit_cell.centering === primitive_centering
+    @test iucr_unit_cell ≈ TetragonalUnitCell(a / sqrt(2), c; centering=primitive_centering)
 
     # ------ a = b > c
 
-    # Construct lattice constants for orthorhombic unit cell
+    # Construct orthorhombic unit cell
     a = 1.0
     b = a
     c = 0.5 * a
-    lattice_constants, _ = standardize(
-        OrthorhombicLatticeConstants(a, b, c), base_centering
-    )
+    unit_cell = standardize(OrthorhombicUnitCell(a, b, c; centering=base_centering))
 
     # Check test conditions
-    @test lattice_constants isa OrthorhombicLatticeConstants
-    @test lattice_constants.a ≈ lattice_constants.b
+    @test unit_cell isa OrthorhombicUnitCell
+    @test centering(unit_cell) === base_centering
+    @test lattice_constants(unit_cell).a ≈ lattice_constants(unit_cell).b
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, base_centering))
+    iucr_unit_cell = conventional_cell(unit_cell)
 
     # Check results
-    @test iucr_unit_cell.lattice_constants ≈ TetragonalLatticeConstants(a / sqrt(2), c)
-    @test iucr_unit_cell.centering === primitive_centering
+    @test iucr_unit_cell ≈ TetragonalUnitCell(a / sqrt(2), c; centering=primitive_centering)
 
     # ------ b = a * sqrt(3)
 
     # Construct basis for hexagonal unit cell
     h_a = 3.0
     h_c = 1.0
-    h_basis_a, h_basis_b, h_basis_c = basis(HexagonalLatticeConstants(h_a, h_c))
+    h_basis_a, h_basis_b, h_basis_c = basis(HexagonalUnitCell(h_a, h_c))
 
-    # Construct lattice constants for monoclinic unit cell
+    # Construct orthorhombic unit cell
     basis_a = h_basis_a
     basis_b = h_basis_a + 2 * h_basis_b
     basis_c = h_basis_c
-    lattice_constants = OrthorhombicLatticeConstants(
-        norm(basis_a), norm(basis_b), norm(basis_c)
+    unit_cell = OrthorhombicUnitCell(
+        norm(basis_a), norm(basis_b), norm(basis_c); centering=base_centering
     )
 
     # Check test conditions
-    @test lattice_constants isa OrthorhombicLatticeConstants
-    @test lattice_constants.b ≈ lattice_constants.a * sqrt(3)
+    @test unit_cell isa OrthorhombicUnitCell
+    @test centering(unit_cell) === base_centering
+    @test lattice_constants(unit_cell).b ≈ lattice_constants(unit_cell).a * sqrt(3)
 
     # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, base_centering))
+    iucr_unit_cell = conventional_cell(unit_cell)
 
     # Check results
-    @test iucr_unit_cell.lattice_constants ≈ HexagonalLatticeConstants(h_a, h_c)
-    @test iucr_unit_cell.centering === primitive_centering
-
-    # ------ orthorhombic unit cell is not equivalent to a tetragonal unit cell
-
-    # Construct lattice constants for orthorhombic unit cell
-    a = 2.0
-    b = 1.0
-    c = 3.0
-    lattice_constants = OrthorhombicLatticeConstants(a, b, c)
-
-    # Exercise functionality
-    iucr_unit_cell = conventional_cell(UnitCell(lattice_constants, base_centering))
-
-    # Check results
-    expected_lattice_constants, _ = standardize(lattice_constants, base_centering)
-    @test iucr_unit_cell.lattice_constants ≈ expected_lattice_constants
-    @test iucr_unit_cell.centering === base_centering
+    @test iucr_unit_cell ≈ HexagonalUnitCell(h_a, h_c)
 end
 
-@testset "conventional_cell():orthorhombic: chain of limiting cases" begin
+@testset "conventional_cell()::OrthorhombicUnitCell: chain of limiting cases" begin
     # --- Preparations
 
     a = 5
     b = 7
     c = 9
 
-    lattice_constants = OrthorhombicLatticeConstants(a, b, c)
-    basis_a, basis_b, basis_c = basis(lattice_constants)
+    orthorhombic_unit_cell = OrthorhombicUnitCell(a, b, c)
+    basis_a, basis_b, basis_c = basis(orthorhombic_unit_cell)
 
     # --- Exercise functionality and check results
 
     # primitive unit cell: aP --> mP --> oP
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(basis_a, basis_b, basis_c; identify_lattice_system=false),
-        primitive_centering,
+        basis_a,
+        basis_b,
+        basis_c;
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, primitive_centering))
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa OrthorhombicLatticeConstants
+    expected_unit_cell = standardize(orthorhombic_unit_cell)
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa OrthorhombicUnitCell
+    @test centering(expected_unit_cell) === primitive_centering
     @debug "chain of limiting cases: aP --> mP --> oP"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # body-centered unit cell: aP --> mI --> oI
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a,
-            basis_b,
-            0.5 * (basis_a + basis_b + basis_c);
-            identify_lattice_system=false,
-        ),
-        primitive_centering,
+        basis_a,
+        basis_b,
+        0.5 * (basis_a + basis_b + basis_c);
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, body_centering))
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa OrthorhombicLatticeConstants
+    expected_unit_cell = standardize(
+        OrthorhombicUnitCell(a, b, c; centering=body_centering)
+    )
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa OrthorhombicUnitCell
+    @test centering(expected_unit_cell) === body_centering
     @debug "chain of limiting cases: aP --> mI --> oI"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # face-centered unit cell: aP --> mI --> oF
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            0.5 * (basis_a + basis_b),
-            0.5 * (basis_a - basis_b),
-            0.5 * (basis_a - basis_c);
-            identify_lattice_system=false,
-        ),
-        primitive_centering,
+        0.5 * (basis_a + basis_b),
+        0.5 * (basis_a - basis_b),
+        0.5 * (basis_a - basis_c);
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, face_centering))
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa OrthorhombicLatticeConstants
+    expected_unit_cell = standardize(
+        OrthorhombicUnitCell(a, b, c; centering=face_centering)
+    )
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa OrthorhombicUnitCell
+    @test centering(expected_unit_cell) === face_centering
     @debug "chain of limiting cases: aP --> mI --> oF"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # base-centered unit cell: aP --> mP --> oC
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a, 0.5 * (basis_a + basis_b), basis_c; identify_lattice_system=false
-        ),
-        primitive_centering,
+        basis_a,
+        0.5 * (basis_a + basis_b),
+        basis_c;
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, base_centering))
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa OrthorhombicLatticeConstants
+    expected_unit_cell = standardize(
+        OrthorhombicUnitCell(a, b, c; centering=base_centering)
+    )
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa OrthorhombicUnitCell
+    @test centering(expected_unit_cell) === base_centering
     @debug "chain of limiting cases: aP --> mP --> oC"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 
     # base-centered unit cell: aP --> mI --> oC
     triclinic_unit_cell = UnitCell(
-        LatticeConstants(
-            basis_a,
-            0.5 * (basis_a + basis_b),
-            0.5 * (basis_a + basis_b) + basis_c;
-            identify_lattice_system=false,
-        ),
-        primitive_centering,
+        basis_a,
+        0.5 * (basis_a + basis_b),
+        0.5 * (basis_a + basis_b) + basis_c;
+        identify_lattice_system=false,
+        centering=primitive_centering,
     )
-    expected_unit_cell = standardize(UnitCell(lattice_constants, base_centering))
-    @test triclinic_unit_cell.lattice_constants isa TriclinicLatticeConstants
-    @test expected_unit_cell.lattice_constants isa OrthorhombicLatticeConstants
+    expected_unit_cell = standardize(
+        OrthorhombicUnitCell(a, b, c; centering=base_centering)
+    )
+    @test triclinic_unit_cell isa TriclinicUnitCell
+    @test expected_unit_cell isa OrthorhombicUnitCell
+    @test centering(expected_unit_cell) === base_centering
     @debug "chain of limiting cases: aP --> mI --> oC"
     @test conventional_cell(triclinic_unit_cell) ≈ expected_unit_cell
 end

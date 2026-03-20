@@ -360,6 +360,7 @@ end
 
 # --- Functions/Methods
 
+import Base.:(-)
 import Base.:(==)
 import Base.isapprox
 using LinearAlgebra: dot
@@ -1107,7 +1108,7 @@ function isapprox(
 end
 
 using DataStructures: OrderedDict
-function -(x::UnitCell{T}, y::UnitCell{T}) where {T<:LatticeSystem}
+function Base.:(-)(x::UnitCell{T}, y::UnitCell{T}) where {T<:LatticeSystem}
     Δlattice_constants = OrderedDict([
         (
             Symbol("Δ$name"),

@@ -182,9 +182,9 @@ function conventional_cell(::Orthorhombic, unit_cell::UnitCell)
 
     # Get lattice constants and centering
     lattice_constants_ = lattice_constants(unit_cell)
-    a = lattice_constants.a
-    b = lattice_constants.b
-    c = lattice_constants.c
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
 
     centering_ = centering(unit_cell)
 
@@ -245,5 +245,5 @@ function conventional_cell(::Orthorhombic, unit_cell::UnitCell)
     end
 
     # Not a limiting case, so return unit cell with standardized lattice constants
-    return UnitCell(lattice_constants_; centering=centering_)
+    return unit_cell
 end
