@@ -125,17 +125,20 @@ python-docs:
 
 # --- Utility rules
 
-.PHONY: clean spotless
+.PHONY: clean-coverage clean spotless
+
+## Remove automatically generated coverage files
+clean-coverage:
+	find . -name "*.jl.*.cov" -exec rm -f {} \;  # Julia coverage
+	find . -name "*.coverage.*" -exec rm -f {} \;  # Python coverage
+	rm -rf coverage htmlcov coverage.xml  # Python coverage
 
 ## Remove files and directories automatically generated during development and testing
 ## (e.g., coverage files).
-clean:
-	find . -name "*.jl.*.cov" -exec rm -f {} \;  # Julia coverage
+clean: clean-coverage
 	find . -type d -name "__pycache__" -delete  # compiled python
 	find . -type f -name "*.py[co]" -delete  # compiled python
 	rm -rf .cache .pytest_cache  # pytest
-	find . -name "*.coverage.*" -exec rm -f {} \;  # Python coverage
-	rm -rf coverage htmlcov coverage.xml  # Python coverage
 
 ## Remove all automatically generated files and directories (e.g., coverage files, package
 ## documentation, and `Manifest.toml` files).
