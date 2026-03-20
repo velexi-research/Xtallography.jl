@@ -172,13 +172,13 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> lattice_system(HexagonalLatticeConstants(2, 4))
+julia> lattice_system(HexagonalUnitCell(2, 4))
 Hexagonal()
 
-julia> lattice_system(CubicLatticeConstants(2))
+julia> lattice_system(CubicUnitCell(2))
 Cubic()
 
-julia> lattice_system(UnitCell(OrthorhombicLatticeConstants(2, 3, 4), F_centering))
+julia> lattice_system(OrthorhombicUnitCell(2, 3, 4; centering=F_centering))
 Orthorhombic()
 ```
 """

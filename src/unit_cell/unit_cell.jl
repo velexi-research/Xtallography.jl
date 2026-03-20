@@ -263,7 +263,7 @@ Examples
 ========
 ```jldoctest
 julia> UnitCell([1, 0, 0], [0, 2, 0], [0, 0, 1])
-TetragonalUnitCell(1.0, 2.0)
+TetragonalUnitCell((a = 1.0, c = 2.0), UnitCellSymmetry(PrimitiveCentering(), Set{SymmetryElement}()))
 ```
 """
 function UnitCell(
@@ -435,10 +435,10 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> is_bravais_lattice(TetragonalUnitCell(2, 3); centering=primitive_centering)
+julia> is_bravais_lattice(TetragonalUnitCell(2, 3; centering=primitive_centering))
 true
 
-julia> is_bravais_lattice(TetragonalUnitCell(2, 3); centering=face_centering)
+julia> is_bravais_lattice(TetragonalUnitCell(2, 3; centering=face_centering))
 false
 ```
 """
@@ -567,15 +567,15 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> unit_cell = OrthorhombicUnitCell(3, 2, 1); centering=P_centering)
-OrthorhombicUnitCell(3.0, 2.0, 1.0), PrimitiveCentering()
+julia> unit_cell = OrthorhombicUnitCell(3, 2, 1; centering=P_centering)
+OrthorhombicUnitCell((a = 3, b = 2, c = 1), UnitCellSymmetry(PrimitiveCentering(), Set{SymmetryElement}()))
 julia> standardize(unit_cell)
-OrthorhombicUnitCell(1.0, 2.0, 3.0), PrimitiveCentering())
+OrthorhombicUnitCell((a = 1, b = 2, c = 3), UnitCellSymmetry(PrimitiveCentering(), Set{SymmetryElement}()))
 
 julia> unit_cell = OrthorhombicUnitCell(3, 2, 1; centering=base_centering)
-OrthorhombicUnitCell(3.0, 2.0, 1.0), BaseCentering())
+OrthorhombicUnitCell((a = 3, b = 2, c = 1), UnitCellSymmetry(BaseCentering(), Set{SymmetryElement}()))
 julia> standardize(unit_cell)
-OrthorhombicUnitCell(2.0, 3.0, 1.0), BaseCentering())
+OrthorhombicUnitCell((a = 2, b = 3, c = 1), UnitCellSymmetry(BaseCentering(), Set{SymmetryElement}()))
 ```
 """
 function standardize(unit_cell::UnitCell)
@@ -614,7 +614,7 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> unit_cell = UnitCell(([1, 1, 0], [1, -1, 0], [0, 1, 1]); centering=P_centering);
+julia> unit_cell = UnitCell([1, 1, 0], [1, -1, 0], [0, 1, 1]; centering=P_centering);
 
 julia> lattice_system(unit_cell)
 Triclinic()
@@ -678,7 +678,7 @@ Examples
 ========
 ```jldoctest
 julia> reduced_cell(UnitCell([1, 0, 0], [1, 1, 0], [0, 0, 2]; centering=P_centering))
-TetragonalUnitCell(1.0, 2.0, PrimitiveCentering())
+TetragonalUnitCell((a = 1.0, c = 2.0), UnitCellSymmetry(PrimitiveCentering(), Set{SymmetryElement}()))
 ```
 """
 function reduced_cell(unit_cell::UnitCell)
@@ -992,9 +992,9 @@ Return values
 Examples
 ========
 ```jldoctest
-julia> unit_cell_ref = UnitCell([1, 0, 0], [1, 1, 0], [0, 0, 2]; centering=body_centering);
+julia> unit_cell_ref = UnitCell([1, 0, 0], [1, 1, 0], [0, 0, 2]);
 
-julia> unit_cell_test = TetragonalUnitCell((1.0, 2.0); centering=body_centering);
+julia> unit_cell_test = TetragonalUnitCell(1.0, 2.0);
 
 julia> is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
 true

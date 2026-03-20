@@ -391,16 +391,18 @@ julia> unit_cell = MonoclinicUnitCell(1.0, 2.0, 3.0, 3π / 5);
 
 julia> body_centered_unit_cell = convert_to_body_centering(unit_cell);
 
-julia> body_centered_unit_cell.a ≈ 2.8541019662496847
+julia> lattice_constants_ = lattice_constants(body_centered_unit_cell);
+
+julia> lattice_constants_.a ≈ 2.8541019662496847
 true
 
-julia> body_centered_unit_cell.b ≈ 2
+julia> lattice_constants_.b ≈ 2
 true
 
-julia> body_centered_unit_cell.c ≈ 3
+julia> lattice_constants_.c ≈ 3
 true
 
-julia> body_centered_unit_cell.β ≈ 2.8018712454717734
+julia> lattice_constants_.β ≈ 2.8018712454717734
 true
 ```
 """
@@ -441,16 +443,18 @@ julia> unit_cell = MonoclinicUnitCell(1.0, 2.0, 3.0, 3π / 5);
 
 julia> base_centered_unit_cell = convert_to_base_centering(unit_cell);
 
-julia> base_centered_unit_cell.a ≈ 2.8541019662496847
+julia> lattice_constants_ = lattice_constants(base_centered_unit_cell);
+
+julia> lattice_constants_.a ≈ 2.8541019662496847
 true
 
-julia> base_centered_unit_cell.b ≈ 2
+julia> lattice_constants_.b ≈ 2
 true
 
-julia> base_centered_unit_cell.c ≈ 1
+julia> lattice_constants_.c ≈ 1
 true
 
-julia> base_centered_unit_cell.β ≈ 1.5963584695539381
+julia> lattice_constants_.β ≈ 1.5963584695539381
 true
 ```
 """
