@@ -52,11 +52,17 @@ Supertype: [`Centering`](@ref)
 struct PrimitiveCentering <: Centering end
 
 """
-    primitive_centering, P_centering
+    primitive_centering
 
 The singleton instance of type [`PrimitiveCentering`](@ref)
 """
 const primitive_centering = PrimitiveCentering()
+
+"""
+    P_centering
+
+Alias for [`primitive_centering`](@ref)
+"""
 const P_centering = primitive_centering
 
 """
@@ -96,11 +102,17 @@ Supertype: [`Centering`](@ref)
 struct BodyCentering <: Centering end
 
 """
-    body_centering, I_centering
+    body_centering
 
 The singleton instance of type [`BodyCentering`](@ref)
 """
 const body_centering = BodyCentering()
+
+"""
+    I_centering
+
+Alias for [`body_centering`](@ref)
+"""
 const I_centering = body_centering
 
 """
@@ -114,11 +126,17 @@ Supertype: [`Centering`](@ref)
 struct FaceCentering <: Centering end
 
 """
-    face_centering, F_centering
+    face_centering
 
 The singleton instance of type [`FaceCentering`](@ref)
 """
 const face_centering = FaceCentering()
+
+"""
+    F_centering
+
+Alias for [`face_centering`](@ref)
+"""
 const F_centering = face_centering
 
 """

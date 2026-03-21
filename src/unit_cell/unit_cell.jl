@@ -1086,6 +1086,18 @@ function Base.:(==)(x::UnitCell{T}, y::UnitCell{T}) where {T<:LatticeSystem}
     )
 end
 
+"""
+    isapprox(x::UnitCell, y::UnitCell;
+             atol::Real=0, rtol::Real=atol>0 ? 0 : √eps)
+
+Inexact equality comparison between `UnitCell`. Two unit cells are approximately equal if
+(1) their lattice constant values are equal to within the tolerance bounds and (2) they
+have the same symmetry. For instance, `isapprox` returns `true` for
+`TetragonalUnitCell` if
+`isapprox(lattice_constants(x).a - lattice_constants(y).a; atol=atol, rtol=rtol)` and
+`isapprox(lattice_constants(x).b - lattice_constants(y).b; atol=atol, rtol=rtol)` and
+`symmetry(x) == symmetry(y)`.  Returns `false` if `x` and `y` have different types.
+"""
 function isapprox(x::UnitCell, y::UnitCell; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps())
     # Default isapprox() implementation to allow comparison between unit cells for
     # different lattice systems.

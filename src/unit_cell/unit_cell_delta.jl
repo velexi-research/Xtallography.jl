@@ -38,7 +38,6 @@ Type Aliases
 [`RhombohedralUnitCellDelta`](@ref), [`HexagonalUnitCellDelta`](@ref),
 [`CubicUnitCellDelta`](@ref)
 """
-#abstract type UnitCellDelta{T<:LatticeSystem} end
 struct UnitCellDelta{T<:LatticeSystem}
     # --- Fields
 
@@ -217,6 +216,17 @@ end
     return Δlattice_constants(unit_cell_delta)
 end
 
+"""
+    isapprox(Δx::UnitCellDelta, Δy::UnitCellDelta;
+             atol::Real=0, rtol::Real=atol>0 ? 0 : √eps)
+
+Inexact equality comparison between `UnitCellDelta`. Two unit cell deltas are approximately
+equal if all lattice constant values are within the tolerance bounds. For instance,
+`isapprox` returns `true` for `TetragonalUnitCellDelta` if
+`isapprox(Δlattice_constants(Δx).Δa - Δlattice_constants(Δy).Δa; atol=atol, rtol=rtol)` and
+`isapprox(Δlattice_constants(Δx).Δb - Δlattice_constants(Δy).Δb; atol=atol, rtol=rtol)`.
+Returns `false` if `Δx` and `Δy` have different types.
+"""
 function isapprox(
     x::UnitCellDelta, y::UnitCellDelta; atol::Real=0, rtol::Real=atol > 0 ? 0 : √eps()
 )
