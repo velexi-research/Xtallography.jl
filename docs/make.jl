@@ -15,11 +15,14 @@ makedocs(;
         assets=String[],
     ),
     pages=[
-        "Home" => "index.md",
+        "Overview" => "index.md",
         "Examples" => "examples.md",
-        "Types" => "types.md",
-        "Functions" => "functions.md",
-        "Python Interface" => "python-interface.md",
+        "Reference" => [
+            "Symmetry" => "symmetry.md",
+            "Unit Cell" => "unit-cell.md",
+            "Utility Functions" => "functions.md",
+            "Python Interface" => "python-interface.md",
+        ],
         "Index" => "docs-index.md",
     ],
     checkdocs=:exports,
