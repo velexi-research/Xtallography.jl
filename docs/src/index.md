@@ -7,13 +7,15 @@ functionality is added on an as-needed basis to support research projects.
 
 Currently, Xtallography provides support for:
 
-* types for defining Bravais lattice types,
+* types for defining unit cells (e.g., lattice systems, centerings, symmetry),
 
-* basic unit cell computations (e.g., basis, volume, surface area),
+* basic unit cell computations (e.g., basis, volume, surface area, reduced cell),
 
 * standardization of lattice constants for unit cells,
 
-* conversions between equivalent unit cells for a lattice.
+* identification of equivalent higher symmetry unit cells,
+
+* comparison between unit cells (e.g., equivalence and lattice constant deltas).
 
 In addition, Xtallography provides a basic [Python interface](python-interface/) to support
 integration with Python codebases.

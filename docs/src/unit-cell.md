@@ -15,7 +15,7 @@ UnitCellDelta
 UnitCellSymmetry
 ```
 
-### Unit Cell Constants
+### Constants
 
 ```@docs
 primitive_unit_cell_symmetry

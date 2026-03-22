@@ -18,8 +18,8 @@ makedocs(;
         "Overview" => "index.md",
         "Examples" => "examples.md",
         "Reference" => [
-            "Symmetry" => "symmetry.md",
             "Unit Cell" => "unit-cell.md",
+            "Symmetry" => "symmetry.md",
             "Utility Functions" => "functions.md",
             "Python Interface" => "python-interface.md",
         ],
