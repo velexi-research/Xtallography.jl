@@ -30,8 +30,8 @@ jobs:
         # os: [ubuntu-latest, windows-latest, macos-latest]
         os: [ubuntu-latest]
         arch: [x64]
-        julia-version: ['1.9', '1.10', '1.11']
-        python-version: ['3.11', '3.12', '3.13']
+        julia-version: ['1.10', '1.11', '1.12']
+        python-version: ['3.11', '3.12', '3.13', '3.14']
 
     defaults:
       run:
@@ -42,8 +42,8 @@ jobs:
     env:
         codecov-os: 'Linux'
         codecov-arch: x64
-        codecov-julia-version: '1.11'
-        codecov-python-version: '3.13'
+        codecov-julia-version: '1.12'
+        codecov-python-version: '3.14'
 
     steps:
       - name: Check out code
@@ -153,7 +153,7 @@ jobs:
       - name: Set up Julia
         uses: julia-actions/setup-julia@v2
         with:
-          version: '1.11'
+          version: '1.12'
 
       - name: Set up Julia caches
         uses: julia-actions/cache@v2
@@ -168,7 +168,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.13'
+          python-version: '3.14'
 
       - name: Load cached $HOME/.local
         uses: actions/cache@v4
