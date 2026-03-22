@@ -13,7 +13,7 @@ Currently, Xtallography provides support for:
 
 * standardization of lattice constants for unit cells,
 
-* identification of equivalent higher symmetry unit cells,
+* identification of equivalent unit cells with higher symmetry,
 
 * comparison between unit cells (e.g., equivalence and lattice constant deltas).
 
