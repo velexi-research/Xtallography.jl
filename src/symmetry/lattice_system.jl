@@ -156,14 +156,11 @@ const cubic = Cubic()
 # --- Functions/Methods
 
 """
-TODO: split docstring by arg type
-
     lattice_system(unit_cell::UnitCell) -> LatticeSystem
 
-    lattice_system(Δunit_cell::UnitCellDelta) -> LatticeSystem
+    lattice_system(unit_cell::UnitCellDelta) -> LatticeSystem
 
-Return the lattice system for a set of `lattice_constants`, `Δlattice_constants` or
-`unit_cell`.
+Return the lattice system for `unit_cell` or `Δunit_cell`.
 
 Return values
 =============
@@ -180,6 +177,9 @@ Cubic()
 
 julia> lattice_system(OrthorhombicUnitCell(2, 3, 4; centering=F_centering))
 Orthorhombic()
+
+julia> lattice_system(TetragonalUnitCellDelta(0.1, .05))
+Tetragonal()
 ```
 """
 function lattice_system end
