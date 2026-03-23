@@ -134,7 +134,7 @@ clean-coverage:
 	rm -rf coverage htmlcov coverage.xml  # Python coverage
 
 ## Remove files and directories automatically generated during development and testing
-## (e.g., coverage files).
+## (e.g., compiled python code).
 clean: clean-coverage
 	find . -type d -name "__pycache__" -delete  # compiled python
 	find . -type f -name "*.py[co]" -delete  # compiled python
