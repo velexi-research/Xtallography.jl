@@ -1,0 +1,160 @@
+#   Copyright 2025 Velexi Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+"""
+Lattice type and functions
+"""
+# --- Imports
+
+# Standard library
+from collections import namedtuple
+
+# Local packages/modules
+from .centering import Centering
+from .lattice_system import LatticeSystem
+
+
+# --- Types
+
+
+Lattice = namedtuple("Lattice", "lattice_system centering")
+
+
+# --- Constants
+
+
+BRAVAIS_LATTICES = (
+    Lattice(LatticeSystem.TRICLINIC, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.MONOCLINIC, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.MONOCLINIC, Centering.BASE),
+    Lattice(LatticeSystem.MONOCLINIC, Centering.BODY),
+    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.BASE),
+    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.BODY),
+    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.FACE),
+    Lattice(LatticeSystem.TETRAGONAL, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.TETRAGONAL, Centering.BODY),
+    Lattice(LatticeSystem.RHOMBOHEDRAL, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.HEXAGONAL, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.CUBIC, Centering.PRIMITIVE),
+    Lattice(LatticeSystem.CUBIC, Centering.BODY),
+    Lattice(LatticeSystem.CUBIC, Centering.FACE),
+)
+
+
+# --- Functions
+
+
+def create_lattice(
+    lattice_system: str | None = None,
+    centering: str | None = None,
+) -> Lattice:
+    """
+    Create a Lattice object.
+
+    Parameters
+    ----------
+    lattice_system: lattice system
+
+    centering: lattice centering
+
+    Return value
+    ------------
+    lattice: Lattice object with the specified `lattice_system` and `centering`
+    """
+    # --- Check arguments
+
+    # ------ `lattice_system`
+
+    if not isinstance(lattice_system, str):
+        raise ValueError(
+            f"`lattice_system` must be a string. (lattice_system={lattice_system})"
+        )
+
+    # Enforce that `lattice_system` is lowercase
+    lattice_system = lattice_system.lower()
+
+    # ------ `centering`
+
+    if not isinstance(centering, str):
+        raise ValueError(f"`centering` must be a string. (centering={centering})")
+
+    # Enforce that `centering` is lowercase
+    centering = centering.lower()
+
+    # --- Construct Lattice
+
+    try:
+        lattice = Lattice(LatticeSystem(lattice_system), Centering(centering))
+
+    except ValueError as error:
+        if "is not a valid LatticeSystem" in str(error):
+            raise ValueError(
+                "`lattice_system` must be one of "
+                f"{LatticeSystem.values()}. (lattice_system='{lattice_system}')."
+            )
+
+        if "is not a valid Centering" in str(error):
+            raise ValueError(
+                "`centering` must be one of "
+                f"{Centering.values()}. (centering='{centering}')."
+            )
+
+    return lattice
+
+
+def standardize_lattice(lattice: Lattice) -> Lattice:
+    """
+    Standardize and validate field values for `lattice`.
+
+    Parameters
+    ----------
+    lattice: Lattice to standardize
+
+    Return value
+    ------------
+    lattice: standardized Lattice
+    """
+    # --- Validate types
+
+    for field, value in zip(lattice._fields, lattice):
+        if not isinstance(value, str):
+            raise ValueError(
+                f"`lattice.{field}` must be a string. (lattice.{field}={value})"
+            )
+
+    # --- Standardize field values
+
+    standardized_field_values = {}
+    for field, value in zip(lattice._fields, lattice):
+        standardized_field_values[field] = value.lower()
+
+    # --- Construct Lattice with standardized field values
+
+    lattice = create_lattice(
+        standardized_field_values["lattice_system"],
+        standardized_field_values["centering"],
+    )
+
+    return lattice
+
+
+def is_bravais_lattice(lattice: Lattice) -> bool:
+    """
+    Return `True` if `lattice` is a valid Bravais lattice; return `False` otherwise.
+
+    Parameters
+    ----------
+    lattice: Lattice to check
+    """
+    return lattice in BRAVAIS_LATTICES
