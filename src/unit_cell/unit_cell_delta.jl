@@ -29,7 +29,7 @@ export isapprox
 """
     UnitCellDelta{T<:LatticeSystem}
 
-Delta between two unit cells (for the same lattice system)
+Delta between lattice constants of two unit cells (for the same lattice system)
 
 Type Aliases
 ============
