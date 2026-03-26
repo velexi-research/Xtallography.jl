@@ -70,7 +70,7 @@ def create_lattice(
 
     Return value
     ------------
-    lattice: Lattice object with the specified `lattice_system` and `centering`
+    Lattice object with the specified `lattice_system` and `centering`
     """
     # --- Check arguments
 
@@ -123,7 +123,7 @@ def standardize_lattice(lattice: Lattice) -> Lattice:
 
     Return value
     ------------
-    lattice: standardized Lattice
+    standardized Lattice
     """
     # --- Validate types
 
