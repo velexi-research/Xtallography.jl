@@ -18,445 +18,216 @@ Core types and functions that support lattice and unit cell computations
 # --- Imports
 
 # Standard library
-from abc import abstractmethod, ABC
-from collections import namedtuple
-from enum import auto, StrEnum
-import math
-import sys
-from typing import Optional
+from abc import abstractmethod, abstractclassmethod, ABC
 
 # Local packages/modules
 from .. import _JL
 
-# --- Types
 
-# ----- Enumerations
-
-
-class LatticeSystem(StrEnum):
-    TRICLINIC = auto()
-    MONOCLINIC = auto()
-    ORTHORHOMBIC = auto()
-    TETRAGONAL = auto()
-    RHOMBOHEDRAL = auto()
-    HEXAGONAL = auto()
-    CUBIC = auto()
-
-    def to_julia(self):
-        """
-        Convert a Python LatticeSystem object to a Julia LatticeSystem object.
-        """
-        if self.value == "triclinic":
-            return _JL.triclinic
-
-        elif self.value == "monoclinic":
-            return _JL.monoclinic
-
-        elif self.value == "orthorhombic":
-            return _JL.orthorhombic
-
-        elif self.value == "tetragonal":
-            return _JL.tetragonal
-
-        elif self.value == "rhombohedral":
-            return _JL.rhombohedral
-
-        elif self.value == "hexagonal":
-            return _JL.hexagonal
-
-        elif self.value == "cubic":
-            return _JL.cubic
-
-    @classmethod
-    def from_julia(cls, lattice_system_jl: _JL.LatticeSystem):
-        """
-        Convert a Julia LatticeSystem object to a Python LatticeSystem object.
-        """
-        # Check arguments
-        if not _JL.isa(lattice_system_jl, _JL.LatticeSystem):
-            raise ValueError(
-                "`lattice_system_jl` must be a Julia `LatticeSystem` object. "
-                f"(lattice_system_jl={lattice_system_jl})."
-            )
-
-        # Convert lattice_system_jl to a LatticeSystem object
-        if lattice_system_jl == _JL.triclinic:
-            lattice_system = LatticeSystem.TRICLINIC
-        elif lattice_system_jl == _JL.monoclinic:
-            lattice_system = LatticeSystem.MONOCLINIC
-        elif lattice_system_jl == _JL.orthorhombic:
-            lattice_system = LatticeSystem.ORTHORHOMBIC
-        elif lattice_system_jl == _JL.tetragonal:
-            lattice_system = LatticeSystem.TETRAGONAL
-        elif lattice_system_jl == _JL.rhombohedral:
-            lattice_system = LatticeSystem.RHOMBOHEDRAL
-        elif lattice_system_jl == _JL.hexagonal:
-            lattice_system = LatticeSystem.HEXAGONAL
-        elif lattice_system_jl == _JL.cubic:
-            lattice_system = LatticeSystem.CUBIC
-        else:
-            lattice_system_jl_type = _JL.nameof(_JL.typeof(lattice_system_jl))
-            raise ValueError(
-                "Unsupported LatticeSystem type. "
-                f"(lattice_system_jl={lattice_system_jl_type})"
-            )
-
-        return lattice_system
-
-    @classmethod
-    def values(cls):
-        """
-        Return full list of LatticeSystem values.
-        """
-        return list(map(lambda c: c.value, cls))
+# --- Classes
 
 
-class Centering(StrEnum):
-    PRIMITIVE = auto()
-    BASE_CENTERED = auto()
-    BODY_CENTERED = auto()
-    FACE_CENTERED = auto()
-
-    def to_julia(self):
-        """
-        Convert a Python Centering object to a Julia Centering object.
-        """
-        if self.value == "primitive":
-            return _JL.primitive
-
-        elif self.value == "base_centered":
-            return _JL.base_centered
-
-        elif self.value == "body_centered":
-            return _JL.body_centered
-
-        elif self.value == "face_centered":
-            return _JL.face_centered
-
-    @classmethod
-    def from_julia(cls, centering_jl: _JL.Centering):
-        """
-        Convert a Julia Centering object to a Python Centering object.
-        """
-        # Check arguments
-        if not _JL.isa(centering_jl, _JL.Centering):
-            raise ValueError(
-                "`centering_jl` must be a Julia `Centering` object. "
-                f"(centering_jl={centering_jl})."
-            )
-
-        # Convert centering_jl to a Centering object
-        if centering_jl == _JL.primitive:
-            centering = Centering.PRIMITIVE
-        elif centering_jl == _JL.base_centered:
-            centering = Centering.BASE_CENTERED
-        elif centering_jl == _JL.body_centered:
-            centering = Centering.BODY_CENTERED
-        elif centering_jl == _JL.face_centered:
-            centering = Centering.FACE_CENTERED
-        else:
-            centering_jl_type = _JL.nameof(_JL.typeof(centering_jl))
-            raise ValueError(
-                f"Unsupported Centering type. (centering_jl={centering_jl_type})"
-            )
-
-        return centering
-
-    @classmethod
-    def values(cls):
-        """
-        Return full list of Centering values.
-        """
-        return list(map(lambda c: c.value, cls))
-
-
-# ----- Lattice
-
-Lattice = namedtuple("Lattice", "lattice_system centering")
-
-
-# Constants
-BRAVAIS_LATTICES = (
-    Lattice(LatticeSystem.TRICLINIC, Centering.PRIMITIVE),
-    Lattice(LatticeSystem.MONOCLINIC, Centering.PRIMITIVE),
-    Lattice(LatticeSystem.MONOCLINIC, Centering.BASE_CENTERED),
-    Lattice(LatticeSystem.MONOCLINIC, Centering.BODY_CENTERED),
-    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.PRIMITIVE),
-    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.BASE_CENTERED),
-    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.BODY_CENTERED),
-    Lattice(LatticeSystem.ORTHORHOMBIC, Centering.FACE_CENTERED),
-    Lattice(LatticeSystem.TETRAGONAL, Centering.PRIMITIVE),
-    Lattice(LatticeSystem.TETRAGONAL, Centering.BODY_CENTERED),
-    Lattice(LatticeSystem.RHOMBOHEDRAL, Centering.PRIMITIVE),
-    Lattice(LatticeSystem.HEXAGONAL, Centering.PRIMITIVE),
-    Lattice(LatticeSystem.CUBIC, Centering.PRIMITIVE),
-    Lattice(LatticeSystem.CUBIC, Centering.BODY_CENTERED),
-    Lattice(LatticeSystem.CUBIC, Centering.FACE_CENTERED),
-)
-
-
-# Functions
-def create_lattice(
-    lattice_system: str | None = None,
-    centering: str | None = None,
-) -> Lattice:
+class SymmetryElement(ABC):
     """
-    Create a Lattice object.
-
-    Parameters
-    ----------
-    lattice_system: lattice system
-
-    centering: lattice centering
-
-    Return value
-    ------------
-    lattice: Lattice object with the specified `lattice_system` and `centering`
+    Abstract base class for symmetry element classes
     """
-    # --- Check arguments
-
-    # ------ `lattice_system`
-
-    if not isinstance(lattice_system, str):
-        raise ValueError(
-            f"`lattice_system` must be a string. (lattice_system={lattice_system})"
-        )
-
-    # Enforce that `lattice_system` is lowercase
-    lattice_system = lattice_system.lower()
-
-    # ------ `centering`
-
-    if not isinstance(centering, str):
-        raise ValueError(f"`centering` must be a string. (centering={centering})")
-
-    # Enforce that `centering` is lowercase
-    centering = centering.lower()
-
-    # --- Construct Lattice
-
-    try:
-        lattice = Lattice(LatticeSystem(lattice_system), Centering(centering))
-
-    except ValueError as error:
-        if "is not a valid LatticeSystem" in str(error):
-            raise ValueError(
-                "`lattice_system` must be one of "
-                f"{LatticeSystem.values()}. (lattice_system='{lattice_system}')."
-            )
-
-        if "is not a valid Centering" in str(error):
-            raise ValueError(
-                "`centering` must be one of "
-                f"{Centering.values()}. (centering='{centering}')."
-            )
-
-    return lattice
-
-
-def standardize_lattice(lattice: Lattice) -> Lattice:
-    """
-    Standardize and validate field values for `lattice`.
-
-    Parameters
-    ----------
-    lattice: Lattice to standardize
-
-    Return value
-    ------------
-    lattice: standardized Lattice
-    """
-    # --- Validate types
-
-    for field, value in zip(lattice._fields, lattice):
-        if not isinstance(value, str):
-            raise ValueError(
-                f"`lattice.{field}` must be a string. (lattice.{field}={value})"
-            )
-
-    # --- Standardize field values
-
-    standardized_field_values = {}
-    for field, value in zip(lattice._fields, lattice):
-        standardized_field_values[field] = value.lower()
-
-    # --- Construct Lattice with standardized field values
-
-    lattice = create_lattice(
-        standardized_field_values["lattice_system"],
-        standardized_field_values["centering"],
-    )
-
-    return lattice
-
-
-def is_bravais_lattice(lattice: Lattice) -> bool:
-    """
-    Return `True` if `lattice` is a valid Bravais lattice; return `False` otherwise.
-
-    Parameters
-    ----------
-    lattice: Lattice to check
-    """
-    return lattice in BRAVAIS_LATTICES
-
-
-# ------ UnitCell
-
-
-class UnitCell(ABC):
-    """
-    Abstract base class for unit cell classes
-    """
-
-    # --- Initializer
-
-    def __init__(
-        self, lattice_system: LatticeSystem, centering: Centering = Centering.PRIMITIVE
-    ):
-        """
-        Initialize core of UnitCell object.
-
-        Parameters
-        ----------
-        `lattice_system`: lattice system
-
-        `centering`: centering
-        """
-        # --- Check arguments
-
-        # Validate that (lattice_system, centering) is a valid Bravais lattice
-        if not is_bravais_lattice(Lattice(lattice_system, centering)):
-            raise ValueError(
-                f"('{lattice_system}', '{centering}') is not a valid Bravais lattice."
-            )
-
-        # Enforce that lattice_system is a LatticeSystem object
-        if not isinstance(lattice_system, LatticeSystem):
-            lattice_system = LatticeSystem(lattice_system)
-
-        # Enforce that centering is a Centering object
-        if not isinstance(centering, Centering):
-            centering = Centering(centering)
-
-        # --- Initialize attributes
-
-        self._lattice_system = lattice_system
-        self._centering = centering
-
-    # --- Properties
-
-    @property
-    def lattice_system(self):
-        """
-        Return the lattice system of the unit cell.
-        """
-        return self._lattice_system
-
-    @property
-    def centering(self):
-        """
-        Return the unit cell centering.
-        """
-        return self._centering
 
     # --- Methods
 
     @abstractmethod
     def to_julia(self):
         """
-        Convert Python UnitCell object to a Julia UnitCell object.
+        Convert Python SymmetryElement object to a Julia SymmetryElement object.
         """
 
-    @classmethod
-    def from_julia(cls, unit_cell_jl: _JL.UnitCell):
+    @abstractclassmethod
+    def from_julia(cls, symmetry_element_jl: _JL.SymmetryElement):
         """
-        Convert a Julia UnitCell object to a Python UnitCell object.
+        Convert a Julia SymmetryElement object to a Python SymmetryElement object.
 
         Parameters
         ----------
-        unit_cell_jl: Julia UnitCell object
+        symmetry_element_jl: Julia SymmetryElement object
 
         Return value
         ------------
-        unit_cell: Python UnitCell object
+        Python SymmetryElement object
         """
-        # TODO: add logic to switch between subclass cases
 
-    @abstractmethod
-    def __repr__(self):
+
+class GlidePlane(SymmetryElement):
+    """
+    Class representing a glide plane
+    """
+
+    # --- Initializer
+
+    def __init__(self, translation: str, reflection_plane: str):
         """
-        Return string representation of UnitCell.
+        Initialize GlidePlane object.
+
+        Parameters
+        ----------
+        `translation`: glide translation
+
+        `reflection_plane`: reflection plane
         """
+        # --- Initialize attributes
+
+        self._translation = translation
+        self._reflection_plane = reflection_plane
+
+    # --- Properties
+
+    @property
+    def translation(self):
+        """
+        Return translation vector.
+        """
+        return self._translation
+
+    @property
+    def reflection_plane(self):
+        """
+        Return normal to the reflection plane.
+        """
+        return self._reflection_plane
+
+    # --- Methods
+
+    def to_julia(self):
+        """
+        Convert Python GlidePlane object to a Julia GlidePlane object.
+        """
+        return _JL.GlidePlane(self.translation, self.reflection_plane)
+
+    @classmethod
+    def from_julia(cls, glide_plane_jl: _JL.GlidePlane):
+        """
+        Convert a Julia GlidePlane object to a Python GlidePlane object.
+
+        Parameters
+        ----------
+        glide_plane_jl: Julia GlidePlane object
+
+        Return value
+        ------------
+        Python GlidePlane object
+        """
+        # Check arguments
+        if not _JL.isa(glide_plane_jl, _JL.GlidePlane):
+            raise ValueError(
+                "`glide_plane_jl` must be a Julia `GlidePlane` object. "
+                f"(glide_plane_jl={glide_plane_jl})."
+            )
+
+        # Convert glide_plane_jl to a GlidePlane object
+        return GlidePlane(glide_plane_jl.translation, glide_plane_jl.reflection_plane)
 
     def __eq__(self, other):
         """
-        Return True if `self` and `other`are identical unit cells; otherwise, return
-        False.
-
-        Parameters
-        ----------
-        other: UnitCell object to compare against
+        Return `True` if `self` and `other` represent the same glide plane; otherwise,
+        return `False`.
         """
-        if not isinstance(other, type(self)):
+        if not isinstance(other, GlidePlane):
             return False
 
-        for var in vars(self):
-            if getattr(self, var) != getattr(other, var):
-                return False
+        return (
+            self.translation == other.translation
+            and self.reflection_plane == other.reflection_plane
+        )
 
-        return True
 
-    def isclose(self, other, rtol: Optional[float] = None, atol: float = 0):
+class ScrewAxis(SymmetryElement):
+    """
+    Class representing a screw axis
+    """
+
+    # --- Initializer
+
+    def __init__(self, axis: str, n: int, m: int):
         """
-        Return True if `self` and `other` are approximately equal unit cells; otherwise,
-        return False.
+        Initialize ScrewAxis object.
 
         Parameters
         ----------
-        other: UnitCell object to compare against
+        `axis`: direction of rotation axis
 
-        rtol: relative tolerance
+        `n`: rotation order
 
-        atol: absolute tolerance
-
-        Note
-        ----
-        * The default values for `rtol` and `atol` are set using the same logic as the
-          Julia `isapprox()` method.
+        `m`: number of translation steps of size 1/n following rotation by 2π/n
         """
         # --- Check arguments
 
-        if atol < 0:
-            raise ValueError(f"`atol` must be nonnegative. (atol={atol})")
+        if m > n:
+            raise ValueError(f"`m` must be no greater than `n` (n={n},m={m})")
 
-        if rtol is None:
-            if atol > 0:
-                rtol = 0
-            else:
-                rtol = math.sqrt(sys.float_info.epsilon)
+        # --- Initialize attributes
 
-        if rtol < 0:
-            raise ValueError(f"`rtol` must be nonnegative. (rtol={rtol})")
+        self._axis = axis
+        self._n = n
+        self._m = m
 
-        # --- Compare UnitCell objects
+    # --- Properties
 
-        # Compare types
-        if not isinstance(other, type(self)):
+    @property
+    def axis(self):
+        """
+        Return rotation axis.
+        """
+        return self._axis
+
+    @property
+    def n(self):
+        """
+        Return `n` (the rotation order).
+        """
+        return self._n
+
+    @property
+    def m(self):
+        """
+        Return `m` (the number of translation steps of size 1/n following rotation by 2π/n).
+        """
+        return self._m
+
+    # --- Methods
+
+    def to_julia(self):
+        """
+        Convert Python ScrewAxis object to a Julia ScrewAxis object.
+        """
+        return _JL.ScrewAxis(self.axis, self.n, self.m)
+
+    @classmethod
+    def from_julia(cls, screw_axis_jl: _JL.ScrewAxis):
+        """
+        Convert a Julia ScrewAxis object to a Python ScrewAxis object.
+
+        Parameters
+        ----------
+        screw_axis_jl: Julia ScrewAxis object
+
+        Return value
+        ------------
+        Python ScrewAxis object
+        """
+        # Check arguments
+        if not _JL.isa(screw_axis_jl, _JL.ScrewAxis):
+            raise ValueError(
+                "`screw_axis_jl` must be a Julia `ScrewAxis` object. "
+                f"(screw_axis_jl={screw_axis_jl})."
+            )
+
+        # Convert screw_axis_jl to a ScrewAxis object
+        return ScrewAxis(screw_axis_jl.axis, screw_axis_jl.n, screw_axis_jl.m)
+
+    def __eq__(self, other):
+        """
+        Return `True` if `self` and `other` represent the same screw axis; otherwise,
+        return `False`.
+        """
+        if not isinstance(other, ScrewAxis):
             return False
 
-        # Compare lattice constants
-        for var in vars(self):
-            if var == "_lattice_system" or var == "_centering":
-                # Compare lattice_system or centering
-                if getattr(self, var) != getattr(other, var):
-                    return False
-
-            else:
-                # Compare lattice constant
-                if not math.isclose(
-                    getattr(self, var), getattr(other, var), rel_tol=rtol, abs_tol=atol
-                ):
-                    return False
-
-        return True
+        return self.axis == other.axis and self.n == other.n and self.m == other.m

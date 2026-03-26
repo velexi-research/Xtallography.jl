@@ -24,3 +24,5 @@ from .lattice import create_lattice, standardize_lattice  # noqa
 from .centering import Centering  # noqa
 
 from .lattice_system import LatticeSystem  # noqa
+
+from .symmetry_elements import GlidePlane, ScrewAxis, SymmetryElement  # noqa
