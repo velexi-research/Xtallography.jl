@@ -18,7 +18,7 @@ Core types and functions that support lattice and unit cell computations
 # --- Imports
 
 # Standard library
-from abc import abstractmethod, abstractclassmethod, ABC
+from abc import abstractmethod, ABC
 
 # Local packages/modules
 from .. import _JL
@@ -40,7 +40,7 @@ class SymmetryElement(ABC):
         Convert Python SymmetryElement object to a Julia SymmetryElement object.
         """
 
-    @abstractclassmethod
+    @classmethod
     def from_julia(cls, symmetry_element_jl: _JL.SymmetryElement):
         """
         Convert a Julia SymmetryElement object to a Python SymmetryElement object.
@@ -52,6 +52,28 @@ class SymmetryElement(ABC):
         Return value
         ------------
         Python SymmetryElement object
+        """
+        if _JL.isa(symmetry_element_jl, _JL.GlidePlane):
+            return GlidePlane.from_julia(symmetry_element_jl)
+        elif _JL.isa(symmetry_element_jl, _JL.ScrewAxis):
+            return ScrewAxis.from_julia(symmetry_element_jl)
+
+        raise ValueError(
+            "`symmetry_element_jl` must be a Julia `GlidePlane` or `ScrewAxis` object. "
+            f"(symmetry_element_jl={symmetry_element_jl})."
+        )
+
+    @abstractmethod
+    def __eq__(self, other: SymmetryElement):
+        """
+        Return `True` if `self` and `other` represent the same symmetry element; otherwise,
+        return `False`.
+        """
+
+    @abstractmethod
+    def __hash__(self):
+        """
+        Return hashable representation of SymmetryElement object.
         """
 
 
@@ -136,6 +158,12 @@ class GlidePlane(SymmetryElement):
             self.translation == other.translation
             and self.reflection_plane == other.reflection_plane
         )
+
+    def __hash__(self):
+        """
+        Return hashable representation of GlidePlane object.
+        """
+        return hash(f"{self.translation},{self.reflection_plane}")
 
 
 class ScrewAxis(SymmetryElement):
@@ -231,3 +259,9 @@ class ScrewAxis(SymmetryElement):
             return False
 
         return self.axis == other.axis and self.n == other.n and self.m == other.m
+
+    def __hash__(self):
+        """
+        Return hashable representation of ScrewAxis object.
+        """
+        return hash(f"{self.axis},{self.n},{self.m}")

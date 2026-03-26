@@ -18,8 +18,7 @@ The `xtallography.symmetry` package defines classes and methods related to cryst
 
 from .lattice import Lattice  # noqa
 from .lattice import BRAVAIS_LATTICES  # noqa
-from .lattice import is_bravais_lattice  # noqa
-from .lattice import create_lattice, standardize_lattice  # noqa
+from .lattice import create_lattice, standardize_lattice, is_bravais_lattice  # noqa
 
 from .centering import Centering  # noqa
 
