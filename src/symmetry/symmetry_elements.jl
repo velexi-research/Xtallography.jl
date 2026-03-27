@@ -107,8 +107,16 @@ struct ScrewAxis <: SymmetryElement
     function ScrewAxis(axis::String, n::Int, m::Int)
 
         # Enforce constraints
-        if m > n
-            throw(ArgumentError("`m` be no greater than `n` (n=$n,m=$m)"))
+        if n ≤ 0
+            throw(ArgumentError("`n` must be positive (n=$n)"))
+        end
+
+        if m ≤ 0
+            throw(ArgumentError("`m` must be positive (m=$m)"))
+        end
+
+        if m ≥ n
+            throw(ArgumentError("`m` must be less than `n` (n=$n,m=$m)"))
         end
 
         # Return new ScrewAxis

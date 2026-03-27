@@ -84,11 +84,52 @@ end
 
     # ----- Invalid arguments
 
+    # n = 0
     axis = "1,1,1"
-    n = 2
+    n = 0
     m = 4
 
-    expected_message = "`m` be no greater than `n` (n=2,m=4)"
+    expected_message = "`n` must be positive (n=0)"
+    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
+
+    # n < 0
+    axis = "1,1,1"
+    n = -10
+    m = 4
+
+    expected_message = "`n` must be positive (n=-10)"
+    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
+
+    # m = 0
+    axis = "1,1,1"
+    n = 2
+    m = 0
+
+    expected_message = "`m` must be positive (m=0)"
+    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
+
+    # m < 0
+    axis = "1,1,1"
+    n = 2
+    m = -1
+
+    expected_message = "`m` must be positive (m=-1)"
+    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
+
+    # m = n
+    axis = "1,1,1"
+    n = 3
+    m = 3
+
+    expected_message = "`m` must be less than `n` (n=3,m=3)"
+    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
+
+    # m > n
+    axis = "1,1,1"
+    n = 3
+    m = 4
+
+    expected_message = "`m` must be less than `n` (n=3,m=4)"
     @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
 end
 
