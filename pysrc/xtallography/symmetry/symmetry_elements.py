@@ -19,6 +19,7 @@ Core types and functions that support lattice and unit cell computations
 
 # Standard library
 from abc import abstractmethod, ABC
+from dataclasses import dataclass
 
 # Local packages/modules
 from .. import _JL
@@ -63,57 +64,23 @@ class SymmetryElement(ABC):
             f"(symmetry_element_jl={symmetry_element_jl})."
         )
 
-    @abstractmethod
-    def __eq__(self, other: SymmetryElement):
-        """
-        Return `True` if `self` and `other` represent the same symmetry element; otherwise,
-        return `False`.
-        """
 
-    @abstractmethod
-    def __hash__(self):
-        """
-        Return hashable representation of SymmetryElement object.
-        """
-
-
+@dataclass(frozen=True)
 class GlidePlane(SymmetryElement):
     """
     Class representing a glide plane
+
+    Fields
+    ------
+    * `translation` (str): glide translation
+
+    * `reflection_plane` (str): reflection plane
     """
 
-    # --- Initializer
+    # --- Fields
 
-    def __init__(self, translation: str, reflection_plane: str):
-        """
-        Initialize GlidePlane object.
-
-        Parameters
-        ----------
-        `translation`: glide translation
-
-        `reflection_plane`: reflection plane
-        """
-        # --- Initialize attributes
-
-        self._translation = translation
-        self._reflection_plane = reflection_plane
-
-    # --- Properties
-
-    @property
-    def translation(self):
-        """
-        Return translation vector.
-        """
-        return self._translation
-
-    @property
-    def reflection_plane(self):
-        """
-        Return normal to the reflection plane.
-        """
-        return self._reflection_plane
+    translation: str
+    reflection_plane: str
 
     # --- Methods
 
@@ -146,30 +113,26 @@ class GlidePlane(SymmetryElement):
         # Convert glide_plane_jl to a GlidePlane object
         return GlidePlane(glide_plane_jl.translation, glide_plane_jl.reflection_plane)
 
-    def __eq__(self, other):
-        """
-        Return `True` if `self` and `other` represent the same glide plane; otherwise,
-        return `False`.
-        """
-        if not isinstance(other, GlidePlane):
-            return False
 
-        return (
-            self.translation == other.translation
-            and self.reflection_plane == other.reflection_plane
-        )
-
-    def __hash__(self):
-        """
-        Return hashable representation of GlidePlane object.
-        """
-        return hash(f"{self.translation},{self.reflection_plane}")
-
-
+@dataclass(frozen=True)
 class ScrewAxis(SymmetryElement):
     """
     Class representing a screw axis
+
+    Fields
+    ------
+    * `axis` (str): direction of rotation axis
+
+    * `n` (int): rotation order
+
+    * `m` (int): number of translation steps of size 1/n following rotation by 2π/n
     """
+
+    # --- Fields
+
+    axis: str
+    n: int
+    m: int
 
     # --- Initializer
 
@@ -190,34 +153,12 @@ class ScrewAxis(SymmetryElement):
         if m > n:
             raise ValueError(f"`m` must be no greater than `n` (n={n},m={m})")
 
-        # --- Initialize attributes
+        # --- Initialize field values
 
-        self._axis = axis
-        self._n = n
-        self._m = m
-
-    # --- Properties
-
-    @property
-    def axis(self):
-        """
-        Return rotation axis.
-        """
-        return self._axis
-
-    @property
-    def n(self):
-        """
-        Return `n` (the rotation order).
-        """
-        return self._n
-
-    @property
-    def m(self):
-        """
-        Return `m` (the number of translation steps of size 1/n following rotation by 2π/n).
-        """
-        return self._m
+        # for frozen DataClasses, field values cannot be set directly
+        object.__setattr__(self, "axis", axis)
+        object.__setattr__(self, "n", n)
+        object.__setattr__(self, "m", m)
 
     # --- Methods
 
@@ -249,19 +190,3 @@ class ScrewAxis(SymmetryElement):
 
         # Convert screw_axis_jl to a ScrewAxis object
         return ScrewAxis(screw_axis_jl.axis, screw_axis_jl.n, screw_axis_jl.m)
-
-    def __eq__(self, other):
-        """
-        Return `True` if `self` and `other` represent the same screw axis; otherwise,
-        return `False`.
-        """
-        if not isinstance(other, ScrewAxis):
-            return False
-
-        return self.axis == other.axis and self.n == other.n and self.m == other.m
-
-    def __hash__(self):
-        """
-        Return hashable representation of ScrewAxis object.
-        """
-        return hash(f"{self.axis},{self.n},{self.m}")
