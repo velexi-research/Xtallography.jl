@@ -140,14 +140,24 @@ class test_xtallography_symmetry_lattice_Lattice(unittest.TestCase):
         """
         Test that Lattice objects are immutable.
         """
-        # --- Tests
+        # --- Preparations
 
         lattice = Lattice("triclinic", "primitive")
 
+        # --- Tests
+
+        # attempt to change `lattice_system` field
         with pytest.raises(FrozenInstanceError) as exception_info:
             lattice.lattice_system = LatticeSystem.CUBIC
 
         expected_error = "cannot assign to field 'lattice_system'"
+        assert expected_error in str(exception_info)
+
+        # attempt to change `centering` field
+        with pytest.raises(FrozenInstanceError) as exception_info:
+            lattice.centering = Centering.BASE
+
+        expected_error = "cannot assign to field 'centering'"
         assert expected_error in str(exception_info)
 
     @staticmethod

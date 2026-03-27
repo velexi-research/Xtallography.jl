@@ -17,10 +17,12 @@ Unit tests for `xtallography.symmetry.symmetry_elements` module
 # --- Imports
 
 # Standard library
+from dataclasses import FrozenInstanceError
 import unittest
 
 # External packages
 import juliacall
+import pytest
 from xtallography.symmetry import GlidePlane, ScrewAxis
 
 # Local packages/modules
@@ -65,6 +67,40 @@ class test_xtallography_symmetry_symmetry_elements_GlidePlane(unittest.TestCase)
         assert glide_plane.translation == translation
         assert glide_plane.reflection_plane == reflection_plane
 
+    @staticmethod
+    def test_init_invalid_arguments():
+        """
+        Test argument checks for `__init__()`
+        """
+        # --- Tests
+
+        # No invalid arguments for GlidePlane initializer
+
+    @staticmethod
+    def test_frozen():
+        """
+        Test that GlidePlane objects are immutable.
+        """
+        # --- Preparations
+
+        glide_plane = GlidePlane("0,1,0", "1,0,0")
+
+        # --- Tests
+
+        # attempt to change `translation` field
+        with pytest.raises(FrozenInstanceError) as exception_info:
+            glide_plane.translation = "0,0,1"
+
+        expected_error = "cannot assign to field 'translation'"
+        assert expected_error in str(exception_info)
+
+        # attempt to change `reflection_plane` field
+        with pytest.raises(FrozenInstanceError) as exception_info:
+            glide_plane.reflection_plane = "0,0,1"
+
+        expected_error = "cannot assign to field 'reflection_plane'"
+        assert expected_error in str(exception_info)
+
     def test_to_julia(self):
         """
         Test `to_julia()`.
@@ -96,38 +132,6 @@ class test_xtallography_symmetry_symmetry_elements_GlidePlane(unittest.TestCase)
 
         assert glide_plane.translation == translation
         assert glide_plane.reflection_plane == reflection_plane
-
-    def test_eq(self):
-        """
-        Test `__eq__()`.
-        """
-        # --- Preparations
-
-        translation = "0,1,0"
-        reflection_plane = "1,0,0"
-        glide_plane = GlidePlane(translation, reflection_plane)
-
-        # --- Tests
-
-        # ------ same glide planes
-
-        other_glide_plane = GlidePlane(translation, reflection_plane)
-        assert glide_plane == other_glide_plane
-
-        # ------ different glide planes
-
-        # translation differs
-        other_glide_plane = GlidePlane("0,0,1", reflection_plane)
-        assert glide_plane != other_glide_plane
-
-        # reflection plane differs
-        other_glide_plane = GlidePlane(translation, "0,0,1")
-        assert glide_plane != other_glide_plane
-
-        # ------ comparison with non-GlidePlane object
-
-        other_glide_plane = ScrewAxis("1,0,0", 3, 2)
-        assert glide_plane != other_glide_plane
 
 
 class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
@@ -168,6 +172,47 @@ class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
         assert screw_axis.n == n
         assert screw_axis.m == m
 
+    @staticmethod
+    def test_init_invalid_arguments():
+        """
+        Test argument checks for `__init__()`
+        """
+        # --- Tests
+
+        # m ≥ n
+
+    @staticmethod
+    def test_frozen():
+        """
+        Test that ScrewAxis objects are immutable.
+        """
+        # --- Preparations
+
+        screw_axis = ScrewAxis("1,0,0", 6, 4)
+
+        # --- Tests
+
+        # attempt to change `axis` field
+        with pytest.raises(FrozenInstanceError) as exception_info:
+            screw_axis.axis = "0,1,0"
+
+        expected_error = "cannot assign to field 'axis'"
+        assert expected_error in str(exception_info)
+
+        # attempt to change `n` field
+        with pytest.raises(FrozenInstanceError) as exception_info:
+            screw_axis.n = 10
+
+        expected_error = "cannot assign to field 'n'"
+        assert expected_error in str(exception_info)
+
+        # attempt to change `m` field
+        with pytest.raises(FrozenInstanceError) as exception_info:
+            screw_axis.m = 5
+
+        expected_error = "cannot assign to field 'm'"
+        assert expected_error in str(exception_info)
+
     def test_to_julia(self):
         """
         Test `to_julia()`.
@@ -203,41 +248,3 @@ class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
         assert screw_axis.axis == axis
         assert screw_axis.n == n
         assert screw_axis.m == m
-
-    def test_eq(self):
-        """
-        Test `__eq__()`.
-        """
-        # --- Preparations
-
-        axis = "1,0,0"
-        n = 6
-        m = 4
-        screw_axis = ScrewAxis(axis, n, m)
-
-        # --- Tests
-
-        # ------ same screw axes
-
-        other_screw_axis = ScrewAxis(axis, n, m)
-        assert screw_axis == other_screw_axis
-
-        # ------ different screw axes
-
-        # axis differs
-        other_screw_axis = ScrewAxis("0,0,1", n, m)
-        assert screw_axis != other_screw_axis
-
-        # n differs
-        other_screw_axis = ScrewAxis(axis, n + 1, m)
-        assert screw_axis != other_screw_axis
-
-        # m differs
-        other_screw_axis = ScrewAxis(axis, n, m - 1)
-        assert screw_axis != other_screw_axis
-
-        # ------ comparison with non-ScrewAxis object
-
-        # reflection plane differs
-        other_screw_axis = GlidePlane("1,0,1", "0,0,1")
-        assert screw_axis != other_screw_axis
