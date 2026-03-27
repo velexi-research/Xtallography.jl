@@ -17,6 +17,7 @@ Unit tests for `xtallography.symmetry.lattice` module
 # --- Imports
 
 # Standard library
+from dataclasses import FrozenInstanceError
 import unittest
 
 # External packages
@@ -126,13 +127,27 @@ class test_xtallography_symmetry_lattice_Lattice(unittest.TestCase):
         assert expected_error in str(exception_info)
 
         # invalid `centering` value
-        # invalid `lattice_system` value
         with pytest.raises(ValueError) as exception_info:
             Lattice("rhombohedral", "def")
 
         expected_error = (
-            "`centering` must be one of {Centering.values()}. (centering='def')"
+            f"`centering` must be one of {Centering.values()}. (centering='def')"
         )
+        assert expected_error in str(exception_info)
+
+    @staticmethod
+    def test_frozen():
+        """
+        Test that Lattice objects are immutable.
+        """
+        # --- Tests
+
+        lattice = Lattice("triclinic", "primitive")
+
+        with pytest.raises(FrozenInstanceError) as exception_info:
+            lattice.lattice_system = LatticeSystem.CUBIC
+
+        expected_error = "cannot assign to field 'lattice_system'"
         assert expected_error in str(exception_info)
 
     @staticmethod
