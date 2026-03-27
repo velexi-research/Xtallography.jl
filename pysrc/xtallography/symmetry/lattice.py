@@ -17,17 +17,88 @@ Lattice type and functions
 # --- Imports
 
 # Standard library
-from collections import namedtuple
+from dataclasses import dataclass
+from typing import Union
 
 # Local packages/modules
 from .centering import Centering
 from .lattice_system import LatticeSystem
 
 
-# --- Types
+# --- Classes
 
 
-Lattice = namedtuple("Lattice", "lattice_system centering")
+@dataclass(frozen=True)
+class Lattice:
+    """
+    Class representing a lattice
+    """
+
+    lattice_system: LatticeSystem
+    centering: Centering = Centering.PRIMITIVE
+
+    # --- Initializer
+
+    def __init__(
+        self,
+        lattice_system: Union[LatticeSystem, str],
+        centering: Union[Centering, str] = Centering.PRIMITIVE,
+    ):
+
+        # --- Check arguments
+
+        # ------ `lattice_system`
+
+        if not isinstance(lattice_system, Union[LatticeSystem, str]):
+            raise ValueError(
+                "`lattice_system` must be a LatticeSystem object or a string. "
+                f"(lattice_system={lattice_system})"
+            )
+
+        # Convert `lattice_system` to LatticeSystem object
+        if isinstance(lattice_system, str):
+            lattice_system = lattice_system.lower()
+            try:
+                lattice_system = LatticeSystem(lattice_system)
+            except ValueError as error:
+                if "is not a valid LatticeSystem" in str(error):
+                    raise ValueError(
+                        "`lattice_system` must be one of "
+                        f"{LatticeSystem.values()}. (lattice_system='{lattice_system}')."
+                    )
+
+        # ------ `centering`
+
+        if not isinstance(centering, Union[Centering, str]):
+            raise ValueError(
+                "`centering` must be a Centering object or a string. "
+                f"(centering={centering})"
+            )
+
+        # Convert `centering` to Centering object
+        if isinstance(lattice_system, str):
+            centering = centering.lower()
+            try:
+                centering = Centering(centering)
+            except ValueError as error:
+                if "is not a valid Centering" in str(error):
+                    raise ValueError(
+                        "`centering` must be one of "
+                        f"{Centering.values()}. (centering='{centering}')."
+                    )
+
+        # --- Initialize field values
+
+        # for frozen DataClasses, field values cannot be set directly
+        object.__setattr__(self, "lattice_system", lattice_system)
+        object.__setattr__(self, "centering", centering)
+
+    def is_bravais_lattice(self) -> bool:
+        """
+        Return `True` if Lattice object is a valid Bravais lattice; return `False`
+        otherwise.
+        """
+        return self in BRAVAIS_LATTICES
 
 
 # --- Constants
@@ -50,111 +121,3 @@ BRAVAIS_LATTICES = (
     Lattice(LatticeSystem.CUBIC, Centering.BODY),
     Lattice(LatticeSystem.CUBIC, Centering.FACE),
 )
-
-
-# --- Functions
-
-
-def create_lattice(
-    lattice_system: str | None = None,
-    centering: str | None = None,
-) -> Lattice:
-    """
-    Create a Lattice object.
-
-    Parameters
-    ----------
-    lattice_system: lattice system
-
-    centering: lattice centering
-
-    Return value
-    ------------
-    Lattice object with the specified `lattice_system` and `centering`
-    """
-    # --- Check arguments
-
-    # ------ `lattice_system`
-
-    if not isinstance(lattice_system, str):
-        raise ValueError(
-            f"`lattice_system` must be a string. (lattice_system={lattice_system})"
-        )
-
-    # Enforce that `lattice_system` is lowercase
-    lattice_system = lattice_system.lower()
-
-    # ------ `centering`
-
-    if not isinstance(centering, str):
-        raise ValueError(f"`centering` must be a string. (centering={centering})")
-
-    # Enforce that `centering` is lowercase
-    centering = centering.lower()
-
-    # --- Construct Lattice
-
-    try:
-        lattice = Lattice(LatticeSystem(lattice_system), Centering(centering))
-
-    except ValueError as error:
-        if "is not a valid LatticeSystem" in str(error):
-            raise ValueError(
-                "`lattice_system` must be one of "
-                f"{LatticeSystem.values()}. (lattice_system='{lattice_system}')."
-            )
-
-        if "is not a valid Centering" in str(error):
-            raise ValueError(
-                "`centering` must be one of "
-                f"{Centering.values()}. (centering='{centering}')."
-            )
-
-    return lattice
-
-
-def standardize_lattice(lattice: Lattice) -> Lattice:
-    """
-    Standardize and validate field values for `lattice`.
-
-    Parameters
-    ----------
-    lattice: Lattice to standardize
-
-    Return value
-    ------------
-    standardized Lattice
-    """
-    # --- Validate types
-
-    for field, value in zip(lattice._fields, lattice):
-        if not isinstance(value, str):
-            raise ValueError(
-                f"`lattice.{field}` must be a string. (lattice.{field}={value})"
-            )
-
-    # --- Standardize field values
-
-    standardized_field_values = {}
-    for field, value in zip(lattice._fields, lattice):
-        standardized_field_values[field] = value.lower()
-
-    # --- Construct Lattice with standardized field values
-
-    lattice = create_lattice(
-        standardized_field_values["lattice_system"],
-        standardized_field_values["centering"],
-    )
-
-    return lattice
-
-
-def is_bravais_lattice(lattice: Lattice) -> bool:
-    """
-    Return `True` if `lattice` is a valid Bravais lattice; return `False` otherwise.
-
-    Parameters
-    ----------
-    lattice: Lattice to check
-    """
-    return lattice in BRAVAIS_LATTICES
