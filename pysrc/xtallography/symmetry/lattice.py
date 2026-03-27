@@ -32,6 +32,12 @@ from .lattice_system import LatticeSystem
 class Lattice:
     """
     Class representing a lattice
+
+    Fields
+    ------
+    * `lattice_system` (LatticeSystem): lattice system
+
+    * `centering` (Centering): centering of lattice
     """
 
     lattice_system: LatticeSystem
