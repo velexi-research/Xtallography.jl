@@ -179,7 +179,47 @@ class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
         """
         # --- Tests
 
-        # m ≥ n
+        # n = 0
+        with pytest.raises(ValueError) as exception_info:
+            ScrewAxis("1,0,0", 0, 4)
+
+        expected_error = "`n` must be positive (n=0)"
+        assert expected_error in str(exception_info)
+
+        # n < 0
+        with pytest.raises(ValueError) as exception_info:
+            ScrewAxis("1,0,0", -5, 4)
+
+        expected_error = "`n` must be positive (n=-5)"
+        assert expected_error in str(exception_info)
+
+        # m = 0
+        with pytest.raises(ValueError) as exception_info:
+            ScrewAxis("1,0,0", 6, 0)
+
+        expected_error = "`m` must be positive (m=0)"
+        assert expected_error in str(exception_info)
+
+        # m < 0
+        with pytest.raises(ValueError) as exception_info:
+            ScrewAxis("1,0,0", 6, -4)
+
+        expected_error = "`m` must be positive (m=-4)"
+        assert expected_error in str(exception_info)
+
+        # m = n
+        with pytest.raises(ValueError) as exception_info:
+            ScrewAxis("1,0,0", 6, 6)
+
+        expected_error = "`m` must be less than `n` (n=6,m=6)"
+        assert expected_error in str(exception_info)
+
+        # m > n
+        with pytest.raises(ValueError) as exception_info:
+            ScrewAxis("1,0,0", 6, 7)
+
+        expected_error = "`m` must be less than `n` (n=6,m=7)"
+        assert expected_error in str(exception_info)
 
     @staticmethod
     def test_frozen():

@@ -150,8 +150,14 @@ class ScrewAxis(SymmetryElement):
         """
         # --- Check arguments
 
-        if m > n:
-            raise ValueError(f"`m` must be no greater than `n` (n={n},m={m})")
+        if n <= 0:
+            raise ValueError(f"`n` must be positive (n={n})")
+
+        if m <= 0:
+            raise ValueError(f"`m` must be positive (m={m})")
+
+        if m >= n:
+            raise ValueError(f"`m` must be less than `n` (n={n},m={m})")
 
         # --- Initialize field values
 
