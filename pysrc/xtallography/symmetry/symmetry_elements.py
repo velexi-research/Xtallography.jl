@@ -64,6 +64,12 @@ class SymmetryElement(ABC):
             f"(symmetry_element_jl={symmetry_element_jl})."
         )
 
+    @abstractmethod
+    def __repr__(self):
+        """
+        Return string representation of SymmetryElement.
+        """
+
 
 @dataclass(frozen=True)
 class GlidePlane(SymmetryElement):
@@ -112,6 +118,12 @@ class GlidePlane(SymmetryElement):
 
         # Convert glide_plane_jl to a GlidePlane object
         return GlidePlane(glide_plane_jl.translation, glide_plane_jl.reflection_plane)
+
+    def __repr__(self):
+        """
+        Return string representation of GlidePlane.
+        """
+        return f"GlidePlane({self.translation},{self.reflection_plane})"
 
 
 @dataclass(frozen=True)
@@ -196,3 +208,9 @@ class ScrewAxis(SymmetryElement):
 
         # Convert screw_axis_jl to a ScrewAxis object
         return ScrewAxis(screw_axis_jl.axis, screw_axis_jl.n, screw_axis_jl.m)
+
+    def __repr__(self):
+        """
+        Return string representation of ScrewAxis.
+        """
+        return f"ScrewAxis({self.axis},{self.n},{self.n})"
