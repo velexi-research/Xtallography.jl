@@ -133,6 +133,21 @@ class test_xtallography_symmetry_symmetry_elements_GlidePlane(unittest.TestCase)
         assert glide_plane.translation == translation
         assert glide_plane.reflection_plane == reflection_plane
 
+    def test_repr(self):
+        """
+        Test `__repr__()`.
+        """
+        # --- Tests
+
+        translation = "0,1,0"
+        reflection_plane = "1,0,0"
+        glide_plane = GlidePlane(translation, reflection_plane)
+
+        assert (
+            str(glide_plane)
+            == "GlidePlane(translation='0,1,0',reflection_plane='1,0,0')"
+        )
+
 
 class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
     """
@@ -288,3 +303,16 @@ class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
         assert screw_axis.axis == axis
         assert screw_axis.n == n
         assert screw_axis.m == m
+
+    def test_repr(self):
+        """
+        Test `__repr__()`.
+        """
+        # --- Tests
+
+        axis = "1,0,0"
+        n = 6
+        m = 4
+        screw_axis = ScrewAxis(axis, n, m)
+
+        assert str(screw_axis) == "ScrewAxis(axis='1,0,0',n=6,m=4)"

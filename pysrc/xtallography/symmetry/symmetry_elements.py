@@ -123,7 +123,10 @@ class GlidePlane(SymmetryElement):
         """
         Return string representation of GlidePlane.
         """
-        return f"GlidePlane({self.translation},{self.reflection_plane})"
+        return (
+            f"GlidePlane(translation='{self.translation}',"
+            f"reflection_plane='{self.reflection_plane}')"
+        )
 
 
 @dataclass(frozen=True)
@@ -213,4 +216,4 @@ class ScrewAxis(SymmetryElement):
         """
         Return string representation of ScrewAxis.
         """
-        return f"ScrewAxis({self.axis},{self.n},{self.n})"
+        return f"ScrewAxis(axis='{self.axis}',n={self.n},m={self.m})"
