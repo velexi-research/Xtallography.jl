@@ -27,7 +27,12 @@ import pytest
 # Local packages/modules
 from xtallography.symmetry import LatticeSystem, Centering
 from xtallography.symmetry import GlidePlane, ScrewAxis, SymmetryElement
-from xtallography.unit_cell import TriclinicUnitCell, TetragonalUnitCell
+from xtallography.unit_cell import (
+    TriclinicLatticeConstants,
+    TriclinicUnitCell,
+    UnitCellSymmetry,
+    TetragonalUnitCell,
+)
 
 
 # --- Test Suites
@@ -79,13 +84,20 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
 
         unit_cell = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
 
+        assert unit_cell.lattice_constants == TriclinicLatticeConstants(
+            a, b, c, alpha, beta, gamma
+        )
+        assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.PRIMITIVE, symmetry_elements=set()
+        )
+
         assert unit_cell.a == a
         assert unit_cell.b == b
         assert unit_cell.c == c
         assert unit_cell.alpha == alpha
         assert unit_cell.beta == beta
         assert unit_cell.gamma == gamma
-        assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
         assert unit_cell.centering == Centering.PRIMITIVE
         assert unit_cell.symmetry_elements == set()
 
@@ -96,13 +108,20 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
             a, b, c, alpha, beta, gamma, centering=Centering.PRIMITIVE
         )
 
+        assert unit_cell.lattice_constants == TriclinicLatticeConstants(
+            a, b, c, alpha, beta, gamma
+        )
+        assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.PRIMITIVE, symmetry_elements=set()
+        )
+
         assert unit_cell.a == a
         assert unit_cell.b == b
         assert unit_cell.c == c
         assert unit_cell.alpha == alpha
         assert unit_cell.beta == beta
         assert unit_cell.gamma == gamma
-        assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
         assert unit_cell.centering == Centering.PRIMITIVE
         assert unit_cell.symmetry_elements == set()
 
@@ -111,13 +130,20 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
             a, b, c, alpha, beta, gamma, centering=Centering.BASE
         )
 
+        assert unit_cell.lattice_constants == TriclinicLatticeConstants(
+            a, b, c, alpha, beta, gamma
+        )
+        assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.BASE, symmetry_elements=set()
+        )
+
         assert unit_cell.a == a
         assert unit_cell.b == b
         assert unit_cell.c == c
         assert unit_cell.alpha == alpha
         assert unit_cell.beta == beta
         assert unit_cell.gamma == gamma
-        assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
         assert unit_cell.centering == Centering.BASE
         assert unit_cell.symmetry_elements == set()
 
@@ -126,19 +152,12 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
             a, b, c, alpha, beta, gamma, centering=Centering.BODY
         )
 
-        assert unit_cell.a == a
-        assert unit_cell.b == b
-        assert unit_cell.c == c
-        assert unit_cell.alpha == alpha
-        assert unit_cell.beta == beta
-        assert unit_cell.gamma == gamma
+        assert unit_cell.lattice_constants == TriclinicLatticeConstants(
+            a, b, c, alpha, beta, gamma
+        )
         assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
-        assert unit_cell.centering == Centering.BODY
-        assert unit_cell.symmetry_elements == set()
-
-        # centering = face
-        unit_cell = TriclinicUnitCell(
-            a, b, c, alpha, beta, gamma, centering=Centering.FACE
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.BODY, symmetry_elements=set()
         )
 
         assert unit_cell.a == a
@@ -147,7 +166,28 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
         assert unit_cell.alpha == alpha
         assert unit_cell.beta == beta
         assert unit_cell.gamma == gamma
+        assert unit_cell.centering == Centering.BODY
+        assert unit_cell.symmetry_elements == set()
+
+        # centering = face
+        unit_cell = TriclinicUnitCell(
+            a, b, c, alpha, beta, gamma, centering=Centering.FACE
+        )
+
+        assert unit_cell.lattice_constants == TriclinicLatticeConstants(
+            a, b, c, alpha, beta, gamma
+        )
         assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.FACE, symmetry_elements=set()
+        )
+
+        assert unit_cell.a == a
+        assert unit_cell.b == b
+        assert unit_cell.c == c
+        assert unit_cell.alpha == alpha
+        assert unit_cell.beta == beta
+        assert unit_cell.gamma == gamma
         assert unit_cell.centering == Centering.FACE
         assert unit_cell.symmetry_elements == set()
 
@@ -164,13 +204,20 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
             symmetry_elements=symmetry_elements,
         )
 
+        assert unit_cell.lattice_constants == TriclinicLatticeConstants(
+            a, b, c, alpha, beta, gamma
+        )
+        assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.FACE, symmetry_elements=symmetry_elements
+        )
+
         assert unit_cell.a == a
         assert unit_cell.b == b
         assert unit_cell.c == c
         assert unit_cell.alpha == alpha
         assert unit_cell.beta == beta
         assert unit_cell.gamma == gamma
-        assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
         assert unit_cell.centering == Centering.FACE
         assert unit_cell.symmetry_elements == set(symmetry_elements)
 

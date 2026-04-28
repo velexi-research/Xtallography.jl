@@ -26,7 +26,12 @@ import pytest
 # Local packages/modules
 from xtallography.symmetry import LatticeSystem, Centering
 from xtallography.symmetry import GlidePlane, ScrewAxis, SymmetryElement
-from xtallography.unit_cell import TetragonalUnitCell, CubicUnitCell
+from xtallography.unit_cell import (
+    TetragonalLatticeConstants,
+    TetragonalUnitCell,
+    UnitCellSymmetry,
+    CubicUnitCell,
+)
 
 
 # --- Test Suites
@@ -74,9 +79,14 @@ class test_xtallography_unit_cell_tetragonal(unittest.TestCase):
 
         unit_cell = TetragonalUnitCell(a, c)
 
+        assert unit_cell.lattice_constants == TetragonalLatticeConstants(a, c)
+        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.PRIMITIVE, symmetry_elements=set()
+        )
+
         assert unit_cell.a == a
         assert unit_cell.c == c
-        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
         assert unit_cell.centering == Centering.PRIMITIVE
         assert unit_cell.symmetry_elements == set()
 
@@ -85,36 +95,56 @@ class test_xtallography_unit_cell_tetragonal(unittest.TestCase):
         # centering = primitive
         unit_cell = TetragonalUnitCell(a, c, centering=Centering.PRIMITIVE)
 
+        assert unit_cell.lattice_constants == TetragonalLatticeConstants(a, c)
+        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.PRIMITIVE, symmetry_elements=set()
+        )
+
         assert unit_cell.a == a
         assert unit_cell.c == c
-        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
         assert unit_cell.centering == Centering.PRIMITIVE
         assert unit_cell.symmetry_elements == set()
 
         # centering = base
         unit_cell = TetragonalUnitCell(a, c, centering=Centering.BASE)
 
+        assert unit_cell.lattice_constants == TetragonalLatticeConstants(a, c)
+        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.BASE, symmetry_elements=set()
+        )
+
         assert unit_cell.a == a
         assert unit_cell.c == c
-        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
         assert unit_cell.centering == Centering.BASE
         assert unit_cell.symmetry_elements == set()
 
         # centering = body
         unit_cell = TetragonalUnitCell(a, c, centering=Centering.BODY)
 
+        assert unit_cell.lattice_constants == TetragonalLatticeConstants(a, c)
+        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.BODY, symmetry_elements=set()
+        )
+
         assert unit_cell.a == a
         assert unit_cell.c == c
-        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
         assert unit_cell.centering == Centering.BODY
         assert unit_cell.symmetry_elements == set()
 
         # centering = face
         unit_cell = TetragonalUnitCell(a, c, centering=Centering.FACE)
 
+        assert unit_cell.lattice_constants == TetragonalLatticeConstants(a, c)
+        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.FACE, symmetry_elements=set()
+        )
+
         assert unit_cell.a == a
         assert unit_cell.c == c
-        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
         assert unit_cell.centering == Centering.FACE
         assert unit_cell.symmetry_elements == set()
 
@@ -122,9 +152,14 @@ class test_xtallography_unit_cell_tetragonal(unittest.TestCase):
         symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
         unit_cell = TetragonalUnitCell(a, c, symmetry_elements=symmetry_elements)
 
+        assert unit_cell.lattice_constants == TetragonalLatticeConstants(a, c)
+        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.PRIMITIVE, symmetry_elements=symmetry_elements
+        )
+
         assert unit_cell.a == a
         assert unit_cell.c == c
-        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
         assert unit_cell.centering == Centering.PRIMITIVE
         assert unit_cell.symmetry_elements == set(symmetry_elements)
 

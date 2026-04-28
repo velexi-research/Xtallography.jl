@@ -26,7 +26,12 @@ import pytest
 # Local packages/modules
 from xtallography.symmetry import LatticeSystem, Centering
 from xtallography.symmetry import GlidePlane, ScrewAxis, SymmetryElement
-from xtallography.unit_cell import CubicUnitCell, TetragonalUnitCell
+from xtallography.unit_cell import (
+    CubicLatticeConstants,
+    CubicUnitCell,
+    UnitCellSymmetry,
+    TetragonalUnitCell,
+)
 
 
 # --- Test Suites
@@ -73,8 +78,13 @@ class test_xtallography_unit_cell_cubic(unittest.TestCase):
 
         unit_cell = CubicUnitCell(a)
 
-        assert unit_cell.a == a
+        assert unit_cell.lattice_constants == CubicLatticeConstants(a)
         assert unit_cell.lattice_system == LatticeSystem.CUBIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.PRIMITIVE, symmetry_elements=set()
+        )
+
+        assert unit_cell.a == a
         assert unit_cell.centering == Centering.PRIMITIVE
         assert unit_cell.symmetry_elements == set()
 
@@ -83,32 +93,52 @@ class test_xtallography_unit_cell_cubic(unittest.TestCase):
         # centering = primitive
         unit_cell = CubicUnitCell(a, centering=Centering.PRIMITIVE)
 
-        assert unit_cell.a == a
+        assert unit_cell.lattice_constants == CubicLatticeConstants(a)
         assert unit_cell.lattice_system == LatticeSystem.CUBIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.PRIMITIVE, symmetry_elements=set()
+        )
+
+        assert unit_cell.a == a
         assert unit_cell.centering == Centering.PRIMITIVE
         assert unit_cell.symmetry_elements == set()
 
         # centering = base
         unit_cell = CubicUnitCell(a, centering=Centering.BASE)
 
-        assert unit_cell.a == a
+        assert unit_cell.lattice_constants == CubicLatticeConstants(a)
         assert unit_cell.lattice_system == LatticeSystem.CUBIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.BASE, symmetry_elements=set()
+        )
+
+        assert unit_cell.a == a
         assert unit_cell.centering == Centering.BASE
         assert unit_cell.symmetry_elements == set()
 
         # centering = body
         unit_cell = CubicUnitCell(a, centering=Centering.BODY)
 
-        assert unit_cell.a == a
+        assert unit_cell.lattice_constants == CubicLatticeConstants(a)
         assert unit_cell.lattice_system == LatticeSystem.CUBIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.BODY, symmetry_elements=set()
+        )
+
+        assert unit_cell.a == a
         assert unit_cell.centering == Centering.BODY
         assert unit_cell.symmetry_elements == set()
 
         # centering = face
         unit_cell = CubicUnitCell(a, centering=Centering.FACE)
 
-        assert unit_cell.a == a
+        assert unit_cell.lattice_constants == CubicLatticeConstants(a)
         assert unit_cell.lattice_system == LatticeSystem.CUBIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.FACE, symmetry_elements=set()
+        )
+
+        assert unit_cell.a == a
         assert unit_cell.centering == Centering.FACE
         assert unit_cell.symmetry_elements == set()
 
@@ -116,8 +146,13 @@ class test_xtallography_unit_cell_cubic(unittest.TestCase):
         symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
         unit_cell = CubicUnitCell(a, symmetry_elements=symmetry_elements)
 
-        assert unit_cell.a == a
+        assert unit_cell.lattice_constants == CubicLatticeConstants(a)
         assert unit_cell.lattice_system == LatticeSystem.CUBIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.PRIMITIVE, symmetry_elements=symmetry_elements
+        )
+
+        assert unit_cell.a == a
         assert unit_cell.centering == Centering.PRIMITIVE
         assert unit_cell.symmetry_elements == set(symmetry_elements)
 
