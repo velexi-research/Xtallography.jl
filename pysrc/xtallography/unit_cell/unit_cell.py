@@ -18,7 +18,7 @@ UnitCell class
 # --- Imports
 
 # Standard library
-from abc import abstractmethod, abstractclassmethod, ABC
+from abc import abstractmethod, ABC
 from dataclasses import dataclass, fields
 import math
 import sys
@@ -51,7 +51,13 @@ class UnitCell(ABC):
     """
     Abstract base class for unit cell classes
 
-    TODO: add field descriptions
+    Fields
+    ------
+    * `lattice_system` (LatticeSystem): lattice system of unit cell
+
+    * `lattice_constants` (LatticeConstants): lattice constants of unit cell
+
+    * `symmetry` (UnitCellSymmetry): symmetry of unit cell
     """
 
     lattice_system: LatticeSystem
@@ -190,7 +196,7 @@ class UnitCell(ABC):
         Convert Python UnitCell object to a Julia UnitCell object.
         """
 
-    @abstractclassmethod
+    @classmethod
     def from_julia(cls, unit_cell_jl: _JL.UnitCell):
         """
         Convert a Julia UnitCell object to a Python UnitCell object.
@@ -203,7 +209,7 @@ class UnitCell(ABC):
         ------------
         Python UnitCell object
         """
-        # TODO: add polymorphic method to convert Julia UnitCell of unknown type
+        # Dynamically defined in unit_cell/__init__.py
 
     @abstractmethod
     def __repr__(self):

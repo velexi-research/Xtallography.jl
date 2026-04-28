@@ -24,8 +24,11 @@ import sys
 # External packages
 import juliacall
 import pytest
+from xtallography.symmetry import Centering, LatticeSystem
 from xtallography.unit_cell import (
     UnitCell,
+    UnitCellSymmetry,
+    TriclinicLatticeConstants,
     TriclinicUnitCell,
     MonoclinicUnitCell,
     OrthorhombicUnitCell,
@@ -40,11 +43,12 @@ from xtallography.unit_cell import (
 
 # --- Test Suites
 
-# TODO
-#
 # Lattice-specific tests are located in subclass unit tests
 #
 # __init__()
+# to_julia()
+# from_julia()
+# __repr__()
 # __eq__()
 # isclose()
 
@@ -72,11 +76,35 @@ class test_xtallography_unit_cell_UnitCell(unittest.TestCase):
     # --- Tests
 
     @staticmethod
-    def test_properties():
+    def test_fields_and_properties():
         """
-        Test properties
+        Test fields and properties.
         """
-        # TODO
+        # --- Preparations
+
+        a = 1
+        b = 2
+        c = 3
+        alpha = 0.1
+        beta = 0.2
+        gamma = 0.3
+
+        # --- Tests
+
+        unit_cell = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+
+        # fields
+        assert unit_cell.lattice_constants == TriclinicLatticeConstants(
+            a, b, c, alpha, beta, gamma
+        )
+        assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.PRIMITIVE, symmetry_elements=set()
+        )
+
+        # properties
+        assert unit_cell.centering == Centering.PRIMITIVE
+        assert unit_cell.symmetry_elements == set()
 
     @staticmethod
     def test_isclose_default_args():
@@ -148,39 +176,60 @@ class test_xtallography_unit_cell_UnitCell(unittest.TestCase):
         # --- Tests
 
         # triclinic
-        unit_cell_jl = TriclinicUnitCell(1, 2, 3, 0.1, 0.2, 0.3).to_julia()
+        unit_cell_ref = TriclinicUnitCell(1, 2, 3, 0.1, 0.2, 0.3)
+        unit_cell_jl = unit_cell_ref.to_julia()
         unit_cell = UnitCell.from_julia(unit_cell_jl)
         assert isinstance(unit_cell, TriclinicUnitCell)
+        assert unit_cell == unit_cell_ref
+        assert unit_cell is not unit_cell_ref
 
         # monoclinic
-        unit_cell_jl = MonoclinicUnitCell(1, 2, 3, 1.8).to_julia()
+        unit_cell_ref = MonoclinicUnitCell(1, 2, 3, 1.8)
+        unit_cell_jl = unit_cell_ref.to_julia()
         unit_cell = UnitCell.from_julia(unit_cell_jl)
         assert isinstance(unit_cell, MonoclinicUnitCell)
+        assert unit_cell == unit_cell_ref
+        assert unit_cell is not unit_cell_ref
 
         # orthorhombic
-        unit_cell_jl = OrthorhombicUnitCell(1, 2, 3).to_julia()
+        unit_cell_ref = OrthorhombicUnitCell(1, 2, 3)
+        unit_cell_jl = unit_cell_ref.to_julia()
         unit_cell = UnitCell.from_julia(unit_cell_jl)
         assert isinstance(unit_cell, OrthorhombicUnitCell)
+        assert unit_cell == unit_cell_ref
+        assert unit_cell is not unit_cell_ref
 
         # tetragonal
-        unit_cell_jl = TetragonalUnitCell(1, 2).to_julia()
+        unit_cell_ref = TetragonalUnitCell(1, 2)
+        unit_cell_jl = unit_cell_ref.to_julia()
         unit_cell = UnitCell.from_julia(unit_cell_jl)
         assert isinstance(unit_cell, TetragonalUnitCell)
+        assert unit_cell == unit_cell_ref
+        assert unit_cell is not unit_cell_ref
 
         # rhombohedral
-        unit_cell_jl = RhombohedralUnitCell(1, 1.8).to_julia()
+        unit_cell_ref = RhombohedralUnitCell(1, 1.8)
+        unit_cell_jl = unit_cell_ref.to_julia()
         unit_cell = UnitCell.from_julia(unit_cell_jl)
         assert isinstance(unit_cell, RhombohedralUnitCell)
+        assert unit_cell == unit_cell_ref
+        assert unit_cell is not unit_cell_ref
 
         # hexagonal
-        unit_cell_jl = HexagonalUnitCell(1, 2).to_julia()
+        unit_cell_ref = HexagonalUnitCell(1, 2)
+        unit_cell_jl = unit_cell_ref.to_julia()
         unit_cell = UnitCell.from_julia(unit_cell_jl)
         assert isinstance(unit_cell, HexagonalUnitCell)
+        assert unit_cell == unit_cell_ref
+        assert unit_cell is not unit_cell_ref
 
         # cubic
-        unit_cell_jl = CubicUnitCell(1).to_julia()
+        unit_cell_ref = CubicUnitCell(1)
+        unit_cell_jl = unit_cell_ref.to_julia()
         unit_cell = UnitCell.from_julia(unit_cell_jl)
         assert isinstance(unit_cell, CubicUnitCell)
+        assert unit_cell == unit_cell_ref
+        assert unit_cell is not unit_cell_ref
 
     def test_from_julia_invalid_args(self):
         """
