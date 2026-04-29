@@ -55,6 +55,14 @@ struct UnitCell{T<:LatticeSystem}
     # - For efficiency of argument checking, a separate constructor is provided for each
     #   lattice system.
 
+    function UnitCell{T}(
+        lattice_constants::NamedTuple, symmetry::UnitCellSymmetry
+    ) where {T<:LatticeSystem}
+        # Default constructor to allow extension to custom lattice systems
+
+        return new(lattice_constants, symmetry)
+    end
+
     function UnitCell{Triclinic}(lattice_constants::NamedTuple, symmetry::UnitCellSymmetry)
 
         # --- Check arguments
@@ -826,9 +834,11 @@ function reduced_cell(unit_cell::UnitCell)
                 candidate_basis[2].vector,
                 candidate_basis[3].vector,
             ],
-            sum_length_sq=candidate_basis[1].length_sq +
-                          candidate_basis[2].length_sq +
-                          candidate_basis[3].length_sq,
+            sum_length_sq=(
+                candidate_basis[1].length_sq +
+                candidate_basis[2].length_sq +
+                candidate_basis[3].length_sq
+            ),
             surface_area=surface_area(
                 candidate_basis[1].vector,
                 candidate_basis[2].vector,
