@@ -37,7 +37,9 @@ class TriclinicLatticeConstants(LatticeConstants):
     """
     Class representing the lattice constants for a triclinic unit cell
 
-    TODO: add fields
+    Fields
+    ------
+    * `a`, `b`, `c`, `alpha`, `beta`, `gamma` (float or int): lattice constants
     """
 
     a: Union[float, int]
@@ -53,7 +55,9 @@ class MonoclinicLatticeConstants(LatticeConstants):
     """
     Class representing the lattice constants for a monoclinic unit cell
 
-    TODO: add fields
+    Fields
+    ------
+    * `a`, `b`, `c`, `beta` (float or int): lattice constants
     """
 
     a: Union[float, int]
@@ -67,7 +71,9 @@ class OrthorhombicLatticeConstants(LatticeConstants):
     """
     Class representing the lattice constants for a orthorhombic unit cell
 
-    TODO: add fields
+    Fields
+    ------
+    * `a`, `b`, `c` (float or int): lattice constants
     """
 
     a: Union[float, int]
@@ -80,7 +86,9 @@ class HexagonalLatticeConstants(LatticeConstants):
     """
     Class representing the lattice constants for a hexagonal unit cell
 
-    TODO: add fields
+    Fields
+    ------
+    * `a`, `c` (float or int): lattice constants
     """
 
     a: Union[float, int]
@@ -92,7 +100,9 @@ class RhombohedralLatticeConstants(LatticeConstants):
     """
     Class representing the lattice constants for a rhombohedral unit cell
 
-    TODO: add fields
+    Fields
+    ------
+    * `a`, `alpha` (float or int): lattice constants
     """
 
     a: Union[float, int]
@@ -104,7 +114,9 @@ class TetragonalLatticeConstants(LatticeConstants):
     """
     Class representing the lattice constants for a tetragonal unit cell
 
-    TODO: add fields
+    Fields
+    ------
+    * `a`, `c` (float or int): lattice constants
     """
 
     a: Union[float, int]
@@ -116,7 +128,9 @@ class CubicLatticeConstants(LatticeConstants):
     """
     Class representing the lattice constants for a cubic unit cell
 
-    TODO: add fields
+    Fields
+    ------
+    * `a` (float or int): lattice constants
     """
 
     a: Union[float, int]
