@@ -343,7 +343,7 @@ class test_xtallography_unit_cell_UnitCell(unittest.TestCase):
         lattice_constants_2 = TriclinicLatticeConstants(1, 2, 3, 0.1, 0.2, 0.3)
         unit_cell_2 = TestUnitCell(lattice_system_2, lattice_constants_2)
 
-        assert unit_cell_1 != unit_cell_2
+        assert not unit_cell_1.isclose(unit_cell_2)
 
     @staticmethod
     def test_isclose_default_args():
