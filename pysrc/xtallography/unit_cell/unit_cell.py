@@ -88,8 +88,14 @@ class UnitCell(ABC):
         # ------ lattice_system
 
         # Enforce that lattice_system is a LatticeSystem object
-        if not isinstance(lattice_system, LatticeSystem):
-            lattice_system = LatticeSystem(lattice_system)
+        if isinstance(lattice_system, str):
+            lattice_system = LatticeSystem(lattice_system.lower())
+
+        elif not isinstance(lattice_system, LatticeSystem):
+            raise ValueError(
+                "`lattice_system` must be a `LatticeSystem` or `str`."
+                f"(lattice_system={lattice_system})"
+            )
 
         # ------ lattice_constants
 

@@ -26,6 +26,7 @@ import juliacall
 import pytest
 from xtallography.symmetry import Centering, LatticeSystem
 from xtallography.unit_cell import (
+    LatticeConstants,
     UnitCell,
     UnitCellSymmetry,
     TriclinicLatticeConstants,
@@ -35,6 +36,7 @@ from xtallography.unit_cell import (
     TetragonalUnitCell,
     RhombohedralUnitCell,
     HexagonalUnitCell,
+    CubicLatticeConstants,
     CubicUnitCell,
 )
 
@@ -43,7 +45,7 @@ from xtallography.unit_cell import (
 
 # --- Test Suites
 
-# Lattice-specific tests are located in subclass unit tests
+# Lattice-specific tests for the following methods are located in subclass unit test files
 #
 # __init__()
 # to_julia()
@@ -74,6 +76,191 @@ class test_xtallography_unit_cell_UnitCell(unittest.TestCase):
         """
 
     # --- Tests
+
+    @staticmethod
+    def test_init_arg_checks_lattice_system():
+        """
+        Test argument checks for `UnitCell.__init__()`: lattice_system
+        """
+        # --- Preparations
+
+        # define concrete subclass of UnitCell for testing purposes
+        class TestUnitCell(UnitCell):
+            def __init__(
+                self, lattice_system: LatticeSystem, lattice_constants: LatticeConstants
+            ):
+                super().__init__(lattice_system, lattice_constants)
+
+            def to_julia(self):
+                return None
+
+            def __repr__(self):
+                return ""
+
+        # --- Tests
+
+        # ------ lattice_system is str
+
+        # correct capitalization
+        lattice_system = "cubic"
+        lattice_constants = CubicLatticeConstants(1)
+
+        unit_cell = TestUnitCell(lattice_system, lattice_constants)
+        assert unit_cell.lattice_system == LatticeSystem.CUBIC
+
+        # incorrect capitalization
+        lattice_system = "Cubic"
+        lattice_constants = CubicLatticeConstants(1)
+
+        unit_cell = TestUnitCell(lattice_system, lattice_constants)
+        assert unit_cell.lattice_system == LatticeSystem.CUBIC
+
+    @staticmethod
+    def test_init_invalid_args():
+        """
+        Test argument checks for `UnitCell.__init__()`.
+        """
+        # --- Preparations
+
+        # define concrete subclass of UnitCell for testing purposes
+        class TestUnitCell(UnitCell):
+            def __init__(
+                self, lattice_system: LatticeSystem, lattice_constants: LatticeConstants
+            ):
+                super().__init__(lattice_system, lattice_constants)
+
+            def to_julia(self):
+                return None
+
+            def __repr__(self):
+                return ""
+
+        # --- Tests
+
+        # ------ type(lattice_system) not LatticeSystem or str
+
+        lattice_system = 4
+        lattice_constants = CubicLatticeConstants(1)
+
+        with pytest.raises(ValueError) as exception_info:
+            TestUnitCell(lattice_system, lattice_constants)
+
+        expected_error = (
+            "`lattice_system` must be a `LatticeSystem` or `str`."
+            f"(lattice_system={lattice_system})"
+        )
+        assert expected_error in str(exception_info)
+
+        # ------ lattice_system is not a valid LatticeSystem
+
+        lattice_system = "triangle"
+        lattice_constants = CubicLatticeConstants(1)
+
+        with pytest.raises(ValueError) as exception_info:
+            TestUnitCell(lattice_system, lattice_constants)
+
+        expected_error = "'triangle' is not a valid LatticeSystem"
+        assert expected_error in str(exception_info)
+
+        # ------ lattice_constants incompatible with lattice_system
+
+        # triclinic
+        lattice_system = LatticeSystem.TRICLINIC
+        lattice_constants = CubicLatticeConstants(1)
+
+        with pytest.raises(ValueError) as exception_info:
+            TestUnitCell(lattice_system, lattice_constants)
+
+        expected_error = (
+            "`lattice_constants` for triclinic unit cell must be a "
+            "TriclinicLatticeConstants object. "
+            f"(lattice_constants={lattice_constants})"
+        )
+        assert expected_error in str(exception_info)
+
+        # monoclinic
+        lattice_system = LatticeSystem.MONOCLINIC
+        lattice_constants = CubicLatticeConstants(1)
+
+        with pytest.raises(ValueError) as exception_info:
+            TestUnitCell(lattice_system, lattice_constants)
+
+        expected_error = (
+            "`lattice_constants` for monoclinic unit cell must be a "
+            "MonoclinicLatticeConstants object. "
+            f"(lattice_constants={lattice_constants})"
+        )
+        assert expected_error in str(exception_info)
+
+        # orthorhombic
+        lattice_system = LatticeSystem.ORTHORHOMBIC
+        lattice_constants = CubicLatticeConstants(1)
+
+        with pytest.raises(ValueError) as exception_info:
+            TestUnitCell(lattice_system, lattice_constants)
+
+        expected_error = (
+            "`lattice_constants` for orthorhombic unit cell must be a "
+            "OrthorhombicLatticeConstants object. "
+            f"(lattice_constants={lattice_constants})"
+        )
+        assert expected_error in str(exception_info)
+
+        # hexagonal
+        lattice_system = LatticeSystem.HEXAGONAL
+        lattice_constants = CubicLatticeConstants(1)
+
+        with pytest.raises(ValueError) as exception_info:
+            TestUnitCell(lattice_system, lattice_constants)
+
+        expected_error = (
+            "`lattice_constants` for hexagonal unit cell must be a "
+            "HexagonalLatticeConstants object. "
+            f"(lattice_constants={lattice_constants})"
+        )
+        assert expected_error in str(exception_info)
+
+        # rhombohedral
+        lattice_system = LatticeSystem.RHOMBOHEDRAL
+        lattice_constants = CubicLatticeConstants(1)
+
+        with pytest.raises(ValueError) as exception_info:
+            TestUnitCell(lattice_system, lattice_constants)
+
+        expected_error = (
+            "`lattice_constants` for rhombohedral unit cell must be a "
+            "RhombohedralLatticeConstants object. "
+            f"(lattice_constants={lattice_constants})"
+        )
+        assert expected_error in str(exception_info)
+
+        # tetragonal
+        lattice_system = LatticeSystem.TETRAGONAL
+        lattice_constants = CubicLatticeConstants(1)
+
+        with pytest.raises(ValueError) as exception_info:
+            TestUnitCell(lattice_system, lattice_constants)
+
+        expected_error = (
+            "`lattice_constants` for tetragonal unit cell must be a "
+            "TetragonalLatticeConstants object. "
+            f"(lattice_constants={lattice_constants})"
+        )
+        assert expected_error in str(exception_info)
+
+        # cubic
+        lattice_system = LatticeSystem.CUBIC
+        lattice_constants = TriclinicLatticeConstants(1, 2, 3, 0.1, 0.2, 0.3)
+
+        with pytest.raises(ValueError) as exception_info:
+            TestUnitCell(lattice_system, lattice_constants)
+
+        expected_error = (
+            "`lattice_constants` for cubic unit cell must be a "
+            "CubicLatticeConstants object. "
+            f"(lattice_constants={lattice_constants})"
+        )
+        assert expected_error in str(exception_info)
 
     @staticmethod
     def test_fields_and_properties():

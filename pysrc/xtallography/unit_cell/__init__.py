@@ -19,6 +19,7 @@ lattice/unit cell types and methods.
 
 # Local packages/modules
 from .lattice_constants import (  # noqa
+    LatticeConstants,
     TriclinicLatticeConstants,
     MonoclinicLatticeConstants,
     OrthorhombicLatticeConstants,
