@@ -38,6 +38,7 @@ from xtallography.unit_cell import (
     HexagonalUnitCell,
     CubicLatticeConstants,
     CubicUnitCell,
+    PRIMITIVE_UNIT_CELL_SYMMETRY,
 )
 
 # Local packages/modules
@@ -125,9 +126,12 @@ class test_xtallography_unit_cell_UnitCell(unittest.TestCase):
         # define concrete subclass of UnitCell for testing purposes
         class TestUnitCell(UnitCell):
             def __init__(
-                self, lattice_system: LatticeSystem, lattice_constants: LatticeConstants
+                self,
+                lattice_system: LatticeSystem,
+                lattice_constants: LatticeConstants,
+                symmetry: UnitCellSymmetry = PRIMITIVE_UNIT_CELL_SYMMETRY,
             ):
-                super().__init__(lattice_system, lattice_constants)
+                super().__init__(lattice_system, lattice_constants, symmetry=symmetry)
 
             def to_julia(self):
                 return None
@@ -262,6 +266,20 @@ class test_xtallography_unit_cell_UnitCell(unittest.TestCase):
         )
         assert expected_error in str(exception_info)
 
+        # ------ symmetry is not a UnitCellSymmetry object
+
+        lattice_system = LatticeSystem.CUBIC
+        lattice_constants = CubicLatticeConstants(1)
+        symmetry = 3
+
+        with pytest.raises(ValueError) as exception_info:
+            TestUnitCell(lattice_system, lattice_constants, symmetry=symmetry)
+
+        expected_error = (
+            f"`symmetry` must be a `UnitCellSymmetry` object. (symmetry={symmetry})"
+        )
+        assert expected_error in str(exception_info)
+
     @staticmethod
     def test_fields_and_properties():
         """
@@ -292,6 +310,40 @@ class test_xtallography_unit_cell_UnitCell(unittest.TestCase):
         # properties
         assert unit_cell.centering == Centering.PRIMITIVE
         assert unit_cell.symmetry_elements == set()
+
+    @staticmethod
+    def test_isclose():
+        """
+        Test `UnitCell.isclose()` special cases
+        """
+        # --- Preparations
+
+        # define concrete subclass of UnitCell for testing purposes
+        class TestUnitCell(UnitCell):
+            def __init__(
+                self, lattice_system: LatticeSystem, lattice_constants: LatticeConstants
+            ):
+                super().__init__(lattice_system, lattice_constants)
+
+            def to_julia(self):
+                return None
+
+            def __repr__(self):
+                return ""
+
+        # --- Tests
+
+        # ------ lattice systems do not match
+
+        lattice_system_1 = LatticeSystem.CUBIC
+        lattice_constants_1 = CubicLatticeConstants(1)
+        unit_cell_1 = TestUnitCell(lattice_system_1, lattice_constants_1)
+
+        lattice_system_2 = LatticeSystem.TRICLINIC
+        lattice_constants_2 = TriclinicLatticeConstants(1, 2, 3, 0.1, 0.2, 0.3)
+        unit_cell_2 = TestUnitCell(lattice_system_2, lattice_constants_2)
+
+        assert unit_cell_1 != unit_cell_2
 
     @staticmethod
     def test_isclose_default_args():
