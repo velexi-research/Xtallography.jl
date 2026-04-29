@@ -249,25 +249,22 @@ class test_xtallography_unit_cell_UnitCell(unittest.TestCase):
         )
         assert expected_error in str(exception_info)
 
-        # ------ `unit_cell_jl` is an unsupported Julia UnitCell object
+        # ------ `unit_cell_jl` is a Julia UnitCell object for a custom lattice system
 
-        # TODO
-        # self.jl.seval("import Xtallography: lattice_system")
-        # self.jl.seval("struct UnsupportedLatticeSystem <: LatticeSystem end")
-        # self.jl.seval(
-        #    "UnsupportedUnitCell = UnitCell{UnsupportedLatticeSystem}"
-        # )
-        # self.jl.seval(
-        #    "lattice_system(::UnsupportedUnitCell) = UnsupportedLatticeSystem()"
-        # )
-        # unit_cell_jl_invalid = self.jl.UnitCell(
-        #    self.jl.UnsupportedUnitCell(), centering=self.jl.primitive_centering
-        # )
-        # with pytest.raises(ValueError) as exception_info:
-        #    UnitCell.from_julia(unit_cell_jl_invalid)
-        #
-        # expected_error = (
-        #    "Unsupported LatticeSystem type. "
-        #    "(lattice_system_jl=UnsupportedLatticeSystem)"
-        # )
-        # assert expected_error in str(exception_info)
+        self.jl.seval("import Xtallography: lattice_system")
+        self.jl.seval("struct UnsupportedLatticeSystem <: LatticeSystem end")
+        self.jl.seval("UnsupportedUnitCell = UnitCell{UnsupportedLatticeSystem}")
+        self.jl.seval(
+            "lattice_system(::UnsupportedUnitCell) = UnsupportedLatticeSystem()"
+        )
+        lattice_constants_jl = self.jl.seval("(a=1,)")
+        unit_cell_jl_invalid = self.jl.UnsupportedUnitCell(lattice_constants_jl)
+
+        with pytest.raises(ValueError) as exception_info:
+            UnitCell.from_julia(unit_cell_jl_invalid)
+
+        expected_error = (
+            "Unsupported LatticeSystem type. "
+            "(lattice_system_jl=UnsupportedLatticeSystem)"
+        )
+        assert expected_error in str(exception_info)
