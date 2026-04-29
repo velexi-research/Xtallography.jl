@@ -20,8 +20,8 @@ PYTEST_OPTIONS=-n ${NPROCS}
 # --- Testing rules
 
 .PHONY: test fast-test coverage \
-	julia-tests julia-coverage \
-	python-tests python-coverage
+	julia-test julia-coverage \
+	python-test python-coverage
 
 ## Run all tests.
 test:
@@ -30,9 +30,9 @@ test:
 	find . -name "*.coverage.*" -exec rm -f {} \;  # Python coverage
 	rm -rf coverage htmlcov coverage.xml  # Python coverage
 	@echo Running Julia unit tests
-	@$(MAKE) julia-tests
+	@$(MAKE) julia-test
 	@echo Running Python unit tests
-	@$(MAKE) python-tests
+	@$(MAKE) python-test
 	@echo Generating code coverage reports
 	@$(MAKE) coverage
 
@@ -53,7 +53,7 @@ coverage:
 	@$(MAKE) python-coverage
 
 ## Run only Julia unit tests.
-julia-tests:
+julia-test:
 	jltest --code-coverage test/runtests.jl
 	@echo
 
@@ -62,13 +62,13 @@ julia-coverage:
 	@jlcoverage
 
 ## Run only Python unit tests.
-python-tests:
+python-test:
 	pytest ${PYTEST_OPTIONS}
 	@make python-lint
 	@echo
 
 .coverage:
-	-make python-tests
+	-make python-test
 
 ## Generate basic Python coverage report
 python-coverage: .coverage
