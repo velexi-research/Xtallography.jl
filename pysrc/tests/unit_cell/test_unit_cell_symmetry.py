@@ -26,6 +26,7 @@ import pytest
 from xtallography.symmetry import Centering
 from xtallography.symmetry import GlidePlane, ScrewAxis
 from xtallography.unit_cell import UnitCellSymmetry
+from xtallography.unit_cell_symmetry import PRIMITIVE_UNIT_CELL_SYMMETRY
 
 # Local packages/modules
 
@@ -261,3 +262,13 @@ class test_xtallography_unit_cell_symmetry_UnitCellSymmetry(unittest.TestCase):
         other = UnitCellSymmetry(centering)
 
         assert unit_cell_symmetry != other
+
+    @staticmethod
+    def test_PRIMITIVE_UNIT_CELL_SYMMETRY():
+        """
+        Test that UnitCellSymmetry.PRIMITIVE_UNIT_CELL_SYMMETRY is set correctly.
+        """
+        assert (
+            UnitCellSymmetry.PRIMITIVE_UNIT_CELL_SYMMETRY
+            == PRIMITIVE_UNIT_CELL_SYMMETRY
+        )
