@@ -2,6 +2,22 @@ Xtallography Release Notes
 ============================================================================================
 
 --------------------------------------------------------------------------------------------
+0.6.0 (2026-04-30)
+==================
+**Enhancements**
+- Add unit cell symmetry types.
+- Improve naming conventions for centering types and constants.
+- Improve consistency of Python interface with Julia source code.
+- Update package documentation.
+
+**Developer Updates**
+- Improve documentation generation.
+- Update Makefile targets. Fixed Makefile bugs.
+- Update package dependencies.
+- Update unit tests.
+- Polish docstrings.
+
+--------------------------------------------------------------------------------------------
 0.5.3 (2025-04-27)
 ==================
 **Bug Fixes**
