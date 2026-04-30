@@ -26,7 +26,7 @@ import pytest
 from xtallography.symmetry import Centering
 from xtallography.symmetry import GlidePlane, ScrewAxis
 from xtallography.unit_cell import UnitCellSymmetry
-from xtallography.unit_cell_symmetry import PRIMITIVE_UNIT_CELL_SYMMETRY
+from xtallography.unit_cell.unit_cell_symmetry import PRIMITIVE_UNIT_CELL_SYMMETRY
 
 # Local packages/modules
 
