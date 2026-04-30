@@ -18,7 +18,7 @@ Lattice type and functions
 
 # Standard library
 from dataclasses import dataclass
-from typing import Union
+from typing import ClassVar, Union
 
 # Local packages/modules
 from .centering import Centering
@@ -40,8 +40,15 @@ class Lattice:
     * `centering` (Centering): centering of lattice
     """
 
+    # --- Fields
+
     lattice_system: LatticeSystem
     centering: Centering = Centering.PRIMITIVE
+
+    # --- Class variables
+
+    BRAVAIS_LATTICES: ClassVar[tuple] = (None,)
+    """List of Bravais lattices"""
 
     # --- Initializer
 
@@ -104,7 +111,7 @@ class Lattice:
         Return `True` if Lattice object is a valid Bravais lattice; return `False`
         otherwise.
         """
-        return self in BRAVAIS_LATTICES
+        return self in self.BRAVAIS_LATTICES
 
 
 # --- Constants
@@ -127,3 +134,6 @@ BRAVAIS_LATTICES = (
     Lattice(LatticeSystem.CUBIC, Centering.BODY),
     Lattice(LatticeSystem.CUBIC, Centering.FACE),
 )
+
+# Dynamically add Bravais lattices to Lattice class
+Lattice.BRAVAIS_LATTICES = BRAVAIS_LATTICES
