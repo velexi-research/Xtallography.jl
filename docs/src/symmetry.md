@@ -18,20 +18,26 @@ Types and functions related to defining crystal symmetry.
 ```@docs
 LatticeSystem
 lattice_system
-Triclinic
-triclinic
+LATTICE_SYSTEMS
+```
+
+### Concrete Types
+
+```@docs
+Cubic
+cubic
+Hexagonal
+hexagonal
 Monoclinic
 monoclinic
 Orthorhombic
 orthorhombic
-Hexagonal
-hexagonal
 Rhombohedral
 rhombohedral
 Tetragonal
 tetragonal
-Cubic
-cubic
+Triclinic
+triclinic
 ```
 
 -------------------------------------------------------------------------------------------
@@ -46,9 +52,11 @@ cubic
 ```@docs
 Centering
 CENTERINGS
-PrimitiveCentering
-primitive_centering
-P_centering
+```
+
+### Concrete Types
+
+```@docs
 BaseCentering
 base_centering
 BodyCentering
@@ -57,6 +65,9 @@ I_centering
 FaceCentering
 face_centering
 F_centering
+PrimitiveCentering
+primitive_centering
+P_centering
 ```
 
 -------------------------------------------------------------------------------------------
@@ -69,6 +80,11 @@ F_centering
 
 ```@docs
 SymmetryElement
+```
+
+### Concrete Types
+
+```@docs
 GlidePlane
 ScrewAxis
 ```

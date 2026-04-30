@@ -18,7 +18,7 @@ makedocs(;
         "Overview" => "index.md",
         "Examples" => "examples.md",
         "Reference" => [
-            "Unit Cell" => "unit-cell.md",
+            "Unit Cells" => "unit-cells.md",
             "Symmetry" => "symmetry.md",
             "Utility Functions" => "functions.md",
             "Python Interface" => "python-interface.md",
