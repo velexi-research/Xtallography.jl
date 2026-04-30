@@ -50,7 +50,7 @@ class UnitCellSymmetry:
 
     # --- Class variables
 
-    PRIMITIVE_UNIT_CELL_SYMMETRY: ClassVar[UnitCellSymmetry] = None
+    PRIMITIVE_UNIT_CELL_SYMMETRY: ClassVar = None
     """
     `UnitCellSymmetry` object representing a primitive unit cell with no additional
     symmetry elements.
