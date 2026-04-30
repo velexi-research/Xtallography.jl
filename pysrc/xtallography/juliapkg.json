@@ -1,13 +1,13 @@
 {
-  "julia": "^1.9",
+  "julia": "^1.10",
   "packages": {
     "PythonCall": {
       "uuid": "6099a3de-0909-46bc-b1f4-468b9a2dfc0d",
-      "version": "^0.9.24"
+      "version": "^0.9.31"
     },
     "Xtallography": {
       "uuid": "795fc1aa-9caa-44e9-84db-c49cd1f148be",
-      "version": "^0.5"
+      "version": "^0.6"
     }
   }
 }
