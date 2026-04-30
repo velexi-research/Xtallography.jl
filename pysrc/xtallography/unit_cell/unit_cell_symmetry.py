@@ -20,7 +20,7 @@ UnitCellSymmetry class
 # Standard library
 from dataclasses import dataclass
 import copy
-from typing import ClassVar, Optional
+from typing import ClassVar, Optional, Union
 
 # Local packages/modules
 from .. import _JL
@@ -61,7 +61,7 @@ class UnitCellSymmetry:
     def __init__(
         self,
         centering: Optional[Centering] = Centering.PRIMITIVE,
-        symmetry_elements: Optional[set, list] = copy.deepcopy([]),
+        symmetry_elements: Optional[Union[set, list]] = copy.deepcopy([]),
     ):
         """
         Initialize UnitCellSymmetry object.
