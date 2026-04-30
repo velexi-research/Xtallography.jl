@@ -28,8 +28,8 @@ include("math.jl")
 
 # --- Symmetry types and methods
 
-include("symmetry/lattice_system.jl")
-include("symmetry/centering.jl")
+include("symmetry/lattice_systems.jl")
+include("symmetry/centerings.jl")
 include("symmetry/symmetry_elements.jl")
 include("symmetry/bravais_lattices.jl")
 
