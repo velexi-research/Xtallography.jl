@@ -23,12 +23,32 @@ import unittest
 # External packages
 import juliacall
 import pytest
-from xtallography.symmetry import GlidePlane, ScrewAxis
+from xtallography.symmetry import SymmetryElement, GlidePlane, ScrewAxis
 
 # Local packages/modules
 
 
 # --- Test Suites
+
+
+class test_xtallography_symmetry_symmetry_elements_SymmetryElement(unittest.TestCase):
+    """
+    Test suite for the `SymmetryElement` class
+    """
+
+    def test_from_julia_invalid_args(self):
+        """
+        Test argument checks for `from_julia()`
+        """
+        symmetry_element_jl = 10
+        with pytest.raises(ValueError) as exception_info:
+            SymmetryElement.from_julia(symmetry_element_jl)
+
+        expected_error = (
+            "`symmetry_element_jl` must be a Julia `GlidePlane` or `ScrewAxis` object. "
+            f"(symmetry_element_jl={symmetry_element_jl})."
+        )
+        assert expected_error in str(exception_info)
 
 
 class test_xtallography_symmetry_symmetry_elements_GlidePlane(unittest.TestCase):
@@ -132,6 +152,20 @@ class test_xtallography_symmetry_symmetry_elements_GlidePlane(unittest.TestCase)
 
         assert glide_plane.translation == translation
         assert glide_plane.reflection_plane == reflection_plane
+
+    def test_from_julia_invalid_args(self):
+        """
+        Test argument checks for `from_julia()`
+        """
+        glide_plane_jl = 10
+        with pytest.raises(ValueError) as exception_info:
+            GlidePlane.from_julia(glide_plane_jl)
+
+        expected_error = (
+            "`glide_plane_jl` must be a Julia `GlidePlane` object. "
+            f"(glide_plane_jl={glide_plane_jl})."
+        )
+        assert expected_error in str(exception_info)
 
     def test_repr(self):
         """
@@ -303,6 +337,20 @@ class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
         assert screw_axis.axis == axis
         assert screw_axis.n == n
         assert screw_axis.m == m
+
+    def test_from_julia_invalid_args(self):
+        """
+        Test argument checks for `from_julia()`
+        """
+        screw_axis_jl = 10
+        with pytest.raises(ValueError) as exception_info:
+            ScrewAxis.from_julia(screw_axis_jl)
+
+        expected_error = (
+            "`screw_axis_jl` must be a Julia `ScrewAxis` object. "
+            f"(screw_axis_jl={screw_axis_jl})."
+        )
+        assert expected_error in str(exception_info)
 
     def test_repr(self):
         """
