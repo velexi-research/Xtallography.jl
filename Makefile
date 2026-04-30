@@ -116,8 +116,8 @@ docs:
 
 ## Generate Julia package documentation.
 julia-docs:
-	julia --color=yes -e 'using Pkg; Pkg.update()'
-	julia --project=${DOCS_DIR} --color=yes -e 'using Pkg; Pkg.update()'
+	julia --color=yes -e 'using Pkg; Pkg.instantiate()'
+	julia --project=${DOCS_DIR} --color=yes -e 'using Pkg; Pkg.instantiate()'
 	julia --project=${DOCS_DIR} --color=yes --compile=min -O0 ${DOCS_DIR}/make.jl
 
 ## Generate Python package documentation.
