@@ -20,7 +20,7 @@ UnitCellSymmetry class
 # Standard library
 from dataclasses import dataclass
 import copy
-from typing import Optional
+from typing import ClassVar, Optional
 
 # Local packages/modules
 from .. import _JL
@@ -47,6 +47,14 @@ class UnitCellSymmetry:
 
     centering: Centering
     symmetry_elements: set
+
+    # --- Class variables
+
+    PRIMITIVE_UNIT_CELL_SYMMETRY: ClassVar[UnitCellSymmetry] = None
+    """
+    `UnitCellSymmetry` object representing a primitive unit cell with no additional
+    symmetry elements.
+    """
 
     # --- Initializer
 
@@ -133,10 +141,13 @@ class UnitCellSymmetry:
         )
 
 
+PRIMITIVE_UNIT_CELL_SYMMETRY = UnitCellSymmetry()
 """
 PRIMITIVE_UNIT_CELL_SYMMETRY
 
 `UnitCellSymmetry` object representing a primitive unit cell with no additional symmetry
 elements.
 """
-PRIMITIVE_UNIT_CELL_SYMMETRY = UnitCellSymmetry()
+
+# Dynamically add PRIMITIVE_UNIT_CELL_SYMMETRY to UnitCellSymmetry class
+UnitCellSymmetryPRIMITIVE_UNIT_CELL_SYMMETRY = PRIMITIVE_UNIT_CELL_SYMMETRY
