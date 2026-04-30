@@ -24,6 +24,7 @@ import unittest
 import juliacall
 import pytest
 from xtallography.symmetry import Centering, Lattice, LatticeSystem
+from xtallography.symmetry.lattice import BRAVAIS_LATTICES
 
 # Local packages/modules
 
@@ -292,3 +293,10 @@ class test_xtallography_symmetry_lattice_Lattice(unittest.TestCase):
         # (cubic, face)
         lattice = Lattice("cubic", "face")
         assert lattice.is_bravais_lattice()
+
+    @staticmethod
+    def test_BRAVAIS_LATTICES():
+        """
+        Test that Lattice.BRAVAIS_LATTICES is set correctly.
+        """
+        assert Lattice.BRAVAIS_LATTICES == BRAVAIS_LATTICES
