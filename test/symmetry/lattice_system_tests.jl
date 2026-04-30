@@ -46,4 +46,7 @@ end
     @test rhombohedral === Rhombohedral()
     @test hexagonal === Hexagonal()
     @test cubic === Cubic()
+
+    @test LATTICE_SYSTEMS ==
+        (triclinic, monoclinic, orthorhombic, hexagonal, rhombohedral, tetragonal, cubic)
 end

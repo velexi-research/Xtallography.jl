@@ -20,8 +20,12 @@ Lattice system types and functions
 # ------ Types
 
 export LatticeSystem
+
+# ------ Constants
+
 export Triclinic, Monoclinic, Orthorhombic, Tetragonal, Rhombohedral, Hexagonal, Cubic
 export triclinic, monoclinic, orthorhombic, tetragonal, rhombohedral, hexagonal, cubic
+export LATTICE_SYSTEMS
 
 # ------ Functions/Methods
 
