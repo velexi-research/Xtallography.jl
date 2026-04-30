@@ -48,17 +48,18 @@ from .unit_cell_dynamic import unit_cell_from_julia
 setattr(UnitCell, "from_julia", classmethod(unit_cell_from_julia))
 
 
+# --- Auto-doc
+
+PRIMITIVE_UNIT_CELL_SYMMETRY = PRIMITIVE_UNIT_CELL_SYMMETRY
+"""
+`UnitCellSymmetry` object representing a primitive unit cell with no additional symmetry
+elements.
+"""
+
 # --- Exports
 
 __all__ = [
-    "LatticeSystem",
-    "Centering",
-    "Lattice",
     "UnitCell",
-    "BRAVAIS_LATTICES",
-    "create_lattice",
-    "standardize_lattice",
-    "is_bravais_lattice",
     "TriclinicUnitCell",
     "MonoclinicUnitCell",
     "OrthorhombicUnitCell",
@@ -66,4 +67,14 @@ __all__ = [
     "RhombohedralUnitCell",
     "HexagonalUnitCell",
     "CubicUnitCell",
+    "LatticeConstants",
+    "TriclinicLatticeConstants",
+    "MonoclinicLatticeConstants",
+    "OrthorhombicLatticeConstants",
+    "TetragonalLatticeConstants",
+    "RhombohedralLatticeConstants",
+    "HexagonalLatticeConstants",
+    "CubicLatticeConstants",
+    "UnitCellSymmetry",
+    "PRIMITIVE_UNIT_CELL_SYMMETRY",
 ]
