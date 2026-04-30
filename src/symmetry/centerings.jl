@@ -19,8 +19,10 @@ Centering types and functions
 
 # ------ Types
 
-# Centering
 export Centering, PrimitiveCentering, BaseCentering, BodyCentering, FaceCentering
+
+# ------ Constants
+
 export primitive_centering, P_centering
 export base_centering
 export body_centering, I_centering
