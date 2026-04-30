@@ -567,7 +567,7 @@ function convert_to_mI_test_all_triclinic_basis_permutations(
         monoclinic_unit_cell = convert_to_mI(unit_cell)
 
         # Check results
-        @test is_equivalent_unit_cell(monoclinic_unit_cell, expected_monoclinic_unit_cell)
+        @test is_equivalent(monoclinic_unit_cell, expected_monoclinic_unit_cell)
     end
 end
 
@@ -1158,7 +1158,7 @@ function convert_to_mC_test_all_triclinic_basis_permutations(
         monoclinic_unit_cell = convert_to_mC(unit_cell)
 
         # Check results
-        @test is_equivalent_unit_cell(monoclinic_unit_cell, expected_monoclinic_unit_cell)
+        @test is_equivalent(monoclinic_unit_cell, expected_monoclinic_unit_cell)
     end
 end
 

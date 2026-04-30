@@ -873,7 +873,7 @@ end
     =#
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell): triclinic" begin
+@testset "is_equivalent(::UnitCell): triclinic" begin
     # --- Preparations
 
     a = 2
@@ -890,12 +890,12 @@ end
     # identical triclinic unit cells
     unit_cell_ref = unit_cell
     unit_cell_test = UnitCell(basis_a, basis_b, basis_c; identify_lattice_system=false)
-    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+    @test is_equivalent(unit_cell_test, unit_cell_ref)
 
     # primitive unit cell defined by linear combination of [basis_a, basis_b, basis_c]
     unit_cell_ref = reduced_cell(unit_cell)
     unit_cell_test = UnitCell(basis_a + basis_b + basis_c, basis_b, basis_c)
-    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+    @test is_equivalent(unit_cell_test, unit_cell_ref)
 
     # body-centered unit cell
     body_centered_unit_cell = TriclinicUnitCell(
@@ -904,10 +904,10 @@ end
     primitive_unit_cell = UnitCell(
         basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c); identify_lattice_system=false
     )
-    @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
+    @test is_equivalent(body_centered_unit_cell, primitive_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::TriclinicUnitCell)" begin
+@testset "is_equivalent(::TriclinicUnitCell)" begin
     # --- Preparations
 
     a_ref = 6
@@ -924,16 +924,16 @@ end
     # equivalent primitive unit cell defined by linear combination of
     # [basis_a, basis_b, basis_c]
     unit_cell = UnitCell(basis_a + basis_b + basis_c, basis_b, basis_c)
-    @test is_equivalent_unit_cell(unit_cell, reference_unit_cell)
+    @test is_equivalent(unit_cell, reference_unit_cell)
 
     # equivalent primitive unit cell defined by a different linear combination of
     # [basis_a, basis_b, basis_c]
     unit_cell = UnitCell(basis_a + basis_b + basis_c, basis_b + basis_c, basis_c)
-    @test is_equivalent_unit_cell(unit_cell, reference_unit_cell)
+    @test is_equivalent(unit_cell, reference_unit_cell)
 
     # test unit cell and reference unit cell are for different lattice systems
     unit_cell = CubicUnitCell(1)
-    @test !is_equivalent_unit_cell(unit_cell, reference_unit_cell)
+    @test !is_equivalent(unit_cell, reference_unit_cell)
 end
 
 @testset ":(==)(::TriclinicUnitCell)" begin

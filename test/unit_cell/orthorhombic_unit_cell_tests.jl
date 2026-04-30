@@ -592,7 +592,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell): orthorhombic" begin
+@testset "is_equivalent(::UnitCell): orthorhombic" begin
     # --- Preparations
 
     a = 2
@@ -612,7 +612,7 @@ end
         identify_lattice_system=false,
         centering=primitive_centering,
     )
-    @test is_equivalent_unit_cell(orthorhombic_unit_cell, triclinic_unit_cell)
+    @test is_equivalent(orthorhombic_unit_cell, triclinic_unit_cell)
 
     # body-centered unit cell
     body_centering_unit_cell = OrthorhombicUnitCell(
@@ -625,7 +625,7 @@ end
         identify_lattice_system=false,
         centering=primitive_centering,
     )
-    @test is_equivalent_unit_cell(body_centering_unit_cell, primitive_unit_cell)
+    @test is_equivalent(body_centering_unit_cell, primitive_unit_cell)
 
     # face-centered unit cell
     face_centering_unit_cell = OrthorhombicUnitCell(
@@ -638,7 +638,7 @@ end
         identify_lattice_system=false,
         centering=primitive_centering,
     )
-    @test is_equivalent_unit_cell(face_centering_unit_cell, primitive_unit_cell)
+    @test is_equivalent(face_centering_unit_cell, primitive_unit_cell)
 
     # base-centered unit cell
     base_centering_unit_cell = OrthorhombicUnitCell(
@@ -651,10 +651,10 @@ end
         identify_lattice_system=false,
         centering=primitive_centering,
     )
-    @test is_equivalent_unit_cell(base_centering_unit_cell, primitive_unit_cell)
+    @test is_equivalent(base_centering_unit_cell, primitive_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::OrthorhombicUnitCell)" begin
+@testset "is_equivalent(::OrthorhombicUnitCell)" begin
     # --- Preparations
 
     a_ref = 2
@@ -666,15 +666,15 @@ end
 
     # unit cells are equivalent
     lattice_constants_test = OrthorhombicUnitCell(a_ref + 1e-9, b_ref + 3e-8, c_ref - 1e-9)
-    @test is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # test unit cell and reference unit cell are unrelated
     lattice_constants_test = OrthorhombicUnitCell(2 * a_ref, b_ref / 2, c_ref)
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # test unit cell and reference unit cell are for different lattice systems
     lattice_constants_test = CubicUnitCell(1)
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 end
 
 @testset ":(==)(::OrthorhombicUnitCell)" begin

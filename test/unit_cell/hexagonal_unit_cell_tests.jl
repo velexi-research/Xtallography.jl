@@ -494,7 +494,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell): hexagonal" begin
+@testset "is_equivalent(::UnitCell): hexagonal" begin
     # --- Preparations
 
     a = 2
@@ -513,7 +513,7 @@ end
         identify_lattice_system=false,
         centering=primitive_centering,
     )
-    @test is_equivalent_unit_cell(hexagonal_unit_cell, triclinic_unit_cell)
+    @test is_equivalent(hexagonal_unit_cell, triclinic_unit_cell)
 
     # equivalent unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ π / 3
@@ -521,7 +521,7 @@ end
     unit_cell_test = UnitCell(
         basis_a + basis_b, basis_b, basis_c; centering=primitive_centering
     )
-    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+    @test is_equivalent(unit_cell_test, unit_cell_ref)
 
     # equivalent unit cell defined by linear combination of [basis_a, basis_b, basis_c],
     # β ≈ 2π / 3
@@ -529,10 +529,10 @@ end
     unit_cell_test = UnitCell(
         basis_a - basis_b, basis_b, basis_c; centering=primitive_centering
     )
-    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+    @test is_equivalent(unit_cell_test, unit_cell_ref)
 end
 
-@testset "is_equivalent_unit_cell(::HexagonalUnitCell)" begin
+@testset "is_equivalent(::HexagonalUnitCell)" begin
     # --- Preparations
 
     a_ref = 2
@@ -543,15 +543,15 @@ end
 
     # unit cells are equivalent
     lattice_constants_test = HexagonalUnitCell(a_ref + 1e-9, c_ref - 1e-9)
-    @test is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # test unit cell and reference unit cell are unrelated
     lattice_constants_test = HexagonalUnitCell(2 * a_ref, c_ref)
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # test unit cell and reference unit cell are for different lattice systems
     lattice_constants_test = CubicUnitCell(1)
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 end
 
 @testset ":(==)(::HexagonalUnitCell)" begin

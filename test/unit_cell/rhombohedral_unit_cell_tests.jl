@@ -415,7 +415,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell): rhombohedral" begin
+@testset "is_equivalent(::UnitCell): rhombohedral" begin
     # --- Preparations
 
     a = 2
@@ -434,10 +434,10 @@ end
         identify_lattice_system=false,
         centering=primitive_centering,
     )
-    @test is_equivalent_unit_cell(rhombohedral_unit_cell, triclinic_unit_cell)
+    @test is_equivalent(rhombohedral_unit_cell, triclinic_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::RhombohedralUnitCell)" begin
+@testset "is_equivalent(::RhombohedralUnitCell)" begin
     # --- Preparations
 
     a_ref = 2
@@ -448,15 +448,15 @@ end
 
     # unit cells are equivalent
     lattice_constants_test = RhombohedralUnitCell(a_ref + 1e-9, α_ref - 1e-9)
-    @test is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # test unit cell and reference unit cell are unrelated
     lattice_constants_test = RhombohedralUnitCell(2 * a_ref, α_ref)
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # test unit cell and reference unit cell are for different lattice systems
     lattice_constants_test = CubicUnitCell(1)
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 end
 
 @testset ":(==)(::RhombohedralUnitCell)" begin

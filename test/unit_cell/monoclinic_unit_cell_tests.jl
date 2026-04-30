@@ -806,7 +806,7 @@ end
     @test volume(reduced_face_centered_unit_cell) ≈ 0.25 * volume(face_centered_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell): monoclinic" begin
+@testset "is_equivalent(::UnitCell): monoclinic" begin
     # --- Preparations
 
     a = 2
@@ -829,7 +829,7 @@ end
         identify_lattice_system=false,
         centering=primitive_centering,
     )
-    @test is_equivalent_unit_cell(monoclinic_unit_cell, triclinic_unit_cell)
+    @test is_equivalent(monoclinic_unit_cell, triclinic_unit_cell)
 
     # body-centered unit cell
     body_centered_unit_cell = MonoclinicUnitCell(
@@ -842,7 +842,7 @@ end
         identify_lattice_system=false,
         centering=primitive_centering,
     )
-    @test is_equivalent_unit_cell(body_centered_unit_cell, primitive_unit_cell)
+    @test is_equivalent(body_centered_unit_cell, primitive_unit_cell)
 
     # equivalent base-centered and body-centered monoclinic unit cells
     base_centered_unit_cell = MonoclinicUnitCell(
@@ -851,10 +851,10 @@ end
     body_centered_unit_cell = UnitCell(
         basis_a + basis_c, basis_b, basis_c; centering=body_centering
     )
-    @test is_equivalent_unit_cell(base_centered_unit_cell, body_centered_unit_cell)
+    @test is_equivalent(base_centered_unit_cell, body_centered_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::MonoclinicUnitCell)" begin
+@testset "is_equivalent(::MonoclinicUnitCell)" begin
     # --- Preparations
 
     a_ref = 6
@@ -872,7 +872,7 @@ end
     β = asin(sin(β_ref) / c * c_ref)
     lattice_constants_test = MonoclinicUnitCell(a, b, c, β)
 
-    @test is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # Equivalent unit cell #2
     a = sqrt(a_ref^2 + c_ref^2 - 2 * a_ref * c_ref * cos(β_ref))
@@ -881,7 +881,7 @@ end
     β = asin(sin(β_ref) / a * a_ref)
     lattice_constants_test = MonoclinicUnitCell(a, b, c, β)
 
-    @test is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # Equivalent unit cell #3
     a = a_ref
@@ -890,7 +890,7 @@ end
     β = asin(sin(β_ref) / c * c_ref)
     lattice_constants_test = MonoclinicUnitCell(a, b, c, β)
 
-    @test is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # Supercell: b multiple of b_ref
     a = a_ref
@@ -899,7 +899,7 @@ end
     β = β_ref
     lattice_constants_test = MonoclinicUnitCell(a, b, c, β)
 
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # Supercell: c multiple of c_ref
     a = a_ref
@@ -908,7 +908,7 @@ end
     β = β_ref
     lattice_constants_test = MonoclinicUnitCell(a, b, c, β)
 
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # Supercell: c equal to diagonal from unit cell twice as high in c_ref direction
     a = a_ref
@@ -917,11 +917,11 @@ end
     β = asin(sin(β_ref) / c * (2 * c_ref))
     lattice_constants_test = MonoclinicUnitCell(a, b, c, β)
 
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # test unit cell and reference unit cell are for different lattice systems
     lattice_constants_test = CubicUnitCell(1)
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 end
 
 @testset "is_supercell(::MonoclinicUnitCell): valid arguments" begin

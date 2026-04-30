@@ -469,7 +469,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell, ::UnitCell)" begin
+@testset "is_equivalent(::UnitCell, ::UnitCell)" begin
     # --- Preparations
 
     a = 2
@@ -488,7 +488,7 @@ end
         identify_lattice_system=false,
         centering=primitive_centering,
     )
-    @test is_equivalent_unit_cell(tetragonal_unit_cell, triclinic_unit_cell)
+    @test is_equivalent(tetragonal_unit_cell, triclinic_unit_cell)
 
     # body-centered unit cell
     body_centering_unit_cell = TetragonalUnitCell(
@@ -501,17 +501,17 @@ end
         identify_lattice_system=false,
         centering=primitive_centering,
     )
-    @test is_equivalent_unit_cell(body_centering_unit_cell, primitive_unit_cell)
+    @test is_equivalent(body_centering_unit_cell, primitive_unit_cell)
 
     # face-centered unit cell
     face_centering_unit_cell = TetragonalUnitCell(
         lattice_constants(reference_unit_cell); centering=face_centering
     )
     primitive_unit_cell = TetragonalUnitCell(a / sqrt(2), c; centering=body_centering)
-    @test is_equivalent_unit_cell(face_centering_unit_cell, primitive_unit_cell)
+    @test is_equivalent(face_centering_unit_cell, primitive_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::TetragonalUnitCell)" begin
+@testset "is_equivalent(::TetragonalUnitCell)" begin
     # --- Preparations
 
     a_ref = 2
@@ -522,15 +522,15 @@ end
 
     # unit cells are equivalent
     lattice_constants_test = TetragonalUnitCell(a_ref + 1e-9, c_ref - 1e-9)
-    @test is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # test unit cell and reference unit cell are unrelated
     lattice_constants_test = TetragonalUnitCell(2 * a_ref, c_ref)
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 
     # test unit cell and reference unit cell are for different lattice systems
     lattice_constants_test = CubicUnitCell(1)
-    @test !is_equivalent_unit_cell(lattice_constants_test, lattice_constants_ref)
+    @test !is_equivalent(lattice_constants_test, lattice_constants_ref)
 end
 
 @testset ":(==)(::TetragonalUnitCell)" begin

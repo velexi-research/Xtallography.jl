@@ -401,7 +401,7 @@ end
     @test reduced_cell_ ≈ expected_reduced_cell
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell): cubic" begin
+@testset "is_equivalent(::UnitCell): cubic" begin
     # --- Preparations
 
     a = 5
@@ -420,7 +420,7 @@ end
         centering=primitive_centering,
     )
 
-    @test is_equivalent_unit_cell(cubic_unit_cell, primitive_unit_cell)
+    @test is_equivalent(cubic_unit_cell, primitive_unit_cell)
 
     # equivalent body-centered unit cell and primitive rhombohedral unit cell
     cubic_unit_cell = CubicUnitCell(
@@ -430,7 +430,7 @@ end
         basis_a, basis_b, 0.5 * (basis_a + basis_b + basis_c); centering=primitive_centering
     )
 
-    @test is_equivalent_unit_cell(cubic_unit_cell, primitive_unit_cell)
+    @test is_equivalent(cubic_unit_cell, primitive_unit_cell)
 
     # equivalent face-centered unit cell and primitive triclinic unit cell
     cubic_unit_cell = CubicUnitCell(
@@ -442,10 +442,10 @@ end
         0.5 * (basis_b + basis_c);
         centering=primitive_centering,
     )
-    @test is_equivalent_unit_cell(cubic_unit_cell, primitive_unit_cell)
+    @test is_equivalent(cubic_unit_cell, primitive_unit_cell)
 end
 
-@testset "is_equivalent_unit_cell(::CubicUnitCell)" begin
+@testset "is_equivalent(::CubicUnitCell)" begin
     # --- Preparations
 
     reference_unit_cell = CubicUnitCell(2.0)
@@ -454,19 +454,19 @@ end
 
     # unit cells are equivalent
     unit_cell = CubicUnitCell(2.0 + 1e-9)
-    @test is_equivalent_unit_cell(unit_cell, reference_unit_cell)
+    @test is_equivalent(unit_cell, reference_unit_cell)
 
     # test unit cell is a supercell of the reference unit cell
     unit_cell = CubicUnitCell(10.0)
-    @test !is_equivalent_unit_cell(unit_cell, reference_unit_cell)
+    @test !is_equivalent(unit_cell, reference_unit_cell)
 
     # test unit cell and reference unit cell are unrelated
     unit_cell = CubicUnitCell(3)
-    @test !is_equivalent_unit_cell(unit_cell, reference_unit_cell)
+    @test !is_equivalent(unit_cell, reference_unit_cell)
 
     # test unit cell and reference unit cell are for different lattice systems
     unit_cell = OrthorhombicUnitCell(1, 2, 3)
-    @test !is_equivalent_unit_cell(unit_cell, reference_unit_cell)
+    @test !is_equivalent(unit_cell, reference_unit_cell)
 end
 
 @testset "is_supercell(::CubicUnitCell): valid arguments" begin

@@ -106,7 +106,7 @@ end
     @test centering(reduced_cell_) === primitive_centering
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell): valid arguments" begin
+@testset "is_equivalent(::UnitCell): valid arguments" begin
     # --- Tests
 
     # equivalent unit cells with the same lattice system, default atol and rtol
@@ -120,7 +120,7 @@ end
     β_alt = π - asin(sin(β) / c_alt * c)
     unit_cell_test = MonoclinicUnitCell(a, b, c_alt, β_alt)
 
-    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+    @test is_equivalent(unit_cell_test, unit_cell_ref)
 
     # equivalent unit cells with different lattice systems, default atol and rtol
     b = 2
@@ -130,7 +130,7 @@ end
     unit_cell_ref = MonoclinicUnitCell(a, b, c, β; centering=primitive_centering)
     unit_cell_test = OrthorhombicUnitCell(a, 2 * c * sin(β), b; centering=base_centering)
 
-    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+    @test is_equivalent(unit_cell_test, unit_cell_ref)
 
     # nonequivalent unit cells that are equivalent when atol is sufficiently large
     a = 1
@@ -140,9 +140,9 @@ end
     unit_cell_test = OrthorhombicUnitCell(
         a + 2, b - 1, c + 5; centering=primitive_centering
     )
-    @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
-    @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=4)
-    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=6)
+    @test !is_equivalent(unit_cell_test, unit_cell_ref)
+    @test !is_equivalent(unit_cell_test, unit_cell_ref; atol=4)
+    @test is_equivalent(unit_cell_test, unit_cell_ref; atol=6)
 
     # nonequivalent unit cells that are equivalent when rtol is sufficiently large
     a = 1
@@ -152,9 +152,9 @@ end
     unit_cell_test = OrthorhombicUnitCell(
         a + 2, b - 1, c + 5; centering=primitive_centering
     )
-    @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
-    @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=0, rtol=0.5)
-    @test is_equivalent_unit_cell(unit_cell_test, unit_cell_ref; atol=0, rtol=1)
+    @test !is_equivalent(unit_cell_test, unit_cell_ref)
+    @test !is_equivalent(unit_cell_test, unit_cell_ref; atol=0, rtol=0.5)
+    @test is_equivalent(unit_cell_test, unit_cell_ref; atol=0, rtol=1)
 
     # nonequivalent unit cells, case #1
     b = 2
@@ -164,17 +164,17 @@ end
     unit_cell_ref = MonoclinicUnitCell(a, b, c, β; centering=primitive_centering)
     unit_cell_test = CubicUnitCell(a; centering=face_centering)
 
-    @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+    @test !is_equivalent(unit_cell_test, unit_cell_ref)
 
     # nonequivalent unit cells, case #2
     a = 1
     unit_cell_ref = CubicUnitCell(a; centering=primitive_centering)
     unit_cell_test = CubicUnitCell(a; centering=face_centering)
 
-    @test !is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+    @test !is_equivalent(unit_cell_test, unit_cell_ref)
 end
 
-@testset "is_equivalent_unit_cell(::UnitCell): invalid arguments" begin
+@testset "is_equivalent(::UnitCell): invalid arguments" begin
     # --- Preparations
 
     unit_cell_ref = CubicUnitCell(1.0)
@@ -184,13 +184,13 @@ end
 
     # atol < 0
     expected_message = "`atol` must be nonnegative"
-    @test_throws DomainError(-1, expected_message) is_equivalent_unit_cell(
+    @test_throws DomainError(-1, expected_message) is_equivalent(
         unit_cell_test, unit_cell_ref; atol=-1
     )
 
     # rtol < 0
     expected_message = "`rtol` must be nonnegative"
-    @test_throws DomainError(-1, expected_message) is_equivalent_unit_cell(
+    @test_throws DomainError(-1, expected_message) is_equivalent(
         unit_cell_test, unit_cell_ref; rtol=-1
     )
 end

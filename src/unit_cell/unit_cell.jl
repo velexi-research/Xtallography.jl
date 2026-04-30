@@ -26,7 +26,7 @@ export lattice_constants, symmetry, centering, symmetry_elements
 export is_bravais_lattice
 export basis, volume, surface_area
 export standardize, conventional_cell, reduced_cell
-export is_equivalent_unit_cell, is_supercell
+export is_equivalent, is_supercell
 export isapprox
 
 # --- Types
@@ -976,7 +976,7 @@ function reduced_cell(unit_cell::UnitCell)
 end
 
 """
-    is_equivalent_unit_cell(
+    is_equivalent(
         unit_cell_test::UnitCell,
         unit_cell_ref::UnitCell;
         atol::Real=1e-3,
@@ -1006,11 +1006,11 @@ julia> unit_cell_ref = UnitCell([1, 0, 0], [1, 1, 0], [0, 0, 2]);
 
 julia> unit_cell_test = TetragonalUnitCell(1.0, 2.0);
 
-julia> is_equivalent_unit_cell(unit_cell_test, unit_cell_ref)
+julia> is_equivalent(unit_cell_test, unit_cell_ref)
 true
 ```
 """
-function is_equivalent_unit_cell(
+function is_equivalent(
     unit_cell_test::UnitCell,
     unit_cell_ref::UnitCell;
     atol::Real=1e-3,
