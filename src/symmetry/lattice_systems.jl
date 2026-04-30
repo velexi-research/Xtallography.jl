@@ -153,6 +153,15 @@ The singleton instance of type [`Cubic`](@ref)
 """
 const cubic = Cubic()
 
+"""
+    LATTICE_SYSTEMS
+
+List of valid lattice systems in 3D
+"""
+const LATTICE_SYSTEMS = (
+    triclinic, monoclinic, orthorhombic, hexagonal, rhombohedral, tetragonal, cubic
+)
+
 # --- Functions/Methods
 
 """
