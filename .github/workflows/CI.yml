@@ -27,10 +27,12 @@ jobs:
       fail-fast: false
 
       matrix:
-        # os: [ubuntu-latest, windows-latest, macos-latest]
         os: [ubuntu-latest]
         arch: [x64]
-        julia-version: ['1.10', '1.11', '1.12']
+
+        # Temporarily disable Julia 1.12 until ubuntu-latest includes OpenSSL 3.5
+        julia-version: ['1.10', '1.11']  
+        # julia-version: ['1.10', '1.11', '1.12']
         python-version: ['3.11', '3.12', '3.13', '3.14']
 
     defaults:
@@ -42,17 +44,12 @@ jobs:
     env:
         codecov-os: 'Linux'
         codecov-arch: x64
-        codecov-julia-version: '1.12'
+        codecov-julia-version: '1.11'
         codecov-python-version: '3.14'
 
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-
-      # --- Update OpenSSL
-
-      - name: Update OpenSSL
-        run: sudo apt-get update && sudo apt-get install openssl
 
       # --- Run Julia tests
 
@@ -158,7 +155,7 @@ jobs:
       - name: Set up Julia
         uses: julia-actions/setup-julia@v2
         with:
-          version: '1.12'
+          version: '1.11'
 
       - name: Set up Julia caches
         uses: julia-actions/cache@v2
