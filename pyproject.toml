@@ -15,7 +15,7 @@ exclude = [
 [tool.poetry.dependencies]
 python = "^3.11,<3.15"
 pre-commit = "^4"
-juliacall = "^0.9.24"
+juliacall = "=0.9.29"
 
 [tool.poetry.group.dev]
 optional = true
