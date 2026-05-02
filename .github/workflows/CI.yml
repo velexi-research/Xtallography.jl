@@ -49,6 +49,11 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
+      # --- Update OpenSSL
+
+      - name: Update OpenSSL
+        run: sudo apt-get update && sudo apt-get upgrade openssl
+
       # --- Run Julia tests
 
       - name: Set up Julia
@@ -115,9 +120,6 @@ jobs:
 
       - name: Run Python tests
         run: |
-          # DEBUGGING
-          cat /home/runner/work/Xtallography.jl/Xtallography.jl/.venv/lib/python3.14/site-packages/juliacall/juliapkg.json
-
           # Use the development version of juliapkg.json
           mv pysrc/xtallography/juliapkg-dev.json pysrc/xtallography/juliapkg.json
 
