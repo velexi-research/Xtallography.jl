@@ -49,18 +49,18 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # --- Run Julia tests
 
       - name: Set up Julia
-        uses: julia-actions/setup-julia@v2
+        uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.julia-version }}
           arch: ${{ matrix.arch }}
 
       - name: Set up Julia caches
-        uses: julia-actions/cache@v2
+        uses: julia-actions/cache@v3
         with:
           cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ matrix.julia-version }}-python-${{ matrix.python-version }}-julia-${{ hashFiles('.github/workflows/CI.yml') }}
 
@@ -87,12 +87,12 @@ jobs:
       # --- Run Python tests
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Load cached $HOME/.local
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.local
           key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ matrix.julia-version }}-python-${{ matrix.python-version }}-dotlocal-${{ hashFiles('.github/workflows/CI.yml') }}
@@ -106,7 +106,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .venv
           key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ matrix.julia-version }}-python-${{ matrix.python-version }}-venv-${{ hashFiles('**/poetry.lock') }}
@@ -134,7 +134,7 @@ jobs:
             matrix.julia-version == env.codecov-julia-version &&
             matrix.python-version == env.codecov-python-version
 
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: lcov.info coverage.xml
@@ -148,17 +148,17 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # --- Set up Julia
 
       - name: Set up Julia
-        uses: julia-actions/setup-julia@v2
+        uses: julia-actions/setup-julia@v3
         with:
           version: '1.11'
 
       - name: Set up Julia caches
-        uses: julia-actions/cache@v2
+        uses: julia-actions/cache@v3
         with:
           cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ hashFiles('.github/workflows/CI.yml') }}
 
@@ -168,12 +168,12 @@ jobs:
       # --- Set up Python
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: '3.14'
 
       - name: Load cached $HOME/.local
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.local
           key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-dotlocal-${{ hashFiles('.github/workflows/CI.yml') }}
@@ -187,7 +187,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .venv
           key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-venv-${{ hashFiles('**/poetry.lock') }}
@@ -329,18 +329,18 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: 'gh-pages'
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: "."
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
