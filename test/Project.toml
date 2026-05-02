@@ -7,3 +7,10 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestTools = "a8cb73c1-6ac8-4a70-8c57-09fe1bc7c59b"
+
+[compat]
+AngleBetweenVectors = "0.3.0"
+Aqua = "0.8.14"
+Combinatorics = "1.1.0"
+JuliaFormatter = "2.3.0"
+TestTools = "0.6.6"
