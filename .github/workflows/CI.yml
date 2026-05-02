@@ -27,11 +27,13 @@ jobs:
       fail-fast: false
 
       matrix:
-        # os: [ubuntu-latest, windows-latest, macos-latest]
         os: [ubuntu-latest]
         arch: [x64]
-        julia-version: ['1.9', '1.10', '1.11']
-        python-version: ['3.11', '3.12', '3.13']
+
+        # Temporarily disable Julia 1.12 until ubuntu-latest includes OpenSSL 3.5
+        julia-version: ['1.10', '1.11']  
+        # julia-version: ['1.10', '1.11', '1.12']
+        python-version: ['3.11', '3.12', '3.13', '3.14']
 
     defaults:
       run:
@@ -43,7 +45,7 @@ jobs:
         codecov-os: 'Linux'
         codecov-arch: x64
         codecov-julia-version: '1.11'
-        codecov-python-version: '3.13'
+        codecov-python-version: '3.14'
 
     steps:
       - name: Check out code
@@ -168,7 +170,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.13'
+          python-version: '3.14'
 
       - name: Load cached $HOME/.local
         uses: actions/cache@v4
@@ -193,7 +195,9 @@ jobs:
       # --- Build documentation
 
       - name: Install Julia documentation dependencies
-        run: julia --project=docs --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        run: |
+          julia --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+          julia --project=docs --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 
       - name: Install Python documentation dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'

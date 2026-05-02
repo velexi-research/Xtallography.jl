@@ -1,0 +1,80 @@
+#   Copyright 2025 Velexi Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+"""
+The `xtallography.lattices` module provides support for integration with `Xtallography.jl`
+lattice/unit cell types and methods.
+"""
+# --- Imports
+
+# Local packages/modules
+from .lattice_constants import (  # noqa
+    LatticeConstants,
+    TriclinicLatticeConstants,
+    MonoclinicLatticeConstants,
+    OrthorhombicLatticeConstants,
+    HexagonalLatticeConstants,
+    RhombohedralLatticeConstants,
+    TetragonalLatticeConstants,
+    CubicLatticeConstants,
+)
+from .unit_cell import UnitCell
+from .unit_cell_symmetry import UnitCellSymmetry  # noqa
+from .unit_cell_symmetry import PRIMITIVE_UNIT_CELL_SYMMETRY  # noqa
+from .triclinic import TriclinicUnitCell
+from .monoclinic import MonoclinicUnitCell
+from .orthorhombic import OrthorhombicUnitCell
+from .tetragonal import TetragonalUnitCell
+from .rhombohedral import RhombohedralUnitCell
+from .hexagonal import HexagonalUnitCell
+from .cubic import CubicUnitCell
+
+from .unit_cell_dynamic import unit_cell_from_julia
+
+
+# --- Dynamically update UnitCell class
+
+
+setattr(UnitCell, "from_julia", classmethod(unit_cell_from_julia))
+
+
+# --- Auto-doc
+
+PRIMITIVE_UNIT_CELL_SYMMETRY = PRIMITIVE_UNIT_CELL_SYMMETRY
+"""
+`UnitCellSymmetry` object representing a primitive unit cell with no additional symmetry
+elements.
+"""
+
+# --- Exports
+
+__all__ = [
+    "UnitCell",
+    "TriclinicUnitCell",
+    "MonoclinicUnitCell",
+    "OrthorhombicUnitCell",
+    "TetragonalUnitCell",
+    "RhombohedralUnitCell",
+    "HexagonalUnitCell",
+    "CubicUnitCell",
+    "LatticeConstants",
+    "TriclinicLatticeConstants",
+    "MonoclinicLatticeConstants",
+    "OrthorhombicLatticeConstants",
+    "TetragonalLatticeConstants",
+    "RhombohedralLatticeConstants",
+    "HexagonalLatticeConstants",
+    "CubicLatticeConstants",
+    "UnitCellSymmetry",
+    "PRIMITIVE_UNIT_CELL_SYMMETRY",
+]

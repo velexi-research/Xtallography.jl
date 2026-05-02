@@ -26,17 +26,24 @@ const VERSION = TOML.parsefile(joinpath(pkgdir(@__MODULE__), "Project.toml"))["v
 
 include("math.jl")
 
-# --- Lattice-specific types and methods
+# --- Symmetry types and methods
 
-include("lattices/core.jl")
-include("lattices/lattice_constants.jl")
-include("lattices/unit_cell.jl")
-include("lattices/triclinic.jl")
-include("lattices/monoclinic.jl")
-include("lattices/orthorhombic.jl")
-include("lattices/tetragonal.jl")
-include("lattices/rhombohedral.jl")
-include("lattices/hexagonal.jl")
-include("lattices/cubic.jl")
+include("symmetry/lattice_systems.jl")
+include("symmetry/centerings.jl")
+include("symmetry/symmetry_elements.jl")
+include("symmetry/bravais_lattices.jl")
+
+# --- Unit cell types and methods
+
+include("unit_cell/unit_cell_symmetry.jl")
+include("unit_cell/unit_cell.jl")
+include("unit_cell/unit_cell_delta.jl")
+include("unit_cell/triclinic.jl")
+include("unit_cell/monoclinic.jl")
+include("unit_cell/orthorhombic.jl")
+include("unit_cell/tetragonal.jl")
+include("unit_cell/rhombohedral.jl")
+include("unit_cell/hexagonal.jl")
+include("unit_cell/cubic.jl")
 
 end  # End of Xtallography module

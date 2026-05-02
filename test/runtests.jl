@@ -37,5 +37,9 @@ jltest.run_tests(@__DIR__)
 println()
 print("Aqua.jl checks: ")
 @testset EnhancedTestSet "Aqua.jl code quality checks" begin
-    Aqua.test_all(Xtallography; deps_compat=(ignore=[:LinearAlgebra, :Logging, :Test],))
+    Aqua.test_all(
+        Xtallography;
+        deps_compat=(ignore=[:LinearAlgebra, :Logging, :Test],),
+        stale_deps=(ignore=[:PythonCall],),
+    )
 end

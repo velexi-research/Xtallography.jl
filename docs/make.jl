@@ -15,13 +15,17 @@ makedocs(;
         assets=String[],
     ),
     pages=[
-        "Home" => "index.md",
+        "Overview" => "index.md",
         "Examples" => "examples.md",
-        "Types" => "types.md",
-        "Functions" => "functions.md",
-        "Python Interface" => "python-interface.md",
+        "Reference" => [
+            "Unit Cells" => "unit-cells.md",
+            "Symmetry" => "symmetry.md",
+            "Utility Functions" => "functions.md",
+            "Python Interface" => "python-interface.md",
+        ],
         "Index" => "docs-index.md",
     ],
+    checkdocs=:exports,
     warnonly=[:missing_docs, :cross_references],
 )
 

@@ -20,8 +20,8 @@ PYTEST_OPTIONS=-n ${NPROCS}
 # --- Testing rules
 
 .PHONY: test fast-test coverage \
-	julia-tests julia-coverage \
-	python-tests python-coverage
+	julia-test julia-coverage \
+	python-test python-coverage
 
 ## Run all tests.
 test:
@@ -30,9 +30,9 @@ test:
 	find . -name "*.coverage.*" -exec rm -f {} \;  # Python coverage
 	rm -rf coverage htmlcov coverage.xml  # Python coverage
 	@echo Running Julia unit tests
-	@$(MAKE) julia-tests
+	@$(MAKE) julia-test
 	@echo Running Python unit tests
-	@$(MAKE) python-tests
+	@$(MAKE) python-test
 	@echo Generating code coverage reports
 	@$(MAKE) coverage
 
@@ -53,7 +53,7 @@ coverage:
 	@$(MAKE) python-coverage
 
 ## Run only Julia unit tests.
-julia-tests:
+julia-test:
 	jltest --code-coverage test/runtests.jl
 	@echo
 
@@ -62,13 +62,13 @@ julia-coverage:
 	@jlcoverage
 
 ## Run only Python unit tests.
-python-tests:
+python-test:
 	pytest ${PYTEST_OPTIONS}
 	@make python-lint
 	@echo
 
 .coverage:
-	-make python-tests
+	-make python-test
 
 ## Generate basic Python coverage report
 python-coverage: .coverage
@@ -105,33 +105,46 @@ python-lint:
 
 # --- Documentation rules
 
-.PHONY: docs
+.PHONY: docs julia-docs python-docs
 
 ## Generate package documentation.
 docs:
-	julia --project=${DOCS_DIR} --color=yes -e 'using Pkg; Pkg.update()'
-	julia --project=${DOCS_DIR} --color=yes --compile=min -O0 ${DOCS_DIR}/make.jl
+	@echo Generating Julia documentation
+	@make julia-docs
 	@echo Generating Python documentation
+	@make python-docs
+
+## Generate Julia package documentation.
+julia-docs:
+	julia --color=yes -e 'using Pkg; Pkg.instantiate()'
+	julia --project=${DOCS_DIR} --color=yes -e 'using Pkg; Pkg.instantiate()'
+	julia --project=${DOCS_DIR} --color=yes --compile=min -O0 ${DOCS_DIR}/make.jl
+
+## Generate Python package documentation.
+python-docs:
 	PDOC_ALLOW_EXEC=1 pdoc --math ${PYTHON_PKG_DIR} -o ${DOCS_DIR}/build/python
 
 # --- Utility rules
 
-.PHONY: clean spotless
+.PHONY: clean-coverage clean spotless
+
+## Remove automatically generated coverage files
+clean-coverage:
+	find . -name "*.jl.*.cov" -exec rm -f {} \;  # Julia coverage
+	find . -name "*.coverage.*" -exec rm -f {} \;  # Python coverage
+	rm -rf coverage htmlcov coverage.xml  # Python coverage
 
 ## Remove files and directories automatically generated during development and testing
-## (e.g., coverage files).
-clean:
-	find . -name "*.jl.*.cov" -exec rm -f {} \;  # Julia coverage
+## (e.g., compiled python code).
+clean: clean-coverage
 	find . -type d -name "__pycache__" -delete  # compiled python
 	find . -type f -name "*.py[co]" -delete  # compiled python
 	rm -rf .cache .pytest_cache  # pytest
-	find . -name "*.coverage.*" -exec rm -f {} \;  # Python coverage
-	rm -rf coverage htmlcov coverage.xml  # Python coverage
 
 ## Remove all automatically generated files and directories (e.g., coverage files, package
 ## documentation, and `Manifest.toml` files).
 spotless: clean
-	@echo Removing auto-generated package documentatoin
+	@echo Removing auto-generated package documentation
 	rm -rf docs/build/
 	@echo Removing Manifest.toml files
 	find . -name "Manifest.toml" -exec rm -rf {} \;

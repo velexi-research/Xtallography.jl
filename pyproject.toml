@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xtallography"
-version = "0.5.3"
+version = "0.6.0"
 description = "Library of utility functions for analysis of 3D crystals."
 license = "Apache-2.0"
 readme = "README.md"
@@ -13,9 +13,9 @@ exclude = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11,<3.13"
+python = "^3.11,<3.15"
 pre-commit = "^4"
-juliacall = "^0.9.24"
+juliacall = "^0.9.31"
 
 [tool.poetry.group.dev]
 optional = true
