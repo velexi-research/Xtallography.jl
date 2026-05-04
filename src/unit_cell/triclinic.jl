@@ -62,16 +62,11 @@ const TriclinicUnitCell = UnitCell{Triclinic}
     TriclinicUnitCell(
         a::Real, b::Real, c::Real, α::Real, β::Real, γ::Real;
         centering::Centering=primitive_centering,
-        symmetry_elements::Union{Set,Vector,Nothing}=nothing
+        symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+        check_angle_constraints::Bool=true
     )
 
 Construct a TriclinicUnitCell object from a set of lattice constants.
-
-!!! note
-
-    The constraints that valid triclinic unit cell angles must satisfy are _not_ enforced
-    by the constructor. It is acceptable to construct `TriclinicUnitCell` with
-    invalid values for `α`, `β`, and `γ`.
 
 !!! note
 
@@ -83,6 +78,10 @@ Keyword Arguments
 - `centering`: centering of unit cell
 
 - `symmetry_elements`: symmetry elements of crystal
+
+- `check_angle_constraints`: if `true`, throw an error if `α`, `β`, and `γ` do not satisfy
+  the angle constraints for a valid triclinic unit cell. Otherwise, ignore angle
+  constraints.
 """
 function TriclinicUnitCell(
     a::Real,
@@ -93,6 +92,7 @@ function TriclinicUnitCell(
     γ::Real;
     centering::Centering=primitive_centering,
     symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+    check_angle_constraints::Bool=true,
 )
 
     # --- Check arguments
@@ -131,6 +131,58 @@ function TriclinicUnitCell(
         (a=a, b=b, c=c, α=α, β=β, γ=γ);
         centering=centering,
         symmetry_elements=symmetry_elements,
+        check_angle_constraints=check_angle_constraints,
+    )
+end
+
+"""
+    UnitCell{Triclinic}(
+        lattice_constants::NamedTuple;
+        centering::Centering=primitive_centering,
+        symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+        check_angle_constraints::Bool=true
+    ) -> UnitCell{Triclinic}
+
+Construct a UnitCell from a set of lattice constants. The lattice system `T` must be
+consistent with the fields present in `lattice_constants`.
+
+Keyword Arguments
+=================
+- `centering`: centering of unit cell
+
+- `symmetry_elements`: symmetry elements of crystal
+
+- `check_angle_constraints`: if `true`, throw an error if `α`, `β`, and `γ` do not satisfy
+  the angle constraints for a valid triclinic unit cell. Otherwise, ignore angle
+  constraints.
+"""
+@inline function UnitCell{Triclinic}(
+    lattice_constants::NamedTuple;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+    check_angle_constraints::Bool=true,
+)
+    # --- Check arguments
+
+    if (
+        check_angle_constraints &&
+        !satisfies_triclinic_angle_constraints(
+            lattice_constants.α, lattice_constants.β, lattice_constants.γ
+        )
+    )
+        throw(
+            DomainError(
+                (lattice_constants.α, lattice_constants.β, lattice_constants.γ),
+                "`α`, `β`, and `γ` do not satisfy the angle constraints for " *
+                "a triclnic unit cell",
+            ),
+        )
+    end
+
+    # --- Construct and return TriclinicUnitCell object
+
+    return UnitCell{Triclinic}(
+        lattice_constants, UnitCellSymmetry(centering; symmetry_elements=symmetry_elements)
     )
 end
 

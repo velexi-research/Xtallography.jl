@@ -55,10 +55,10 @@ include("testing_utilities.jl")
     )
 end
 
-@testset "TriclinicUnitCell(::NamedTuple;::Centering,::Set) outer constructor" begin
+@testset "TriclinicUnitCell(::NamedTuple;::Centering,::Set) outer constructor: valid arguments" begin
     # --- Preparations
 
-    lattice_constants_ = (a=1, b=3, c=5, α=π / 7, β=2π / 7, γ=3π / 7)
+    lattice_constants_ = (a=1, b=3, c=5, α=π / 4, β=π / 5, γ=π / 6)
 
     # --- Tests
 
@@ -83,6 +83,29 @@ end
     @test lattice_constants(unit_cell) == lattice_constants_
     @test symmetry(unit_cell) ==
         UnitCellSymmetry(primitive_centering, Set{SymmetryElement}(symmetry_elements_))
+
+    # ------ check_angle_constraints = false
+
+    lattice_constants_ = (a=1, b=3, c=5, α=3π / 4, β=4π / 5, γ=5π / 6)
+    unit_cell = TriclinicUnitCell(lattice_constants_; check_angle_constraints=false)
+
+    @test lattice_constants(unit_cell) == lattice_constants_
+    @test symmetry(unit_cell) == primitive_unit_cell_symmetry
+end
+
+@testset "TriclinicUnitCell(::NamedTuple;::Centering,::Set) outer constructor: invalid arguments" begin
+    # --- Tests
+
+    # ------ (α, β, γ) does not satisfy angle constraints for a triclinic unit cell
+
+    lattice_constants_ = (a=1, b=3, c=5, α=3π / 4, β=4π / 5, γ=5π / 6)
+
+    expected_message =
+        "`α`, `β`, and `γ` do not satisfy the angle constraints for " *
+        "a triclnic unit cell"
+    @test_throws DomainError(
+        (lattice_constants_.α, lattice_constants_.β, lattice_constants_.γ), expected_message
+    ) TriclinicUnitCell(lattice_constants_)
 end
 
 @testset "TriclinicUnitCell(::Real,::Real,::Real,::Real,::Real,::Real;::Centering,::Set) outer constructor: valid arguments" begin
@@ -92,8 +115,8 @@ end
     b = 2
     c = 3
     α = π / 4
-    β = π / 2
-    γ = 3 * π / 4
+    β = π / 5
+    γ = π / 6
 
     # --- Exercise functionality and check results
 
@@ -139,6 +162,25 @@ end
     @test centering(unit_cell) === primitive_centering
     @test symmetry_elements(unit_cell) isa Set
     @test symmetry_elements(unit_cell) == Set(symmetry_elements_)
+
+    # check_angle_constraints = false
+    a=1
+    b=3
+    c=5
+    α=3π / 4
+    β=4π / 5
+    γ=5π / 6
+    unit_cell = TriclinicUnitCell(a, b, c, α, β, γ; check_angle_constraints=false)
+
+    @test lattice_constants(unit_cell).a == a
+    @test lattice_constants(unit_cell).b == b
+    @test lattice_constants(unit_cell).c == c
+    @test lattice_constants(unit_cell).α == α
+    @test lattice_constants(unit_cell).β == β
+    @test lattice_constants(unit_cell).γ == γ
+    @test centering(unit_cell) === primitive_centering
+    @test symmetry_elements(unit_cell) isa Set
+    @test isempty(symmetry_elements(unit_cell))
 end
 
 @testset "TriclinicUnitCell(::Real,::Real,::Real,::Real,::Real,::Real;::Centering,::Set) outer constructor: invalid arguments" begin
@@ -237,6 +279,15 @@ end
     # γ > π
     expected_message = "`γ` must satisfy 0 < γ < π"
     @test_throws DomainError(4, expected_message) TriclinicUnitCell(a, b, c, α, β, 4)
+
+    # ------ (α, β, γ) does not satisfy angle constraints for a triclinic unit cell
+
+    expected_message =
+        "`α`, `β`, and `γ` do not satisfy the angle constraints for " *
+        "a triclnic unit cell"
+    @test_throws DomainError((3π/4, 3π/4, 3π/4), expected_message) TriclinicUnitCell(
+        a, b, c, 3π/4, 3π/4, 3π/4
+    )
 
     # ------ symmetry elements
 
@@ -338,13 +389,13 @@ end
 # ------ Methods
 
 @testset "lattice_system(::TriclinicUnitCell)" begin
-    lattice_constants_ = (a=1, b=2, c=3, α=π / 5, β=2π / 5, γ=3π / 5)
+    lattice_constants_ = (a=1, b=3, c=5, α=π / 4, β=π / 5, γ=π / 6)
     unit_cell = TriclinicUnitCell(lattice_constants_)
     @test lattice_system(unit_cell) === triclinic
 end
 
 @testset "lattice_constants(::TriclinicUnitCell)" begin
-    lattice_constants_ = (a=1, b=2, c=3, α=π / 4, β=π / 2, γ=3 * π / 4)
+    lattice_constants_ = (a=1, b=3, c=5, α=π / 4, β=π / 5, γ=π / 6)
     unit_cell = TriclinicUnitCell(lattice_constants_)
     @test lattice_constants(unit_cell) == lattice_constants_
 end
@@ -352,7 +403,7 @@ end
 @testset "symmetry(::TriclinicUnitCell)" begin
     # --- Preparations
 
-    lattice_constants_ = (a=1, b=2, c=3, α=π / 4, β=π / 2, γ=3 * π / 4)
+    lattice_constants_ = (a=1, b=3, c=5, α=π / 4, β=π / 5, γ=π / 6)
     symmetry_elements_ = Set([a_2_1, d_perp_110])
 
     # --- Tests
@@ -370,7 +421,7 @@ end
 @testset "centering(::TriclinicUnitCell)" begin
     # --- Preparations
 
-    lattice_constants_ = (a=1, b=2, c=3, α=π / 4, β=π / 2, γ=3 * π / 4)
+    lattice_constants_ = (a=1, b=3, c=5, α=π / 4, β=π / 5, γ=π / 6)
 
     # --- Tests
 
@@ -388,7 +439,7 @@ end
 @testset "symmetry_elements(::TriclinicUnitCell)" begin
     # --- Preparations
 
-    lattice_constants_ = (a=1, b=2, c=3, α=π / 4, β=π / 2, γ=3 * π / 4)
+    lattice_constants_ = (a=1, b=3, c=5, α=π / 4, β=π / 5, γ=π / 6)
 
     # --- Tests
 
@@ -410,8 +461,8 @@ end
     b = 2
     c = 3
     α = π / 4
-    β = π / 2
-    γ = 3 * π / 4
+    β = π / 5
+    γ = π / 6
 
     # --- Tests
 
@@ -500,14 +551,15 @@ end
     a = 1.0
     b = 5.0
     c = 10.0
-    α = 1π / 10
-    β = 2π / 10
-    γ = 3π / 10
+    α = π / 5
+    β = 3π / 10
+    γ = 2π / 5
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -517,14 +569,15 @@ end
     a = 1.0
     b = 10.0
     c = 5.0
-    α = 1π / 10
-    β = 2π / 10
-    γ = 3π / 10
+    α = π / 5
+    β = 3π / 10
+    γ = 2π / 5
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, c, b, α, γ, β)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -534,14 +587,15 @@ end
     a = 1.0
     b = 5.0
     c = 10.0
-    α = 1π / 10
-    β = 8π / 10
-    γ = 7π / 10
+    α = π / 5
+    β = 7π / 10
+    γ = 3π / 5
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, b, c, α, π - β, π - γ)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -551,14 +605,15 @@ end
     a = 10.0
     b = 1.0
     c = 5.0
-    α = 1π / 10
-    β = 8π / 10
-    γ = 7π / 10
+    α = π / 5
+    β = 7π / 10
+    γ = 3π / 5
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(b, c, a, π - β, π - γ, α)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -566,14 +621,15 @@ end
     # ------ a ≈ b ≈ c, only need to swap α and β
 
     a = b = c = 1.0
-    α = 2π / 10
-    β = 1π / 10
-    γ = 3π / 10
+    α = 3π / 10
+    β = π / 5
+    γ = 2π / 5
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, b, c, β, α, γ)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -581,14 +637,15 @@ end
     # ------ a ≈ b ≈ c, only need to swap β and γ
 
     a = b = c = 1.0
-    α = 1π / 10
-    β = 3π / 10
-    γ = 2π / 10
+    α = π / 5
+    β = 2π / 5
+    γ = 3π / 10
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, b, c, α, γ, β)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -596,14 +653,15 @@ end
     # ------ a ≈ b ≈ c, only need to reverse order of angles
 
     a = b = c = 1.0
-    α = 3π / 10
-    β = 2π / 10
-    γ = 1π / 10
+    α = 2π / 5
+    β = 3π / 10
+    γ = π / 5
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, b, c, γ, β, α)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -612,30 +670,32 @@ end
 
     a = b = 1.0
     c = 5
-    α = 4π / 10
-    β = 8π / 10
-    γ = 7π / 10
+    α = 2π / 5
+    β = 3π / 10
+    γ = π / 5
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
-    expected_unit_cell = TriclinicUnitCell(a, b, c, π - β, α, π - γ)
+    expected_unit_cell = TriclinicUnitCell(a, b, c, β, α, γ)
     @test standardized_unit_cell ≈ expected_unit_cell
 
     # ------ b ≈ c (after sorting a, b, c)
 
     a = b = 5.0
     c = 1
-    α = 8π / 10
+    α = 4π / 5
     β = 7π / 10
-    γ = 4π / 10
+    γ = 2π / 5
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(c, a, b, γ, π - α, π - β)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -649,14 +709,15 @@ end
     a = 1.0
     b = 5.0
     c = 10.0
-    α = 6π / 10
-    β = 7π / 10
-    γ = 8π / 10
+    α = 2π / 3
+    β = 3π / 5
+    γ = 4π / 7
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test !is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = unit_cell
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -666,14 +727,15 @@ end
     a = 1.0
     b = 10.0
     c = 5.0
-    α = 6π / 10
-    β = 7π / 10
-    γ = 8π / 10
+    α = 2π / 3
+    β = 3π / 5
+    γ = 4π / 7
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test !is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, c, b, α, γ, β)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -683,14 +745,15 @@ end
     a = 1.0
     b = 5.0
     c = 10.0
-    α = 4π / 10
-    β = 3π / 10
-    γ = 8π / 10
+    α = π / 3
+    β = 2π / 5
+    γ = 4π / 7
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test !is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, b, c, π - α, π - β, γ)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -700,29 +763,31 @@ end
     a = 10.0
     b = 1.0
     c = 5.0
-    α = 4π / 10
-    β = 3π / 10
-    γ = 8π / 10
+    α = 2π / 5
+    β = 2π / 3
+    γ = 3π / 7
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test !is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
-    expected_unit_cell = TriclinicUnitCell(b, c, a, π - β, γ, π - α)
+    expected_unit_cell = TriclinicUnitCell(b, c, a, β, π - γ, π - α)
     @test standardized_unit_cell ≈ expected_unit_cell
 
     # ------ a ≈ b ≈ c, only need to swap α and β
 
     a = b = c = 1.0
-    α = 8π / 10
-    β = 7π / 10
-    γ = 9π / 10
+    α = 3π / 5
+    β = 4π / 7
+    γ = 2π / 3
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test !is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, b, c, β, α, γ)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -730,14 +795,15 @@ end
     # ------ a ≈ b ≈ c, only need to swap β and γ
 
     a = b = c = 1.0
-    α = 7π / 10
-    β = 9π / 10
-    γ = 8π / 10
+    α = 4π / 7
+    β = 2π / 3
+    γ = 3π / 5
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test !is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, b, c, α, γ, β)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -745,14 +811,15 @@ end
     # ------ a ≈ b ≈ c, only need to reverse order of angles
 
     a = b = c = 1.0
-    α = 9π / 10
-    β = 8π / 10
-    γ = 7π / 10
+    α = 2π / 3
+    β = 3π / 5
+    γ = 4π / 7
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test !is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, b, c, γ, β, α)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -761,14 +828,15 @@ end
 
     a = b = 1.0
     c = 5
-    α = 7π / 10
-    β = 4π / 10
-    γ = 4π / 10
+    α = 2π / 3
+    β = 2π / 5
+    γ = 3π / 7
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test !is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(a, b, c, π - β, α, π - γ)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -777,14 +845,15 @@ end
 
     a = b = 5.0
     c = 1
-    α = 8π / 10
-    β = 4π / 10
-    γ = 3π / 10
+    α = 3π / 5
+    β = 3π / 7
+    γ = π / 3
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test !is_triclinic_type_I_cell(unit_cell)
 
     # Exercise functionality and check results
     standardized_unit_cell = standardize(unit_cell)
+    @test is_equivalent(unit_cell, standardized_unit_cell)
 
     expected_unit_cell = TriclinicUnitCell(c, a, b, π - γ, π - β, α)
     @test standardized_unit_cell ≈ expected_unit_cell
@@ -1000,10 +1069,10 @@ end
 @testset "-(::TriclinicUnitCell)" begin
     # --- Preparations
 
-    lattice_constants_x = (a=1, b=5, c=3, α=π / 7, β=2π / 7, γ=3π / 7)
+    lattice_constants_x = (a=1, b=3, c=5, α=π / 4, β=π / 5, γ=π / 6)
     x = TriclinicUnitCell(lattice_constants_x)
 
-    lattice_constants_y = (a=2, b=2.3, c=3, α=5π / 9, β=6π / 9, γ=7π / 9)
+    lattice_constants_y = (a=1, b=3, c=5, α=π / 4, β=π / 5, γ=π / 7)
     y = TriclinicUnitCell(lattice_constants_y)
 
     # --- Tests
@@ -1027,9 +1096,9 @@ end
     a = 1
     b = 1
     c = 1
-    α = 2π / 10
+    α = π / 5
     β = 3π / 10
-    γ = 4π / 10
+    γ = 2π / 5
     @test is_triclinic_type_I_cell(TriclinicUnitCell(a, b, c, α, β, γ))
 
     # α equal to π/2
@@ -1038,7 +1107,7 @@ end
     c = 1
     α = π / 2
     β = 3π / 10
-    γ = 4π / 10
+    γ = 2π / 5
     @test is_triclinic_type_I_cell(TriclinicUnitCell(a, b, c, α, β, γ))
 
     # α equal to π/2 + ϵ (so that cos(α) < 0)
@@ -1047,7 +1116,7 @@ end
     c = 1
     α = π / 2 + 1e-9
     β = 3π / 10
-    γ = 4π / 10
+    γ = 2π / 5
     @test is_triclinic_type_I_cell(TriclinicUnitCell(a, b, c, α, β, γ))
 
     # ------ Type II
@@ -1056,27 +1125,27 @@ end
     a = 1
     b = 1
     c = 1
-    α = 6π / 10
-    β = 7π / 10
-    γ = 8π / 10
+    α = 3π / 5
+    β = 2π / 5
+    γ = π / 3
     @test !is_triclinic_type_I_cell(TriclinicUnitCell(a, b, c, α, β, γ))
 
     # γ equal to π/2
     a = 1
     b = 1
     c = 1
-    α = 8π / 10
-    β = 7π / 10
+    α = 3π / 5
+    β = 2π / 5
     γ = π / 2
     @test is_triclinic_type_I_cell(TriclinicUnitCell(a, b, c, α, β, γ))
 
-    # β equal to π/2 + ϵ (so that cos(β) < 0)
+    # γ equal to π/2 + ϵ (so that cos(γ) < 0)
     a = 1
     b = 1
     c = 1
-    α = 7π / 10
-    β = π / 2 + 1e-9
-    γ = 8π / 10
+    α = 3π / 5
+    β = 2π / 5
+    γ = π / 2 + 1e-9
     @test is_triclinic_type_I_cell(TriclinicUnitCell(a, b, c, α, β, γ))
 end
 
