@@ -90,7 +90,7 @@ class TriclinicUnitCell(UnitCell):
                 f"`gamma` must lie in the interval (0, 2 pi). (gamma={gamma})"
             )
 
-        if check_angle_constraints and not self.satisfies_triclinic_angle_constraints(
+        if check_angle_constraints and not self.satisfies_angle_constraints(
             alpha, beta, gamma
         ):
             raise ValueError(
@@ -210,7 +210,7 @@ class TriclinicUnitCell(UnitCell):
         )
 
     @classmethod
-    def satisfies_triclinic_angle_constraints(
+    def satisfies_angle_constraints(
         cls, alpha: Union[float, int], beta: Union[float, int], gamma: Union[float, int]
     ) -> bool:
         """
@@ -227,9 +227,9 @@ class TriclinicUnitCell(UnitCell):
         - `True` if (`alpha`, `beta`, `gamma`) form a valid triple of angles for a
           triclinic unit cell; `False` otherwise
 
-        >>> TriclinicUnitCell.satisfies_triclinic_angle_constraints(pi/4, pi/5, pi/6)
+        >>> TriclinicUnitCell.satisfies_angle_constraints(pi/4, pi/5, pi/6)
         True
-        >>> TriclinicUnitCell.satisfies_triclinic_angle_constraints(3*pi/4, 4*pi/5, 5*pi/6)
+        >>> TriclinicUnitCell.satisfies_angle_constraints(3*pi/4, 4*pi/5, 5*pi/6)
         False
         """
         return (

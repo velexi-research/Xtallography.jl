@@ -1015,3 +1015,18 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
             a, b, c, alpha, beta, gamma, symmetry_elements=symmetry_elements[0:-1]
         )
         assert not unit_cell_1.isclose(unit_cell_2)
+
+    @staticmethod
+    def test_satisfies_angle_constraints():
+        """
+        Test `satisfies_angle_constraints()`.
+        """
+        # --- Tests
+
+        # (alpha, beta, gamma) satisfy angle constraints
+        assert TriclinicUnitCell.satisfies_angle_constraints(pi / 4, pi / 5, pi / 6)
+
+        # (alpha, beta, gamma) do not satisfy angle constraints
+        assert not TriclinicUnitCell.satisfies_angle_constraints(
+            3 * pi / 4, 4 * pi / 5, 5 * pi / 6
+        )
