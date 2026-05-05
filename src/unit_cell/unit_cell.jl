@@ -261,9 +261,8 @@ Construct a UnitCell from a set of basis vectors.
 
 Keyword Arguments
 =================
-- `identify_lattice_system`: if set to `true`, return a UnitCell with the highest symmetry
-  lattice system that is consistent with the basis. Otherwise, return a
-  TriclinicUnitCell object.
+- `identify_lattice_system`: if `true`, return a UnitCell with the highest symmetry lattice
+  system that is consistent with the basis. Otherwise, return a TriclinicUnitCell object.
 
 - `centering`: centering of unit cell
 

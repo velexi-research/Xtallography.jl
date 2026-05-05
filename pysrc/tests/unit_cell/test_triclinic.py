@@ -18,6 +18,7 @@ Unit tests for `xtallography.unit_cell.triclinic` module
 
 # Standard library
 import math
+from math import pi
 import unittest
 
 # External packages
@@ -74,9 +75,9 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
         a = 1
         b = 2
         c = 3
-        alpha = 0.1
-        beta = 0.2
-        gamma = 0.3
+        alpha = pi / 4
+        beta = pi / 5
+        gamma = pi / 6
 
         # --- Tests
 
@@ -221,6 +222,32 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
         assert unit_cell.centering == Centering.FACE
         assert unit_cell.symmetry_elements == set(symmetry_elements)
 
+        # ------ check_angle_constraints = false
+
+        a = 1
+        b = 3
+        c = 5
+        alpha = 3 * pi / 4
+        beta = 4 * pi / 5
+        gamma = 5 * pi / 6
+        unit_cell = TriclinicUnitCell(
+            a, b, c, alpha, beta, gamma, check_angle_constraints=False
+        )
+
+        assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
+        assert unit_cell.symmetry == UnitCellSymmetry(
+            centering=Centering.PRIMITIVE, symmetry_elements=set()
+        )
+
+        assert unit_cell.a == a
+        assert unit_cell.b == b
+        assert unit_cell.c == c
+        assert unit_cell.alpha == alpha
+        assert unit_cell.beta == beta
+        assert unit_cell.gamma == gamma
+        assert unit_cell.centering == Centering.PRIMITIVE
+        assert unit_cell.symmetry_elements == set()
+
     @staticmethod
     def test_init_invalid_args():
         """
@@ -231,9 +258,9 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
         a = 1
         b = 2
         c = 3
-        alpha = 0.1
-        beta = 0.2
-        gamma = 0.3
+        alpha = pi / 4
+        beta = pi / 5
+        gamma = pi / 6
 
         # --- Tests
 
@@ -417,6 +444,21 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
         )
         assert expected_error in str(exception_info)
 
+        # ------ (α, β, γ) does not satisfy angle constraints for a triclinic unit cell
+
+        invalid_alpha = 3 * pi / 4
+        invalid_beta = 3 * pi / 4
+        invalid_gamma = 3 * pi / 4
+        with pytest.raises(ValueError) as exception_info:
+            TriclinicUnitCell(a, b, c, invalid_alpha, invalid_beta, invalid_gamma)
+
+        expected_error = (
+            "`alpha`, `beta`, and `gamma` do not satisfy the angle constraints for "
+            "a triclinic unit cell. "
+            f"(alpha={invalid_alpha},beta={invalid_beta},gamma={invalid_gamma})"
+        )
+        assert expected_error in str(exception_info)
+
     def test_to_julia(self):
         """
         Test `to_julia()`.
@@ -427,9 +469,9 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
         a = 1
         b = 2
         c = 3
-        alpha = 0.1
-        beta = 0.2
-        gamma = 0.3
+        alpha = pi / 4
+        beta = pi / 5
+        gamma = pi / 6
 
         # --- Tests
 
@@ -593,9 +635,9 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
         a = 1
         b = 2
         c = 3
-        alpha = 0.1
-        beta = 0.2
-        gamma = 0.3
+        alpha = pi / 4
+        beta = pi / 5
+        gamma = pi / 6
 
         # --- Tests
 
@@ -698,9 +740,9 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
         a = 1
         b = 2
         c = 3
-        alpha = 0.1
-        beta = 0.2
-        gamma = 0.3
+        alpha = pi / 4
+        beta = pi / 5
+        gamma = pi / 6
 
         # --- Tests
 
@@ -787,9 +829,9 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
         a = 1
         b = 2
         c = 3
-        alpha = 0.1
-        beta = 0.2
-        gamma = 0.3
+        alpha = pi / 4
+        beta = pi / 5
+        gamma = pi / 6
 
         # --- Tests
 
@@ -869,9 +911,9 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
         a = 1
         b = 2
         c = 3
-        alpha = 0.1
-        beta = 0.2
-        gamma = 0.3
+        alpha = pi / 4
+        beta = pi / 5
+        gamma = pi / 6
 
         # --- Tests
 
@@ -973,3 +1015,18 @@ class test_xtallography_unit_cell_triclinic(unittest.TestCase):
             a, b, c, alpha, beta, gamma, symmetry_elements=symmetry_elements[0:-1]
         )
         assert not unit_cell_1.isclose(unit_cell_2)
+
+    @staticmethod
+    def test_satisfies_angle_constraints():
+        """
+        Test `satisfies_angle_constraints()`.
+        """
+        # --- Tests
+
+        # (alpha, beta, gamma) satisfy angle constraints
+        assert TriclinicUnitCell.satisfies_angle_constraints(pi / 4, pi / 5, pi / 6)
+
+        # (alpha, beta, gamma) do not satisfy angle constraints
+        assert not TriclinicUnitCell.satisfies_angle_constraints(
+            3 * pi / 4, 4 * pi / 5, 5 * pi / 6
+        )

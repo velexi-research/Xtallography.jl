@@ -20,7 +20,7 @@ The triclinic module defines classes and methods specific to triclinic lattices.
 # Standard library
 import copy
 import math
-from typing import Optional
+from typing import Optional, Union
 
 # Local packages/modules
 from xtallography.symmetry import Centering, LatticeSystem
@@ -51,6 +51,7 @@ class TriclinicUnitCell(UnitCell):
         gamma: float,
         centering: Optional[Centering] = Centering.PRIMITIVE,
         symmetry_elements: Optional[set] = copy.deepcopy(set()),
+        check_angle_constraints: Optional[bool] = True,
     ):
         """
         Initialize TriclinicUnitCell object.
@@ -89,7 +90,13 @@ class TriclinicUnitCell(UnitCell):
                 f"`gamma` must lie in the interval (0, 2 pi). (gamma={gamma})"
             )
 
-        # TODO: add valid angle check
+        if check_angle_constraints and not self.satisfies_angle_constraints(
+            alpha, beta, gamma
+        ):
+            raise ValueError(
+                "`alpha`, `beta`, and `gamma` do not satisfy the angle constraints for "
+                f"a triclinic unit cell. (alpha={alpha},beta={beta},gamma={gamma})"
+            )
 
         # --- Initialize parent class
 
@@ -200,4 +207,34 @@ class TriclinicUnitCell(UnitCell):
             "symmetry_elements=["
             f"{','.join(sorted([str(item) for item in self.symmetry_elements]))}"
             "])"
+        )
+
+    @classmethod
+    def satisfies_angle_constraints(
+        cls, alpha: Union[float, int], beta: Union[float, int], gamma: Union[float, int]
+    ) -> bool:
+        """
+        Determine whether `alpha`, `beta`, and `beta` satisfy the angle constraints for
+        a triclinic unit cell:
+
+        * 0 <  alpha + beta + gamma < 2 * pi
+        * 0 <  alpha + beta - gamma < 2 * pi
+        * 0 <  alpha - beta + gamma < 2 * pi
+        * 0 < -alpha + beta + gamma < 2 * pi
+
+        Return values
+        =============
+        - `True` if (`alpha`, `beta`, `gamma`) form a valid triple of angles for a
+          triclinic unit cell; `False` otherwise
+
+        >>> TriclinicUnitCell.satisfies_angle_constraints(pi/4, pi/5, pi/6)
+        True
+        >>> TriclinicUnitCell.satisfies_angle_constraints(3*pi/4, 4*pi/5, 5*pi/6)
+        False
+        """
+        return (
+            (0 < alpha + beta + gamma < 2 * math.pi)
+            and (0 < alpha + beta - gamma < 2 * math.pi)
+            and (0 < alpha - beta + gamma < 2 * math.pi)
+            and (0 < -alpha + beta + gamma < 2 * math.pi)
         )
