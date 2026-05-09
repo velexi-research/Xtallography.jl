@@ -674,8 +674,8 @@ end
 """
     reduced_cell(unit_cell::UnitCell) -> UnitCell
 
-Compute the primitive reduced cell for the lattice defined by `unit_cell`. The
-Selling-Delaunay reduction algorithm is used to compute the reduced basis.
+Compute the primitive reduced cell for `unit_cell`. The Selling-Delaunay reduction
+algorithm is used to compute the reduced basis.
 
 Return values
 =============
@@ -1053,7 +1053,7 @@ Keyword Arguments
 
   !!! note
 
-      `max_index` is ignored for Cubic lattice systems.
+      `max_index` is ignored for Cubic unit cells.
 
 Return values
 =============
@@ -1075,8 +1075,8 @@ false
 ```
 """
 function is_supercell(::UnitCell, ::UnitCell)
-    # Default is_supercell() implementation to allow comparison between lattice constants
-    # of different lattice systems.
+    # Default is_supercell() implementation to allow comparison between unit cells for
+    # different lattice systems.
     return false
 end
 
