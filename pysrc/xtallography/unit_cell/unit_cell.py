@@ -24,6 +24,9 @@ import math
 import sys
 from typing import Optional, Union
 
+# External packages
+import numpy
+
 # Local packages/modules
 from .. import _JL
 
@@ -58,11 +61,23 @@ class UnitCell(ABC):
     * `lattice_constants` (LatticeConstants): lattice constants of unit cell
 
     * `symmetry` (UnitCellSymmetry): symmetry of unit cell
+
+    * `unit_cell_jl` (_JL.UnitCell): Julia object representing unit cell
+
+    * `volume` (float): volume of unit cell
+
+    * `surface_area` (float): surface area of unit cell
     """
 
     lattice_system: LatticeSystem
     lattice_constants: LatticeConstants
     symmetry: UnitCellSymmetry
+
+    # attributes that cannot be set until object is fully constructed
+    _unit_cell_jl: _JL.UnitCell
+    _basis: list
+    _volume: float
+    _surface_area: float
 
     # --- Initializer
 
@@ -177,6 +192,10 @@ class UnitCell(ABC):
         object.__setattr__(self, "lattice_system", lattice_system)
         object.__setattr__(self, "lattice_constants", lattice_constants)
         object.__setattr__(self, "symmetry", symmetry)
+        object.__setattr__(self, "_unit_cell_jl", None)
+        object.__setattr__(self, "_basis", None)
+        object.__setattr__(self, "_volume", None)
+        object.__setattr__(self, "_surface_area", None)
 
     # --- Properties
 
@@ -193,6 +212,56 @@ class UnitCell(ABC):
         Return the symmetry elements of the unit cell.
         """
         return self.symmetry.symmetry_elements
+
+    @property
+    def unit_cell_jl(self):
+        """
+        Julia object representing unit cell.
+        """
+        if self._unit_cell_jl is None:
+            object.__setattr__(self, "_unit_cell_jl", self.to_julia())
+
+        return self._unit_cell_jl
+
+    @property
+    def basis(self):
+        """
+        Return a list of basis vectors for the unit cell.
+        """
+        if self._basis is None:
+            # Compute basis
+            basis_jl = _JL.basis(self.unit_cell_jl)
+
+            # Convert basis vectors to NumPy arrays
+            basis = []
+            for vector_jl in basis_jl:
+                basis.append(numpy.array([element for element in vector_jl]))
+
+            object.__setattr__(self, "_basis", basis)
+
+        return self._basis
+
+    @property
+    def volume(self):
+        """
+        Return the volume of the unit cell.
+        """
+        if self._volume is None:
+            object.__setattr__(self, "_volume", _JL.volume(self.unit_cell_jl))
+
+        return self._volume
+
+    @property
+    def surface_area(self):
+        """
+        Return the surface area of the unit cell.
+        """
+        if self._surface_area is None:
+            object.__setattr__(
+                self, "_surface_area", _JL.surface_area(self.unit_cell_jl)
+            )
+
+        return self._surface_area
 
     # --- Methods
 
@@ -298,3 +367,24 @@ class UnitCell(ABC):
                 return False
 
         return True
+
+    def compute_reduced_cell(self):
+        """
+        Compute the primitive reduced cell for the unit cell. The Selling-Delaunay
+        reduction algorithm is used to compute the reduced basis.
+
+        Return value
+        ------------
+        UnitCell object representing the reduced cell
+        """
+        return UnitCell.from_julia(_JL.reduced_cell(self.unit_cell_jl))
+
+    def compute_conventional_cell(self):
+        """
+        Return the IUCr conventional cell that is equivalent to the unit cell.
+
+        Return values
+        -------------
+        UnitCell object representing the IUCr conventional cell for the unit cell
+        """
+        return self.from_julia(_JL.conventional_cell(self.unit_cell_jl))
