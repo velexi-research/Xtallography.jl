@@ -572,3 +572,18 @@ class test_xtallography_unit_cell_UnitCell(unittest.TestCase):
         -----
         * Correctness of the conventional cell algorithm is tested in the Julia unit tests
         """
+        # --- Tests
+
+        # Construct triclinic unit cell
+        a = 5.0
+        alpha = math.pi / 2
+        triclinic_unit_cell = TriclinicUnitCell(a, a, a, alpha, alpha, alpha)
+        assert isinstance(triclinic_unit_cell, TriclinicUnitCell)
+
+        # Compute conventional cell
+        conventional_cell = triclinic_unit_cell.compute_conventional_cell()
+
+        assert isinstance(conventional_cell, CubicUnitCell)
+
+        expected_conventional_cell = CubicUnitCell(a)
+        assert conventional_cell.isclose(expected_conventional_cell)
