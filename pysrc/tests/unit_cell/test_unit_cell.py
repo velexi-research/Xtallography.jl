@@ -23,6 +23,7 @@ import sys
 
 # External packages
 import juliacall
+import numpy
 import pytest
 from xtallography.symmetry import Centering, LatticeSystem
 from xtallography.unit_cell import (
@@ -33,6 +34,7 @@ from xtallography.unit_cell import (
     TriclinicUnitCell,
     MonoclinicUnitCell,
     OrthorhombicUnitCell,
+    TetragonalLatticeConstants,
     TetragonalUnitCell,
     RhombohedralUnitCell,
     HexagonalUnitCell,
@@ -280,36 +282,52 @@ class test_xtallography_unit_cell_UnitCell(unittest.TestCase):
         )
         assert expected_error in str(exception_info)
 
-    @staticmethod
-    def test_fields_and_properties():
+    def test_fields_and_properties(self):
         """
         Test fields and properties.
         """
         # --- Preparations
 
         a = 1
-        b = 2
         c = 3
-        alpha = 0.1
-        beta = 0.2
-        gamma = 0.3
 
         # --- Tests
 
-        unit_cell = TriclinicUnitCell(a, b, c, alpha, beta, gamma)
+        unit_cell = TetragonalUnitCell(a, c)
 
-        # fields
-        assert unit_cell.lattice_constants == TriclinicLatticeConstants(
-            a, b, c, alpha, beta, gamma
-        )
-        assert unit_cell.lattice_system == LatticeSystem.TRICLINIC
+        # ------ fields
+
+        assert unit_cell.lattice_constants == TetragonalLatticeConstants(a, c)
+        assert unit_cell.lattice_system == LatticeSystem.TETRAGONAL
         assert unit_cell.symmetry == UnitCellSymmetry(
             centering=Centering.PRIMITIVE, symmetry_elements=set()
         )
 
-        # properties
+        # ------ properties
+
+        # centering
         assert unit_cell.centering == Centering.PRIMITIVE
+
+        # symmetry_elements
         assert unit_cell.symmetry_elements == set()
+
+        # unit_cell_jl
+        assert self.jl.isa(unit_cell.unit_cell_jl, self.jl.UnitCell)
+
+        # basis
+        basis = unit_cell.basis
+        assert len(basis) == 3
+        assert numpy.allclose(basis[0], numpy.array([a, 0, 0]))
+        assert numpy.allclose(basis[1], numpy.array([0, a, 0]))
+        assert numpy.allclose(basis[2], numpy.array([0, 0, c]))
+
+        # volume
+        expected_volume = c * a**2
+        assert unit_cell.volume == pytest.approx(expected_volume)
+
+        # surface_area
+        expected_surface_area = 2 * a**2 + 4 * a * c
+        assert unit_cell.surface_area == pytest.approx(expected_surface_area)
 
     @staticmethod
     def test_isclose():
@@ -507,3 +525,50 @@ class test_xtallography_unit_cell_UnitCell(unittest.TestCase):
             "(lattice_system_jl=UnsupportedLatticeSystem)"
         )
         assert expected_error in str(exception_info)
+
+    def test_compute_reduced_cell(self):
+        """
+        Test `compute_reduced_cell()`.
+
+        Notes
+        -----
+        * Correctness of the cell reduction algorithm is tested in the Julia unit tests
+        """
+        # --- Tests
+
+        a = 5.0
+        unit_cell = CubicUnitCell(a, centering=Centering.FACE)
+        basis = unit_cell.basis
+
+        reduced_cell = unit_cell.compute_reduced_cell()
+
+        assert isinstance(reduced_cell, TriclinicUnitCell)
+        assert 4 * reduced_cell.volume == pytest.approx(unit_cell.volume)
+
+        expected_reduced_cell = UnitCell.from_julia(
+            self.jl.reduced_cell(
+                self.jl.UnitCell(
+                    self.jl.Vector(
+                        numpy.array([x for x in 0.5 * (basis[0] + basis[1])])
+                    ),
+                    self.jl.Vector(
+                        numpy.array([x for x in 0.5 * (basis[1] - basis[2])])
+                    ),
+                    self.jl.Vector(
+                        numpy.array([x for x in 0.5 * (basis[1] + basis[2])])
+                    ),
+                    identify_lattice_system=False,
+                    centering=self.jl.P_centering,
+                ),
+            )
+        )
+        assert reduced_cell.isclose(expected_reduced_cell)
+
+    def test_compute_conventional_cell(self):
+        """
+        Test `compute_conventional_cell()`.
+
+        Notes
+        -----
+        * Correctness of the conventional cell algorithm is tested in the Julia unit tests
+        """
