@@ -387,4 +387,4 @@ class UnitCell(ABC):
         -------------
         UnitCell object representing the IUCr conventional cell for the unit cell
         """
-        return self.from_julia(_JL.conventional_cell(self.unit_cell_jl))
+        return UnitCell.from_julia(_JL.conventional_cell(self.unit_cell_jl))
