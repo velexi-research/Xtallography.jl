@@ -106,6 +106,123 @@ end
     @test centering(reduced_cell_) === primitive_centering
 end
 
+@testset "compute_delaunay_set(::Vector): valid arguments" begin
+    # --- Tests
+
+    # ------ dot(b_1, b_2) > 0
+
+    basis_a = [2, 0, 0]
+    basis_b = [1, 1, 0]
+    basis_c = [-1, 0, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+
+    # ------ dot(b_1, b_3) > 0
+
+    basis_a = [2, 0, 0]
+    basis_b = [-1, 0, 0]
+    basis_c = [1, 1, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+
+    # ------ dot(b_1, b_4) > 0
+
+    basis_a = [2, 0, 0]
+    basis_b = [-1, 0, 0]
+    basis_c = [-2, -1, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+
+    # ------ dot(b_2, b_3) > 0
+
+    basis_a = [-2, 0, 0]
+    basis_b = [1, 1, 0]
+    basis_c = [1, 0, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+
+    # ------ dot(b_2, b_4) > 0
+
+    basis_a = [-1, -1, 0]
+    basis_b = [1, 0, 0]
+    basis_c = [-1, 1, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+
+    # ------ dot(b_3, b_4) > 0
+
+    basis_a = [0, 0, 0]
+    basis_b = [3, 0, 0]
+    basis_c = [-2, 1, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-2, 1, 0], [1, 1, 0], [1, -2, 0], [0, 0, 0], [-1, 2, 0], [-1, -1, 0], [2, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+end
+
+@testset "compute_delaunay_set(::Vector): invalid arguments" begin
+    # --- Preparations
+
+    # Valid basis vectors
+    basis_a = [1, 2, 3]
+    basis_b = [2, 3, 4]
+    basis_c = [3, 4, 5]
+
+    # --- Tests
+
+    # length(basis_a) != 3
+    expected_message = "`basis_a` must contain exactly 3 components (basis_a=[1, 2, 3, 4])"
+    @test_throws ArgumentError(expected_message) compute_delaunay_set(
+        [1, 2, 3, 4], basis_b, basis_c
+    )
+
+    # length(basis_b) != 3
+    expected_message = "`basis_b` must contain exactly 3 components (basis_b=[1, 2])"
+    @test_throws ArgumentError(expected_message) compute_delaunay_set(
+        basis_a, [1, 2], basis_c
+    )
+
+    # length(basis_c) != 3
+    expected_message = "`basis_c` must contain exactly 3 components (basis_c=[1, 2, 3, 4])"
+    @test_throws ArgumentError(expected_message) compute_delaunay_set(
+        basis_a, basis_b, [1, 2, 3, 4]
+    )
+end
+
 @testset "is_equivalent(::UnitCell): valid arguments" begin
     # --- Tests
 

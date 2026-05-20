@@ -25,7 +25,8 @@ export lattice_system
 export lattice_constants, symmetry, centering, symmetry_elements
 export is_bravais_lattice
 export basis, volume, surface_area
-export standardize, conventional_cell, reduced_cell
+export standardize, conventional_cell
+export reduced_cell, compute_delaunay_set
 export is_equivalent, is_supercell
 export isapprox
 
@@ -710,98 +711,25 @@ function reduced_cell(unit_cell::UnitCell)
         basis_c = basis_c_primitive
     end
 
-    # Initialize working basis set
-    working_basis = [basis_a, basis_b, basis_c, -(basis_a + basis_b + basis_c)]
-
     # --- Perform Selling-Delaunay reduction
 
-    # ------ Reduce the sum of the squares of the lengths of the working basis set
-
-    # TODO: refactor and test
-    while true
-        # Compute scalar products
-        scalar_products = [
-            dot(working_basis[1], working_basis[2]),
-            dot(working_basis[1], working_basis[3]),
-            dot(working_basis[1], working_basis[4]),
-            dot(working_basis[2], working_basis[3]),
-            dot(working_basis[2], working_basis[4]),
-            dot(working_basis[3], working_basis[4]),
-        ]
-
-        # Check if the reduction is complete (when none of the scalar products is positive)
-        if all(scalar_products .<= ALMOST_ZERO)
-            break
-        end
-
-        # Find the largest positive scalar product
-        _, idx = findmax(scalar_products)
-        if idx == 1
-            b_1 = working_basis[1]
-            b_2 = working_basis[2]
-            b_3 = working_basis[3]
-            b_4 = working_basis[4]
-        elseif idx == 2
-            b_1 = working_basis[1]
-            b_2 = working_basis[3]
-            b_3 = working_basis[2]
-            b_4 = working_basis[4]
-        elseif idx == 3
-            b_1 = working_basis[1]
-            b_2 = working_basis[4]
-            b_3 = working_basis[2]
-            b_4 = working_basis[3]
-        elseif idx == 4
-            b_1 = working_basis[2]
-            b_2 = working_basis[3]
-            b_3 = working_basis[1]
-            b_4 = working_basis[4]
-        elseif idx == 5
-            b_1 = working_basis[2]
-            b_2 = working_basis[4]
-            b_3 = working_basis[1]
-            b_4 = working_basis[3]
-        else
-            b_1 = working_basis[3]
-            b_2 = working_basis[4]
-            b_3 = working_basis[1]
-            b_4 = working_basis[2]
-        end
-
-        # Update working basis set to reduce the sum of the squares of the lengths
-        working_basis = [-b_1, b_2, b_1 + b_3, b_1 + b_4]
-    end
-
-    # ------ Compute the reduced basis
-
-    # Compute Delaunay set and squared vector lengths
-    delaunay_set = [
-        (vector=working_basis[1], length_sq=dot(working_basis[1], working_basis[1])),
-        (vector=working_basis[2], length_sq=dot(working_basis[2], working_basis[2])),
-        (vector=working_basis[3], length_sq=dot(working_basis[3], working_basis[3])),
-        (vector=working_basis[4], length_sq=dot(working_basis[4], working_basis[4])),
-        (
-            vector=working_basis[1] + working_basis[2],
-            length_sq=dot(
-                working_basis[1] + working_basis[2], working_basis[1] + working_basis[2]
-            ),
-        ),
-        (
-            vector=working_basis[1] + working_basis[3],
-            length_sq=dot(
-                working_basis[1] + working_basis[3], working_basis[1] + working_basis[3]
-            ),
-        ),
-        (
-            vector=working_basis[2] + working_basis[3],
-            length_sq=dot(
-                working_basis[2] + working_basis[3], working_basis[2] + working_basis[3]
-            ),
-        ),
-    ]
+    # Compute Delaunay set
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
 
     # Sort vectors by squared vector length
+    delaunay_set = [
+        (vector=delaunay_set[1], length_sq=dot(delaunay_set[1], delaunay_set[1])),
+        (vector=delaunay_set[2], length_sq=dot(delaunay_set[2], delaunay_set[2])),
+        (vector=delaunay_set[3], length_sq=dot(delaunay_set[3], delaunay_set[3])),
+        (vector=delaunay_set[4], length_sq=dot(delaunay_set[4], delaunay_set[4])),
+        (vector=delaunay_set[5], length_sq=dot(delaunay_set[5], delaunay_set[5])),
+        (vector=delaunay_set[6], length_sq=dot(delaunay_set[6], delaunay_set[6])),
+        (vector=delaunay_set[7], length_sq=dot(delaunay_set[7], delaunay_set[7])),
+    ]
     sort!(delaunay_set; by=item -> item.length_sq)
+
+    # Remove zero vectors
+    #deleteat!(delaunay_set, findall(x->abs.length_sq < ALMOST_ZERO,delaunay_set))
 
     # TODO: refactor and test
     # Remove vectors that are scalar multiples of shorter vectors
@@ -972,6 +900,112 @@ function reduced_cell(unit_cell::UnitCell)
             reduced_basis_a, reduced_basis_b, reduced_basis_c; centering=primitive_centering
         ),
     )
+end
+
+"""
+    compute_delaunay_set(
+        basis_a::Vector{<:Real}, basis_b::Vector{<:Real}, basis_c::Vector{<:Real}
+    ) -> Vector{Vector{Real}}
+
+Compute Delaunay set associated with `basis_a`, `basis_b`, and `basis_c`.
+
+Return values
+=============
+- Delaunay set
+"""
+function compute_delaunay_set(
+    basis_a::Vector{<:Real}, basis_b::Vector{<:Real}, basis_c::Vector{<:Real}
+)
+
+    # Check arguments
+    if length(basis_a) != 3
+        throw(
+            ArgumentError("`basis_a` must contain exactly 3 components (basis_a=$basis_a)")
+        )
+    end
+
+    if length(basis_b) != 3
+        throw(
+            ArgumentError("`basis_b` must contain exactly 3 components (basis_b=$basis_b)")
+        )
+    end
+
+    if length(basis_c) != 3
+        throw(
+            ArgumentError("`basis_c` must contain exactly 3 components (basis_c=$basis_c)")
+        )
+    end
+
+    # Initialize reduced vector set
+    reduced_set = [basis_a, basis_b, basis_c, -(basis_a + basis_b + basis_c)]
+
+    # Reduce the sum of the squares of the lengths of the candidate basis vectxors
+    while true
+        # Compute scalar products
+        scalar_products = [
+            dot(reduced_set[1], reduced_set[2]),
+            dot(reduced_set[1], reduced_set[3]),
+            dot(reduced_set[1], reduced_set[4]),
+            dot(reduced_set[2], reduced_set[3]),
+            dot(reduced_set[2], reduced_set[4]),
+            dot(reduced_set[3], reduced_set[4]),
+        ]
+
+        # Check if the reduction is complete (when none of the scalar products is positive)
+        if all(scalar_products .<= ALMOST_ZERO)
+            break
+        end
+
+        # Find the largest positive scalar product
+        _, idx = findmax(scalar_products)
+        if idx == 1
+            b_1 = reduced_set[1]
+            b_2 = reduced_set[2]
+            b_3 = reduced_set[3]
+            b_4 = reduced_set[4]
+        elseif idx == 2
+            b_1 = reduced_set[1]
+            b_2 = reduced_set[3]
+            b_3 = reduced_set[2]
+            b_4 = reduced_set[4]
+        elseif idx == 3
+            b_1 = reduced_set[1]
+            b_2 = reduced_set[4]
+            b_3 = reduced_set[2]
+            b_4 = reduced_set[3]
+        elseif idx == 4
+            b_1 = reduced_set[2]
+            b_2 = reduced_set[3]
+            b_3 = reduced_set[1]
+            b_4 = reduced_set[4]
+        elseif idx == 5
+            b_1 = reduced_set[2]
+            b_2 = reduced_set[4]
+            b_3 = reduced_set[1]
+            b_4 = reduced_set[3]
+        else
+            b_1 = reduced_set[3]
+            b_2 = reduced_set[4]
+            b_3 = reduced_set[1]
+            b_4 = reduced_set[2]
+        end
+
+        # Update reduced basis set to reduce the sum of the squares of the lengths
+        reduced_set = [-b_1, b_2, b_1 + b_3, b_1 + b_4]
+    end
+
+    # Compute Delaunay set
+    delaunay_set = [
+        reduced_set[1],
+        reduced_set[2],
+        reduced_set[3],
+        reduced_set[4],
+        reduced_set[1] + reduced_set[2],
+        reduced_set[1] + reduced_set[3],
+        reduced_set[2] + reduced_set[3],
+    ]
+
+    return delaunay_set
 end
 
 """
