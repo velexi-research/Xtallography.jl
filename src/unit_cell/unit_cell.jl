@@ -26,7 +26,7 @@ export lattice_constants, symmetry, centering, symmetry_elements
 export is_bravais_lattice
 export basis, volume, surface_area
 export standardize, conventional_cell
-export reduced_cell, compute_delaunay_set
+export reduced_cell, compute_delaunay_set, prune_delaunay_set
 export is_equivalent, is_supercell
 export isapprox
 
@@ -716,38 +716,8 @@ function reduced_cell(unit_cell::UnitCell)
     # Compute Delaunay set
     delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
 
-    # Sort vectors by squared vector length
-    delaunay_set = [
-        (vector=delaunay_set[1], length_sq=dot(delaunay_set[1], delaunay_set[1])),
-        (vector=delaunay_set[2], length_sq=dot(delaunay_set[2], delaunay_set[2])),
-        (vector=delaunay_set[3], length_sq=dot(delaunay_set[3], delaunay_set[3])),
-        (vector=delaunay_set[4], length_sq=dot(delaunay_set[4], delaunay_set[4])),
-        (vector=delaunay_set[5], length_sq=dot(delaunay_set[5], delaunay_set[5])),
-        (vector=delaunay_set[6], length_sq=dot(delaunay_set[6], delaunay_set[6])),
-        (vector=delaunay_set[7], length_sq=dot(delaunay_set[7], delaunay_set[7])),
-    ]
-    sort!(delaunay_set; by=item -> item.length_sq)
-
-    # Remove zero vectors
-    #deleteat!(delaunay_set, findall(x->abs.length_sq < ALMOST_ZERO,delaunay_set))
-
-    # TODO: refactor and test
-    # Remove vectors that are scalar multiples of shorter vectors
-    to_remove = []
-    for i in 1:length(delaunay_set)
-        basis_1 = delaunay_set[i].vector
-        length_basis_1 = sqrt(delaunay_set[i].length_sq)
-
-        for j in (i + 1):length(delaunay_set)
-            basis_2 = delaunay_set[j].vector
-            length_basis_2 = sqrt(delaunay_set[j].length_sq)
-
-            if dot(basis_1, basis_2) / length_basis_1 / length_basis_2 ≈ 1.0
-                push!(to_remove, j)
-            end
-        end
-    end
-    delaunay_set = [delaunay_set[i] for i in 1:length(delaunay_set) if !(i in to_remove)]
+    # Prune Delaunay set
+    delaunay_set = prune_delaunay_set(delaunay_set)
 
     # TODO: refactor and test
     # Generate all possible bases that can be formed from the candidate basis vectors
@@ -1006,6 +976,50 @@ function compute_delaunay_set(
     ]
 
     return delaunay_set
+end
+
+"""
+    prune_delaunay_set(delaunay_set::Vector{<:Vector{<:Real}})
+
+Remove the following vectors from `delaunay_set`:
+
+* zero vectors
+
+and
+
+* vectors that are scalar multiples of another vector with shorter length.
+
+`delaunay_set` is transformed into a vector of NamedTuple objects with keys: `vector` and
+`length_sq`.
+"""
+function prune_delaunay_set(delaunay_set::Vector{<:Vector{<:Real}})
+
+    # Compute squared length of each vector
+    delaunay_set = [(vector=v, length_sq=dot(v, v)) for v in delaunay_set]
+
+    # Sort vectors by squared length
+    sort!(delaunay_set; by=item -> item.length_sq)
+
+    # Remove zero vectors
+    deleteat!(delaunay_set, findall(x->abs(x.length_sq) < ALMOST_ZERO, delaunay_set))
+
+    # Remove vectors that are scalar multiples of shorter vectors
+    to_remove = []
+    for i in 1:length(delaunay_set)
+        basis_1 = delaunay_set[i].vector
+        length_basis_1 = sqrt(delaunay_set[i].length_sq)
+
+        for j in (i + 1):length(delaunay_set)
+            basis_2 = delaunay_set[j].vector
+            length_basis_2 = sqrt(delaunay_set[j].length_sq)
+
+            if abs(dot(basis_1, basis_2)) / length_basis_1 / length_basis_2 ≈ 1.0
+                push!(to_remove, j)
+            end
+        end
+    end
+
+    delaunay_set = [delaunay_set[i] for i in 1:length(delaunay_set) if !(i in to_remove)]
 end
 
 """

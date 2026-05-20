@@ -18,7 +18,7 @@ Tests for unit_cell/unit_cell.jl
 # --- Imports
 
 # Standard library
-using LinearAlgebra: qr, I
+using LinearAlgebra: dot
 using Test
 
 # External packages
@@ -221,6 +221,81 @@ end
     @test_throws ArgumentError(expected_message) compute_delaunay_set(
         basis_a, basis_b, [1, 2, 3, 4]
     )
+end
+
+@testset "prune_delaunay_set(::Vector): valid arguments" begin
+    # --- Tests
+
+    # delaunay_set contains zero vectors
+    delaunay_set = [
+        [0, 0, 0],
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+        [0, 0, 0],
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+    ]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
+
+    # ------ delaunay_set contains vectors that are scalar multiples of each other
+
+    # scalar multiple vectors have same length
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 0, 0], [0, 1, 0]]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
+
+    # shorter scalar multiple vector comes first
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [3, 0, 0], [0, 2, 0]]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
+
+    # shorter scalar multiple vector comes second
+    delaunay_set = [[3, 0, 0], [0, 1, 0], [0, 0, 1], [1, 0, 0], [0, 2, 0]]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [[0, 1, 0], [0, 0, 1], [1, 0, 0]]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
+
+    # scalar multiple vectors point in opposite directions
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [-1, 0, 0], [0, -2, 0]]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
 end
 
 @testset "is_equivalent(::UnitCell): valid arguments" begin
