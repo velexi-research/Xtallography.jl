@@ -382,7 +382,7 @@ Convert a base-centered monoclinic unit cell to body-centered monoclinic unit ce
 
 Return values
 =============
-- unit cell of equivalent body-centered unit cell
+unit cell of equivalent body-centered unit cell
 
 Examples
 ========
@@ -434,7 +434,7 @@ Convert a body-centered monoclinic unit cell to base-centered monoclinic unit ce
 
 Return values
 =============
-- lattice constants for equivalent base-centered unit cell
+lattice constants for equivalent base-centered unit cell
 
 Examples
 ========

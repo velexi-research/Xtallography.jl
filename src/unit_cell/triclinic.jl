@@ -483,7 +483,7 @@ primitive monoclinic unit cell.
 
 Return values
 =============
-- unit cell for the equivalent primitive monoclinic unit cell if one exists
+unit cell for the equivalent primitive monoclinic unit cell if one exists
 
 Exceptions
 ==========
@@ -533,7 +533,7 @@ body-centered monoclinic unit cell.
 
 Return values
 =============
-- unit cell for the equivalent body-centered monoclinic unit cell if one exists
+unit cell for the equivalent body-centered monoclinic unit cell if one exists
 
 Exceptions
 ==========
@@ -1392,12 +1392,12 @@ base-centered monoclinic unit cell.
 
 Return values
 =============
-- lattice constants for the equivalent base-centered monoclinic unit cell if one exists;
-  `nothing` otherwise
+lattice constants for the equivalent base-centered monoclinic unit cell if one exists;
+`nothing` otherwise
 
-  !!! warn
+!!! warn
 
-      Returned lattice constants are _not_ guaranteed to be standardized.
+    Returned lattice constants are _not_ guaranteed to be standardized.
 
 Exceptions
 ==========
@@ -2058,8 +2058,8 @@ Otherwise, the triclinic unit cell is Type II.
 
 Return values
 =============
-- `true` if `unit_cell` defines a Type I cell; `false` if `unit_cell` defines a Type II
-  cell
+`true` if `unit_cell` defines a Type I cell; `false` if `unit_cell` defines a Type II
+cell
 """
 function is_triclinic_type_I_cell(unit_cell::TriclinicUnitCell)
     # Extract lattice angles
@@ -2083,8 +2083,8 @@ Determine whether `α`, `β`, and `γ` satisfy the angle constraints for a tricl
 
 Return values
 =============
-- `true` if (`α`, `β`, `γ`) form a valid triple of angles for a triclinic unit cell;
-  `false` otherwise
+`true` if (`α`, `β`, `γ`) form a valid triple of angles for a triclinic unit cell;
+`false` otherwise
 
 Examples
 ========
