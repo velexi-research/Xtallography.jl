@@ -26,7 +26,7 @@ export lattice_constants, symmetry, centering, symmetry_elements
 export is_bravais_lattice
 export basis, volume, surface_area
 export standardize, conventional_cell
-export reduced_cell, compute_delaunay_set, prune_delaunay_set
+export reduced_cell, compute_delaunay_set, prune_delaunay_set, find_reduced_basis
 export is_equivalent, is_supercell
 export isapprox
 
@@ -385,7 +385,7 @@ Return the lattice constants for `unit_cell`.
 
 Return values
 =============
-* lattice constants
+lattice constants
 """
 @inline function lattice_constants(unit_cell::UnitCell)
     return unit_cell.lattice_constants
@@ -398,7 +398,7 @@ Return the symmetry for `unit_cell`.
 
 Return values
 =============
-* symmetry
+symmetry
 """
 @inline function symmetry(unit_cell::UnitCell)
     return unit_cell.symmetry
@@ -411,7 +411,7 @@ Return the centering of `unit_cell`.
 
 Return values
 =============
-* centering
+centering
 """
 @inline function centering(unit_cell::UnitCell)
     return centering(unit_cell.symmetry)
@@ -424,7 +424,7 @@ Return the symmetry elements of `unit_cell`.
 
 Return values
 =============
-* symmetry elements
+symmetry elements
 """
 @inline function symmetry_elements(unit_cell::UnitCell)
     return symmetry_elements(unit_cell.symmetry)
@@ -437,8 +437,8 @@ Determine if the unit cell defined by `unit_cell` is a valid Bravais lattice typ
 
 Return values
 =============
-- `true` if the lattice system and centering of `unit_cell` define a valid Bravais lattice
-  type; `false` otherwise
+`true` if the lattice system and centering of `unit_cell` define a valid Bravais lattice
+type; `false` otherwise
 
 Examples
 ========
@@ -461,7 +461,7 @@ Return a set of basis vectors ``\\vec{a}, \\vec{b}, \\vec{c}`` for `unit_ cell`.
 
 Return values
 =============
-- basis vectors ``\\vec{a}``, ``\\vec{b}``, ``\\vec{c}``
+basis vectors ``\\vec{a}``, ``\\vec{b}``, ``\\vec{c}``
 
 Examples
 ========
@@ -485,7 +485,7 @@ Compute the volume of the unit cell defined by `unit_cell`.
 
 Return values
 =============
-- volume of the unit cell
+volume of the unit cell
 
 Examples
 ========
@@ -503,7 +503,7 @@ Compute the surface area of the unit cell defined by `unit_cell`.
 
 Return values
 =============
-- surface area of the unit cell
+surface area of the unit cell
 
 Examples
 ========
@@ -570,7 +570,7 @@ Standardize the lattice constants and centering for `unit_cell`.
 
 Return values
 =============
-- unit cell with standardized lattice constants and centering
+unit cell with standardized lattice constants and centering
 
 Examples
 ========
@@ -617,7 +617,7 @@ Return the IUCr conventional cell that is equivalent to `unit_cell`.
 
 Return values
 =============
-- IUCr conventional cell for `unit_cell`
+IUCr conventional cell for `unit_cell`
 
 Examples
 ========
@@ -680,7 +680,7 @@ algorithm is used to compute the reduced basis.
 
 Return values
 =============
-- primitive reduced cell
+primitive reduced cell
 
 Examples
 ========
@@ -716,63 +716,12 @@ function reduced_cell(unit_cell::UnitCell)
     # Compute Delaunay set
     delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
 
-    # Prune Delaunay set
+    # Remove (1) zero vectors and (2) vectors that are scalar multiples of another vector
+    # with shorter length.
     delaunay_set = prune_delaunay_set(delaunay_set)
 
-    # TODO: refactor and test
-    # Generate all possible bases that can be formed from the candidate basis vectors
-    # and compute the (1) sum of squared lengths of the basis vectors and (2) the
-    # surface area of the unit cell
-    #candidate_basis_vectors = [ candidate for candidate in delaunay_set]
-    basis_choices = [
-        (
-            vectors=[
-                candidate_basis[1].vector,
-                candidate_basis[2].vector,
-                candidate_basis[3].vector,
-            ],
-            sum_length_sq=(
-                candidate_basis[1].length_sq +
-                candidate_basis[2].length_sq +
-                candidate_basis[3].length_sq
-            ),
-            surface_area=surface_area(
-                candidate_basis[1].vector,
-                candidate_basis[2].vector,
-                candidate_basis[3].vector,
-            ),
-        ) for candidate_basis in combinations(delaunay_set, 3)
-    ]
-
-    # Eliminate basis choices that are not linearly independent
-    basis_choices = [
-        candidate_basis for
-        candidate_basis in basis_choices if is_basis(candidate_basis.vectors...)
-    ]
-
-    # Retain basis choices that have the minimum sum of length squared
-    min_sum_length_sq = minimum(item.sum_length_sq for item in basis_choices)
-    basis_choices = [
-        candidate_basis for candidate_basis in basis_choices if (
-            candidate_basis.sum_length_sq < min_sum_length_sq ||
-            candidate_basis.sum_length_sq ≈ min_sum_length_sq
-        )
-    ]
-
-    # Select basis with the maximum surface area
-    max_surface_area = maximum(item.surface_area for item in basis_choices)
-    reduced_basis = nothing
-    for candidate in basis_choices
-        if candidate.surface_area == max_surface_area
-            reduced_basis = candidate
-            break
-        end
-    end
-
-    # Construct reduced basis (sorted in increasing order of length)
-    reduced_basis_a, reduced_basis_b, reduced_basis_c = sort(
-        reduced_basis.vectors; by=v -> dot(v, v)
-    )
+    # Find reduced basis (smallest sum of squared lengths with maximum surface area)
+    reduced_basis_a, reduced_basis_b, reduced_basis_c = find_reduced_basis(delaunay_set)
 
     # TODO: refactor and test
     # Adjust the signs of the basis vectors so that they represent the "homogeneous
@@ -881,7 +830,7 @@ Compute Delaunay set associated with `basis_a`, `basis_b`, and `basis_c`.
 
 Return values
 =============
-- Delaunay set
+Delaunay set
 """
 function compute_delaunay_set(
     basis_a::Vector{<:Real}, basis_b::Vector{<:Real}, basis_c::Vector{<:Real}
@@ -989,13 +938,23 @@ and
 
 * vectors that are scalar multiples of another vector with shorter length.
 
-`delaunay_set` is transformed into a vector of NamedTuple objects with keys: `vector` and
+Return values
+=============
+pruned Delaunay set with each vector `v` augmented by the squared length of `v`. The
+returned list contains NamedTuple objects with the following keys: `vector` and
 `length_sq`.
+
+!!! note
+
+    This function converts all vectors in `delaunay_set` to `Vector{Float64}`.
 """
 function prune_delaunay_set(delaunay_set::Vector{<:Vector{<:Real}})
 
     # Compute squared length of each vector
-    delaunay_set = [(vector=v, length_sq=dot(v, v)) for v in delaunay_set]
+    delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=Float64(dot(v, v))) for
+        v in delaunay_set
+    ]
 
     # Sort vectors by squared length
     sort!(delaunay_set; by=item -> item.length_sq)
@@ -1023,6 +982,86 @@ function prune_delaunay_set(delaunay_set::Vector{<:Vector{<:Real}})
 end
 
 """
+    find_reduced_basis(
+        delaunay_set::Vector{@NamedTuple{vector::Vector{Float64}, length_sq::Float64}}
+    ) -> Vector{Vector{Float64}}
+
+Identify reduced basis for `delaunay_set`.
+
+Return values
+=============
+reduced basis vectors sorted by length (in ascending order)
+"""
+function find_reduced_basis(
+    delaunay_set::Vector{@NamedTuple{vector::Vector{Float64},length_sq::Float64}}
+)
+    # Check arguments
+    if length(delaunay_set) < 3
+        throw(
+            ArgumentError(
+                "`delaunay_set` must contain at least 3 elements" *
+                "(delaunay_set=$delaunay_set)",
+            ),
+        )
+    end
+
+    # Generate all possible bases that can be formed from the candidate basis vectors
+    # and compute the (1) sum of squared lengths of the basis vectors and (2) the
+    # surface area of the unit cell
+    basis_choices = [
+        (
+            vectors=[
+                candidate_basis[1].vector,
+                candidate_basis[2].vector,
+                candidate_basis[3].vector,
+            ],
+            sum_length_sq=(
+                candidate_basis[1].length_sq +
+                candidate_basis[2].length_sq +
+                candidate_basis[3].length_sq
+            ),
+            surface_area=surface_area(
+                candidate_basis[1].vector,
+                candidate_basis[2].vector,
+                candidate_basis[3].vector,
+            ),
+        ) for candidate_basis in combinations(delaunay_set, 3)
+    ]
+
+    # Eliminate basis choices that are degenerate (i.e., not linearly independent)
+    basis_choices = [
+        candidate_basis for
+        candidate_basis in basis_choices if is_basis(candidate_basis.vectors...)
+    ]
+
+    # Retain basis choices that have the minimum sum of length squared
+    min_sum_length_sq = minimum(item.sum_length_sq for item in basis_choices)
+    basis_choices = [
+        candidate_basis for candidate_basis in basis_choices if (
+            candidate_basis.sum_length_sq < min_sum_length_sq ||
+            candidate_basis.sum_length_sq ≈ min_sum_length_sq
+        )
+    ]
+
+    # Select basis with the maximum surface area
+    max_surface_area = maximum(item.surface_area for item in basis_choices)
+    reduced_basis = nothing
+    for candidate in basis_choices
+        if candidate.surface_area == max_surface_area
+            reduced_basis = candidate
+            break
+        end
+    end
+
+    # Construct reduced basis (sorted in increasing order of length)
+    reduced_basis_a, reduced_basis_b, reduced_basis_c = sort(
+        reduced_basis.vectors; by=v -> dot(v, v)
+    )
+
+    return reduced_basis_a, reduced_basis_b, reduced_basis_c
+end
+
+"""
     is_equivalent(
         unit_cell_test::UnitCell,
         unit_cell_ref::UnitCell;
@@ -1044,7 +1083,7 @@ Keyword Arguments
 
 Return values
 =============
-- `true` if the test unit cell is equivalent to the reference unit cell; `false` otherwise
+`true` if the test unit cell is equivalent to the reference unit cell; `false` otherwise
 
 Examples
 ========
@@ -1105,7 +1144,7 @@ Keyword Arguments
 
 Return values
 =============
-- `true` if the test unit cell is a supercell of the reference unit cell; `false` otherwise
+`true` if the test unit cell is a supercell of the reference unit cell; `false` otherwise
 
 Examples
 ========

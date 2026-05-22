@@ -226,6 +226,24 @@ end
 @testset "prune_delaunay_set(::Vector): valid arguments" begin
     # --- Tests
 
+    # delaunay_set requiring no pruning
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [0, 1, 1], [1, 0, 1]]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [
+        [1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [0, 1, 1], [1, 0, 1]
+    ]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
+
     # delaunay_set contains zero vectors
     delaunay_set = [
         [0, 0, 0],
@@ -246,6 +264,10 @@ end
     ]
 
     @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
 
     # ------ delaunay_set contains vectors that are scalar multiples of each other
 
@@ -260,6 +282,10 @@ end
     ]
 
     @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
 
     # shorter scalar multiple vector comes first
     delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [3, 0, 0], [0, 2, 0]]
@@ -272,6 +298,10 @@ end
     ]
 
     @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
 
     # shorter scalar multiple vector comes second
     delaunay_set = [[3, 0, 0], [0, 1, 0], [0, 0, 1], [1, 0, 0], [0, 2, 0]]
@@ -284,6 +314,10 @@ end
     ]
 
     @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
 
     # scalar multiple vectors point in opposite directions
     delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [-1, 0, 0], [0, -2, 0]]
@@ -296,6 +330,89 @@ end
     ]
 
     @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
+end
+
+@testset "find_reduced_basis(::Vector): valid arguments" begin
+    # --- Tests
+
+    # delaunay_set has no degenerate bases
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [1, 0, 1]]
+    augmented_delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=Float64(dot(v, v))) for
+        v in delaunay_set
+    ]
+
+    reduced_basis = find_reduced_basis(augmented_delaunay_set)
+
+    expected_reduced_basis = [[1, 0, 0], [0, 1, 0], [1, 0, 1]]
+    @test Set(reduced_basis) == Set(expected_reduced_basis)
+
+    # delaunay_set has two bases having vectors different sums of squared lengths
+    delaunay_set = [[1, 1, 0], [0, 1, 0], [0, 0, 1], [1, 0, 0]]
+    augmented_delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=Float64(dot(v, v))) for
+        v in delaunay_set
+    ]
+
+    reduced_basis = find_reduced_basis(augmented_delaunay_set)
+
+    expected_reduced_basis = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    @test Set(reduced_basis) == Set(expected_reduced_basis)
+
+    # delaunay_set has two bases having vectors with equal sum of squared lengths
+    # (within tolerance of ≈) but different surface areas
+    unit_cell = TriclinicUnitCell(
+        sqrt(6), sqrt(8), sqrt(8), π/3, acos(sqrt(3)/6), acos(sqrt(3)/4)
+    )
+    b_1, b_2, b_3 = basis(unit_cell)
+
+    delaunay_set = [-b_3, b_1, b_2 - b_1, b_3 - b_2, b_2, b_2 - b_1 - b_3, b_1 - b_3]
+    augmented_delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=Float64(dot(v, v))) for
+        v in delaunay_set
+    ]
+
+    reduced_basis = find_reduced_basis(augmented_delaunay_set)
+
+    expected_reduced_basis = [b_1, -b_3, b_2 - b_1]
+    @test Set(reduced_basis) == Set(expected_reduced_basis)
+end
+
+@testset "find_reduced_basis(::Vector): invalid arguments" begin
+    # --- Tests
+
+    # vectors in delaunay_set are not of type Vector{Float64}
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0]]
+    augmented_delaunay_set = [
+        (vector=v, length_sq=Float64(dot(v, v))) for v in delaunay_set
+    ]
+
+    @test_throws MethodError find_reduced_basis(delaunay_set)
+
+    # length_sq values delaunay_set are of type Float64
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0]]
+    augmented_delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=dot(v, v)) for v in delaunay_set
+    ]
+
+    @test_throws MethodError find_reduced_basis(augmented_delaunay_set)
+
+    # delaunay_set has fewer than 3 elements
+    delaunay_set = [[1, 0, 0], [0, 1, 0]]
+    augmented_delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=Float64(dot(v, v))) for
+        v in delaunay_set
+    ]
+
+    error_message =
+        "`delaunay_set` must contain at least 3 elements" *
+        "(delaunay_set=$augmented_delaunay_set)"
+
+    @test_throws ArgumentError(error_message) find_reduced_basis(augmented_delaunay_set)
 end
 
 @testset "is_equivalent(::UnitCell): valid arguments" begin
