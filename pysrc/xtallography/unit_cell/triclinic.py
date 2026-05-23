@@ -19,7 +19,7 @@ The triclinic module defines classes and methods specific to triclinic lattices.
 
 # Standard library
 import copy
-import math
+from math import pi
 from typing import Optional, Union
 
 # Local packages/modules
@@ -75,17 +75,17 @@ class TriclinicUnitCell(UnitCell):
         if c <= 0:
             raise ValueError(f"`c` must be positive. (c={c})")
 
-        if alpha <= 0 or alpha >= 2 * math.pi:
+        if alpha <= 0 or alpha >= 2 * pi:
             raise ValueError(
                 f"`alpha` must lie in the interval (0, 2 pi). (alpha={alpha})"
             )
 
-        if beta <= 0 or beta >= 2 * math.pi:
+        if beta <= 0 or beta >= 2 * pi:
             raise ValueError(
                 f"`beta` must lie in the interval (0, 2 pi). (beta={beta})"
             )
 
-        if gamma <= 0 or gamma >= 2 * math.pi:
+        if gamma <= 0 or gamma >= 2 * pi:
             raise ValueError(
                 f"`gamma` must lie in the interval (0, 2 pi). (gamma={gamma})"
             )
@@ -233,8 +233,8 @@ class TriclinicUnitCell(UnitCell):
         False
         """
         return (
-            (0 < alpha + beta + gamma < 2 * math.pi)
-            and (0 < alpha + beta - gamma < 2 * math.pi)
-            and (0 < alpha - beta + gamma < 2 * math.pi)
-            and (0 < -alpha + beta + gamma < 2 * math.pi)
+            (0 < alpha + beta + gamma < 2 * pi)
+            and (0 < alpha + beta - gamma < 2 * pi)
+            and (0 < alpha - beta + gamma < 2 * pi)
+            and (0 < -alpha + beta + gamma < 2 * pi)
         )
