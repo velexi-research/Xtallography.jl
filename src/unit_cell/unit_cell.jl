@@ -254,16 +254,18 @@ end
         basis_a::Vector{<:Real},
         basis_b::Vector{<:Real},
         basis_c::Vector{<:Real};
-        identify_lattice_system=true,
-        centering=primitive_centering
+        identify_lattice_system::Bool=true,
+        centering::Centering=primitive_centering,
     ) -> UnitCell
 
 Construct a UnitCell from a set of basis vectors.
 
 Keyword Arguments
 =================
-- `identify_lattice_system`: if `true`, return a UnitCell with the highest symmetry lattice
-  system that is consistent with the basis. Otherwise, return a TriclinicUnitCell object.
+- `identify_lattice_system`: if `true`, return a UnitCell with (1) the highest symmetry
+  lattice system that is consistent with the basis vectors and (2) standardized lattice
+  constants. Otherwise, return a TriclinicUnitCell with lattice constants computed directly
+  from the basis vectors (without lattice constants standardization).
 
 - `centering`: centering of unit cell
 
@@ -298,52 +300,53 @@ function UnitCell(
         # Construct a UnitCell object for the highest symmetry lattice system that is
         # consistent with the basis
 
-        if α ≈ β ≈ γ
-            # --- Case: orthorhombic, tetragonal, cubic, or rhombohedral
+        # --- Case: orthorhombic, tetragonal, cubic, or rhombohedral
 
-            if α ≈ β ≈ γ ≈ π / 2
-                # --- Case: orthorhombic, tetragonal, or cubic
+        if α ≈ β ≈ γ ≈ π / 2
+            # --- Case: orthorhombic, tetragonal, or cubic
 
-                if a ≈ b ≈ c
-                    # Case: cubic
-                    return CubicUnitCell(a)
+            if a ≈ b ≈ c
+                # Case: cubic
+                return CubicUnitCell(a; centering=centering)
 
-                elseif a ≈ b
-                    # Case: tetragonal
-                    return TetragonalUnitCell(a, c)
+            elseif a ≈ b
+                # Case: tetragonal
+                return TetragonalUnitCell(a, c; centering=centering)
 
-                elseif b ≈ c
-                    # Case: tetragonal
-                    return TetragonalUnitCell(b, a)
+            elseif b ≈ c
+                # Case: tetragonal
+                return TetragonalUnitCell(b, a; centering=centering)
 
-                elseif c ≈ a
-                    # Case: tetragonal
-                    return TetragonalUnitCell(c, b)
-
-                else
-                    # Case: orthorhombic
-                    return standardize(OrthorhombicUnitCell(a, b, c; centering=centering))
-                end
+            elseif c ≈ a
+                # Case: tetragonal
+                return TetragonalUnitCell(c, b; centering=centering)
 
             else
-                if a ≈ b ≈ c
-                    # Case: rhombohedral
-                    return RhombohedralUnitCell(a, α)
-                end
+                # Case: orthorhombic
+                return standardize(OrthorhombicUnitCell(a, b, c; centering=centering))
             end
 
         else
-            # --- Case: hexagonal, monoclinic, or triclinic
+            # --- Case: hexagonal, monoclinic, rhombohedral, or triclinic
 
-            if a ≈ b && α ≈ β ≈ π / 2 && (γ ≈ 2π / 3 || γ ≈ π / 3)
+            if a ≈ b &&
+                α ≈ β ≈ π / 2 &&
+                (γ ≈ 2π / 3 || γ ≈ π / 3) &&
+                centering === P_centering
                 # Case: hexagonal
                 return HexagonalUnitCell(a, c)
 
-            elseif b ≈ c && β ≈ γ ≈ π / 2 && (α ≈ 2π / 3 || α ≈ π / 3)
+            elseif b ≈ c &&
+                β ≈ γ ≈ π / 2 &&
+                (α ≈ 2π / 3 || α ≈ π / 3) &&
+                centering === P_centering
                 # Case: hexagonal
                 return HexagonalUnitCell(b, a)
 
-            elseif c ≈ a && γ ≈ α ≈ π / 2 && (β ≈ 2π / 3 || β ≈ π / 3)
+            elseif c ≈ a &&
+                γ ≈ α ≈ π / 2 &&
+                (β ≈ 2π / 3 || β ≈ π / 3) &&
+                centering === P_centering
                 # Case: hexagonal
                 return HexagonalUnitCell(c, b)
 
@@ -358,12 +361,27 @@ function UnitCell(
             elseif γ ≈ β ≈ π / 2
                 # Case: monoclinic
                 return standardize(MonoclinicUnitCell(c, a, b, α; centering=centering))
+
+            else
+                # Case: rhombohedral or triclinic
+
+                # Standardize triclinic lattice constants (needed to correctly identify
+                # rhombohedral unit cells)
+                a, b, c, α, β, γ = standardize(a, b, c, α, β, γ)
+
+                if α ≈ β ≈ γ && a ≈ b ≈ c
+                    # Case: rhombohedral
+                    return RhombohedralUnitCell(a, α)
+                else
+                    # Case: triclinic (with lattice constant standardization)
+                    return TriclinicUnitCell(a, b, c, α, β, γ)
+                end
             end
         end
     end
 
-    # Case: triclinic
-    return standardize(TriclinicUnitCell(a, b, c, α, β, γ))
+    # Return triclinic unit cell (without lattice constant standardization)
+    return TriclinicUnitCell(a, b, c, α, β, γ)
 end
 
 # --- Functions/Methods
@@ -722,95 +740,6 @@ function reduced_cell(unit_cell::UnitCell)
 
     # Find reduced basis (smallest sum of squared lengths with maximum surface area)
     reduced_basis_a, reduced_basis_b, reduced_basis_c = find_reduced_basis(delaunay_set)
-
-    # TODO: refactor and test
-    # Adjust the signs of the basis vectors so that they represent the "homogeneous
-    # corner" of the unit cell (i.e., where the three unit cell angles are all acute
-    # or all non-acute)
-    dot_ab = dot(reduced_basis_a, reduced_basis_b)
-    dot_bc = dot(reduced_basis_b, reduced_basis_c)
-    dot_ca = dot(reduced_basis_c, reduced_basis_a)
-
-    if dot_ab * dot_bc * dot_ca > 0
-        # Unit cell is of Type I, so there is a choice of sign for the basis such that
-        # all three unit cell angles are acute
-
-        if dot_ab > 0
-            if dot_bc <= 0
-                reduced_basis_c *= -1
-            end
-        elseif dot_bc > 0
-            if dot_ca <= 0
-                reduced_basis_a *= -1
-            end
-        else  # dot_ca > 0
-            if dot_ab <= 0
-                reduced_basis_b *= -1
-            end
-        end
-
-    else
-        # Unit cell is of Type II, so there is a choice of sign for the basis such that
-        # all three unit cell angles are non-acute
-
-        if dot_ab <= 0
-            if dot_bc > 0
-                reduced_basis_c *= -1
-            end
-        elseif dot_bc <= 0
-            if dot_ca > 0
-                reduced_basis_a *= -1
-            end
-        else  # dot_ca <= 0
-            if dot_ab > 0
-                reduced_basis_b *= -1
-            end
-        end
-    end
-
-    # TODO: refactor and test
-    # When there are multiple orderings of the reduced basis vectors by length, reorder
-    # the reduced basis vectors so that the angles affected by basis ordering are in
-    # increasing
-    length_sq_a = dot(reduced_basis_a, reduced_basis_a)
-    length_sq_b = dot(reduced_basis_b, reduced_basis_b)
-    length_sq_c = dot(reduced_basis_c, reduced_basis_c)
-
-    if length_sq_a ≈ length_sq_b ≈ length_sq_c
-        # Use bubble sort to reorder the basis vectors
-
-        if dot(reduced_basis_b, reduced_basis_c) < dot(reduced_basis_c, reduced_basis_a)
-            tmp = reduced_basis_a
-            reduced_basis_a = reduced_basis_b
-            reduced_basis_b = tmp
-        end
-
-        if dot(reduced_basis_c, reduced_basis_a) < dot(reduced_basis_a, reduced_basis_b)
-            tmp = reduced_basis_b
-            reduced_basis_b = reduced_basis_c
-            reduced_basis_c = tmp
-        end
-
-        if dot(reduced_basis_b, reduced_basis_c) < dot(reduced_basis_c, reduced_basis_a)
-            tmp = reduced_basis_a
-            reduced_basis_a = reduced_basis_b
-            reduced_basis_b = tmp
-        end
-
-    elseif length_sq_a ≈ length_sq_b
-        if dot(reduced_basis_b, reduced_basis_c) < dot(reduced_basis_c, reduced_basis_a)
-            tmp = reduced_basis_a
-            reduced_basis_a = reduced_basis_b
-            reduced_basis_b = tmp
-        end
-
-    elseif length_sq_b ≈ length_sq_c
-        if dot(reduced_basis_c, reduced_basis_a) < dot(reduced_basis_a, reduced_basis_b)
-            tmp = reduced_basis_b
-            reduced_basis_b = reduced_basis_c
-            reduced_basis_c = tmp
-        end
-    end
 
     # --- Return standardized primitive unit cell defined by reduced basis
 

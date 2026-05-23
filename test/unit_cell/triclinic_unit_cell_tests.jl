@@ -33,8 +33,6 @@ include("testing_utilities.jl")
 # ------ Constructors
 
 @testset "TriclinicUnitCell(::NamedTuple,::UnitCellSymmetry) inner constructor" begin
-    # --- Tests
-
     # Valid arguments
     lattice_constants_ = (a=1, b=3, c=5, α=π / 7, β=2π / 7, γ=3π / 7)
     symmetry_ = primitive_unit_cell_symmetry
@@ -84,8 +82,7 @@ end
     @test symmetry(unit_cell) ==
         UnitCellSymmetry(primitive_centering, Set{SymmetryElement}(symmetry_elements_))
 
-    # ------ check_angle_constraints = false
-
+    # check_angle_constraints = false
     lattice_constants_ = (a=1, b=3, c=5, α=3π / 4, β=4π / 5, γ=5π / 6)
     unit_cell = TriclinicUnitCell(lattice_constants_; check_angle_constraints=false)
 
@@ -94,10 +91,7 @@ end
 end
 
 @testset "TriclinicUnitCell(::NamedTuple;::Centering,::Set) outer constructor: invalid arguments" begin
-    # --- Tests
-
-    # ------ (α, β, γ) does not satisfy angle constraints for a triclinic unit cell
-
+    # (α, β, γ) does not satisfy angle constraints for a triclinic unit cell
     lattice_constants_ = (a=1, b=3, c=5, α=3π / 4, β=4π / 5, γ=5π / 6)
 
     expected_message =
@@ -118,7 +112,7 @@ end
     β = π / 5
     γ = π / 6
 
-    # --- Exercise functionality and check results
+    # --- Tests
 
     # Default keyword arguments
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
@@ -488,11 +482,9 @@ end
     γ = π / 5
     unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
 
-    # --- Exercise functionality
+    # --- Tests
 
     basis_a, basis_b, basis_c = basis(unit_cell)
-
-    # --- Check results
 
     @test basis_a ≈ [a, 0, 0]
     @test basis_b ≈ [b * cos(γ), b * sin(γ), 0]
@@ -516,7 +508,7 @@ end
 
     basis_a, basis_b, basis_c = basis(unit_cell)
 
-    # --- Exercise functionality and check results
+    # --- Tests
 
     @test volume(unit_cell) ≈ abs(det(hcat(basis_a, basis_b, basis_c)))
 end
@@ -535,7 +527,7 @@ end
 
     basis_a, basis_b, basis_c = basis(unit_cell)
 
-    # --- Exercise functionality and check results
+    # --- Tests
 
     @test surface_area(unit_cell) ≈
         2 * norm(cross(basis_a, basis_b)) +
@@ -543,10 +535,78 @@ end
           2 * norm(cross(basis_c, basis_a))
 end
 
-@testset "standardize(::TriclinicUnitCell): Type I cell" begin
+@testset "standardize(::Real,::Real,::Real,::Real,::Real,::Real): Type I cell" begin
+    # --- Preparations
+
+    a_ref = 1.0
+    b_ref = 5.0
+    c_ref = 10.0
+    α_ref = π / 5
+    β_ref = 3π / 10
+    γ_ref = 2π / 5
+    unit_cell_ref = standardize(TriclinicUnitCell(a_ref, b_ref, c_ref, α_ref, β_ref, γ_ref))
+    @test is_triclinic_type_I_cell(unit_cell_ref)
+
+    basis_a, basis_b, basis_c = basis(unit_cell_ref)
+
     # --- Tests
 
-    # ------ lattice constants already in standard form
+    # Check that orientations of basis vectors standardize to expected lattice constants
+    for i in (-1, 1)
+        for j in (-1, 1)
+            for k in (-1, 1)
+                unit_cell = UnitCell(i * basis_a, j * basis_b, k * basis_c)
+
+                a, b, c, α, β, γ = standardize(lattice_constants(unit_cell)...)
+
+                @test a ≈ a_ref
+                @test b ≈ b_ref
+                @test c ≈ c_ref
+                @test α ≈ α_ref
+                @test β ≈ β_ref
+                @test γ ≈ γ_ref
+            end
+        end
+    end
+end
+
+@testset "standardize(::Real,::Real,::Real,::Real,::Real,::Real): Type II cell" begin
+    # --- Preparations
+
+    a_ref = 1.0
+    b_ref = 5.0
+    c_ref = 10.0
+    α_ref = 2π / 3
+    β_ref = 3π / 5
+    γ_ref = 4π / 7
+    unit_cell_ref = standardize(TriclinicUnitCell(a_ref, b_ref, c_ref, α_ref, β_ref, γ_ref))
+    @test !is_triclinic_type_I_cell(unit_cell_ref)
+
+    basis_a, basis_b, basis_c = basis(unit_cell_ref)
+
+    # --- Tests
+
+    # Check that orientations of basis vectors standardize to expected lattice constants
+    for i in (-1, 1)
+        for j in (-1, 1)
+            for k in (-1, 1)
+                unit_cell = UnitCell(i * basis_a, j * basis_b, k * basis_c)
+
+                a, b, c, α, β, γ = standardize(lattice_constants(unit_cell)...)
+
+                @test a ≈ a_ref
+                @test b ≈ b_ref
+                @test c ≈ c_ref
+                @test α ≈ α_ref
+                @test β ≈ β_ref
+                @test γ ≈ γ_ref
+            end
+        end
+    end
+end
+
+@testset "standardize(::TriclinicUnitCell): Type I cell" begin
+    # --- lattice constants already in standard form
 
     a = 1.0
     b = 5.0
@@ -564,7 +624,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, b, c, α, β, γ)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ edge lengths not sorted
+    # --- edge lengths not sorted
 
     a = 1.0
     b = 10.0
@@ -582,7 +642,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, c, b, α, γ, β)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ origin not at "homogeneous corner"
+    # --- origin not at "homogeneous corner"
 
     a = 1.0
     b = 5.0
@@ -600,7 +660,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, b, c, α, π - β, π - γ)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ edge lengths not sorted and origin not at "homogeneous corner"
+    # --- edge lengths not sorted and origin not at "homogeneous corner"
 
     a = 10.0
     b = 1.0
@@ -618,7 +678,7 @@ end
     expected_unit_cell = TriclinicUnitCell(b, c, a, π - β, π - γ, α)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ a ≈ b ≈ c, only need to swap α and β
+    # --- a ≈ b ≈ c, only need to swap α and β
 
     a = b = c = 1.0
     α = 3π / 10
@@ -634,7 +694,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, b, c, β, α, γ)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ a ≈ b ≈ c, only need to swap β and γ
+    # --- a ≈ b ≈ c, only need to swap β and γ
 
     a = b = c = 1.0
     α = π / 5
@@ -650,7 +710,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, b, c, α, γ, β)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ a ≈ b ≈ c, only need to reverse order of angles
+    # --- a ≈ b ≈ c, only need to reverse order of angles
 
     a = b = c = 1.0
     α = 2π / 5
@@ -666,7 +726,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, b, c, γ, β, α)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ a ≈ b (after sorting a, b, c)
+    # --- a ≈ b (after sorting a, b, c)
 
     a = b = 1.0
     c = 5
@@ -683,7 +743,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, b, c, β, α, γ)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ b ≈ c (after sorting a, b, c)
+    # --- b ≈ c (after sorting a, b, c)
 
     a = b = 5.0
     c = 1
@@ -702,9 +762,7 @@ end
 end
 
 @testset "standardize(::TriclinicUnitCell): Type II cell" begin
-    # --- Tests
-
-    # ------ lattice constants already in standard form
+    # --- lattice constants already in standard form
 
     a = 1.0
     b = 5.0
@@ -722,7 +780,7 @@ end
     expected_unit_cell = unit_cell
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ edge lengths not sorted
+    # --- edge lengths not sorted
 
     a = 1.0
     b = 10.0
@@ -740,7 +798,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, c, b, α, γ, β)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ origin not at "homogeneous corner"
+    # --- origin not at "homogeneous corner"
 
     a = 1.0
     b = 5.0
@@ -758,7 +816,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, b, c, π - α, π - β, γ)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ edge lengths not sorted and origin not at "homogeneous corner"
+    # --- edge lengths not sorted and origin not at "homogeneous corner"
 
     a = 10.0
     b = 1.0
@@ -776,7 +834,7 @@ end
     expected_unit_cell = TriclinicUnitCell(b, c, a, β, π - γ, π - α)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ a ≈ b ≈ c, only need to swap α and β
+    # --- a ≈ b ≈ c, only need to swap α and β
 
     a = b = c = 1.0
     α = 3π / 5
@@ -792,7 +850,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, b, c, β, α, γ)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ a ≈ b ≈ c, only need to swap β and γ
+    # --- a ≈ b ≈ c, only need to swap β and γ
 
     a = b = c = 1.0
     α = 4π / 7
@@ -808,7 +866,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, b, c, α, γ, β)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ a ≈ b ≈ c, only need to reverse order of angles
+    # --- a ≈ b ≈ c, only need to reverse order of angles
 
     a = b = c = 1.0
     α = 2π / 3
@@ -824,7 +882,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, b, c, γ, β, α)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ a ≈ b (after sorting a, b, c)
+    # --- a ≈ b (after sorting a, b, c)
 
     a = b = 1.0
     c = 5
@@ -841,7 +899,7 @@ end
     expected_unit_cell = TriclinicUnitCell(a, b, c, π - β, α, π - γ)
     @test standardized_unit_cell ≈ expected_unit_cell
 
-    # ------ b ≈ c (after sorting a, b, c)
+    # --- b ≈ c (after sorting a, b, c)
 
     a = b = 5.0
     c = 1
@@ -860,8 +918,6 @@ end
 end
 
 @testset "standardize(::TriclinicUnitCell): invalid arguments" begin
-    # --- Tests
-
     for centering_ in (body_centering, face_centering, base_centering)
         unit_cell = TriclinicUnitCell(1, 2, 3, 2π / 5, 3π / 5, 4π / 5; centering=centering_)
 
@@ -1087,10 +1143,50 @@ end
     )
 end
 
-@testset "is_triclinic_type_I_cell()" begin
-    # --- Tests
+@testset "is_triclinic_type_I_cell(::Real,::Real,::Real)" begin
+    # --- Type I
 
-    # ------ Type I
+    # no angles equal to π/2
+    α = π / 5
+    β = 3π / 10
+    γ = 2π / 5
+    @test is_triclinic_type_I_cell(α, β, γ)
+
+    # α equal to π/2
+    α = π / 2
+    β = 3π / 10
+    γ = 2π / 5
+    @test is_triclinic_type_I_cell(α, β, γ)
+
+    # α equal to π/2 + ϵ (so that cos(α) < 0)
+    α = π / 2 + 1e-9
+    β = 3π / 10
+    γ = 2π / 5
+    @test is_triclinic_type_I_cell(α, β, γ)
+
+    # --- Type II
+
+    # Type II: no angles equal to π/2
+    α = 3π / 5
+    β = 2π / 5
+    γ = π / 3
+    @test !is_triclinic_type_I_cell(α, β, γ)
+
+    # γ equal to π/2
+    α = 3π / 5
+    β = 2π / 5
+    γ = π / 2
+    @test is_triclinic_type_I_cell(α, β, γ)
+
+    # γ equal to π/2 + ϵ (so that cos(γ) < 0)
+    α = 3π / 5
+    β = 2π / 5
+    γ = π / 2 + 1e-9
+    @test is_triclinic_type_I_cell(α, β, γ)
+end
+
+@testset "is_triclinic_type_I_cell(::UnitCell)" begin
+    # --- Type I
 
     # no angles equal to π/2
     a = 1
@@ -1119,7 +1215,7 @@ end
     γ = 2π / 5
     @test is_triclinic_type_I_cell(TriclinicUnitCell(a, b, c, α, β, γ))
 
-    # ------ Type II
+    # --- Type II
 
     # Type II: no angles equal to π/2
     a = 1
@@ -1150,8 +1246,6 @@ end
 end
 
 @testset "satisfies_triclinic_angle_constraints()" begin
-    # --- Tests
-
     # valid angles for a triclinic unit cell
     @test satisfies_triclinic_angle_constraints(π / 4, π / 5, π / 6)
 

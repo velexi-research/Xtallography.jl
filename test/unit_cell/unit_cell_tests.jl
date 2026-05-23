@@ -29,7 +29,7 @@ using Xtallography
 
 # --- Tests
 
-# Note: the following methods are tested in lattice-specific test suites
+# Note: tests for the following methods may be located in lattice-specific test suites
 #
 # * UnitCell{T}(::NamedTuple, ::UnitCellSymmetry)
 # * UnitCell{T}(::NamedTuple; ::Centering, ::Union{Set,Vector,Nothing})
@@ -71,6 +71,83 @@ using Xtallography
     ]
     for type in expected_types
         @test type <: UnitCell
+    end
+end
+
+# ------ Constructors
+
+@testset "UnitCell(::Vector,::Vector,::Vector;::Bool,::Centering) outer constructor: keyword arguments" begin
+
+    # --- identify_lattice_system = true
+    #
+    # Check that the equivalent higher symmetry unit cell is returned
+
+    # Preparations
+    a = 2
+    α = 2π / 5
+    reference_unit_cell = RhombohedralUnitCell(a, α)
+    basis_a, basis_b, basis_c = basis(reference_unit_cell)
+
+    # Exercise functionality and check results
+    unit_cell = UnitCell(basis_a, basis_b, basis_c; identify_lattice_system=true)
+
+    @test unit_cell isa RhombohedralUnitCell
+
+    # --- identify_lattice_system = false
+    #
+    # Check that a triclinic unit cell is returned (instead of a higher symmetry unit cell)
+
+    # Preparations
+    a = 2
+    α = 2π / 5
+    reference_unit_cell = RhombohedralUnitCell(a, α)
+    basis_a, basis_b, basis_c = basis(reference_unit_cell)
+
+    # Exercise functionality and check results
+    unit_cell = UnitCell(basis_a, basis_b, basis_c; identify_lattice_system=false)
+
+    @test unit_cell isa TriclinicUnitCell
+
+    # --- identify_lattice_system = false
+    #
+    # Check that triclinic unit cell lattice constants are not standardized
+
+    # Preparations
+    a_ref = 1.0
+    b_ref = 5.0
+    c_ref = 10.0
+    α_ref = π / 5
+    β_ref = 3π / 10
+    γ_ref = 2π / 5
+    unit_cell_ref = standardize(TriclinicUnitCell(a_ref, b_ref, c_ref, α_ref, β_ref, γ_ref))
+
+    basis_a, basis_b, basis_c = basis(unit_cell_ref)
+
+    # Check that orientations of basis vectors standardize to expected lattice constants
+    for i in (-1, 1)
+        for j in (-1, 1)
+
+            # Skip standardized unit cell case
+            if i == 1 && j == 1
+                continue
+            end
+
+            # Construct unit cell
+            unit_cell = UnitCell(
+                i * basis_a, j * basis_b, basis_c; identify_lattice_system=false
+            )
+
+            # Check type of unit_cell
+            @test unit_cell isa TriclinicUnitCell
+
+            # Check that angles are not standardized
+            lattice_constants_ = lattice_constants(unit_cell)
+            @test (
+                !(lattice_constants_.α ≈ α_ref) ||
+                !(lattice_constants_.β ≈ β_ref) ||
+                !(lattice_constants_.γ ≈ γ_ref)
+            )
+        end
     end
 end
 

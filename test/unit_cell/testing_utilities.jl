@@ -30,6 +30,7 @@ using Xtallography
 # --- Utility functions
 
 # Helper function for testing UnitCell(::Vector, ::Vector, ::Vector) constructor
+# with `identify_lattice_system` set to `true`
 function test_basis_rotations_and_permutations(
     rotations::Vector,
     expected_unit_cell::UnitCell,
@@ -61,9 +62,17 @@ function test_basis_rotations_and_permutations(
 
             # Construct UnitCell object
             if isnothing(centering)
-                unit_cell = UnitCell(basis[1], basis[2], basis[3])
+                unit_cell = UnitCell(
+                    basis[1], basis[2], basis[3]; identify_lattice_system=true
+                )
             else
-                unit_cell = UnitCell(basis[1], basis[2], basis[3]; centering=centering)
+                unit_cell = UnitCell(
+                    basis[1],
+                    basis[2],
+                    basis[3];
+                    identify_lattice_system=true,
+                    centering=centering,
+                )
             end
 
             # Check results
