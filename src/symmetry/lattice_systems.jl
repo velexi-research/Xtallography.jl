@@ -177,7 +177,7 @@ Return the lattice system for `unit_cell` or `Δunit_cell`.
 
 Return values
 =============
-- lattice system
+lattice system
 
 Examples
 ========

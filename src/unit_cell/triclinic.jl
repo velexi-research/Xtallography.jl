@@ -218,26 +218,33 @@ end
 
 using LinearAlgebra: dot
 
-function standardize(unit_cell::TriclinicUnitCell)
-    # --- Check arguments
+"""
+    standardize(a::Real, b::Real, c::Real, α::Real, β::Real, γ::Real) ->
+        (Real, Real, Real, Real, Real, Real)
 
-    standardize_check_args(unit_cell)
+Standardize the triclinic lattice constants for the unit cell defined by `a`, `b`, `c`,
+`α`, `β`, `γ`.
 
-    # --- Preparations
+!!! note
 
-    # Extract lattice constants
-    lattice_constants_ = lattice_constants(unit_cell)
-    a = lattice_constants_.a
-    b = lattice_constants_.b
-    c = lattice_constants_.c
-    α = lattice_constants_.α
-    β = lattice_constants_.β
-    γ = lattice_constants_.γ
+    Lattice constant standardizations are based on the conventions provided in the Table
+    3.1.4.1. of the International Tables for Crystallography (2016).
 
-    # --- Standardize lattice constants
+    The lattice constants are standardized using the following conventions:
 
+    - `a` ≤ `b` ≤ `c`
+
+    - all three angles are acute (Type I cell) or all three angles are non-acute (Type II
+      cell)
+
+    - angles sorted in increasing order when edge lengths are equal
+        - `α` ≤ `β` when `a` = `b`
+        - `β` ≤ `γ` when `b` = `c`
+        - `α` ≤ `β` ≤ `γ` when `a` = `b` = `c`
+"""
+function standardize(a::Real, b::Real, c::Real, α::Real, β::Real, γ::Real)
     # Shift origin of basis to "homogeneous corner"
-    if is_triclinic_type_I_cell(unit_cell)
+    if is_triclinic_type_I_cell(α, β, γ)
         # Type I
 
         if α > π / 2
@@ -343,6 +350,29 @@ function standardize(unit_cell::TriclinicUnitCell)
             γ = tmp
         end
     end
+
+    return a, b, c, α, β, γ
+end
+
+function standardize(unit_cell::TriclinicUnitCell)
+    # --- Check arguments
+
+    standardize_check_args(unit_cell)
+
+    # --- Preparations
+
+    # Extract lattice constants
+    lattice_constants_ = lattice_constants(unit_cell)
+    a = lattice_constants_.a
+    b = lattice_constants_.b
+    c = lattice_constants_.c
+    α = lattice_constants_.α
+    β = lattice_constants_.β
+    γ = lattice_constants_.γ
+
+    # --- Standardize lattice constants
+
+    a, b, c, α, β, γ = standardize(a, b, c, α, β, γ)
 
     return TriclinicUnitCell(a, b, c, α, β, γ; centering=primitive_centering)
 end
@@ -483,7 +513,7 @@ primitive monoclinic unit cell.
 
 Return values
 =============
-- unit cell for the equivalent primitive monoclinic unit cell if one exists
+unit cell for the equivalent primitive monoclinic unit cell if one exists
 
 Exceptions
 ==========
@@ -533,7 +563,7 @@ body-centered monoclinic unit cell.
 
 Return values
 =============
-- unit cell for the equivalent body-centered monoclinic unit cell if one exists
+unit cell for the equivalent body-centered monoclinic unit cell if one exists
 
 Exceptions
 ==========
@@ -1392,12 +1422,12 @@ base-centered monoclinic unit cell.
 
 Return values
 =============
-- lattice constants for the equivalent base-centered monoclinic unit cell if one exists;
-  `nothing` otherwise
+lattice constants for the equivalent base-centered monoclinic unit cell if one exists;
+`nothing` otherwise
 
-  !!! warn
+!!! warn
 
-      Returned lattice constants are _not_ guaranteed to be standardized.
+    Returned lattice constants are _not_ guaranteed to be standardized.
 
 Exceptions
 ==========
@@ -2043,6 +2073,30 @@ function convert_to_mC_case_2d(unit_cell::TriclinicUnitCell)
 end
 
 """
+    is_triclinic_type_I_cell(α::Real, β::Real, γ::Real) -> Bool
+
+Determine whether the unit cell having lattice angles `α`, `β`, and `γ` is a Type I or
+Type II cell.
+
+A triclinic unit cell is Type I if the product of the cosines of its lattice angles is
+positive:
+
+```math
+\\cos{α} \\cos{β} \\cos{γ} > 0.
+```
+
+Otherwise, the triclinic unit cell is Type II.
+
+Return values
+=============
+`true` if `α`, `β`, `γ` are lattice angles for a Type I cell; `false` if `α`, `β`, `γ` are
+lattice angles for a Type II cell
+"""
+@inline function is_triclinic_type_I_cell(α::Real, β::Real, γ::Real)
+    return cos(α) * cos(β) * cos(γ) >= 0 || abs(cos(α) * cos(β) * cos(γ)) < COS_APPROX_ZERO
+end
+
+"""
     is_triclinic_type_I_cell(unit_cell::TriclinicUnitCell) -> Bool
 
 Determine whether the unit cell defined by `unit_cell` is a Type I or Type II cell.
@@ -2058,8 +2112,8 @@ Otherwise, the triclinic unit cell is Type II.
 
 Return values
 =============
-- `true` if `unit_cell` defines a Type I cell; `false` if `unit_cell` defines a Type II
-  cell
+`true` if `unit_cell` defines a Type I cell; `false` if `unit_cell` defines a Type II
+cell
 """
 function is_triclinic_type_I_cell(unit_cell::TriclinicUnitCell)
     # Extract lattice angles
@@ -2068,7 +2122,7 @@ function is_triclinic_type_I_cell(unit_cell::TriclinicUnitCell)
     β = lattice_constants_.β
     γ = lattice_constants_.γ
 
-    return cos(α) * cos(β) * cos(γ) >= 0 || abs(cos(α) * cos(β) * cos(γ)) < COS_APPROX_ZERO
+    return is_triclinic_type_I_cell(α, β, γ)
 end
 
 """
@@ -2083,8 +2137,8 @@ Determine whether `α`, `β`, and `γ` satisfy the angle constraints for a tricl
 
 Return values
 =============
-- `true` if (`α`, `β`, `γ`) form a valid triple of angles for a triclinic unit cell;
-  `false` otherwise
+`true` if (`α`, `β`, `γ`) form a valid triple of angles for a triclinic unit cell;
+`false` otherwise
 
 Examples
 ========

@@ -25,7 +25,8 @@ export lattice_system
 export lattice_constants, symmetry, centering, symmetry_elements
 export is_bravais_lattice
 export basis, volume, surface_area
-export standardize, conventional_cell, reduced_cell
+export standardize, conventional_cell
+export reduced_cell, compute_delaunay_set, prune_delaunay_set, find_reduced_basis
 export is_equivalent, is_supercell
 export isapprox
 
@@ -253,16 +254,18 @@ end
         basis_a::Vector{<:Real},
         basis_b::Vector{<:Real},
         basis_c::Vector{<:Real};
-        identify_lattice_system=true,
-        centering=primitive_centering
+        identify_lattice_system::Bool=true,
+        centering::Centering=primitive_centering,
     ) -> UnitCell
 
 Construct a UnitCell from a set of basis vectors.
 
 Keyword Arguments
 =================
-- `identify_lattice_system`: if `true`, return a UnitCell with the highest symmetry lattice
-  system that is consistent with the basis. Otherwise, return a TriclinicUnitCell object.
+- `identify_lattice_system`: if `true`, return a UnitCell with (1) the highest symmetry
+  lattice system that is consistent with the basis vectors and (2) standardized lattice
+  constants. Otherwise, return a TriclinicUnitCell with lattice constants computed directly
+  from the basis vectors (without lattice constants standardization).
 
 - `centering`: centering of unit cell
 
@@ -297,52 +300,53 @@ function UnitCell(
         # Construct a UnitCell object for the highest symmetry lattice system that is
         # consistent with the basis
 
-        if α ≈ β ≈ γ
-            # --- Case: orthorhombic, tetragonal, cubic, or rhombohedral
+        # --- Case: orthorhombic, tetragonal, cubic, or rhombohedral
 
-            if α ≈ β ≈ γ ≈ π / 2
-                # --- Case: orthorhombic, tetragonal, or cubic
+        if α ≈ β ≈ γ ≈ π / 2
+            # --- Case: orthorhombic, tetragonal, or cubic
 
-                if a ≈ b ≈ c
-                    # Case: cubic
-                    return CubicUnitCell(a)
+            if a ≈ b ≈ c
+                # Case: cubic
+                return CubicUnitCell(a; centering=centering)
 
-                elseif a ≈ b
-                    # Case: tetragonal
-                    return TetragonalUnitCell(a, c)
+            elseif a ≈ b
+                # Case: tetragonal
+                return TetragonalUnitCell(a, c; centering=centering)
 
-                elseif b ≈ c
-                    # Case: tetragonal
-                    return TetragonalUnitCell(b, a)
+            elseif b ≈ c
+                # Case: tetragonal
+                return TetragonalUnitCell(b, a; centering=centering)
 
-                elseif c ≈ a
-                    # Case: tetragonal
-                    return TetragonalUnitCell(c, b)
-
-                else
-                    # Case: orthorhombic
-                    return standardize(OrthorhombicUnitCell(a, b, c; centering=centering))
-                end
+            elseif c ≈ a
+                # Case: tetragonal
+                return TetragonalUnitCell(c, b; centering=centering)
 
             else
-                if a ≈ b ≈ c
-                    # Case: rhombohedral
-                    return RhombohedralUnitCell(a, α)
-                end
+                # Case: orthorhombic
+                return standardize(OrthorhombicUnitCell(a, b, c; centering=centering))
             end
 
         else
-            # --- Case: hexagonal, monoclinic, or triclinic
+            # --- Case: hexagonal, monoclinic, rhombohedral, or triclinic
 
-            if a ≈ b && α ≈ β ≈ π / 2 && (γ ≈ 2π / 3 || γ ≈ π / 3)
+            if a ≈ b &&
+                α ≈ β ≈ π / 2 &&
+                (γ ≈ 2π / 3 || γ ≈ π / 3) &&
+                centering === P_centering
                 # Case: hexagonal
                 return HexagonalUnitCell(a, c)
 
-            elseif b ≈ c && β ≈ γ ≈ π / 2 && (α ≈ 2π / 3 || α ≈ π / 3)
+            elseif b ≈ c &&
+                β ≈ γ ≈ π / 2 &&
+                (α ≈ 2π / 3 || α ≈ π / 3) &&
+                centering === P_centering
                 # Case: hexagonal
                 return HexagonalUnitCell(b, a)
 
-            elseif c ≈ a && γ ≈ α ≈ π / 2 && (β ≈ 2π / 3 || β ≈ π / 3)
+            elseif c ≈ a &&
+                γ ≈ α ≈ π / 2 &&
+                (β ≈ 2π / 3 || β ≈ π / 3) &&
+                centering === P_centering
                 # Case: hexagonal
                 return HexagonalUnitCell(c, b)
 
@@ -357,12 +361,27 @@ function UnitCell(
             elseif γ ≈ β ≈ π / 2
                 # Case: monoclinic
                 return standardize(MonoclinicUnitCell(c, a, b, α; centering=centering))
+
+            else
+                # Case: rhombohedral or triclinic
+
+                # Standardize triclinic lattice constants (needed to correctly identify
+                # rhombohedral unit cells)
+                a, b, c, α, β, γ = standardize(a, b, c, α, β, γ)
+
+                if α ≈ β ≈ γ && a ≈ b ≈ c
+                    # Case: rhombohedral
+                    return RhombohedralUnitCell(a, α)
+                else
+                    # Case: triclinic (with lattice constant standardization)
+                    return TriclinicUnitCell(a, b, c, α, β, γ)
+                end
             end
         end
     end
 
-    # Case: triclinic
-    return standardize(TriclinicUnitCell(a, b, c, α, β, γ))
+    # Return triclinic unit cell (without lattice constant standardization)
+    return TriclinicUnitCell(a, b, c, α, β, γ)
 end
 
 # --- Functions/Methods
@@ -384,7 +403,7 @@ Return the lattice constants for `unit_cell`.
 
 Return values
 =============
-* lattice constants
+lattice constants
 """
 @inline function lattice_constants(unit_cell::UnitCell)
     return unit_cell.lattice_constants
@@ -397,7 +416,7 @@ Return the symmetry for `unit_cell`.
 
 Return values
 =============
-* symmetry
+symmetry
 """
 @inline function symmetry(unit_cell::UnitCell)
     return unit_cell.symmetry
@@ -410,7 +429,7 @@ Return the centering of `unit_cell`.
 
 Return values
 =============
-* centering
+centering
 """
 @inline function centering(unit_cell::UnitCell)
     return centering(unit_cell.symmetry)
@@ -423,7 +442,7 @@ Return the symmetry elements of `unit_cell`.
 
 Return values
 =============
-* symmetry elements
+symmetry elements
 """
 @inline function symmetry_elements(unit_cell::UnitCell)
     return symmetry_elements(unit_cell.symmetry)
@@ -436,8 +455,8 @@ Determine if the unit cell defined by `unit_cell` is a valid Bravais lattice typ
 
 Return values
 =============
-- `true` if the lattice system and centering of `unit_cell` define a valid Bravais lattice
-  type; `false` otherwise
+`true` if the lattice system and centering of `unit_cell` define a valid Bravais lattice
+type; `false` otherwise
 
 Examples
 ========
@@ -460,7 +479,7 @@ Return a set of basis vectors ``\\vec{a}, \\vec{b}, \\vec{c}`` for `unit_ cell`.
 
 Return values
 =============
-- basis vectors ``\\vec{a}``, ``\\vec{b}``, ``\\vec{c}``
+basis vectors ``\\vec{a}``, ``\\vec{b}``, ``\\vec{c}``
 
 Examples
 ========
@@ -484,7 +503,7 @@ Compute the volume of the unit cell defined by `unit_cell`.
 
 Return values
 =============
-- volume of the unit cell
+volume of the unit cell
 
 Examples
 ========
@@ -502,7 +521,7 @@ Compute the surface area of the unit cell defined by `unit_cell`.
 
 Return values
 =============
-- surface area of the unit cell
+surface area of the unit cell
 
 Examples
 ========
@@ -569,7 +588,7 @@ Standardize the lattice constants and centering for `unit_cell`.
 
 Return values
 =============
-- unit cell with standardized lattice constants and centering
+unit cell with standardized lattice constants and centering
 
 Examples
 ========
@@ -616,7 +635,7 @@ Return the IUCr conventional cell that is equivalent to `unit_cell`.
 
 Return values
 =============
-- IUCr conventional cell for `unit_cell`
+IUCr conventional cell for `unit_cell`
 
 Examples
 ========
@@ -679,7 +698,7 @@ algorithm is used to compute the reduced basis.
 
 Return values
 =============
-- primitive reduced cell
+primitive reduced cell
 
 Examples
 ========
@@ -710,23 +729,74 @@ function reduced_cell(unit_cell::UnitCell)
         basis_c = basis_c_primitive
     end
 
-    # Initialize working basis set
-    working_basis = [basis_a, basis_b, basis_c, -(basis_a + basis_b + basis_c)]
-
     # --- Perform Selling-Delaunay reduction
 
-    # ------ Reduce the sum of the squares of the lengths of the working basis set
+    # Compute Delaunay set
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
 
-    # TODO: refactor and test
+    # Remove (1) zero vectors and (2) vectors that are scalar multiples of another vector
+    # with shorter length.
+    delaunay_set = prune_delaunay_set(delaunay_set)
+
+    # Find reduced basis (smallest sum of squared lengths with maximum surface area)
+    reduced_basis_a, reduced_basis_b, reduced_basis_c = find_reduced_basis(delaunay_set)
+
+    # --- Return standardized primitive unit cell defined by reduced basis
+
+    return standardize(
+        UnitCell(
+            reduced_basis_a, reduced_basis_b, reduced_basis_c; centering=primitive_centering
+        ),
+    )
+end
+
+"""
+    compute_delaunay_set(
+        basis_a::Vector{<:Real}, basis_b::Vector{<:Real}, basis_c::Vector{<:Real}
+    ) -> Vector{Vector{Real}}
+
+Compute Delaunay set associated with `basis_a`, `basis_b`, and `basis_c`.
+
+Return values
+=============
+Delaunay set
+"""
+function compute_delaunay_set(
+    basis_a::Vector{<:Real}, basis_b::Vector{<:Real}, basis_c::Vector{<:Real}
+)
+
+    # Check arguments
+    if length(basis_a) != 3
+        throw(
+            ArgumentError("`basis_a` must contain exactly 3 components (basis_a=$basis_a)")
+        )
+    end
+
+    if length(basis_b) != 3
+        throw(
+            ArgumentError("`basis_b` must contain exactly 3 components (basis_b=$basis_b)")
+        )
+    end
+
+    if length(basis_c) != 3
+        throw(
+            ArgumentError("`basis_c` must contain exactly 3 components (basis_c=$basis_c)")
+        )
+    end
+
+    # Initialize reduced vector set
+    reduced_set = [basis_a, basis_b, basis_c, -(basis_a + basis_b + basis_c)]
+
+    # Reduce the sum of the squares of the lengths of the candidate basis vectxors
     while true
         # Compute scalar products
         scalar_products = [
-            dot(working_basis[1], working_basis[2]),
-            dot(working_basis[1], working_basis[3]),
-            dot(working_basis[1], working_basis[4]),
-            dot(working_basis[2], working_basis[3]),
-            dot(working_basis[2], working_basis[4]),
-            dot(working_basis[3], working_basis[4]),
+            dot(reduced_set[1], reduced_set[2]),
+            dot(reduced_set[1], reduced_set[3]),
+            dot(reduced_set[1], reduced_set[4]),
+            dot(reduced_set[2], reduced_set[3]),
+            dot(reduced_set[2], reduced_set[4]),
+            dot(reduced_set[3], reduced_set[4]),
         ]
 
         # Check if the reduction is complete (when none of the scalar products is positive)
@@ -737,73 +807,90 @@ function reduced_cell(unit_cell::UnitCell)
         # Find the largest positive scalar product
         _, idx = findmax(scalar_products)
         if idx == 1
-            b_1 = working_basis[1]
-            b_2 = working_basis[2]
-            b_3 = working_basis[3]
-            b_4 = working_basis[4]
+            b_1 = reduced_set[1]
+            b_2 = reduced_set[2]
+            b_3 = reduced_set[3]
+            b_4 = reduced_set[4]
         elseif idx == 2
-            b_1 = working_basis[1]
-            b_2 = working_basis[3]
-            b_3 = working_basis[2]
-            b_4 = working_basis[4]
+            b_1 = reduced_set[1]
+            b_2 = reduced_set[3]
+            b_3 = reduced_set[2]
+            b_4 = reduced_set[4]
         elseif idx == 3
-            b_1 = working_basis[1]
-            b_2 = working_basis[4]
-            b_3 = working_basis[2]
-            b_4 = working_basis[3]
+            b_1 = reduced_set[1]
+            b_2 = reduced_set[4]
+            b_3 = reduced_set[2]
+            b_4 = reduced_set[3]
         elseif idx == 4
-            b_1 = working_basis[2]
-            b_2 = working_basis[3]
-            b_3 = working_basis[1]
-            b_4 = working_basis[4]
+            b_1 = reduced_set[2]
+            b_2 = reduced_set[3]
+            b_3 = reduced_set[1]
+            b_4 = reduced_set[4]
         elseif idx == 5
-            b_1 = working_basis[2]
-            b_2 = working_basis[4]
-            b_3 = working_basis[1]
-            b_4 = working_basis[3]
+            b_1 = reduced_set[2]
+            b_2 = reduced_set[4]
+            b_3 = reduced_set[1]
+            b_4 = reduced_set[3]
         else
-            b_1 = working_basis[3]
-            b_2 = working_basis[4]
-            b_3 = working_basis[1]
-            b_4 = working_basis[2]
+            b_1 = reduced_set[3]
+            b_2 = reduced_set[4]
+            b_3 = reduced_set[1]
+            b_4 = reduced_set[2]
         end
 
-        # Update working basis set to reduce the sum of the squares of the lengths
-        working_basis = [-b_1, b_2, b_1 + b_3, b_1 + b_4]
+        # Update reduced basis set to reduce the sum of the squares of the lengths
+        reduced_set = [-b_1, b_2, b_1 + b_3, b_1 + b_4]
     end
 
-    # ------ Compute the reduced basis
-
-    # Compute Delaunay set and squared vector lengths
+    # Compute Delaunay set
     delaunay_set = [
-        (vector=working_basis[1], length_sq=dot(working_basis[1], working_basis[1])),
-        (vector=working_basis[2], length_sq=dot(working_basis[2], working_basis[2])),
-        (vector=working_basis[3], length_sq=dot(working_basis[3], working_basis[3])),
-        (vector=working_basis[4], length_sq=dot(working_basis[4], working_basis[4])),
-        (
-            vector=working_basis[1] + working_basis[2],
-            length_sq=dot(
-                working_basis[1] + working_basis[2], working_basis[1] + working_basis[2]
-            ),
-        ),
-        (
-            vector=working_basis[1] + working_basis[3],
-            length_sq=dot(
-                working_basis[1] + working_basis[3], working_basis[1] + working_basis[3]
-            ),
-        ),
-        (
-            vector=working_basis[2] + working_basis[3],
-            length_sq=dot(
-                working_basis[2] + working_basis[3], working_basis[2] + working_basis[3]
-            ),
-        ),
+        reduced_set[1],
+        reduced_set[2],
+        reduced_set[3],
+        reduced_set[4],
+        reduced_set[1] + reduced_set[2],
+        reduced_set[1] + reduced_set[3],
+        reduced_set[2] + reduced_set[3],
     ]
 
-    # Sort vectors by squared vector length
+    return delaunay_set
+end
+
+"""
+    prune_delaunay_set(delaunay_set::Vector{<:Vector{<:Real}})
+
+Remove the following vectors from `delaunay_set`:
+
+* zero vectors
+
+and
+
+* vectors that are scalar multiples of another vector with shorter length.
+
+Return values
+=============
+pruned Delaunay set with each vector `v` augmented by the squared length of `v`. The
+returned list contains NamedTuple objects with the following keys: `vector` and
+`length_sq`.
+
+!!! note
+
+    This function converts all vectors in `delaunay_set` to `Vector{Float64}`.
+"""
+function prune_delaunay_set(delaunay_set::Vector{<:Vector{<:Real}})
+
+    # Compute squared length of each vector
+    delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=Float64(dot(v, v))) for
+        v in delaunay_set
+    ]
+
+    # Sort vectors by squared length
     sort!(delaunay_set; by=item -> item.length_sq)
 
-    # TODO: refactor and test
+    # Remove zero vectors
+    deleteat!(delaunay_set, findall(x->abs(x.length_sq) < ALMOST_ZERO, delaunay_set))
+
     # Remove vectors that are scalar multiples of shorter vectors
     to_remove = []
     for i in 1:length(delaunay_set)
@@ -814,18 +901,42 @@ function reduced_cell(unit_cell::UnitCell)
             basis_2 = delaunay_set[j].vector
             length_basis_2 = sqrt(delaunay_set[j].length_sq)
 
-            if dot(basis_1, basis_2) / length_basis_1 / length_basis_2 ≈ 1.0
+            if abs(dot(basis_1, basis_2)) / length_basis_1 / length_basis_2 ≈ 1.0
                 push!(to_remove, j)
             end
         end
     end
-    delaunay_set = [delaunay_set[i] for i in 1:length(delaunay_set) if !(i in to_remove)]
 
-    # TODO: refactor and test
+    delaunay_set = [delaunay_set[i] for i in 1:length(delaunay_set) if !(i in to_remove)]
+end
+
+"""
+    find_reduced_basis(
+        delaunay_set::Vector{@NamedTuple{vector::Vector{Float64}, length_sq::Float64}}
+    ) -> Vector{Vector{Float64}}
+
+Identify reduced basis for `delaunay_set`.
+
+Return values
+=============
+reduced basis vectors sorted by length (in ascending order)
+"""
+function find_reduced_basis(
+    delaunay_set::Vector{@NamedTuple{vector::Vector{Float64},length_sq::Float64}}
+)
+    # Check arguments
+    if length(delaunay_set) < 3
+        throw(
+            ArgumentError(
+                "`delaunay_set` must contain at least 3 elements" *
+                "(delaunay_set=$delaunay_set)",
+            ),
+        )
+    end
+
     # Generate all possible bases that can be formed from the candidate basis vectors
     # and compute the (1) sum of squared lengths of the basis vectors and (2) the
     # surface area of the unit cell
-    #candidate_basis_vectors = [ candidate for candidate in delaunay_set]
     basis_choices = [
         (
             vectors=[
@@ -846,7 +957,7 @@ function reduced_cell(unit_cell::UnitCell)
         ) for candidate_basis in combinations(delaunay_set, 3)
     ]
 
-    # Eliminate basis choices that are not linearly independent
+    # Eliminate basis choices that are degenerate (i.e., not linearly independent)
     basis_choices = [
         candidate_basis for
         candidate_basis in basis_choices if is_basis(candidate_basis.vectors...)
@@ -876,102 +987,7 @@ function reduced_cell(unit_cell::UnitCell)
         reduced_basis.vectors; by=v -> dot(v, v)
     )
 
-    # TODO: refactor and test
-    # Adjust the signs of the basis vectors so that they represent the "homogeneous
-    # corner" of the unit cell (i.e., where the three unit cell angles are all acute
-    # or all non-acute)
-    dot_ab = dot(reduced_basis_a, reduced_basis_b)
-    dot_bc = dot(reduced_basis_b, reduced_basis_c)
-    dot_ca = dot(reduced_basis_c, reduced_basis_a)
-
-    if dot_ab * dot_bc * dot_ca > 0
-        # Unit cell is of Type I, so there is a choice of sign for the basis such that
-        # all three unit cell angles are acute
-
-        if dot_ab > 0
-            if dot_bc <= 0
-                reduced_basis_c *= -1
-            end
-        elseif dot_bc > 0
-            if dot_ca <= 0
-                reduced_basis_a *= -1
-            end
-        else  # dot_ca > 0
-            if dot_ab <= 0
-                reduced_basis_b *= -1
-            end
-        end
-
-    else
-        # Unit cell is of Type II, so there is a choice of sign for the basis such that
-        # all three unit cell angles are non-acute
-
-        if dot_ab <= 0
-            if dot_bc > 0
-                reduced_basis_c *= -1
-            end
-        elseif dot_bc <= 0
-            if dot_ca > 0
-                reduced_basis_a *= -1
-            end
-        else  # dot_ca <= 0
-            if dot_ab > 0
-                reduced_basis_b *= -1
-            end
-        end
-    end
-
-    # TODO: refactor and test
-    # When there are multiple orderings of the reduced basis vectors by length, reorder
-    # the reduced basis vectors so that the angles affected by basis ordering are in
-    # increasing
-    length_sq_a = dot(reduced_basis_a, reduced_basis_a)
-    length_sq_b = dot(reduced_basis_b, reduced_basis_b)
-    length_sq_c = dot(reduced_basis_c, reduced_basis_c)
-
-    if length_sq_a ≈ length_sq_b ≈ length_sq_c
-        # Use bubble sort to reorder the basis vectors
-
-        if dot(reduced_basis_b, reduced_basis_c) < dot(reduced_basis_c, reduced_basis_a)
-            tmp = reduced_basis_a
-            reduced_basis_a = reduced_basis_b
-            reduced_basis_b = tmp
-        end
-
-        if dot(reduced_basis_c, reduced_basis_a) < dot(reduced_basis_a, reduced_basis_b)
-            tmp = reduced_basis_b
-            reduced_basis_b = reduced_basis_c
-            reduced_basis_c = tmp
-        end
-
-        if dot(reduced_basis_b, reduced_basis_c) < dot(reduced_basis_c, reduced_basis_a)
-            tmp = reduced_basis_a
-            reduced_basis_a = reduced_basis_b
-            reduced_basis_b = tmp
-        end
-
-    elseif length_sq_a ≈ length_sq_b
-        if dot(reduced_basis_b, reduced_basis_c) < dot(reduced_basis_c, reduced_basis_a)
-            tmp = reduced_basis_a
-            reduced_basis_a = reduced_basis_b
-            reduced_basis_b = tmp
-        end
-
-    elseif length_sq_b ≈ length_sq_c
-        if dot(reduced_basis_c, reduced_basis_a) < dot(reduced_basis_a, reduced_basis_b)
-            tmp = reduced_basis_b
-            reduced_basis_b = reduced_basis_c
-            reduced_basis_c = tmp
-        end
-    end
-
-    # --- Return standardized primitive unit cell defined by reduced basis
-
-    return standardize(
-        UnitCell(
-            reduced_basis_a, reduced_basis_b, reduced_basis_c; centering=primitive_centering
-        ),
-    )
+    return reduced_basis_a, reduced_basis_b, reduced_basis_c
 end
 
 """
@@ -996,7 +1012,7 @@ Keyword Arguments
 
 Return values
 =============
-- `true` if the test unit cell is equivalent to the reference unit cell; `false` otherwise
+`true` if the test unit cell is equivalent to the reference unit cell; `false` otherwise
 
 Examples
 ========
@@ -1057,7 +1073,7 @@ Keyword Arguments
 
 Return values
 =============
-- `true` if the test unit cell is a supercell of the reference unit cell; `false` otherwise
+`true` if the test unit cell is a supercell of the reference unit cell; `false` otherwise
 
 Examples
 ========

@@ -105,7 +105,7 @@ Return the centering of `symmetry`.
 
 Return values
 =============
-* centering
+centering
 """
 @inline function centering(symmetry::UnitCellSymmetry)
     return symmetry.centering
@@ -118,7 +118,7 @@ Return the symmetry elements of `symmetry`.
 
 Return values
 =============
-* symmetry elements
+symmetry elements
 """
 @inline function symmetry_elements(symmetry::UnitCellSymmetry)
     return symmetry.symmetry_elements

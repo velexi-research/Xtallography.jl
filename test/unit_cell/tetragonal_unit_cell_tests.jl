@@ -194,15 +194,17 @@ end
     basis_b = [0, a, 0]
     basis_c = [0, 0, c]
 
-    expected_unit_cell = standardize(TetragonalUnitCell(a, c))
-
     # default centering keyword argument
+    expected_unit_cell = standardize(TetragonalUnitCell(a, c; centering=P_centering))
+
     test_basis_rotations_and_permutations(
         rotations, expected_unit_cell, basis_a, basis_b, basis_c
     )
 
     # centering keyword argument provided
     for centering in (primitive_centering, body_centering)
+        expected_unit_cell = standardize(TetragonalUnitCell(a, c; centering=centering))
+
         test_basis_rotations_and_permutations(
             rotations, expected_unit_cell, basis_a, basis_b, basis_c; centering=centering
         )
@@ -217,15 +219,17 @@ end
     basis_b = [0, a, 0]
     basis_c = [0, 0, c]
 
-    expected_unit_cell = standardize(TetragonalUnitCell(a, c))
-
     # default centering keyword argument
+    expected_unit_cell = standardize(TetragonalUnitCell(a, c; centering=P_centering))
+
     test_basis_rotations_and_permutations(
         rotations, expected_unit_cell, basis_a, basis_b, basis_c
     )
 
     # centering keyword argument provided
     for centering in (primitive_centering, body_centering)
+        expected_unit_cell = standardize(TetragonalUnitCell(a, c; centering=centering))
+
         test_basis_rotations_and_permutations(
             rotations, expected_unit_cell, basis_a, basis_b, basis_c; centering=centering
         )

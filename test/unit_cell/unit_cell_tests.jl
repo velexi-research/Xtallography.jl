@@ -18,7 +18,7 @@ Tests for unit_cell/unit_cell.jl
 # --- Imports
 
 # Standard library
-using LinearAlgebra: qr, I
+using LinearAlgebra: dot
 using Test
 
 # External packages
@@ -29,7 +29,7 @@ using Xtallography
 
 # --- Tests
 
-# Note: the following methods are tested in lattice-specific test suites
+# Note: tests for the following methods may be located in lattice-specific test suites
 #
 # * UnitCell{T}(::NamedTuple, ::UnitCellSymmetry)
 # * UnitCell{T}(::NamedTuple; ::Centering, ::Union{Set,Vector,Nothing})
@@ -74,6 +74,83 @@ using Xtallography
     end
 end
 
+# ------ Constructors
+
+@testset "UnitCell(::Vector,::Vector,::Vector;::Bool,::Centering) outer constructor: keyword arguments" begin
+
+    # --- identify_lattice_system = true
+    #
+    # Check that the equivalent higher symmetry unit cell is returned
+
+    # Preparations
+    a = 2
+    α = 2π / 5
+    reference_unit_cell = RhombohedralUnitCell(a, α)
+    basis_a, basis_b, basis_c = basis(reference_unit_cell)
+
+    # Exercise functionality and check results
+    unit_cell = UnitCell(basis_a, basis_b, basis_c; identify_lattice_system=true)
+
+    @test unit_cell isa RhombohedralUnitCell
+
+    # --- identify_lattice_system = false
+    #
+    # Check that a triclinic unit cell is returned (instead of a higher symmetry unit cell)
+
+    # Preparations
+    a = 2
+    α = 2π / 5
+    reference_unit_cell = RhombohedralUnitCell(a, α)
+    basis_a, basis_b, basis_c = basis(reference_unit_cell)
+
+    # Exercise functionality and check results
+    unit_cell = UnitCell(basis_a, basis_b, basis_c; identify_lattice_system=false)
+
+    @test unit_cell isa TriclinicUnitCell
+
+    # --- identify_lattice_system = false
+    #
+    # Check that triclinic unit cell lattice constants are not standardized
+
+    # Preparations
+    a_ref = 1.0
+    b_ref = 5.0
+    c_ref = 10.0
+    α_ref = π / 5
+    β_ref = 3π / 10
+    γ_ref = 2π / 5
+    unit_cell_ref = standardize(TriclinicUnitCell(a_ref, b_ref, c_ref, α_ref, β_ref, γ_ref))
+
+    basis_a, basis_b, basis_c = basis(unit_cell_ref)
+
+    # Check that orientations of basis vectors standardize to expected lattice constants
+    for i in (-1, 1)
+        for j in (-1, 1)
+
+            # Skip standardized unit cell case
+            if i == 1 && j == 1
+                continue
+            end
+
+            # Construct unit cell
+            unit_cell = UnitCell(
+                i * basis_a, j * basis_b, basis_c; identify_lattice_system=false
+            )
+
+            # Check type of unit_cell
+            @test unit_cell isa TriclinicUnitCell
+
+            # Check that angles are not standardized
+            lattice_constants_ = lattice_constants(unit_cell)
+            @test (
+                !(lattice_constants_.α ≈ α_ref) ||
+                !(lattice_constants_.β ≈ β_ref) ||
+                !(lattice_constants_.γ ≈ γ_ref)
+            )
+        end
+    end
+end
+
 # ------ Methods
 
 @testset "reduced_cell(): minimum sum of length squared not unique" begin
@@ -104,6 +181,315 @@ end
     @test isapprox(lattice_constants_.β, 106.78 * π / 180; atol=0.0005)
     @test isapprox(lattice_constants_.γ, 115.66 * π / 180; atol=0.0005)
     @test centering(reduced_cell_) === primitive_centering
+end
+
+@testset "compute_delaunay_set(::Vector): valid arguments" begin
+    # --- Tests
+
+    # ------ dot(b_1, b_2) > 0
+
+    basis_a = [2, 0, 0]
+    basis_b = [1, 1, 0]
+    basis_c = [-1, 0, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+
+    # ------ dot(b_1, b_3) > 0
+
+    basis_a = [2, 0, 0]
+    basis_b = [-1, 0, 0]
+    basis_c = [1, 1, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+
+    # ------ dot(b_1, b_4) > 0
+
+    basis_a = [2, 0, 0]
+    basis_b = [-1, 0, 0]
+    basis_c = [-2, -1, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+
+    # ------ dot(b_2, b_3) > 0
+
+    basis_a = [-2, 0, 0]
+    basis_b = [1, 1, 0]
+    basis_c = [1, 0, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+
+    # ------ dot(b_2, b_4) > 0
+
+    basis_a = [-1, -1, 0]
+    basis_b = [1, 0, 0]
+    basis_c = [-1, 1, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+
+    # ------ dot(b_3, b_4) > 0
+
+    basis_a = [0, 0, 0]
+    basis_b = [3, 0, 0]
+    basis_c = [-2, 1, 0]
+
+    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+
+    expected_delaunay_set = [
+        [-2, 1, 0], [1, 1, 0], [1, -2, 0], [0, 0, 0], [-1, 2, 0], [-1, -1, 0], [2, -1, 0]
+    ]
+
+    @test delaunay_set == expected_delaunay_set
+end
+
+@testset "compute_delaunay_set(::Vector): invalid arguments" begin
+    # --- Preparations
+
+    # Valid basis vectors
+    basis_a = [1, 2, 3]
+    basis_b = [2, 3, 4]
+    basis_c = [3, 4, 5]
+
+    # --- Tests
+
+    # length(basis_a) != 3
+    expected_message = "`basis_a` must contain exactly 3 components (basis_a=[1, 2, 3, 4])"
+    @test_throws ArgumentError(expected_message) compute_delaunay_set(
+        [1, 2, 3, 4], basis_b, basis_c
+    )
+
+    # length(basis_b) != 3
+    expected_message = "`basis_b` must contain exactly 3 components (basis_b=[1, 2])"
+    @test_throws ArgumentError(expected_message) compute_delaunay_set(
+        basis_a, [1, 2], basis_c
+    )
+
+    # length(basis_c) != 3
+    expected_message = "`basis_c` must contain exactly 3 components (basis_c=[1, 2, 3, 4])"
+    @test_throws ArgumentError(expected_message) compute_delaunay_set(
+        basis_a, basis_b, [1, 2, 3, 4]
+    )
+end
+
+@testset "prune_delaunay_set(::Vector): valid arguments" begin
+    # --- Tests
+
+    # delaunay_set requiring no pruning
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [0, 1, 1], [1, 0, 1]]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [
+        [1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [0, 1, 1], [1, 0, 1]
+    ]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
+
+    # delaunay_set contains zero vectors
+    delaunay_set = [
+        [0, 0, 0],
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+        [0, 0, 0],
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+    ]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
+
+    # ------ delaunay_set contains vectors that are scalar multiples of each other
+
+    # scalar multiple vectors have same length
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 0, 0], [0, 1, 0]]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
+
+    # shorter scalar multiple vector comes first
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [3, 0, 0], [0, 2, 0]]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
+
+    # shorter scalar multiple vector comes second
+    delaunay_set = [[3, 0, 0], [0, 1, 0], [0, 0, 1], [1, 0, 0], [0, 2, 0]]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [[0, 1, 0], [0, 0, 1], [1, 0, 0]]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
+
+    # scalar multiple vectors point in opposite directions
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [-1, 0, 0], [0, -2, 0]]
+
+    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+
+    expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    expected_pruned_delaunay_set = [
+        (vector=x, length_sq=dot(x, x)) for x in expected_delaunay_set
+    ]
+
+    @test pruned_delaunay_set == expected_pruned_delaunay_set
+    for element in pruned_delaunay_set
+        @test element.vector isa Vector{Float64}
+        @test element.length_sq isa Float64
+    end
+end
+
+@testset "find_reduced_basis(::Vector): valid arguments" begin
+    # --- Tests
+
+    # delaunay_set has no degenerate bases
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [1, 0, 1]]
+    augmented_delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=Float64(dot(v, v))) for
+        v in delaunay_set
+    ]
+
+    reduced_basis = find_reduced_basis(augmented_delaunay_set)
+
+    expected_reduced_basis = [[1, 0, 0], [0, 1, 0], [1, 0, 1]]
+    @test Set(reduced_basis) == Set(expected_reduced_basis)
+
+    # delaunay_set has two bases having vectors different sums of squared lengths
+    delaunay_set = [[1, 1, 0], [0, 1, 0], [0, 0, 1], [1, 0, 0]]
+    augmented_delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=Float64(dot(v, v))) for
+        v in delaunay_set
+    ]
+
+    reduced_basis = find_reduced_basis(augmented_delaunay_set)
+
+    expected_reduced_basis = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    @test Set(reduced_basis) == Set(expected_reduced_basis)
+
+    # delaunay_set has two bases having vectors with equal sum of squared lengths
+    # (within tolerance of ≈) but different surface areas
+    unit_cell = TriclinicUnitCell(
+        sqrt(6), sqrt(8), sqrt(8), π/3, acos(sqrt(3)/6), acos(sqrt(3)/4)
+    )
+    b_1, b_2, b_3 = basis(unit_cell)
+
+    delaunay_set = [-b_3, b_1, b_2 - b_1, b_3 - b_2, b_2, b_2 - b_1 - b_3, b_1 - b_3]
+    augmented_delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=Float64(dot(v, v))) for
+        v in delaunay_set
+    ]
+
+    reduced_basis = find_reduced_basis(augmented_delaunay_set)
+
+    expected_reduced_basis = [b_1, -b_3, b_2 - b_1]
+    @test Set(reduced_basis) == Set(expected_reduced_basis)
+end
+
+@testset "find_reduced_basis(::Vector): invalid arguments" begin
+    # --- Tests
+
+    # vectors in delaunay_set are not of type Vector{Float64}
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0]]
+    augmented_delaunay_set = [
+        (vector=v, length_sq=Float64(dot(v, v))) for v in delaunay_set
+    ]
+
+    @test_throws MethodError find_reduced_basis(delaunay_set)
+
+    # length_sq values delaunay_set are of type Float64
+    delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0]]
+    augmented_delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=dot(v, v)) for v in delaunay_set
+    ]
+
+    @test_throws MethodError find_reduced_basis(augmented_delaunay_set)
+
+    # delaunay_set has fewer than 3 elements
+    delaunay_set = [[1, 0, 0], [0, 1, 0]]
+    augmented_delaunay_set = [
+        (vector=convert(Vector{Float64}, v), length_sq=Float64(dot(v, v))) for
+        v in delaunay_set
+    ]
+
+    error_message =
+        "`delaunay_set` must contain at least 3 elements" *
+        "(delaunay_set=$augmented_delaunay_set)"
+
+    @test_throws ArgumentError(error_message) find_reduced_basis(augmented_delaunay_set)
 end
 
 @testset "is_equivalent(::UnitCell): valid arguments" begin

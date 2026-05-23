@@ -59,8 +59,8 @@ Determine if `lattice_system` and `centering` define a valid Bravais lattice typ
 
 Return values
 =============
-- `true` if `lattice_system` and `centering` define a valid Bravais lattice type; `false`
-  otherwise
+`true` if `lattice_system` and `centering` define a valid Bravais lattice type; `false`
+otherwise
 
 Examples
 ========

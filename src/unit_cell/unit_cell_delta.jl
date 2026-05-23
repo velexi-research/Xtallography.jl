@@ -206,7 +206,7 @@ Return the lattice constant deltas for `unit_cell`.
 
 Return values
 =============
-* lattice constant deltas
+lattice constant deltas
 """
 @inline function Δlattice_constants(unit_cell_delta::UnitCellDelta)
     return unit_cell_delta.Δlattice_constants

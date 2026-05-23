@@ -165,15 +165,17 @@ end
 
     # --- Tests
 
-    expected_unit_cell = standardize(CubicUnitCell(a))
-
     # default centering keyword argument
+    expected_unit_cell = standardize(CubicUnitCell(a; centering=P_centering))
+
     test_basis_rotations_and_permutations(
         rotations, expected_unit_cell, basis_a, basis_b, basis_c
     )
 
     # centering keyword argument provided
     for centering in (primitive_centering, body_centering, face_centering)
+        expected_unit_cell = standardize(CubicUnitCell(a; centering=centering))
+
         test_basis_rotations_and_permutations(
             rotations, expected_unit_cell, basis_a, basis_b, basis_c; centering=centering
         )
