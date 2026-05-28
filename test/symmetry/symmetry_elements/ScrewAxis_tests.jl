@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 """
-Tests for symmetry/symmetry_elements.jl
+Tests for ScrewAxis type (defined in symmetry/symmetry_elements.jl)
 """
 # --- Imports
 
@@ -25,53 +25,10 @@ using Xtallography
 
 # --- Tests
 
-# ------ Symmetry element types
-
-@testset "SymmetryElement Subtypes" begin
-    expected_types = [GlidePlane, ScrewAxis]
-
-    for type in expected_types
-        @test type <: SymmetryElement
-    end
-end
-
-@testset "GlidePlane constructor" begin
-    # --- Tests
-
-    # ----- Valid arguments
-
-    translation = "1,1,1"
-    reflection_plane = "0,1,0"
-    symmetry_element = GlidePlane(translation, reflection_plane)
-
-    @test symmetry_element.translation == translation
-    @test symmetry_element.reflection_plane == reflection_plane
-end
-
-@testset "GlidePlane constants" begin
-    expected_constants = [
-        b_perp_a,
-        c_perp_a,
-        n_perp_a,
-        d_perp_a,
-        a_perp_b,
-        c_perp_b,
-        n_perp_b,
-        d_perp_b,
-        a_perp_c,
-        b_perp_c,
-        n_perp_c,
-        d_perp_c,
-    ]
-    for constant in expected_constants
-        @test constant isa GlidePlane
-    end
-end
-
 @testset "ScrewAxis constructor" begin
     # --- Tests
 
-    # ----- Valid arguments
+    # ------ Valid arguments
 
     axis = "1,1,1"
     n = 2
@@ -82,7 +39,7 @@ end
     @test symmetry_element.n == n
     @test symmetry_element.m == m
 
-    # ----- Invalid arguments
+    # ------ Invalid arguments
 
     # n = 0
     axis = "1,1,1"

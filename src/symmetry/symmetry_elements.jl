@@ -20,8 +20,8 @@ Symmetry element types and functions
 # ------ Types
 
 export SymmetryElement
-export GlidePlane
-export ScrewAxis
+export RotationAxis, MirrorPlane, InversionCenter, RotoinversionAxis
+export GlidePlane, ScrewAxis
 
 # ------ Constants
 
@@ -40,6 +40,9 @@ export c_6_1, c_6_2, c_6_3, c_6_4, c_6_5
 
 # --- Types
 
+import Base.:(==)
+import LinearAlgebra: dot
+
 # ------ SymmetryElement
 
 """
@@ -53,6 +56,130 @@ Subtypes
 """
 abstract type SymmetryElement end
 
+# ------ RotationAxis
+
+"""
+    RotationAxis
+
+Type representing a rotation axis
+
+Supertype: [`SymmetryElement`](@ref)
+"""
+struct RotationAxis <: SymmetryElement
+    # --- Fields
+
+    # direction of rotation axis in unit cell fractional coordinates
+    direction::Tuple{Rational,Rational,Rational}
+
+    # a point on the rotation axis in unit cell fractional coordinates
+    location::Tuple{Rational,Rational,Rational}
+
+    # rotation order
+    n::Int
+end
+
+function Base.:(==)(x::RotationAxis, y::RotationAxis)
+    # Check that orders are equal
+    if x.n != y.n
+        return false
+    end
+
+    # Check that directions are the same
+    if dot(x.direction, y.direction)^2 !=
+        dot(x.direction, x.direction) * dot(y.direction, y.direction)
+        return false
+    end
+
+    # Check that line through both locations is in the same direction as both lines
+    delta = (x.location[i] - y.location[i] for i in 1:3)
+    return dot(delta, x.direction)^2 == dot(delta, delta) * dot(x.direction, x.direction)
+end
+
+# ------ MirrorPlane
+
+"""
+    MirrorPlane
+
+Type representing a reflection through a plane
+
+Supertype: [`SymmetryElement`](@ref)
+"""
+struct MirrorPlane <: SymmetryElement
+    # --- Fields
+
+    # normal to mirror plane
+    normal::Tuple{Rational,Rational,Rational}
+
+    # a point on the mirror plane in unit cell fractional coordinates
+    location::Tuple{Rational,Rational,Rational}
+end
+
+function Base.:(==)(x::MirrorPlane, y::MirrorPlane)
+    # Check that directions of the plane normal are the same
+    if dot(x.normal, y.normal)^2 != dot(x.normal, x.normal) * dot(y.normal, y.normal)
+        return false
+    end
+
+    # Check that line through both locations lies a plane orthogonal to the normal vectors
+    delta = (x.location[i] - y.location[i] for i in 1:3)
+    return dot(delta, x.normal) == 0
+end
+
+# ------ InversionCenter
+
+"""
+    InversionCenter
+
+Type representing an inversion through a point
+
+Supertype: [`SymmetryElement`](@ref)
+"""
+struct InversionCenter <: SymmetryElement
+    # --- Fields
+
+    # location of inversion center
+    center::Tuple{Rational,Rational,Rational}
+end
+
+# ------ RotoinversionAxis
+
+"""
+    RotoinversionAxis
+
+Type representing a rotoinversion axis
+
+Supertype: [`SymmetryElement`](@ref)
+"""
+struct RotoinversionAxis <: SymmetryElement
+    # --- Fields
+
+    # direction of rotoinversion axis in unit cell fractional coordinates
+    direction::Tuple{Rational,Rational,Rational}
+
+    # a point on the rotation axis in unit cell fractional coordinates
+    location::Tuple{Rational,Rational,Rational}
+
+    # rotation order
+    n::Int
+end
+
+function Base.:(==)(x::RotoinversionAxis, y::RotoinversionAxis)
+    # Check that orders are equal
+    if x.n != y.n
+        return false
+    end
+
+    # Check that directions are the same
+    if dot(x.direction, y.direction)^2 !=
+        dot(x.direction, x.direction) * dot(y.direction, y.direction)
+        return false
+    end
+
+    # Check that line through both locations is in the same direction as both lines
+    delta = (x.location[i] - y.location[i] for i in 1:3)
+    return dot(delta, x.direction)^2 == dot(delta, delta) * dot(x.direction, x.direction)
+end
+
 # ------ GlidePlane
 
 """
@@ -63,9 +190,13 @@ Type representing a glide plane
 Supertype: [`SymmetryElement`](@ref)
 """
 struct GlidePlane <: SymmetryElement
-    # Fields
-    translation::String  # glide translation
-    reflection_plane::String  # reflection plane
+    # --- Fields
+
+    # glide translation
+    translation::String
+
+    # reflection plane
+    reflection_plane::String
 end
 
 # Constants
@@ -98,10 +229,16 @@ Type representing a screw axis
 Supertype: [`SymmetryElement`](@ref)
 """
 struct ScrewAxis <: SymmetryElement
-    # Fields
-    axis::String  # direction of rotation axis
-    n::Int  # rotation order
-    m::Int  # number of translation steps of size 1/n following rotation by 2π/n
+    # --- Fields
+
+    # direction of rotation axis
+    axis::String
+
+    # rotation order
+    n::Int
+
+    # number of translation steps of size 1/n following rotation by 2π/n
+    m::Int
 
     # Constructor
     function ScrewAxis(axis::String, n::Int, m::Int)
