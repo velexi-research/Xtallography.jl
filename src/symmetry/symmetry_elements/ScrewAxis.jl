@@ -109,6 +109,32 @@ function ScrewAxis(
     return ScrewAxis(n, m, direction, location)
 end
 
+# --- Functions/Methods
+
+import Base.:(==)
+import LinearAlgebra: dot
+
+function Base.:(==)(x::ScrewAxis, y::ScrewAxis)
+    # Check that rotation orders and translation steps are equal
+    if x.n != y.n
+        return false
+    end
+
+    if x.m != y.m
+        return false
+    end
+
+    # Check that directions are the same
+    if dot(x.direction, y.direction)^2 !=
+        dot(x.direction, x.direction) * dot(y.direction, y.direction)
+        return false
+    end
+
+    # Check that line through both locations is in the same direction as both lines
+    delta = (x.location[i] - y.location[i] for i in 1:3)
+    return dot(delta, x.direction)^2 == dot(delta, delta) * dot(x.direction, x.direction)
+end
+
 # --- Constants
 
 const a_2_1 = ScrewAxis(2, 1, (1, 0, 0))

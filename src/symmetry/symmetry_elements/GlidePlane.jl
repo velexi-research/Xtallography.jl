@@ -102,6 +102,28 @@ function GlidePlane(
     return GlidePlane(glide, normal, location)
 end
 
+# --- Functions/Methods
+
+import Base.:(==)
+import LinearAlgebra: dot
+
+function Base.:(==)(x::GlidePlane, y::GlidePlane)
+    # Check that directions of the glides are the same
+    if dot(x.glide, y.glide)^2 != dot(x.glide, x.glide) * dot(y.glide, y.glide)
+        return false
+    end
+
+    # Check that directions of the plane normal vectors are the same
+    if dot(x.normal, y.normal)^2 != dot(x.normal, x.normal) * dot(y.normal, y.normal)
+        return false
+    end
+
+    # Check that line through both locations lies a plane orthogonal to the plane normal
+    # vectors
+    delta = (x.location[i] - y.location[i] for i in 1:3)
+    return dot(delta, x.normal) == 0
+end
+
 # --- Constants
 
 # TODO: check d and n glide planes

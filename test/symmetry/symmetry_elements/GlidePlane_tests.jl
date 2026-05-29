@@ -72,6 +72,73 @@ end
     @test symmetry_element.location == location
 end
 
+@testset ":(==)(::GlidePlane,::GlidePlane)" begin
+    # --- Identical mirror plane
+
+    symmetry_element_1 = GlidePlane((1, 0, 0), (0, 1, 0), (0, 0, 0))
+    symmetry_element_2 = GlidePlane((1, 0, 0), (0, 1, 0), (0, 0, 0))
+
+    @test symmetry_element_1 == symmetry_element_2
+
+    # --- Equivalent mirror plane
+
+    # glides differ, normals same, locations same
+    symmetry_element_1 = GlidePlane((1, 0, 0), (0, 1, 0), (0, 0, 0))
+    symmetry_element_2 = GlidePlane((1//2, 0, 0), (0, 1, 0), (0, 0, 0))
+
+    @test symmetry_element_1 == symmetry_element_2
+
+    # glides same, normals differ, locations same
+    symmetry_element_1 = GlidePlane((1, 0, 0), (0, 1, 0), (0, 0, 0))
+    symmetry_element_2 = GlidePlane((1//2, 0, 0), (0, 1, 0), (0, 0, 0))
+
+    @test symmetry_element_1 == symmetry_element_2
+
+    # glides same, normals same, locations differ
+    symmetry_element_1 = GlidePlane((1, 0, 0), (0, 1, 0), (0, 0, 0))
+    symmetry_element_2 = GlidePlane((1, 0, 0), (0, 1, 0), (3//4, 0, 0))
+
+    @test symmetry_element_1 == symmetry_element_2
+
+    # glides differ, normals differ, locations same
+    symmetry_element_1 = GlidePlane((2, 0, 0), (0, 1, 0), (0, 0, 0))
+    symmetry_element_2 = GlidePlane((1, 0, 0), (0, 1//2, 0), (0, 0, 0))
+
+    @test symmetry_element_1 == symmetry_element_2
+
+    # glides differ, normals same, locations differ
+    symmetry_element_1 = GlidePlane((2, 0, 0), (0, 1, 0), (0, 0, 0))
+    symmetry_element_2 = GlidePlane((1, 0, 0), (0, 1, 0), (3//2, 0, 0))
+
+    @test symmetry_element_1 == symmetry_element_2
+
+    # glides same, normals differ, locations differ
+    symmetry_element_1 = GlidePlane((0, 0, 2//3), (2//7, 0, 0), (0, 1//2, 0))
+    symmetry_element_2 = GlidePlane((0, 0, 2//3), (7//3, 0, 0), (0, -2//7, 3//2))
+
+    @test symmetry_element_1 == symmetry_element_2
+
+    # --- Inequivalent mirror plane
+
+    # glides differ
+    symmetry_element_1 = GlidePlane((1, 1, 0), (0, 0, 1), (0, 0, 0))
+    symmetry_element_2 = GlidePlane((1, 0, 0), (0, 0, 1), (0, 0, 0))
+
+    @test symmetry_element_1 != symmetry_element_2
+
+    # normals differ
+    symmetry_element_1 = GlidePlane((0, 0, 1), (1, 1, 0), (0, 0, 0))
+    symmetry_element_2 = GlidePlane((0, 0, 1), (1, 0, 0), (0, 0, 0))
+
+    @test symmetry_element_1 != symmetry_element_2
+
+    # line between locations is not orthogonal to normal
+    symmetry_element_1 = GlidePlane((0, 0, 1), (1//3, 0, 0), (1//6, 1, 0))
+    symmetry_element_2 = GlidePlane((0, 0, 1), (1, 0, 0), (0, 0, 0))
+
+    @test symmetry_element_1 != symmetry_element_2
+end
+
 @testset "GlidePlane constants" begin
     expected_constants = [
         b_perp_a,

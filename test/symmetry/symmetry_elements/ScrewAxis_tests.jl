@@ -137,6 +137,61 @@ end
     @test symmetry_element.location == location
 end
 
+@testset ":(==)(::ScrewAxis,::ScrewAxis)" begin
+    # --- Identical screw axes
+
+    symmetry_element_1 = ScrewAxis(3, 2, (1, 0, 0), (0, 0, 0))
+    symmetry_element_2 = ScrewAxis(3, 2, (1, 0, 0), (0, 0, 0))
+
+    @test symmetry_element_1 == symmetry_element_2
+
+    # --- Equivalent screw axes
+
+    # directions differ, locations same
+    symmetry_element_1 = ScrewAxis(3, 2, (1, 0, 0), (0, 0, 0))
+    symmetry_element_2 = ScrewAxis(3, 2, (1//2, 0, 0), (0, 0, 0))
+
+    @test symmetry_element_1 == symmetry_element_2
+
+    # directions same, locations differ
+    symmetry_element_1 = ScrewAxis(3, 2, (1, 0, 0), (0, 0, 0))
+    symmetry_element_2 = ScrewAxis(3, 2, (1, 0, 0), (3//4, 0, 0))
+
+    @test symmetry_element_1 == symmetry_element_2
+
+    # directions differ, locations differ
+    symmetry_element_1 = ScrewAxis(3, 2, (2//3, 0, 0), (0, 0, 0))
+    symmetry_element_2 = ScrewAxis(3, 2, (1, 0, 0), (3//2, 0, 0))
+
+    @test symmetry_element_1 == symmetry_element_2
+
+    # --- Inequivalent screw axes
+
+    # rotation orders differ
+    symmetry_element_1 = ScrewAxis(4, 2, (2, 0, 0), (0, 0, 0))
+    symmetry_element_2 = ScrewAxis(3, 2, (1, 0, 0), (0, 0, 0))
+
+    @test symmetry_element_1 != symmetry_element_2
+
+    # translation steps differ
+    symmetry_element_1 = ScrewAxis(3, 2, (2, 0, 0), (0, 0, 0))
+    symmetry_element_2 = ScrewAxis(3, 1, (1, 0, 0), (0, 0, 0))
+
+    @test symmetry_element_1 != symmetry_element_2
+
+    # directions differ
+    symmetry_element_1 = ScrewAxis(3, 2, (1, 1, 0), (0, 0, 0))
+    symmetry_element_2 = ScrewAxis(3, 2, (1, 0, 0), (0, 0, 0))
+
+    @test symmetry_element_1 != symmetry_element_2
+
+    # line between locations != direction
+    symmetry_element_1 = ScrewAxis(3, 2, (1//3, 0, 0), (0, 1, 0))
+    symmetry_element_2 = ScrewAxis(3, 2, (1, 0, 0), (0, 0, 0))
+
+    @test symmetry_element_1 != symmetry_element_2
+end
+
 @testset "ScrewAxis constants" begin
     expected_constants = [
         a_2_1,
