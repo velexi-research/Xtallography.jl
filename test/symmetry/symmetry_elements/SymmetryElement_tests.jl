@@ -60,14 +60,14 @@ end
     # --- RotationAxis != GlidePlane
 
     symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
-    symmetry_element_2 = GlidePlane("0,1,0", "1,0,0")
+    symmetry_element_2 = GlidePlane((0, 1, 0), (1, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- RotationAxis != ScrewAxis
 
     symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
-    symmetry_element_2 = ScrewAxis(2, 1, "1,0,0")
+    symmetry_element_2 = ScrewAxis(2, 1, (1, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
@@ -88,14 +88,14 @@ end
     # --- MirrorPlane != GlidePlane
 
     symmetry_element_1 = MirrorPlane((1, 0, 0), (0, 0, 0))
-    symmetry_element_2 = GlidePlane("0,1,0", "1,0,0")
+    symmetry_element_2 = GlidePlane((0, 1, 0), (1, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- MirrorPlane != ScrewAxis
 
     symmetry_element_1 = MirrorPlane((1, 0, 0), (0, 0, 0))
-    symmetry_element_2 = ScrewAxis(2, 1, "1,0,0")
+    symmetry_element_2 = ScrewAxis(2, 1, (1, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
@@ -109,35 +109,35 @@ end
     # --- InversionCenter != GlidePlane
 
     symmetry_element_1 = InversionCenter((0, 0, 0))
-    symmetry_element_2 = GlidePlane("0,1,0", "1,0,0")
+    symmetry_element_2 = GlidePlane((0, 1, 0), (1, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- InversionCenter != ScrewAxis
 
     symmetry_element_1 = InversionCenter((0, 0, 0))
-    symmetry_element_2 = ScrewAxis(2, 1, "1,0,0")
+    symmetry_element_2 = ScrewAxis(2, 1, (1, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- RotoinversionAxis != GlidePlane
 
     symmetry_element_1 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
-    symmetry_element_2 = GlidePlane("0,1,0", "1,0,0")
+    symmetry_element_2 = GlidePlane((0, 1, 0), (1, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- RotoinversionAxis != ScrewAxis
 
     symmetry_element_1 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
-    symmetry_element_2 = ScrewAxis(2, 1, "1,0,0")
+    symmetry_element_2 = ScrewAxis(2, 1, (1, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- GlidePlane != ScrewAxis
 
-    symmetry_element_1 = GlidePlane("0,1,0", "1,0,0")
-    symmetry_element_2 = ScrewAxis(2, 1, "1,0,0")
+    symmetry_element_1 = GlidePlane((0, 1, 0), (1, 0, 0))
+    symmetry_element_2 = ScrewAxis(2, 1, (1, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 end
