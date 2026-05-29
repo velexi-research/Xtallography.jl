@@ -39,6 +39,11 @@ struct MirrorPlane <: SymmetryElement
     location::Tuple{Rational,Rational,Rational}
 end
 
+# --- Functions/Methods
+
+import Base.:(==)
+import LinearAlgebra: dot
+
 function Base.:(==)(x::MirrorPlane, y::MirrorPlane)
     # Check that directions of the plane normal are the same
     if dot(x.normal, y.normal)^2 != dot(x.normal, x.normal) * dot(y.normal, y.normal)
