@@ -45,12 +45,13 @@ import Base.:(==)
 import LinearAlgebra: dot
 
 function Base.:(==)(x::MirrorPlane, y::MirrorPlane)
-    # Check that directions of the plane normal are the same
+    # Check that directions of the plane normal vectors are the same
     if dot(x.normal, y.normal)^2 != dot(x.normal, x.normal) * dot(y.normal, y.normal)
         return false
     end
 
-    # Check that line through both locations lies a plane orthogonal to the normal vectors
+    # Check that line through both locations lies a plane orthogonal to the plane normal
+    # vectors
     delta = (x.location[i] - y.location[i] for i in 1:3)
     return dot(delta, x.normal) == 0
 end
