@@ -104,44 +104,42 @@ end
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Equivalent rotoinversion axes: directions differ, locations same
+    # --- Equivalent rotoinversion axes
 
+    # directions differ, locations same
     symmetry_element_1 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
     symmetry_element_2 = RotoinversionAxis(2, (1//2, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Equivalent rotoinversion axes: directions same, locations differ
-
+    # directions same, locations differ
     symmetry_element_1 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
     symmetry_element_2 = RotoinversionAxis(2, (1, 0, 0), (3//4, 0, 0))
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Equivalent rotoinversion axes: directions differ, locations differ
-
+    # directions differ, locations differ
     symmetry_element_1 = RotoinversionAxis(2, (2//3, 0, 0), (0, 0, 0))
     symmetry_element_2 = RotoinversionAxis(2, (1, 0, 0), (3//2, 0, 0))
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Inequivalent rotoinversion axes: directions differ
+    # --- Inequivalent rotoinversion axes
 
+    # order is different
+    symmetry_element_1 = RotoinversionAxis(3, (2, 0, 0), (2, 0, 0))
+    symmetry_element_2 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
+
+    @test symmetry_element_1 != symmetry_element_2
+
+    # directions differ
     symmetry_element_1 = RotoinversionAxis(2, (1, 1, 0), (0, 0, 0))
     symmetry_element_2 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
-    # --- Inequivalent rotoinversion axes: line between locations != direction
-
+    # line between locations != direction
     symmetry_element_1 = RotoinversionAxis(2, (1//3, 0, 0), (0, 1, 0))
-    symmetry_element_2 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
-
-    @test symmetry_element_1 != symmetry_element_2
-
-    # --- Inequivalent rotoinversion axes: order is different
-
-    symmetry_element_1 = RotoinversionAxis(3, (2, 0, 0), (2, 0, 0))
     symmetry_element_2 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2

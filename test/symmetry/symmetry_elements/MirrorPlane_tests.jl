@@ -59,36 +59,35 @@ end
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Equivalent mirror plane: normal differ, locations same
+    # --- Equivalent mirror plane
 
+    # normals differ, locations same
     symmetry_element_1 = MirrorPlane((1, 0, 0), (0, 0, 0))
     symmetry_element_2 = MirrorPlane((1//2, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Equivalent mirror plane: normal same, locations differ
-
+    # normals same, locations differ
     symmetry_element_1 = MirrorPlane((1, 0, 0), (0, 0, 0))
     symmetry_element_2 = MirrorPlane((1, 0, 0), (0, 3//4, 0))
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Equivalent mirror plane: normal differ, locations differ
-
+    # normals differ, locations differ
     symmetry_element_1 = MirrorPlane((2//3, 0, 0), (0, 1//2, 0))
     symmetry_element_2 = MirrorPlane((1, 0, 0), (0, -2//7, 3//2))
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Inequivalent mirror plane: normal differ
+    # --- Inequivalent mirror plane
 
+    # normals differ
     symmetry_element_1 = MirrorPlane((1, 1, 0), (0, 0, 0))
     symmetry_element_2 = MirrorPlane((1, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
-    # --- Inequivalent mirror plane: line between locations is not orthogonal to normal
-
+    # line between locations is not orthogonal to normal
     symmetry_element_1 = MirrorPlane((1//3, 0, 0), (1//6, 1, 0))
     symmetry_element_2 = MirrorPlane((1, 0, 0), (0, 0, 0))
 

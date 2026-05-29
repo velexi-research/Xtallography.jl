@@ -105,45 +105,43 @@ end
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Equivalent rotation axes: directions differ, locations same
+    # --- Equivalent rotation axes
 
+    # directions differ, locations same
     symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
     symmetry_element_2 = RotationAxis(2, (1//2, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Equivalent rotation axes: directions same, locations differ
-
+    # directions same, locations differ
     symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
     symmetry_element_2 = RotationAxis(2, (1, 0, 0), (3//4, 0, 0))
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Equivalent rotation axes: directions differ, locations differ
-
+    # directions differ, locations differ
     symmetry_element_1 = RotationAxis(2, (2//3, 0, 0), (0, 0, 0))
     symmetry_element_2 = RotationAxis(2, (1, 0, 0), (3//2, 0, 0))
 
     @test symmetry_element_1 == symmetry_element_2
 
-    # --- Inequivalent rotation axes: directions differ
+    # --- Inequivalent rotation axes
 
+    # order is different
+    symmetry_element_1 = RotationAxis(2, (2, 0, 0), (2, 0, 0))
+    symmetry_element_2 = RotationAxis(3, (1, 0, 0), (0, 0, 0))
+
+    @test symmetry_element_1 != symmetry_element_2
+
+    # directions differ
     symmetry_element_1 = RotationAxis(2, (1, 1, 0), (0, 0, 0))
     symmetry_element_2 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
-    # --- Inequivalent rotation axes: line between locations != direction
-
+    # line between locations != direction
     symmetry_element_1 = RotationAxis(2, (1//3, 0, 0), (0, 1, 0))
     symmetry_element_2 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
-
-    @test symmetry_element_1 != symmetry_element_2
-
-    # --- Inequivalent rotation axes: order is different
-
-    symmetry_element_1 = RotationAxis(2, (2, 0, 0), (2, 0, 0))
-    symmetry_element_2 = RotationAxis(3, (1, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 end
