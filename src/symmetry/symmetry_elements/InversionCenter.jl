@@ -13,14 +13,25 @@
 #   limitations under the License.
 
 """
-Symmetry element types and functions
+InversionCenter type and functions
 """
-# --- Symmetry types and methods
+# --- Exports
 
-include("symmetry_elements/SymmetryElement.jl")
-include("symmetry_elements/RotationAxis.jl")
-include("symmetry_elements/MirrorPlane.jl")
-include("symmetry_elements/InversionCenter.jl")
-include("symmetry_elements/RotoinversionAxis.jl")
-include("symmetry_elements/GlidePlane.jl")
-include("symmetry_elements/ScrewAxis.jl")
+# Types
+export InversionCenter
+
+# --- Types
+
+"""
+    InversionCenter
+
+Type representing an inversion through a point
+
+Supertype: [`SymmetryElement`](@ref)
+"""
+struct InversionCenter <: SymmetryElement
+    # --- Fields
+
+    # location of inversion center
+    center::Tuple{Rational,Rational,Rational}
+end

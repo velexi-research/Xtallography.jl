@@ -13,14 +13,23 @@
 #   limitations under the License.
 
 """
-Symmetry element types and functions
+SymmetryElement type
 """
-# --- Symmetry types and methods
+# --- Exports
 
-include("symmetry_elements/SymmetryElement.jl")
-include("symmetry_elements/RotationAxis.jl")
-include("symmetry_elements/MirrorPlane.jl")
-include("symmetry_elements/InversionCenter.jl")
-include("symmetry_elements/RotoinversionAxis.jl")
-include("symmetry_elements/GlidePlane.jl")
-include("symmetry_elements/ScrewAxis.jl")
+# Types
+export SymmetryElement
+
+# --- Types
+
+"""
+    SymmetryElement
+
+Supertype for symmetry elements in 3D
+
+Subtypes
+========
+[`RotationAxis`](@ref), [`MirrorPlane`](@ref), [`InversionCenter`](@ref),
+[`RotoinversionAxis`](@ref) [`GlidePlane`](@ref), [`ScrewAxis`](@ref)
+"""
+abstract type SymmetryElement end

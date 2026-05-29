@@ -25,17 +25,51 @@ using Xtallography
 
 # --- Tests
 
-@testset "GlidePlane constructor" begin
-    # --- Tests
+@testset "GlidePlane: inner constructor" begin
+    # --- Valid arguments
 
-    # ------ Valid arguments
+    glide = (1, 0, 0)
+    normal = (0, 1, 0)
+    location = (1, 2, 3)
+    symmetry_element = GlidePlane(glide, normal, location)
 
-    translation = "1,1,1"
-    reflection_plane = "0,1,0"
-    symmetry_element = GlidePlane(translation, reflection_plane)
+    @test symmetry_element.glide == glide
+    @test symmetry_element.normal == normal
+    @test symmetry_element.location == location
 
-    @test symmetry_element.translation == translation
-    @test symmetry_element.reflection_plane == reflection_plane
+    # --- Invalid arguments
+
+    glide = (1, 1, 1)
+    normal = (0, 1, 0)
+    location = (1, 2, 3)
+
+    expected_message = "`glide` must be orthogonal to `normal` (glide=$glide,normal=$normal)"
+    @test_throws ArgumentError(expected_message) GlidePlane(glide, normal, location)
+end
+
+@testset "GlidePlane: outer constructor" begin
+    # --- default location 
+
+    glide = (1, 0, 0)
+    normal = (0, 1, 0)
+
+    symmetry_element = GlidePlane(glide, normal)
+
+    @test symmetry_element.glide == glide
+    @test symmetry_element.normal == normal
+    @test symmetry_element.location == (0, 0, 0)
+
+    # --- non-default location 
+
+    glide = (1, 0, 0)
+    normal = (0, 2, 0)
+    location = (1, 2, 3)
+
+    symmetry_element = GlidePlane(glide, normal; location=location)
+
+    @test symmetry_element.glide == glide
+    @test symmetry_element.normal == normal
+    @test symmetry_element.location == location
 end
 
 @testset "GlidePlane constants" begin

@@ -25,69 +25,116 @@ using Xtallography
 
 # --- Tests
 
-@testset "ScrewAxis constructor" begin
-    # --- Tests
+@testset "ScrewAxis: inner constructor" begin
+    # --- Valid arguments
 
-    # ------ Valid arguments
-
-    axis = "1,1,1"
     n = 2
     m = 1
-    symmetry_element = ScrewAxis(axis, n, m)
+    direction = (1, 1, 1)
+    location = (0, 0, 0)
+    symmetry_element = ScrewAxis(n, m, direction, location)
 
-    @test symmetry_element.axis == axis
     @test symmetry_element.n == n
     @test symmetry_element.m == m
+    @test symmetry_element.direction == direction
+    @test symmetry_element.location == location
 
-    # ------ Invalid arguments
+    # --- Invalid arguments
 
     # n = 0
-    axis = "1,1,1"
     n = 0
     m = 4
+    direction = (1, 1, 1)
+    location = (1, 0, 0)
 
     expected_message = "`n` must be positive (n=0)"
-    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
+    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(
+        n, m, direction, location
+    )
 
     # n < 0
-    axis = "1,1,1"
     n = -10
     m = 4
+    direction = (1, 1, 1)
+    location = (1, 0, 0)
 
     expected_message = "`n` must be positive (n=-10)"
-    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
+    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(
+        n, m, direction, location
+    )
 
     # m = 0
-    axis = "1,1,1"
     n = 2
     m = 0
+    direction = (1, 1, 1)
+    location = (1, 0, 0)
 
     expected_message = "`m` must be positive (m=0)"
-    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
+    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(
+        n, m, direction, location
+    )
 
     # m < 0
-    axis = "1,1,1"
     n = 2
     m = -1
+    direction = (1, 1, 1)
+    location = (1, 0, 0)
 
     expected_message = "`m` must be positive (m=-1)"
-    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
+    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(
+        n, m, direction, location
+    )
 
     # m = n
-    axis = "1,1,1"
     n = 3
     m = 3
+    direction = (1, 1, 1)
+    location = (1, 0, 0)
 
     expected_message = "`m` must be less than `n` (n=3,m=3)"
-    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
+    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(
+        n, m, direction, location
+    )
 
     # m > n
-    axis = "1,1,1"
     n = 3
     m = 4
+    direction = (1, 1, 1)
+    location = (1, 0, 0)
 
     expected_message = "`m` must be less than `n` (n=3,m=4)"
-    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(axis, n, m)
+    @test_throws ArgumentError(expected_message) symmetry_element = ScrewAxis(
+        n, m, direction, location
+    )
+end
+
+@testset "ScrewAxis: outer constructor" begin
+    # --- default location 
+
+    n = 3
+    m = 2
+    direction = (1, 0, 0)
+
+    symmetry_element = ScrewAxis(n, m, direction)
+
+    @test symmetry_element.n == n
+    @test symmetry_element.m == m
+    @test symmetry_element.direction == direction
+    @test symmetry_element.location == (0, 0, 0)
+
+    # --- non-default location 
+
+    n = 3
+    m = 1
+    direction = (1, 0, 0)
+    location = (2, 0, 0)
+
+    symmetry_element = ScrewAxis(n, m, direction; location=location)
+
+    @test symmetry_element.n == n
+    @test symmetry_element.m == m
+    @test symmetry_element.direction == direction
+    @test symmetry_element.location == location
 end
 
 @testset "ScrewAxis constants" begin

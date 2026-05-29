@@ -38,36 +38,36 @@ end
 @testset ":(==)(::SymmetryElement,::SymmetryElement): mismatched types" begin
     # --- RotationAxis != MirrorPlane
 
-    symmetry_element_1 = RotationAxis((1, 0, 0), (0, 0, 0), 2)
+    symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
     symmetry_element_2 = MirrorPlane((1, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- RotationAxis != InversionCenter
 
-    symmetry_element_1 = RotationAxis((1, 0, 0), (0, 0, 0), 2)
+    symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
     symmetry_element_2 = InversionCenter((0, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- RotationAxis != RotoinversionAxis
 
-    symmetry_element_1 = RotationAxis((1, 0, 0), (0, 0, 0), 2)
-    symmetry_element_2 = RotoinversionAxis((1, 0, 0), (0, 0, 0), 3)
+    symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
+    symmetry_element_2 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- RotationAxis != GlidePlane
 
-    symmetry_element_1 = RotationAxis((1, 0, 0), (0, 0, 0), 2)
+    symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
     symmetry_element_2 = GlidePlane("0,1,0", "1,0,0")
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- RotationAxis != ScrewAxis
 
-    symmetry_element_1 = RotationAxis((1, 0, 0), (0, 0, 0), 2)
-    symmetry_element_2 = ScrewAxis("1,0,0", 2, 1)
+    symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
+    symmetry_element_2 = ScrewAxis(2, 1, "1,0,0")
 
     @test symmetry_element_1 != symmetry_element_2
 
@@ -81,7 +81,7 @@ end
     # --- MirrorPlane != RotoinversionAxis
 
     symmetry_element_1 = MirrorPlane((1, 0, 0), (0, 0, 0))
-    symmetry_element_2 = RotoinversionAxis((1, 0, 0), (0, 0, 0), 3)
+    symmetry_element_2 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
@@ -95,14 +95,14 @@ end
     # --- MirrorPlane != ScrewAxis
 
     symmetry_element_1 = MirrorPlane((1, 0, 0), (0, 0, 0))
-    symmetry_element_2 = ScrewAxis("1,0,0", 2, 1)
+    symmetry_element_2 = ScrewAxis(2, 1, "1,0,0")
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- InversionCenter != RotoinversionAxis
 
     symmetry_element_1 = InversionCenter((0, 0, 0))
-    symmetry_element_2 = RotoinversionAxis((1, 0, 0), (0, 0, 0), 3)
+    symmetry_element_2 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
 
     @test symmetry_element_1 != symmetry_element_2
 
@@ -116,28 +116,28 @@ end
     # --- InversionCenter != ScrewAxis
 
     symmetry_element_1 = InversionCenter((0, 0, 0))
-    symmetry_element_2 = ScrewAxis("1,0,0", 2, 1)
+    symmetry_element_2 = ScrewAxis(2, 1, "1,0,0")
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- RotoinversionAxis != GlidePlane
 
-    symmetry_element_1 = RotoinversionAxis((1, 0, 0), (0, 0, 0), 3)
+    symmetry_element_1 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
     symmetry_element_2 = GlidePlane("0,1,0", "1,0,0")
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- RotoinversionAxis != ScrewAxis
 
-    symmetry_element_1 = RotoinversionAxis((1, 0, 0), (0, 0, 0), 3)
-    symmetry_element_2 = ScrewAxis("1,0,0", 2, 1)
+    symmetry_element_1 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
+    symmetry_element_2 = ScrewAxis(2, 1, "1,0,0")
 
     @test symmetry_element_1 != symmetry_element_2
 
     # --- GlidePlane != ScrewAxis
 
     symmetry_element_1 = GlidePlane("0,1,0", "1,0,0")
-    symmetry_element_2 = ScrewAxis("1,0,0", 2, 1)
+    symmetry_element_2 = ScrewAxis(2, 1, "1,0,0")
 
     @test symmetry_element_1 != symmetry_element_2
 end
