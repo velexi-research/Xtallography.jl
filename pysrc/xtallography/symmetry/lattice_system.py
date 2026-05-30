@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 """
-Lattice system class and utility functions
+Lattice system class
 """
 # --- Imports
 
