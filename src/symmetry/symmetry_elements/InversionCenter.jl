@@ -32,6 +32,6 @@ Supertype: [`SymmetryElement`](@ref)
 struct InversionCenter <: SymmetryElement
     # --- Fields
 
-    # location of inversion center
+    # location of inversion center in unit cell fractional coordinates
     center::Tuple{Rational,Rational,Rational}
 end

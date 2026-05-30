@@ -41,7 +41,7 @@ Supertype: [`SymmetryElement`](@ref)
 struct GlidePlane <: SymmetryElement
     # --- Fields
 
-    # glide direction in unit cell fractional coordinates
+    # glide direction
     glide::Tuple{Rational,Rational,Rational}
 
     # normal to mirror plane

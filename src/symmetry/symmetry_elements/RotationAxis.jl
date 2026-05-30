@@ -35,7 +35,7 @@ struct RotationAxis <: SymmetryElement
     # rotation order
     n::Int
 
-    # direction of rotation axis in unit cell fractional coordinates
+    # direction of rotation axis
     direction::Tuple{Rational,Rational,Rational}
 
     # a point on the rotation axis in unit cell fractional coordinates

@@ -45,7 +45,7 @@ struct ScrewAxis <: SymmetryElement
     # number of translation steps of size 1/n following rotation by 2π/n
     m::Int
 
-    # direction of rotation axis in unit cell fractional coordinates
+    # direction of rotation axis
     direction::Tuple{Rational,Rational,Rational}
 
     # a point on the rotation axis in unit cell fractional coordinates
