@@ -17,10 +17,8 @@ Dynamic additions to UnitCell class
 
 # --- Imports
 
-# External packages
-from xtallography import _JL
-
 # Local packages/modules
+from xtallography import _JL
 from xtallography.symmetry import LatticeSystem
 
 from .triclinic import TriclinicUnitCell
