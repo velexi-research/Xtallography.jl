@@ -22,6 +22,9 @@ from dataclasses import dataclass
 from fractions import Fraction
 from typing import Optional
 
+# External packages
+import numpy
+
 # Local packages/modules
 from .symmetry_element import SymmetryElement
 from ... import _JL
@@ -150,3 +153,31 @@ class RotationAxis(SymmetryElement):
             f"RotationAxis(n={self.n},direction={self.direction},"
             f"location={self.location})"
         )
+
+    def __eq__(self, other):
+        """
+        Return True if `self` and `other`are identical symmetry elements; otherwise,
+        return False.
+
+        Parameters
+        ----------
+        other:  SymmetryElement object to compare against
+        """
+        if not isinstance(other, type(self)):
+            return False
+
+        # Check that orders are equal
+        if self.n != other.n:
+            return False
+
+        # Check that directions are the same
+        if numpy.dot(self.direction, other.direction) ** 2 != numpy.dot(
+            self.direction, self.direction
+        ) * numpy.dot(other.direction, other.direction):
+            return False
+
+        # Check that line through both locations is in the same direction as both lines
+        delta = tuple(self.location[i] - other.location[i] for i in range(3))
+        return numpy.dot(delta, self.direction) ** 2 == numpy.dot(
+            delta, delta
+        ) * numpy.dot(self.direction, self.direction)

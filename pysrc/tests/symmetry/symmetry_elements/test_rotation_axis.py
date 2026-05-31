@@ -253,3 +253,54 @@ class test_xtallography_symmetry_symmetry_elements_RotationAxis(unittest.TestCas
             "direction=(Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)),"
             "location=(Fraction(1, 1), Fraction(0, 1), Fraction(1, 1)))"
         )
+
+    def test_eq(self):
+        """
+        Test `__eq__()`.
+        """
+        # --- Identical rotation axes
+
+        symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
+        symmetry_element_2 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 == symmetry_element_2
+
+        # --- Equivalent rotation axes
+
+        # directions differ, locations same
+        symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
+        symmetry_element_2 = RotationAxis(2, (0.5, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 == symmetry_element_2
+
+        # directions same, locations differ
+        symmetry_element_1 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
+        symmetry_element_2 = RotationAxis(2, (1, 0, 0), (0.75, 0, 0))
+
+        assert symmetry_element_1 == symmetry_element_2
+
+        # directions differ, locations differ
+        symmetry_element_1 = RotationAxis(2, (Fraction(2, 3), 0, 0), (0, 0, 0))
+        symmetry_element_2 = RotationAxis(2, (1, 0, 0), (Fraction(3, 2), 0, 0))
+
+        assert symmetry_element_1 == symmetry_element_2
+
+        # --- Inequivalent rotation axes
+
+        # order is different
+        symmetry_element_1 = RotationAxis(2, (2, 0, 0), (2, 0, 0))
+        symmetry_element_2 = RotationAxis(3, (1, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 != symmetry_element_2
+
+        # directions differ
+        symmetry_element_1 = RotationAxis(2, (1, 1, 0), (0, 0, 0))
+        symmetry_element_2 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 != symmetry_element_2
+
+        # line between locations != direction
+        symmetry_element_1 = RotationAxis(2, (Fraction(1, 3), 0, 0), (0, 1, 0))
+        symmetry_element_2 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 != symmetry_element_2
