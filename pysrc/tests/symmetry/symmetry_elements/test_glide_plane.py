@@ -1,0 +1,163 @@
+#   Copyright 2025 Velexi Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+"""
+Unit tests for `GlidePlane` class
+"""
+# --- Imports
+
+# Standard library
+from dataclasses import FrozenInstanceError
+import unittest
+
+# External packages
+import juliacall
+import pytest
+from xtallography.symmetry import GlidePlane
+
+# Local packages/modules
+
+
+# --- Test Suites
+
+
+class test_xtallography_symmetry_symmetry_elements_GlidePlane(unittest.TestCase):
+    """
+    Test suite for the `GlidePlane` class
+    """
+
+    # --- Fixtures
+
+    def setUp(self):
+        """
+        Prepare for test.
+        """
+        # Initialize JuliaCall
+        self.jl = juliacall.newmodule("PyXtallographyTest")
+        self.jl.seval("using Xtallography")
+
+    def tearDown(self):
+        """
+        Clean up after test.
+        """
+
+    # --- Tests
+
+    @staticmethod
+    def test_init():
+        """
+        Test `__init__()`.
+        """
+        # --- Tests
+
+        translation = "0,1,0"
+        reflection_plane = "1,0,0"
+        glide_plane = GlidePlane(translation, reflection_plane)
+
+        assert glide_plane.translation == translation
+        assert glide_plane.reflection_plane == reflection_plane
+
+    @staticmethod
+    def test_init_invalid_arguments():
+        """
+        Test argument checks for `__init__()`
+        """
+        # --- Tests
+
+        # No invalid arguments for GlidePlane initializer
+
+    @staticmethod
+    def test_frozen():
+        """
+        Test that GlidePlane objects are immutable.
+        """
+        # --- Preparations
+
+        glide_plane = GlidePlane("0,1,0", "1,0,0")
+
+        # --- Tests
+
+        # attempt to change `translation` field
+        with pytest.raises(FrozenInstanceError) as exception_info:
+            glide_plane.translation = "0,0,1"
+
+        expected_error = "cannot assign to field 'translation'"
+        assert expected_error in str(exception_info)
+
+        # attempt to change `reflection_plane` field
+        with pytest.raises(FrozenInstanceError) as exception_info:
+            glide_plane.reflection_plane = "0,0,1"
+
+        expected_error = "cannot assign to field 'reflection_plane'"
+        assert expected_error in str(exception_info)
+
+    def test_to_julia(self):
+        """
+        Test `to_julia()`.
+        """
+        # --- Preparations
+
+        translation = "0,1,0"
+        reflection_plane = "1,0,0"
+        glide_plane = GlidePlane(translation, reflection_plane)
+
+        # --- Tests
+
+        glide_plane_jl = glide_plane.to_julia()
+        assert self.jl.isa(glide_plane_jl, self.jl.GlidePlane)
+        assert glide_plane_jl.translation == translation
+        assert glide_plane_jl.reflection_plane == reflection_plane
+
+    def test_from_julia(self):
+        """
+        Test `from_julia()`.
+        """
+        # --- Tests
+
+        translation = "0,1,0"
+        reflection_plane = "1,0,0"
+        glide_plane_jl = self.jl.GlidePlane(translation, reflection_plane)
+
+        glide_plane = GlidePlane.from_julia(glide_plane_jl)
+
+        assert glide_plane.translation == translation
+        assert glide_plane.reflection_plane == reflection_plane
+
+    def test_from_julia_invalid_args(self):
+        """
+        Test argument checks for `from_julia()`
+        """
+        glide_plane_jl = 10
+        with pytest.raises(ValueError) as exception_info:
+            GlidePlane.from_julia(glide_plane_jl)
+
+        expected_error = (
+            "`glide_plane_jl` must be a Julia `GlidePlane` object. "
+            f"(glide_plane_jl={glide_plane_jl})."
+        )
+        assert expected_error in str(exception_info)
+
+    def test_repr(self):
+        """
+        Test `__repr__()`.
+        """
+        # --- Tests
+
+        translation = "0,1,0"
+        reflection_plane = "1,0,0"
+        glide_plane = GlidePlane(translation, reflection_plane)
+
+        assert (
+            str(glide_plane)
+            == "GlidePlane(translation='0,1,0',reflection_plane='1,0,0')"
+        )

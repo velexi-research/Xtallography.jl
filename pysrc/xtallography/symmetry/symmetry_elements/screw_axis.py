@@ -12,121 +12,20 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 """
-Core types and functions that support lattice and unit cell computations
+ScrewAxis class
 """
 
 # --- Imports
 
 # Standard library
-from abc import abstractmethod, ABC
 from dataclasses import dataclass
 
 # Local packages/modules
-from .. import _JL
+from .symmetry_element import SymmetryElement
+from ... import _JL
 
 
 # --- Classes
-
-
-class SymmetryElement(ABC):
-    """
-    Abstract base class for symmetry element classes
-    """
-
-    # --- Methods
-
-    @abstractmethod
-    def to_julia(self):
-        """
-        Convert Python SymmetryElement object to a Julia SymmetryElement object.
-        """
-
-    @classmethod
-    def from_julia(cls, symmetry_element_jl: _JL.SymmetryElement):
-        """
-        Convert a Julia SymmetryElement object to a Python SymmetryElement object.
-
-        Parameters
-        ----------
-        symmetry_element_jl: Julia SymmetryElement object
-
-        Return value
-        ------------
-        Python SymmetryElement object
-        """
-        if _JL.isa(symmetry_element_jl, _JL.GlidePlane):
-            return GlidePlane.from_julia(symmetry_element_jl)
-        elif _JL.isa(symmetry_element_jl, _JL.ScrewAxis):
-            return ScrewAxis.from_julia(symmetry_element_jl)
-
-        raise ValueError(
-            "`symmetry_element_jl` must be a Julia `GlidePlane` or `ScrewAxis` object. "
-            f"(symmetry_element_jl={symmetry_element_jl})."
-        )
-
-    @abstractmethod
-    def __repr__(self):
-        """
-        Return string representation of SymmetryElement.
-        """
-
-
-@dataclass(frozen=True)
-class GlidePlane(SymmetryElement):
-    """
-    Class representing a glide plane
-
-    Fields
-    ------
-    * `translation` (str): glide translation
-
-    * `reflection_plane` (str): reflection plane
-    """
-
-    # --- Fields
-
-    translation: str
-    reflection_plane: str
-
-    # --- Methods
-
-    def to_julia(self):
-        """
-        Convert Python GlidePlane object to a Julia GlidePlane object.
-        """
-        return _JL.GlidePlane(self.translation, self.reflection_plane)
-
-    @classmethod
-    def from_julia(cls, glide_plane_jl: _JL.GlidePlane):
-        """
-        Convert a Julia GlidePlane object to a Python GlidePlane object.
-
-        Parameters
-        ----------
-        glide_plane_jl: Julia GlidePlane object
-
-        Return value
-        ------------
-        Python GlidePlane object
-        """
-        # Check arguments
-        if not _JL.isa(glide_plane_jl, _JL.GlidePlane):
-            raise ValueError(
-                "`glide_plane_jl` must be a Julia `GlidePlane` object. "
-                f"(glide_plane_jl={glide_plane_jl})."
-            )
-
-        # Convert glide_plane_jl to a GlidePlane object
-        return GlidePlane(glide_plane_jl.translation, glide_plane_jl.reflection_plane)
-
-    def __repr__(self):
-        """
-        Return string representation of GlidePlane.
-        """
-        return (
-            f"GlidePlane(translation='{self.translation}',"
-            f"reflection_plane='{self.reflection_plane}')"
-        )
 
 
 @dataclass(frozen=True)
