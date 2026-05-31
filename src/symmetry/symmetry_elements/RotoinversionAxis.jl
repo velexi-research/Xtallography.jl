@@ -38,22 +38,22 @@ struct RotoinversionAxis <: SymmetryElement
     # direction of rotoinversion axis
     direction::Tuple{Rational,Rational,Rational}
 
-    # a point on the rotoinversion axis in unit cell fractional coordinates
-    location::Tuple{Rational,Rational,Rational}
+    # location of inversion center in unit cell fractional coordinates
+    center::Tuple{Rational,Rational,Rational}
 
     # Constructor
     function RotoinversionAxis(
-        n::Int,
-        direction::Tuple{<:Real,<:Real,<:Real},
-        location::Tuple{<:Real,<:Real,<:Real},
+        n::Int, direction::Tuple{<:Real,<:Real,<:Real}, center::Tuple{<:Real,<:Real,<:Real}
     )
-        # Enforce constraints
+        # --- Check arguments
+
+        # n be positive
         if n ≤ 0
             throw(ArgumentError("`n` must be positive (n=$n)"))
         end
 
         # Return new RotoinversionAxis
-        return new(n, direction, location)
+        return new(n, direction, center)
     end
 end
 
@@ -62,21 +62,21 @@ end
     RotoinversionAxis(
         n::Int,
         direction::Tuple{<:Real,<:Real,<:Real};
-        location::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0)
+        center::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0)
     )
 
 Construct a RotoinversionAxis object with order `n` about the axis specified by `direction`.
 
 Keyword Arguments
 =================
-- `location`: a point on the rotoinversion axis in unit cell fractional coordinates
+- `center`: location of inversion center in unit cell fractional coordinates
 """
 function RotoinversionAxis(
     n::Int,
     direction::Tuple{<:Real,<:Real,<:Real};
-    location::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0),
+    center::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0),
 )
-    return RotoinversionAxis(n, direction, location)
+    return RotoinversionAxis(n, direction, center)
 end
 
 # --- Functions/Methods
@@ -90,13 +90,12 @@ function Base.:(==)(x::RotoinversionAxis, y::RotoinversionAxis)
         return false
     end
 
-    # Check that directions are the same
-    if dot(x.direction, y.direction)^2 !=
-        dot(x.direction, x.direction) * dot(y.direction, y.direction)
+    # Check inversion centers are the same
+    if x.center != y.center
         return false
     end
 
-    # Check that line through both locations is in the same direction as both lines
-    delta = (x.location[i] - y.location[i] for i in 1:3)
-    return dot(delta, x.direction)^2 == dot(delta, delta) * dot(x.direction, x.direction)
+    # Check that directions are the same
+    return dot(x.direction, y.direction)^2 ==
+           dot(x.direction, x.direction) * dot(y.direction, y.direction)
 end
