@@ -12,208 +12,152 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 """
-Core types and functions that support lattice and unit cell computations
+MirrorPlane class
 """
 
 # --- Imports
 
 # Standard library
-from abc import abstractmethod, ABC
 from dataclasses import dataclass
+from fractions import Fraction
+from typing import Optional
+
+# External packages
+import numpy
 
 # Local packages/modules
+from .symmetry_element import SymmetryElement
 from ... import _JL
 
 
 # --- Classes
 
 
-class SymmetryElement(ABC):
-    """
-    Abstract base class for symmetry element classes
-    """
-
-    # --- Methods
-
-    @abstractmethod
-    def to_julia(self):
-        """
-        Convert Python SymmetryElement object to a Julia SymmetryElement object.
-        """
-
-    @classmethod
-    def from_julia(cls, symmetry_element_jl: _JL.SymmetryElement):
-        """
-        Convert a Julia SymmetryElement object to a Python SymmetryElement object.
-
-        Parameters
-        ----------
-        symmetry_element_jl: Julia SymmetryElement object
-
-        Return value
-        ------------
-        Python SymmetryElement object
-        """
-        if _JL.isa(symmetry_element_jl, _JL.GlidePlane):
-            return GlidePlane.from_julia(symmetry_element_jl)
-        elif _JL.isa(symmetry_element_jl, _JL.ScrewAxis):
-            return ScrewAxis.from_julia(symmetry_element_jl)
-
-        raise ValueError(
-            "`symmetry_element_jl` must be a Julia `GlidePlane` or `ScrewAxis` object. "
-            f"(symmetry_element_jl={symmetry_element_jl})."
-        )
-
-    @abstractmethod
-    def __repr__(self):
-        """
-        Return string representation of SymmetryElement.
-        """
-
-
 @dataclass(frozen=True)
-class GlidePlane(SymmetryElement):
+class MirrorPlane(SymmetryElement):
     """
-    Class representing a glide plane
+    Class representing a mirror plane
 
     Fields
     ------
-    * `translation` (str): glide translation
+    * `normal` (tuple): normal to mirror plane
 
-    * `reflection_plane` (str): reflection plane
+    * `location` (tuple): a point on the mirror plane in unit cell fractional coordinates
     """
 
     # --- Fields
 
-    translation: str
-    reflection_plane: str
-
-    # --- Methods
-
-    def to_julia(self):
-        """
-        Convert Python GlidePlane object to a Julia GlidePlane object.
-        """
-        return _JL.GlidePlane(self.translation, self.reflection_plane)
-
-    @classmethod
-    def from_julia(cls, glide_plane_jl: _JL.GlidePlane):
-        """
-        Convert a Julia GlidePlane object to a Python GlidePlane object.
-
-        Parameters
-        ----------
-        glide_plane_jl: Julia GlidePlane object
-
-        Return value
-        ------------
-        Python GlidePlane object
-        """
-        # Check arguments
-        if not _JL.isa(glide_plane_jl, _JL.GlidePlane):
-            raise ValueError(
-                "`glide_plane_jl` must be a Julia `GlidePlane` object. "
-                f"(glide_plane_jl={glide_plane_jl})."
-            )
-
-        # Convert glide_plane_jl to a GlidePlane object
-        return GlidePlane(glide_plane_jl.translation, glide_plane_jl.reflection_plane)
-
-    def __repr__(self):
-        """
-        Return string representation of GlidePlane.
-        """
-        return (
-            f"GlidePlane(translation='{self.translation}',"
-            f"reflection_plane='{self.reflection_plane}')"
-        )
-
-
-@dataclass(frozen=True)
-class ScrewAxis(SymmetryElement):
-    """
-    Class representing a screw axis
-
-    Fields
-    ------
-    * `axis` (str): direction of rotation axis
-
-    * `n` (int): rotation order
-
-    * `m` (int): number of translation steps of size 1/n following rotation by 2π/n
-    """
-
-    # --- Fields
-
-    axis: str
-    n: int
-    m: int
+    normal: tuple
+    location: tuple
 
     # --- Initializer
 
-    def __init__(self, axis: str, n: int, m: int):
+    def __init__(self, normal: tuple, location: Optional[tuple] = None):
         """
-        Initialize ScrewAxis object.
+        Initialize MirrorPlane object.
 
         Parameters
         ----------
-        `axis`: direction of rotation axis
+        `normal` (tuple): normal to mirror plane
 
-        `n`: rotation order
-
-        `m`: number of translation steps of size 1/n following rotation by 2π/n
+        `location` (tuple): a point on the mirror plane in unit cell fractional coordinates
         """
         # --- Check arguments
 
-        if n <= 0:
-            raise ValueError(f"`n` must be positive (n={n})")
+        # check that `normal` is a 3-tuple
+        if len(normal) != 3:
+            raise ValueError(f"`normal` must be a 3-tuple (normal={normal})")
 
-        if m <= 0:
-            raise ValueError(f"`m` must be positive (m={m})")
+        # convert `normal` to Fraction objects
+        try:
+            normal = tuple(Fraction(x) for x in normal)
+        except ValueError as error:
+            raise ValueError(
+                "all elements of `normal` must convertible to Fraction objects "
+                f"(normal={normal}). "
+                f"[caused by {type(error)}({error})]"
+            )
 
-        if m >= n:
-            raise ValueError(f"`m` must be less than `n` (n={n},m={m})")
+        # set default value for `location`
+        if location is None:
+            location = (Fraction(0), Fraction(0), Fraction(0))
+        else:
+            # check that `location` is a 3-tuple
+            if len(location) != 3:
+                raise ValueError(f"`location` must be a 3-tuple (location={location})")
+
+            # convert `location` to Fraction objects
+            try:
+                location = tuple(Fraction(x) for x in location)
+            except ValueError as error:
+                raise ValueError(
+                    "all elements of `location` must convertible to Fraction objects "
+                    f"(location={location}). "
+                    f"[caused by {type(error)}({error})]"
+                )
 
         # --- Initialize field values
 
         # for frozen DataClasses, field values cannot be set directly
-        object.__setattr__(self, "axis", axis)
-        object.__setattr__(self, "n", n)
-        object.__setattr__(self, "m", m)
+        object.__setattr__(self, "normal", normal)
+        object.__setattr__(self, "location", location)
 
     # --- Methods
 
     def to_julia(self):
         """
-        Convert Python ScrewAxis object to a Julia ScrewAxis object.
+        Convert Python MirrorPlane object to a Julia MirrorPlane object.
         """
-        return _JL.ScrewAxis(self.axis, self.n, self.m)
+        return _JL.MirrorPlane(self.normal, self.location)
 
     @classmethod
-    def from_julia(cls, screw_axis_jl: _JL.ScrewAxis):
+    def from_julia(cls, mirror_plane_jl: _JL.MirrorPlane):
         """
-        Convert a Julia ScrewAxis object to a Python ScrewAxis object.
+        Convert a Julia MirrorPlane object to a Python MirrorPlane object.
 
         Parameters
         ----------
-        screw_axis_jl: Julia ScrewAxis object
+        mirror_plane_jl: Julia MirrorPlane object
 
         Return value
         ------------
-        Python ScrewAxis object
+        Python MirrorPlane object
         """
         # Check arguments
-        if not _JL.isa(screw_axis_jl, _JL.ScrewAxis):
+        if not _JL.isa(mirror_plane_jl, _JL.MirrorPlane):
             raise ValueError(
-                "`screw_axis_jl` must be a Julia `ScrewAxis` object. "
-                f"(screw_axis_jl={screw_axis_jl})."
+                "`mirror_plane_jl` must be a Julia `MirrorPlane` object. "
+                f"(mirror_plane_jl={mirror_plane_jl})."
             )
 
-        # Convert screw_axis_jl to a ScrewAxis object
-        return ScrewAxis(screw_axis_jl.axis, screw_axis_jl.n, screw_axis_jl.m)
+        # Convert mirror_plane_jl to a MirrorPlane object
+        return MirrorPlane(mirror_plane_jl.normal, mirror_plane_jl.location)
 
     def __repr__(self):
         """
-        Return string representation of ScrewAxis.
+        Return string representation of MirrorPlane.
         """
-        return f"ScrewAxis(axis='{self.axis}',n={self.n},m={self.m})"
+        return f"MirrorPlane(normal={self.normal},location={self.location})"
+
+    def __eq__(self, other):
+        """
+        Return True if `self` and `other`are identical symmetry elements; otherwise,
+        return False.
+
+        Parameters
+        ----------
+        other:  SymmetryElement object to compare against
+        """
+        if not isinstance(other, type(self)):
+            return False
+
+        # Check that normals are the same
+        if numpy.dot(self.normal, other.normal) ** 2 != numpy.dot(
+            self.normal, self.normal
+        ) * numpy.dot(other.normal, other.normal):
+            return False
+
+        # Check that line through both locations lies a plane orthogonal to the plane
+        # normal vectors
+        delta = tuple(self.location[i] - other.location[i] for i in range(3))
+        return numpy.dot(delta, self.normal) == 0

@@ -20,6 +20,7 @@ symmetry.
 from .symmetry_element import SymmetryElement  # noqa
 from .rotation_axis import RotationAxis  # noqa
 from .inversion_center import InversionCenter  # noqa
+from .mirror_plane import MirrorPlane  # noqa
 from .rotoinversion_axis import RotoinversionAxis  # noqa
 from .glide_plane import GlidePlane  # noqa
 from .screw_axis import ScrewAxis  # noqa
