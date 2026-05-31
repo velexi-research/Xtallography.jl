@@ -92,6 +92,7 @@ class RotoinversionAxis(SymmetryElement):
         # set default value for `center`
         if center is None:
             center = (Fraction(0), Fraction(0), Fraction(0))
+
         else:
             # check that `center` is a 3-tuple
             if len(center) != 3:

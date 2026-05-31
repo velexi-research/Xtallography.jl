@@ -90,6 +90,7 @@ class RotationAxis(SymmetryElement):
         # set default value for `location`
         if location is None:
             location = (Fraction(0), Fraction(0), Fraction(0))
+
         else:
             # check that `location` is a 3-tuple
             if len(location) != 3:
