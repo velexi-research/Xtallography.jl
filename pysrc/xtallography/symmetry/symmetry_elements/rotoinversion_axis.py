@@ -66,7 +66,7 @@ class RotoinversionAxis(SymmetryElement):
 
         `direction`: direction of rotoinversion axis
 
-        * `center`: location of inversion center in unit cell fractional coordinates
+        `center`: location of inversion center in unit cell fractional coordinates
           coordinates
         """
         # --- Check arguments
