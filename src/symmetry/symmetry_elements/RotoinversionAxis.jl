@@ -32,13 +32,13 @@ Supertype: [`SymmetryElement`](@ref)
 struct RotoinversionAxis <: SymmetryElement
     # --- Fields
 
-    # rotation order
+    # rotoinversion order
     n::Int
 
     # direction of rotoinversion axis
     direction::Tuple{Rational,Rational,Rational}
 
-    # a point on the rotation axis in unit cell fractional coordinates
+    # a point on the rotoinversion axis in unit cell fractional coordinates
     location::Tuple{Rational,Rational,Rational}
 
     # Constructor
