@@ -48,7 +48,7 @@ using Xtallography
 end
 
 @testset "GlidePlane: outer constructor" begin
-    # --- default location 
+    # --- default location
 
     glide = (1, 0, 0)
     normal = (0, 1, 0)
@@ -59,7 +59,7 @@ end
     @test symmetry_element.normal == normal
     @test symmetry_element.location == (0, 0, 0)
 
-    # --- non-default location 
+    # --- non-default location
 
     glide = (1, 0, 0)
     normal = (0, 2, 0)

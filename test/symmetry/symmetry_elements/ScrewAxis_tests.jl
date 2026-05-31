@@ -109,7 +109,7 @@ using Xtallography
 end
 
 @testset "ScrewAxis: outer constructor" begin
-    # --- default location 
+    # --- default location
 
     n = 3
     m = 2
@@ -122,7 +122,7 @@ end
     @test symmetry_element.direction == direction
     @test symmetry_element.location == (0, 0, 0)
 
-    # --- non-default location 
+    # --- non-default location
 
     n = 3
     m = 1

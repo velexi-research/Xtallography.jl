@@ -73,7 +73,7 @@ using Xtallography
 end
 
 @testset "RotationAxis: outer constructor" begin
-    # --- default location 
+    # --- default location
 
     n = 3
     direction = (1, 0, 0)
@@ -84,7 +84,7 @@ end
     @test symmetry_element.direction == direction
     @test symmetry_element.location == (0, 0, 0)
 
-    # --- non-default location 
+    # --- non-default location
 
     n = 3
     direction = (1, 0, 0)
