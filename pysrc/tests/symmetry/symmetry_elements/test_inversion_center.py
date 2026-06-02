@@ -77,6 +77,33 @@ class test_InversionCenter(unittest.TestCase):
         assert all([isinstance(x, Fraction)] for x in inversion_center.center)
 
     @staticmethod
+    def test_init_invalid_arguments():
+        """
+        Test argument checks for `__init__()`
+        """
+        # --- center
+
+        # center is not a 3-tuple
+        with pytest.raises(ValueError) as exception_info:
+            InversionCenter((1, 2, 3, 4))
+
+        expected_error = "`center` must be a 3-tuple (center=(1, 2, 3, 4))"
+        assert expected_error in str(exception_info)
+
+        # some element of center is not convertible to a Fraction object
+        invalid_center = (1, "b", 3)
+        with pytest.raises(ValueError) as exception_info:
+            InversionCenter(invalid_center)
+
+        expected_error = (
+            "all elements of `center` must convertible to Fraction objects "
+            f"(center={invalid_center}). "
+            "[caused by"
+        )
+
+        assert expected_error in str(exception_info)
+
+    @staticmethod
     def test_frozen():
         """
         Test that InversionCenter objects are immutable.

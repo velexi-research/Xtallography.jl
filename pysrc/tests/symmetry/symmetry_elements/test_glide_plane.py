@@ -340,9 +340,9 @@ class test_GlidePlane(unittest.TestCase):
 
         assert symmetry_element_1 == symmetry_element_2
 
-        # glides same, normals same, locations differ
+        # glides same, normals same direction, locations differ
         symmetry_element_1 = GlidePlane((1, 0, 0), (0, 0, 1), (0, 0, 0))
-        symmetry_element_2 = GlidePlane((1, 0, 0), (0, 0, 1), (0, 0.75, 0))
+        symmetry_element_2 = GlidePlane((1, 0, 0), (0, 0, 0.5), (0, 0.75, 0))
 
         assert symmetry_element_1 == symmetry_element_2
 
@@ -373,8 +373,8 @@ class test_GlidePlane(unittest.TestCase):
         assert symmetry_element_1 != symmetry_element_2
 
         # normals differ
-        symmetry_element_1 = GlidePlane((1, 1, 0), (0, 0, 1))
-        symmetry_element_2 = GlidePlane((1, 0, 0), (0, 0, 1))
+        symmetry_element_1 = GlidePlane((1, 0, 0), (0, 0, 1))
+        symmetry_element_2 = GlidePlane((1, 0, 0), (0, 1, 1))
 
         assert symmetry_element_1 != symmetry_element_2
 
