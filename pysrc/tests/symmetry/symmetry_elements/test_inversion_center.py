@@ -24,7 +24,7 @@ import unittest
 # External packages
 import juliacall
 import pytest
-from xtallography.symmetry import InversionCenter
+from xtallography.symmetry import InversionCenter, MirrorPlane
 
 # Local packages/modules
 
@@ -160,6 +160,13 @@ class test_InversionCenter(unittest.TestCase):
         """
         Test `__eq__()`.
         """
+        # --- Comparison with non-InversionCenter
+
+        symmetry_element_1 = InversionCenter((1, 0, 0))
+        symmetry_element_2 = MirrorPlane((0, 0, 1), (0, 0, 0))
+
+        assert symmetry_element_1 != symmetry_element_2
+
         # --- Identical inversion centers
 
         symmetry_element_1 = InversionCenter((1, 0, 0))

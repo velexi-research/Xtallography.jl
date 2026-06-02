@@ -24,7 +24,7 @@ import unittest
 # External packages
 import juliacall
 import pytest
-from xtallography.symmetry import GlidePlane
+from xtallography.symmetry import GlidePlane, MirrorPlane
 
 # Local packages/modules
 
@@ -318,6 +318,13 @@ class test_GlidePlane(unittest.TestCase):
         """
         Test `__eq__()`.
         """
+        # --- Comparison with non-GlidePlane
+
+        symmetry_element_1 = GlidePlane((1, 0, 0), (0, 0, 1), (0, 0, 0))
+        symmetry_element_2 = MirrorPlane((0, 0, 1), (0, 0, 0))
+
+        assert symmetry_element_1 != symmetry_element_2
+
         # --- Identical mirror planes
 
         symmetry_element_1 = GlidePlane((1, 0, 0), (0, 0, 1), (0, 0, 0))

@@ -24,7 +24,7 @@ import unittest
 # External packages
 import juliacall
 import pytest
-from xtallography.symmetry import ScrewAxis
+from xtallography.symmetry import ScrewAxis, RotationAxis
 
 # Local packages/modules
 
@@ -313,14 +313,21 @@ class test_ScrewAxis(unittest.TestCase):
         """
         Test `__eq__()`.
         """
-        # --- Identical rotation axes
+        # --- Comparison with non-ScrewAxis
+
+        symmetry_element_1 = ScrewAxis(6, 4, (1, 0, 0), (0, 0, 0))
+        symmetry_element_2 = RotationAxis(6, (1, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 != symmetry_element_2
+
+        # --- Identical screw axes
 
         symmetry_element_1 = ScrewAxis(6, 4, (1, 0, 0), (0, 0, 0))
         symmetry_element_2 = ScrewAxis(6, 4, (1, 0, 0), (0, 0, 0))
 
         assert symmetry_element_1 == symmetry_element_2
 
-        # --- Equivalent rotation axes
+        # --- Equivalent screw axes
 
         # directions differ, locations same
         symmetry_element_1 = ScrewAxis(6, 4, (1, 0, 0), (0, 0, 0))
@@ -340,7 +347,7 @@ class test_ScrewAxis(unittest.TestCase):
 
         assert symmetry_element_1 == symmetry_element_2
 
-        # --- Inequivalent rotation axes
+        # --- Inequivalent screw axes
 
         # orders differ
         symmetry_element_1 = ScrewAxis(6, 4, (2, 0, 0), (2, 0, 0))

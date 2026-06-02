@@ -24,7 +24,7 @@ import unittest
 # External packages
 import juliacall
 import pytest
-from xtallography.symmetry import RotoinversionAxis
+from xtallography.symmetry import RotoinversionAxis, RotationAxis
 
 # Local packages/modules
 
@@ -281,6 +281,13 @@ class test_RotoinversionAxis(unittest.TestCase):
         """
         Test `__eq__()`.
         """
+        # --- Comparison with non-RotoinversionAxis
+
+        symmetry_element_1 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
+        symmetry_element_2 = RotationAxis(2, (1, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 != symmetry_element_2
+
         # --- Identical rotation axes
 
         symmetry_element_1 = RotoinversionAxis(2, (1, 0, 0), (0, 0, 0))
