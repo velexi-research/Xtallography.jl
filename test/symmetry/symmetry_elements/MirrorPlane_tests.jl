@@ -25,18 +25,25 @@ using Xtallography
 
 # --- Tests
 
-@testset "MirrorPlane constructor" begin
+@testset "MirrorPlane: inner constructor" begin
     # --- Valid arguments
 
-    normal = (1, 0, 0)
-    location = (0, 0, 0)
-
+    normal = (0, 1, 0)
+    location = (1, 2, 3)
     symmetry_element = MirrorPlane(normal, location)
 
     @test symmetry_element.normal == normal
     @test symmetry_element.location == location
 
     # --- Invalid arguments
+
+    # normal = (0,0,0)
+    normal = (0, 0, 0)
+    location = (1, 2, 3)
+
+    expected_message = "`normal` must be a nonzero vector (normal=$normal)"
+
+    @test_throws ArgumentError(expected_message) MirrorPlane(normal, location)
 
     # normal does not contain exactly 3 elements
     normal = (1, 0, 0, 0)
@@ -49,6 +56,27 @@ using Xtallography
     location = (1, 0)
 
     @test_throws MethodError MirrorPlane(normal, location)
+end
+
+@testset "MirrorPlane: outer constructor" begin
+    # --- default location
+
+    normal = (0, 1, 0)
+
+    symmetry_element = MirrorPlane(normal)
+
+    @test symmetry_element.normal == normal
+    @test symmetry_element.location == (0, 0, 0)
+
+    # --- non-default location
+
+    normal = (0, 2, 0)
+    location = (1, 2, 3)
+
+    symmetry_element = MirrorPlane(normal; location=location)
+
+    @test symmetry_element.normal == normal
+    @test symmetry_element.location == location
 end
 
 @testset ":(==)(::MirrorPlane,::MirrorPlane)" begin
