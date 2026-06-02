@@ -155,7 +155,12 @@ class ScrewAxis(SymmetryElement):
             )
 
         # Convert screw_axis_jl to a ScrewAxis object
-        return ScrewAxis(screw_axis_jl.axis, screw_axis_jl.n, screw_axis_jl.m)
+        return ScrewAxis(
+            screw_axis_jl.n,
+            screw_axis_jl.m,
+            screw_axis_jl.direction,
+            screw_axis_jl.location,
+        )
 
     def __repr__(self):
         """
