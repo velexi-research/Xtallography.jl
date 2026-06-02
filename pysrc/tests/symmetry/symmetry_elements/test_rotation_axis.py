@@ -141,7 +141,7 @@ class test_xtallography_symmetry_symmetry_elements_RotationAxis(unittest.TestCas
         # some element of location is not convertible to a Fraction object
         invalid_location = (1, "b", 3)
         with pytest.raises(ValueError) as exception_info:
-            RotationAxis(5, (1, 2, 3), invalid_location)
+            RotationAxis(5, (1, 2, 3), location=invalid_location)
 
         expected_error = (
             "all elements of `location` must convertible to Fraction objects "
@@ -287,7 +287,7 @@ class test_xtallography_symmetry_symmetry_elements_RotationAxis(unittest.TestCas
 
         # --- Inequivalent rotation axes
 
-        # order is different
+        # orders differ
         symmetry_element_1 = RotationAxis(2, (2, 0, 0), (2, 0, 0))
         symmetry_element_2 = RotationAxis(3, (1, 0, 0), (0, 0, 0))
 
