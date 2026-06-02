@@ -18,11 +18,11 @@ symmetry.
 # Package-level types
 
 from .symmetry_element import SymmetryElement  # noqa
-from .rotation_axis import RotationAxis  # noqa
+from .glide_plane import GlidePlane  # noqa
 from .inversion_center import InversionCenter  # noqa
 from .mirror_plane import MirrorPlane  # noqa
+from .rotation_axis import RotationAxis  # noqa
 from .rotoinversion_axis import RotoinversionAxis  # noqa
-from .glide_plane import GlidePlane  # noqa
 from .screw_axis import ScrewAxis  # noqa
 
 from .symmetry_element_dynamic import symmetry_element_from_julia
