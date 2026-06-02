@@ -165,7 +165,9 @@ class GlidePlane(SymmetryElement):
             )
 
         # Convert glide_plane_jl to a GlidePlane object
-        return GlidePlane(glide_plane_jl.translation, glide_plane_jl.reflection_plane)
+        return GlidePlane(
+            glide_plane_jl.glide, glide_plane_jl.normal, glide_plane_jl.location
+        )
 
     def __repr__(self):
         """
