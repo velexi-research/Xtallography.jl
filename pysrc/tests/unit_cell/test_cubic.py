@@ -143,7 +143,10 @@ class test_xtallography_unit_cell_cubic(unittest.TestCase):
         assert unit_cell.symmetry_elements == set()
 
         # symmetry_elements non-empty
-        symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+        symmetry_elements = [
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        ]
         unit_cell = CubicUnitCell(a, symmetry_elements=symmetry_elements)
 
         assert unit_cell.lattice_constants == CubicLatticeConstants(a)
@@ -284,7 +287,10 @@ class test_xtallography_unit_cell_cubic(unittest.TestCase):
 
         # ------ non-default symmetry elements
 
-        symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+        symmetry_elements = [
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        ]
         unit_cell = CubicUnitCell(a, symmetry_elements=symmetry_elements)
         unit_cell_jl = unit_cell.to_julia()
 
@@ -341,7 +347,10 @@ class test_xtallography_unit_cell_cubic(unittest.TestCase):
 
         # ------ non-default symmetry elements
 
-        symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+        symmetry_elements = [
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        ]
         symmetry_elements_jl = self.jl.Vector(
             [element.to_julia() for element in symmetry_elements]
         )
@@ -418,14 +427,21 @@ class test_xtallography_unit_cell_cubic(unittest.TestCase):
 
         # ------ non-default symmetry elements
 
-        symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+        symmetry_elements = [
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        ]
         unit_cell = CubicUnitCell(a, symmetry_elements=symmetry_elements)
         assert str(unit_cell) == (
             f"CubicUnitCell(a={a},"
             "centering=primitive,"
             "symmetry_elements=["
-            "GlidePlane(translation='1,0,0',reflection_plane='0,1,0'),"
-            "ScrewAxis(axis='1,0,0',n=3,m=2)"
+            "GlidePlane(glide=(Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)),"
+            "normal=(Fraction(0, 1), Fraction(1, 1), Fraction(0, 1)),"
+            "location=(Fraction(0, 1), Fraction(0, 1), Fraction(0, 1))),"
+            "ScrewAxis(n=3,m=2,"
+            "direction=(Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)),"
+            "location=(Fraction(0, 1), Fraction(0, 1), Fraction(0, 1)))"
             "])"
         )
 
@@ -468,7 +484,10 @@ class test_xtallography_unit_cell_cubic(unittest.TestCase):
         assert unit_cell_1 != unit_cell_2
 
         # symmetry elements differ
-        symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+        symmetry_elements = [
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        ]
         unit_cell_1 = CubicUnitCell(a, symmetry_elements=symmetry_elements)
         unit_cell_2 = CubicUnitCell(a, symmetry_elements=symmetry_elements[0:-1])
         assert unit_cell_1 != unit_cell_2
@@ -511,7 +530,10 @@ class test_xtallography_unit_cell_cubic(unittest.TestCase):
         assert not unit_cell_1.isclose(unit_cell_2)
 
         # symmetry elements differ
-        symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+        symmetry_elements = [
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        ]
         unit_cell_1 = CubicUnitCell(a, symmetry_elements=symmetry_elements)
         unit_cell_2 = CubicUnitCell(a, symmetry_elements=symmetry_elements[0:-1])
         assert not unit_cell_1.isclose(unit_cell_2)
