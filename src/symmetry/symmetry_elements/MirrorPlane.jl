@@ -37,6 +37,43 @@ struct MirrorPlane <: SymmetryElement
 
     # a point on the mirror plane in unit cell fractional coordinates
     location::Tuple{Rational,Rational,Rational}
+
+    # --- Constructor
+
+    function MirrorPlane(
+        normal::Tuple{<:Real,<:Real,<:Real}, location::Tuple{<:Real,<:Real,<:Real}
+    )
+
+        # --- Check arguments
+
+        # normal != (0,0,0)
+        if normal == (0, 0, 0)
+            throw(ArgumentError("`normal` must be a nonzero vector (normal=$normal)"))
+        end
+
+        # --- Return new MirrorPlane
+
+        return new(normal, location)
+    end
+end
+
+# Outer constructor
+"""
+    MirrorPlane(
+        normal::Tuple{<:Real,<:Real,<:Real};
+        location::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0)
+    )
+
+Construct a MirrorPlane object with orientation defined by `normal`.
+
+Keyword Arguments
+=================
+- `location`: a point on the rotation axis in unit cell fractional coordinates
+"""
+function MirrorPlane(
+    normal::Tuple{<:Real,<:Real,<:Real}; location::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0)
+)
+    return MirrorPlane(normal, location)
 end
 
 # --- Functions/Methods
