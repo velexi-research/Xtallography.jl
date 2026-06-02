@@ -58,7 +58,19 @@ struct GlidePlane <: SymmetryElement
         location::Tuple{<:Real,<:Real,<:Real},
     )
 
-        # Check arguments
+        # --- Check arguments
+
+        # glide != (0,0,0)
+        if glide == (0, 0, 0)
+            throw(ArgumentError("`glide` must be a nonzero vector (glide=$glide)"))
+        end
+
+        # normal != (0,0,0)
+        if normal == (0, 0, 0)
+            throw(ArgumentError("`normal` must be a nonzero vector (normal=$normal)"))
+        end
+
+        # glide ⟂ normal
         if dot(glide, normal) != 0
             throw(
                 ArgumentError(
@@ -68,7 +80,8 @@ struct GlidePlane <: SymmetryElement
             )
         end
 
-        # Return new GlidePlane
+        # --- Return new GlidePlane
+
         return new(glide, normal, location)
     end
 end
@@ -81,14 +94,8 @@ end
         location::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0)
     )
 
-Construct a GlidePlane object that
-
-* has an axis by `direction` and `location`
-
-and
-
-* couples a rotation by `2π/n` and a translation along the rotation axis by `m/n` (in unit
-  cell fractional coordinates).
+Construct a GlidePlane object with the specified `glide` translation and mirror plane
+with orientation defined by `normal`.
 
 Keyword Arguments
 =================
@@ -108,8 +115,8 @@ import Base.:(==)
 import LinearAlgebra: dot
 
 function Base.:(==)(x::GlidePlane, y::GlidePlane)
-    # Check that directions of the glides are the same
-    if dot(x.glide, y.glide)^2 != dot(x.glide, x.glide) * dot(y.glide, y.glide)
+    # Check that glide vectors are the same
+    if x.glide != y.glide
         return false
     end
 
