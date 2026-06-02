@@ -2,6 +2,22 @@ Xtallography Release Notes
 ============================================================================================
 
 --------------------------------------------------------------------------------------------
+0.7.0 (2026-06-02)
+==================
+**Enhancements**
+- Add point group symmetry element types.
+- Redefine GlidePlane and ScrewAxis in terms of mathematical representations (instead of
+  string representations)
+- Add Crystallography.md reference notes.
+
+**Bug Fixes**
+- Fix various bugs.
+
+**Developer Updates**
+- Update package dependencies.
+- Update unit tests.
+
+--------------------------------------------------------------------------------------------
 0.6.0 (2026-05-02)
 ==================
 **Enhancements**
