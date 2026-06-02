@@ -18,6 +18,7 @@ Unit tests for `ScrewAxis` class
 
 # Standard library
 from dataclasses import FrozenInstanceError
+from fractions import Fraction
 import unittest
 
 # External packages
@@ -58,16 +59,36 @@ class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
         """
         Test `__init__()`.
         """
-        # --- Tests
+        # --- basic usage
 
-        axis = "1,0,0"
+        # default location
         n = 6
         m = 4
-        screw_axis = ScrewAxis(axis, n, m)
+        direction = (1, 0, 0)
+        screw_axis = ScrewAxis(n, m, direction)
 
-        assert screw_axis.axis == axis
         assert screw_axis.n == n
         assert screw_axis.m == m
+        assert screw_axis.direction == direction
+        assert all([isinstance(x, Fraction)] for x in screw_axis.direction)
+        assert screw_axis.location == (0, 0, 0)
+        assert all([isinstance(x, Fraction)] for x in screw_axis.location)
+
+        # --- keyword arguments
+
+        # non-default location
+        n = 6
+        m = 4
+        direction = (1, 0, 0)
+        location = (0, 1, 0)
+        screw_axis = ScrewAxis(n, m, direction, location=location)
+
+        assert screw_axis.n == n
+        assert screw_axis.m == m
+        assert screw_axis.direction == direction
+        assert all([isinstance(x, Fraction)] for x in screw_axis.direction)
+        assert screw_axis.location == location
+        assert all([isinstance(x, Fraction)] for x in screw_axis.location)
 
     @staticmethod
     def test_init_invalid_arguments():
@@ -78,44 +99,88 @@ class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
 
         # n = 0
         with pytest.raises(ValueError) as exception_info:
-            ScrewAxis("1,0,0", 0, 4)
+            ScrewAxis(0, 4, (1, 0, 0))
 
         expected_error = "`n` must be positive (n=0)"
         assert expected_error in str(exception_info)
 
         # n < 0
         with pytest.raises(ValueError) as exception_info:
-            ScrewAxis("1,0,0", -5, 4)
+            ScrewAxis(-5, 4, (1, 0, 0))
 
         expected_error = "`n` must be positive (n=-5)"
         assert expected_error in str(exception_info)
 
         # m = 0
         with pytest.raises(ValueError) as exception_info:
-            ScrewAxis("1,0,0", 6, 0)
+            ScrewAxis(6, 0, (1, 0, 0))
 
         expected_error = "`m` must be positive (m=0)"
         assert expected_error in str(exception_info)
 
         # m < 0
         with pytest.raises(ValueError) as exception_info:
-            ScrewAxis("1,0,0", 6, -4)
+            ScrewAxis(6, -4, (1, 0, 0))
 
         expected_error = "`m` must be positive (m=-4)"
         assert expected_error in str(exception_info)
 
         # m = n
         with pytest.raises(ValueError) as exception_info:
-            ScrewAxis("1,0,0", 6, 6)
+            ScrewAxis(6, 6, (1, 0, 0))
 
         expected_error = "`m` must be less than `n` (n=6,m=6)"
         assert expected_error in str(exception_info)
 
         # m > n
         with pytest.raises(ValueError) as exception_info:
-            ScrewAxis("1,0,0", 6, 7)
+            ScrewAxis(6, 7, (1, 0, 0))
 
         expected_error = "`m` must be less than `n` (n=6,m=7)"
+        assert expected_error in str(exception_info)
+
+        # --- direction
+
+        # direction is not a 3-tuple
+        with pytest.raises(ValueError) as exception_info:
+            ScrewAxis(5, 3, (1, 2, 3, 4))
+
+        expected_error = "`direction` must be a 3-tuple (direction=(1, 2, 3, 4))"
+        assert expected_error in str(exception_info)
+
+        # some element of direction is not convertible to a Fraction object
+        invalid_direction = (1, "b", 3)
+        with pytest.raises(ValueError) as exception_info:
+            ScrewAxis(5, 3, invalid_direction)
+
+        expected_error = (
+            "all elements of `direction` must convertible to Fraction objects "
+            f"(direction={invalid_direction}). "
+            "[caused by"
+        )
+
+        assert expected_error in str(exception_info)
+
+        # --- location
+
+        # location is not a 3-tuple
+        with pytest.raises(ValueError) as exception_info:
+            ScrewAxis(5, 3, (1, 2, 3), location=(1, 2))
+
+        expected_error = "`location` must be a 3-tuple (location=(1, 2))"
+        assert expected_error in str(exception_info)
+
+        # some element of location is not convertible to a Fraction object
+        invalid_location = (1, 3, "b")
+        with pytest.raises(ValueError) as exception_info:
+            ScrewAxis(5, 3, (1, 2, 3), location=invalid_location)
+
+        expected_error = (
+            "all elements of `location` must convertible to Fraction objects "
+            f"(location={invalid_location}). "
+            "[caused by"
+        )
+
         assert expected_error in str(exception_info)
 
     @staticmethod
@@ -125,16 +190,9 @@ class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
         """
         # --- Preparations
 
-        screw_axis = ScrewAxis("1,0,0", 6, 4)
+        screw_axis = ScrewAxis(6, 4, (1, 0, 0))
 
         # --- Tests
-
-        # attempt to change `axis` field
-        with pytest.raises(FrozenInstanceError) as exception_info:
-            screw_axis.axis = "0,1,0"
-
-        expected_error = "cannot assign to field 'axis'"
-        assert expected_error in str(exception_info)
 
         # attempt to change `n` field
         with pytest.raises(FrozenInstanceError) as exception_info:
@@ -150,41 +208,71 @@ class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
         expected_error = "cannot assign to field 'm'"
         assert expected_error in str(exception_info)
 
+        # attempt to change `direction` field
+        with pytest.raises(FrozenInstanceError) as exception_info:
+            screw_axis.direction = (0, 1, 0)
+
+        expected_error = "cannot assign to field 'direction'"
+        assert expected_error in str(exception_info)
+
+        # attempt to change `location` field
+        with pytest.raises(FrozenInstanceError) as exception_info:
+            screw_axis.location = (0, 1, 0)
+
+        expected_error = "cannot assign to field 'location'"
+        assert expected_error in str(exception_info)
+
     def test_to_julia(self):
         """
         Test `to_julia()`.
         """
         # --- Preparations
 
-        axis = "1,0,0"
         n = 6
         m = 4
-        screw_axis = ScrewAxis(axis, n, m)
+        direction = (1, 0, 0)
+        screw_axis = ScrewAxis(n, m, direction)
 
         # --- Tests
 
         screw_axis_jl = screw_axis.to_julia()
         assert self.jl.isa(screw_axis_jl, self.jl.ScrewAxis)
-        assert screw_axis_jl.axis == axis
         assert screw_axis_jl.n == n
         assert screw_axis_jl.m == m
+        assert screw_axis_jl.direction == direction
 
     def test_from_julia(self):
         """
         Test `from_julia()`.
         """
-        # --- Tests
+        # --- Preparations
 
-        axis = "1,0,0"
         n = 6
         m = 4
-        screw_axis_jl = self.jl.ScrewAxis(axis, n, m)
+        direction = (1, 0, 0)
 
-        screw_axis = ScrewAxis.from_julia(screw_axis_jl)
+        # --- Tests
 
-        assert screw_axis.axis == axis
-        assert screw_axis.n == n
-        assert screw_axis.m == m
+        # default location
+        screw_axis = ScrewAxis(n, m, direction)
+        screw_axis_jl = screw_axis.to_julia()
+
+        assert self.jl.isa(screw_axis_jl, self.jl.ScrewAxis)
+        assert screw_axis_jl.n == n
+        assert screw_axis_jl.m == m
+        assert screw_axis_jl.direction == direction
+        assert screw_axis_jl.location == (0, 0, 0)
+
+        # non-default location
+        location = (0, 0, 1)
+        screw_axis = ScrewAxis(n, m, direction, location=location)
+        screw_axis_jl = screw_axis.to_julia()
+
+        assert self.jl.isa(screw_axis_jl, self.jl.ScrewAxis)
+        assert screw_axis_jl.n == n
+        assert screw_axis_jl.m == m
+        assert screw_axis_jl.direction == direction
+        assert screw_axis_jl.location == location
 
     def test_from_julia_invalid_args(self):
         """
@@ -204,11 +292,84 @@ class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
         """
         Test `__repr__()`.
         """
-        # --- Tests
-
-        axis = "1,0,0"
+        # default location
         n = 6
         m = 4
-        screw_axis = ScrewAxis(axis, n, m)
+        direction = (1, 0, 0)
+        screw_axis = ScrewAxis(n, m, direction)
 
-        assert str(screw_axis) == "ScrewAxis(axis='1,0,0',n=6,m=4)"
+        assert str(screw_axis) == (
+            "ScrewAxis(n=6,m=4,"
+            "direction=(Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)),"
+            "location=(Fraction(0, 1), Fraction(0, 1), Fraction(0, 1)))"
+        )
+
+        # non-default location
+        n = 6
+        m = 3
+        direction = (1, 0, 0)
+        location = (1, 0, 1)
+        screw_axis = ScrewAxis(n, m, direction, location=location)
+
+        assert str(screw_axis) == (
+            "ScrewAxis(n=6,m=3,"
+            "direction=(Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)),"
+            "location=(Fraction(1, 1), Fraction(0, 1), Fraction(1, 1)))"
+        )
+
+    def test_eq(self):
+        """
+        Test `__eq__()`.
+        """
+        # --- Identical rotation axes
+
+        symmetry_element_1 = ScrewAxis(6, 4, (1, 0, 0), (0, 0, 0))
+        symmetry_element_2 = ScrewAxis(6, 4, (1, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 == symmetry_element_2
+
+        # --- Equivalent rotation axes
+
+        # directions differ, locations same
+        symmetry_element_1 = ScrewAxis(6, 4, (1, 0, 0), (0, 0, 0))
+        symmetry_element_2 = ScrewAxis(6, 4, (0.5, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 == symmetry_element_2
+
+        # directions same, locations differ
+        symmetry_element_1 = ScrewAxis(6, 4, (1, 0, 0), (0, 0, 0))
+        symmetry_element_2 = ScrewAxis(6, 4, (1, 0, 0), (0.75, 0, 0))
+
+        assert symmetry_element_1 == symmetry_element_2
+
+        # directions differ, locations differ
+        symmetry_element_1 = ScrewAxis(6, 4, (Fraction(2, 3), 0, 0), (0, 0, 0))
+        symmetry_element_2 = ScrewAxis(6, 4, (1, 0, 0), (Fraction(3, 2), 0, 0))
+
+        assert symmetry_element_1 == symmetry_element_2
+
+        # --- Inequivalent rotation axes
+
+        # orders differ
+        symmetry_element_1 = ScrewAxis(6, 4, (2, 0, 0), (2, 0, 0))
+        symmetry_element_2 = ScrewAxis(5, 4, (1, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 != symmetry_element_2
+
+        # number of translation steps differ
+        symmetry_element_1 = ScrewAxis(6, 4, (2, 0, 0), (2, 0, 0))
+        symmetry_element_2 = ScrewAxis(6, 3, (1, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 != symmetry_element_2
+
+        # directions differ
+        symmetry_element_1 = ScrewAxis(6, 4, (1, 1, 0), (0, 0, 0))
+        symmetry_element_2 = ScrewAxis(6, 4, (1, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 != symmetry_element_2
+
+        # line between locations != direction
+        symmetry_element_1 = ScrewAxis(6, 4, (Fraction(1, 3), 0, 0), (0, 1, 0))
+        symmetry_element_2 = ScrewAxis(6, 4, (1, 0, 0), (0, 0, 0))
+
+        assert symmetry_element_1 != symmetry_element_2
