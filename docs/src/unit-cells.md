@@ -28,13 +28,62 @@ volume
 ### Concrete Types
 
 ```@docs
-TriclinicUnitCell
-MonoclinicUnitCell
-OrthorhombicUnitCell
-HexagonalUnitCell
-RhombohedralUnitCell
-TetragonalUnitCell
 CubicUnitCell
+CubicUnitCell(
+    a::Real;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+)
+HexagonalUnitCell
+HexagonalUnitCell(
+    a::Real,
+    c::Real;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+)
+OrthorhombicUnitCell
+OrthorhombicUnitCell(
+    a::Real,
+    b::Real,
+    c::Real;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+)
+MonoclinicUnitCell
+MonoclinicUnitCell(
+    a::Real,
+    b::Real,
+    c::Real,
+    β::Real;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+)
+RhombohedralUnitCell
+RhombohedralUnitCell(
+    a::Real,
+    α::Real;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+)
+TetragonalUnitCell
+TetragonalUnitCell(
+    a::Real,
+    c::Real;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+)
+TriclinicUnitCell
+TriclinicUnitCell(
+    a::Real,
+    b::Real,
+    c::Real,
+    α::Real,
+    β::Real,
+    γ::Real;
+    centering::Centering=primitive_centering,
+    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+    check_angle_constraints::Bool=true,
+)
 ```
 
 ### Lattice-Specific Functions
@@ -69,12 +118,19 @@ isapprox(::UnitCellDelta, ::UnitCellDelta)
 
 ```@docs
 CubicUnitCellDelta
+CubicUnitCellDelta(Δa::Real)
 HexagonalUnitCellDelta
+HexagonalUnitCellDelta(Δa::Real, Δc::Real)
 MonoclinicUnitCellDelta
+MonoclinicUnitCellDelta(Δa::Real, Δb::Real, Δc::Real, Δβ::Real)
 OrthorhombicUnitCellDelta
+OrthorhombicUnitCellDelta(Δa::Real, Δb::Real, Δc::Real)
 RhombohedralUnitCellDelta
+RhombohedralUnitCellDelta(Δa::Real, Δα::Real)
 TetragonalUnitCellDelta
+TetragonalUnitCellDelta(Δa::Real, Δc::Real)
 TriclinicUnitCellDelta
+TriclinicUnitCellDelta(Δa::Real, Δb::Real, Δc::Real, Δα::Real, Δβ::Real, Δγ::Real)
 ```
 
 -------------------------------------------------------------------------------------------
