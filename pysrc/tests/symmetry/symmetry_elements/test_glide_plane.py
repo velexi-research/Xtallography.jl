@@ -32,7 +32,7 @@ from xtallography.symmetry import GlidePlane
 # --- Test Suites
 
 
-class test_xtallography_symmetry_symmetry_elements_GlidePlane(unittest.TestCase):
+class test_GlidePlane(unittest.TestCase):
     """
     Test suite for the `GlidePlane` class
     """
@@ -254,31 +254,24 @@ class test_xtallography_symmetry_symmetry_elements_GlidePlane(unittest.TestCase)
         """
         Test `from_julia()`.
         """
-        # --- Preparations
+        # --- default location
 
         glide = (1, 0, 0)
         normal = (0, 0, 1)
+        glide_plane_jl = self.jl.GlidePlane(glide, normal)
+        glide_plane = GlidePlane.from_julia(glide_plane_jl)
 
-        # --- Tests
+        assert glide_plane == GlidePlane(glide, normal)
 
-        # default location
-        glide_plane = GlidePlane(glide, normal)
-        glide_plane_jl = glide_plane.to_julia()
+        # --- non-default location
 
-        assert self.jl.isa(glide_plane_jl, self.jl.GlidePlane)
-        assert glide_plane_jl.glide == glide
-        assert glide_plane_jl.normal == normal
-        assert glide_plane_jl.location == (0, 0, 0)
-
-        # non-default location
+        glide = (1, 0, 0)
+        normal = (0, 0, 1)
         location = (0, 0, 1)
-        glide_plane = GlidePlane(glide, normal, location=location)
-        glide_plane_jl = glide_plane.to_julia()
+        glide_plane_jl = self.jl.GlidePlane(glide, normal, location=location)
+        glide_plane = GlidePlane.from_julia(glide_plane_jl)
 
-        assert self.jl.isa(glide_plane_jl, self.jl.GlidePlane)
-        assert glide_plane_jl.glide == glide
-        assert glide_plane_jl.normal == normal
-        assert glide_plane_jl.location == location
+        assert glide_plane == GlidePlane(glide, normal, location=location)
 
     def test_from_julia_invalid_args(self):
         """

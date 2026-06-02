@@ -32,7 +32,7 @@ from xtallography.symmetry import InversionCenter
 # --- Test Suites
 
 
-class test_xtallography_symmetry_symmetry_elements_InversionCenter(unittest.TestCase):
+class test_InversionCenter(unittest.TestCase):
     """
     Test suite for the `InversionCenter` class
     """
@@ -112,6 +112,16 @@ class test_xtallography_symmetry_symmetry_elements_InversionCenter(unittest.Test
 
         assert self.jl.isa(inversion_center_jl, self.jl.InversionCenter)
         assert inversion_center_jl.center == center
+
+    def test_from_julia(self):
+        """
+        Test `from_julia()`.
+        """
+        center = (1, 2, 3)
+        inversion_center_jl = self.jl.InversionCenter(center)
+        inversion_center = InversionCenter.from_julia(inversion_center_jl)
+
+        assert inversion_center == InversionCenter(center)
 
     def test_from_julia_invalid_args(self):
         """

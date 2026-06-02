@@ -32,7 +32,7 @@ from xtallography.symmetry import RotationAxis
 # --- Test Suites
 
 
-class test_xtallography_symmetry_symmetry_elements_RotationAxis(unittest.TestCase):
+class test_RotationAxis(unittest.TestCase):
     """
     Test suite for the `RotationAxis` class
     """
@@ -212,6 +212,29 @@ class test_xtallography_symmetry_symmetry_elements_RotationAxis(unittest.TestCas
         assert rotation_axis_jl.n == n
         assert rotation_axis_jl.direction == direction
         assert rotation_axis_jl.location == location
+
+    def test_from_julia(self):
+        """
+        Test `from_julia()`.
+        """
+        # --- default location
+
+        n = 4
+        direction = (1, 2, 3)
+        rotation_axis_jl = self.jl.RotationAxis(n, direction)
+        rotation_axis = RotationAxis.from_julia(rotation_axis_jl)
+
+        assert rotation_axis == RotationAxis(n, direction, location=(0, 0, 0))
+
+        # --- non-default location
+
+        n = 6
+        direction = (1, 2, 3)
+        location = (4, 5, 6)
+        rotation_axis_jl = self.jl.RotationAxis(n, direction, location=location)
+        rotation_axis = RotationAxis.from_julia(rotation_axis_jl)
+
+        assert rotation_axis == RotationAxis(n, direction, location=location)
 
     def test_from_julia_invalid_args(self):
         """

@@ -32,7 +32,7 @@ from xtallography.symmetry import ScrewAxis
 # --- Test Suites
 
 
-class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
+class test_ScrewAxis(unittest.TestCase):
     """
     Test suite for the `ScrewAxis` class
     """
@@ -245,34 +245,26 @@ class test_xtallography_symmetry_symmetry_elements_ScrewAxis(unittest.TestCase):
         """
         Test `from_julia()`.
         """
-        # --- Preparations
+        # --- default location
 
         n = 6
         m = 4
-        direction = (1, 0, 0)
+        direction = (1, 2, 3)
+        screw_axis_jl = self.jl.ScrewAxis(n, m, direction)
+        screw_axis = ScrewAxis.from_julia(screw_axis_jl)
 
-        # --- Tests
+        assert screw_axis == ScrewAxis(n, m, direction, location=(0, 0, 0))
 
-        # default location
-        screw_axis = ScrewAxis(n, m, direction)
-        screw_axis_jl = screw_axis.to_julia()
+        # --- non-default location
 
-        assert self.jl.isa(screw_axis_jl, self.jl.ScrewAxis)
-        assert screw_axis_jl.n == n
-        assert screw_axis_jl.m == m
-        assert screw_axis_jl.direction == direction
-        assert screw_axis_jl.location == (0, 0, 0)
+        n = 6
+        m = 3
+        direction = (1, 2, 3)
+        location = (4, 5, 6)
+        screw_axis_jl = self.jl.ScrewAxis(n, m, direction, location=location)
+        screw_axis = ScrewAxis.from_julia(screw_axis_jl)
 
-        # non-default location
-        location = (0, 0, 1)
-        screw_axis = ScrewAxis(n, m, direction, location=location)
-        screw_axis_jl = screw_axis.to_julia()
-
-        assert self.jl.isa(screw_axis_jl, self.jl.ScrewAxis)
-        assert screw_axis_jl.n == n
-        assert screw_axis_jl.m == m
-        assert screw_axis_jl.direction == direction
-        assert screw_axis_jl.location == location
+        assert screw_axis == ScrewAxis(n, m, direction, location=location)
 
     def test_from_julia_invalid_args(self):
         """

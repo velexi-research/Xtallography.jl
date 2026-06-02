@@ -32,7 +32,7 @@ from xtallography.symmetry import MirrorPlane
 # --- Test Suites
 
 
-class test_xtallography_symmetry_symmetry_elements_MirrorPlane(unittest.TestCase):
+class test_MirrorPlane(unittest.TestCase):
     """
     Test suite for the `MirrorPlane` class
     """
@@ -189,6 +189,27 @@ class test_xtallography_symmetry_symmetry_elements_MirrorPlane(unittest.TestCase
         assert self.jl.isa(mirror_plane_jl, self.jl.MirrorPlane)
         assert mirror_plane_jl.normal == normal
         assert mirror_plane_jl.location == location
+
+    def test_from_julia(self):
+        """
+        Test `from_julia()`.
+        """
+        # --- default location
+
+        normal = (1, 2, 3)
+        mirror_plane_jl = self.jl.MirrorPlane(normal)
+        mirror_plane = MirrorPlane.from_julia(mirror_plane_jl)
+
+        assert mirror_plane == MirrorPlane(normal)
+
+        # --- non-default location
+
+        normal = (1, 2, 3)
+        location = (4, 5, 6)
+        mirror_plane_jl = self.jl.MirrorPlane(normal, location=location)
+        mirror_plane = MirrorPlane.from_julia(mirror_plane_jl)
+
+        assert mirror_plane == MirrorPlane(normal, location=location)
 
     def test_from_julia_invalid_args(self):
         """

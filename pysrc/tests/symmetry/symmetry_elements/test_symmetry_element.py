@@ -20,8 +20,17 @@ Unit tests for `SymmetryElement` class
 import unittest
 
 # External packages
+import juliacall
 import pytest
 from xtallography.symmetry import SymmetryElement
+from xtallography.symmetry import (
+    GlidePlane,
+    InversionCenter,
+    MirrorPlane,
+    RotationAxis,
+    RotoinversionAxis,
+    ScrewAxis,
+)
 
 # Local packages/modules
 
@@ -29,10 +38,89 @@ from xtallography.symmetry import SymmetryElement
 # --- Test Suites
 
 
-class test_xtallography_symmetry_symmetry_elements_SymmetryElement(unittest.TestCase):
+class test_SymmetryElement(unittest.TestCase):
     """
     Test suite for the `SymmetryElement` class
     """
+
+    # --- Fixtures
+
+    def setUp(self):
+        """
+        Prepare for test.
+        """
+        # Initialize JuliaCall
+        self.jl = juliacall.newmodule("PyXtallographyTest")
+        self.jl.seval("using Xtallography")
+
+    def tearDown(self):
+        """
+        Clean up after test.
+        """
+
+    # --- Tests
+
+    def test_from_julia(self):
+        """
+        Test `SymmetryElement.from_julia()`.
+
+        Note: only tests that the correctness of the class of the returned object.
+        Correctness of the returned object is tested by the from_julia() tests for
+        concrete subclasses of SymmetryElement.
+        """
+        # --- GlidePlane
+
+        glide = (1, 2, 0)
+        normal = (0, 0, 3)
+        symmetry_element_jl = self.jl.GlidePlane(glide, normal)
+        symmetry_element = SymmetryElement.from_julia(symmetry_element_jl)
+
+        assert isinstance(symmetry_element, GlidePlane)
+
+        # --- InversionCenter
+
+        center = (1, 2, 0)
+        symmetry_element_jl = self.jl.InversionCenter(center)
+        symmetry_element = SymmetryElement.from_julia(symmetry_element_jl)
+
+        assert isinstance(symmetry_element, InversionCenter)
+
+        # --- MirrorPlane
+
+        normal = (1, 1, 1)
+        symmetry_element_jl = self.jl.MirrorPlane(normal)
+        symmetry_element = SymmetryElement.from_julia(symmetry_element_jl)
+
+        assert isinstance(symmetry_element, MirrorPlane)
+
+        # --- RotationAxis
+
+        n = 4
+        direction = (1, 2, 0)
+        symmetry_element_jl = self.jl.RotationAxis(n, direction)
+        symmetry_element = SymmetryElement.from_julia(symmetry_element_jl)
+
+        assert isinstance(symmetry_element, RotationAxis)
+
+        # --- RotoinversionAxis
+
+        n = 4
+        direction = (1, 2, 0)
+        center = (1, 2, 0)
+        symmetry_element_jl = self.jl.RotoinversionAxis(n, direction, center=center)
+        symmetry_element = SymmetryElement.from_julia(symmetry_element_jl)
+
+        assert isinstance(symmetry_element, RotoinversionAxis)
+
+        # --- ScrewAxis
+
+        n = 6
+        m = 4
+        direction = (1, 2, 3)
+        symmetry_element_jl = self.jl.ScrewAxis(n, m, direction)
+        symmetry_element = SymmetryElement.from_julia(symmetry_element_jl)
+
+        assert isinstance(symmetry_element, ScrewAxis)
 
     def test_from_julia_invalid_args(self):
         """

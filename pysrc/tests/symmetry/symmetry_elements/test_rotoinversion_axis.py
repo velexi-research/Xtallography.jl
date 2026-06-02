@@ -32,7 +32,7 @@ from xtallography.symmetry import RotoinversionAxis
 # --- Test Suites
 
 
-class test_xtallography_symmetry_symmetry_elements_RotoinversionAxis(unittest.TestCase):
+class test_RotoinversionAxis(unittest.TestCase):
     """
     Test suite for the `RotoinversionAxis` class
     """
@@ -212,6 +212,29 @@ class test_xtallography_symmetry_symmetry_elements_RotoinversionAxis(unittest.Te
         assert rotoinversion_axis_jl.n == n
         assert rotoinversion_axis_jl.direction == direction
         assert rotoinversion_axis_jl.center == center
+
+    def test_from_julia(self):
+        """
+        Test `from_julia()`.
+        """
+        # --- default center
+
+        n = 4
+        direction = (1, 2, 3)
+        rotoinversion_axis_jl = self.jl.RotoinversionAxis(n, direction)
+        rotoinversion_axis = RotoinversionAxis.from_julia(rotoinversion_axis_jl)
+
+        assert rotoinversion_axis == RotoinversionAxis(n, direction, center=(0, 0, 0))
+
+        # --- non-default center
+
+        n = 6
+        direction = (1, 2, 3)
+        center = (4, 5, 6)
+        rotoinversion_axis_jl = self.jl.RotoinversionAxis(n, direction, center=center)
+        rotoinversion_axis = RotoinversionAxis.from_julia(rotoinversion_axis_jl)
+
+        assert rotoinversion_axis == RotoinversionAxis(n, direction, center=center)
 
     def test_from_julia_invalid_args(self):
         """
