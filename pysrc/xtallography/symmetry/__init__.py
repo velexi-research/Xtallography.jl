@@ -23,7 +23,13 @@ from .centering import Centering  # noqa
 
 from .lattice_system import LatticeSystem  # noqa
 
-from .symmetry_elements import GlidePlane, ScrewAxis, SymmetryElement  # noqa
+from .symmetry_elements import SymmetryElement  # noqa
+from .symmetry_elements import GlidePlane  # noqa
+from .symmetry_elements import InversionCenter  # noqa
+from .symmetry_elements import MirrorPlane  # noqa
+from .symmetry_elements import RotationAxis  # noqa
+from .symmetry_elements import RotoinversionAxis  # noqa
+from .symmetry_elements import ScrewAxis  # noqa
 
 
 # --- Auto-doc
@@ -42,5 +48,9 @@ __all__ = [
     "BRAVAIS_LATTICES",
     "SymmetryElement",
     "GlidePlane",
+    "InversionCenter",
+    "MirrorPlane",
+    "RotationAxis",
+    "RotoinversionAxis",
     "ScrewAxis",
 ]

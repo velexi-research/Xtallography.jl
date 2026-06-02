@@ -599,7 +599,7 @@ function convert_to_mI(unit_cell::TriclinicUnitCell)
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_1(unit_cell)
 
         @debug "aP --> mI (case 1)"
-        return convert_to_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
+        return convert_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
@@ -618,7 +618,7 @@ function convert_to_mI(unit_cell::TriclinicUnitCell)
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_2(unit_cell)
 
         @debug "aP --> mI (case 2)"
-        return convert_to_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
+        return convert_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
@@ -640,7 +640,7 @@ function convert_to_mI(unit_cell::TriclinicUnitCell)
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_3(unit_cell)
 
         @debug "aP --> mI (case 3)"
-        return convert_to_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
+        return convert_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
@@ -659,7 +659,7 @@ function convert_to_mI(unit_cell::TriclinicUnitCell)
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_4(unit_cell)
 
         @debug "aP --> mI (case 4)"
-        return convert_to_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
+        return convert_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
@@ -679,7 +679,7 @@ function convert_to_mI(unit_cell::TriclinicUnitCell)
         m_basis_a, m_basis_b, m_basis_c = convert_to_mI_case_5(unit_cell)
 
         @debug "aP --> mI (case 5)"
-        return convert_to_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
+        return convert_mI_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
@@ -703,7 +703,7 @@ function convert_to_mI(unit_cell::TriclinicUnitCell)
     end
 end
 
-function convert_to_mI_basis_to_unit_cell(
+function convert_mI_basis_to_unit_cell(
     m_basis_a::Vector{<:Real}, m_basis_b::Vector{<:Real}, m_basis_c::Vector{<:Real}
 )
     # Compute monoclinic lattice constants
@@ -712,12 +712,7 @@ function convert_to_mI_basis_to_unit_cell(
     m_c = norm(m_basis_c)
     m_β = angle(m_basis_a, m_basis_c)
 
-    # Check IUCr conventions
-    if m_β < π / 2
-        throw(ErrorException("m_β be at least π/2. (m_β=$m_β)"))
-    end
-
-    return MonoclinicUnitCell(m_a, m_b, m_c, m_β; centering=body_centering)
+    return standardize(MonoclinicUnitCell(m_a, m_b, m_c, m_β; centering=body_centering))
 end
 
 function convert_to_mI_case_1(unit_cell::TriclinicUnitCell)
@@ -1461,7 +1456,7 @@ function convert_to_mC(unit_cell::TriclinicUnitCell)
     try
         # Compute monoclinic basis vectors
         m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_1(unit_cell)
-        return convert_to_mC_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
+        return convert_mC_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
@@ -1481,7 +1476,7 @@ function convert_to_mC(unit_cell::TriclinicUnitCell)
     try
         # Compute monoclinic basis vectors
         m_basis_a, m_basis_b, m_basis_c = convert_to_mC_case_2(unit_cell)
-        return convert_to_mC_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
+        return convert_mC_basis_to_unit_cell(m_basis_a, m_basis_b, m_basis_c)
 
     catch error
         if !(error isa ErrorException) || (
@@ -1506,7 +1501,7 @@ function convert_to_mC(unit_cell::TriclinicUnitCell)
     end
 end
 
-function convert_to_mC_basis_to_unit_cell(
+function convert_mC_basis_to_unit_cell(
     m_basis_a::Vector{<:Real}, m_basis_b::Vector{<:Real}, m_basis_c::Vector{<:Real}
 )
     # Compute monoclinic lattice constants
@@ -1515,12 +1510,7 @@ function convert_to_mC_basis_to_unit_cell(
     m_c = norm(m_basis_c)
     m_β = angle(m_basis_a, m_basis_c)
 
-    # Check IUCr conventions
-    if m_β < π / 2
-        throw(ErrorException("m_β be at least π/2. (m_β=$m_β)"))
-    end
-
-    return MonoclinicUnitCell(m_a, m_b, m_c, m_β; centering=base_centering)
+    return standardize(MonoclinicUnitCell(m_a, m_b, m_c, m_β; centering=base_centering))
 end
 
 function convert_to_mC_case_1(unit_cell::TriclinicUnitCell)

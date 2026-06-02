@@ -71,7 +71,10 @@ class test_xtallography_unit_cell_symmetry_UnitCellSymmetry(unittest.TestCase):
 
         # all keyword arguments specified
         centering = Centering.FACE
-        symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+        symmetry_elements = [
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        ]
         unit_cell_symmetry = UnitCellSymmetry(
             centering=centering, symmetry_elements=symmetry_elements
         )
@@ -87,7 +90,10 @@ class test_xtallography_unit_cell_symmetry_UnitCellSymmetry(unittest.TestCase):
         assert unit_cell_symmetry.symmetry_elements == set()
 
         # keyword arguments: only `symmetry_elements` specified as a list
-        symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+        symmetry_elements = [
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        ]
         unit_cell_symmetry = UnitCellSymmetry(symmetry_elements=symmetry_elements)
 
         assert unit_cell_symmetry.centering == Centering.PRIMITIVE
@@ -95,7 +101,7 @@ class test_xtallography_unit_cell_symmetry_UnitCellSymmetry(unittest.TestCase):
 
         # keyword arguments: only `symmetry_elements` specified as a set
         symmetry_elements = set(
-            [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+            [GlidePlane((1, 0, 0), (0, 1, 0)), ScrewAxis(3, 2, (1, 0, 0))]
         )
         unit_cell_symmetry = UnitCellSymmetry(symmetry_elements=symmetry_elements)
 
@@ -111,8 +117,8 @@ class test_xtallography_unit_cell_symmetry_UnitCellSymmetry(unittest.TestCase):
 
         # `symmetry_elements` contains an element that is not a SymmetryElement object
         symmetry_elements = [
-            GlidePlane("1,0,0", "0,1,0"),
-            ScrewAxis("1,0,0", 3, 2),
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
             "not a SymmetryElement",
         ]
         with pytest.raises(ValueError) as exception_info:
@@ -120,7 +126,7 @@ class test_xtallography_unit_cell_symmetry_UnitCellSymmetry(unittest.TestCase):
 
         expected_error = (
             "`symmetry_elements` contains elements that are not SymmetryElements "
-            f"objects. (symmetry_elements={symmetry_elements})"
+            "objects. (symmetry_elements="
         )
         assert expected_error in str(exception_info)
 
@@ -145,7 +151,7 @@ class test_xtallography_unit_cell_symmetry_UnitCellSymmetry(unittest.TestCase):
         # attempt to change `symmetry_elements` field
         with pytest.raises(FrozenInstanceError) as exception_info:
             unit_cell_symmetry.symmetry_elements = set(
-                [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+                [GlidePlane((1, 0, 0), (0, 1, 0)), ScrewAxis(3, 2, (1, 0, 0))]
             )
 
         expected_error = "cannot assign to field 'symmetry_elements'"
@@ -174,7 +180,10 @@ class test_xtallography_unit_cell_symmetry_UnitCellSymmetry(unittest.TestCase):
 
         # unit cell symmetry: non-primitive centering, non-trivial symmetry elements
         centering = Centering.FACE
-        symmetry_elements = {GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)}
+        symmetry_elements = {
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        }
         unit_cell_symmetry_jl = UnitCellSymmetry(
             centering, symmetry_elements
         ).to_julia()
@@ -211,7 +220,10 @@ class test_xtallography_unit_cell_symmetry_UnitCellSymmetry(unittest.TestCase):
 
         # unit cell symmetry: non-primitive centering, non-trivial symmetry elements
         centering = Centering.FACE
-        symmetry_elements = {GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)}
+        symmetry_elements = {
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        }
         unit_cell_symmetry_jl = UnitCellSymmetry(
             centering, symmetry_elements
         ).to_julia()
@@ -248,7 +260,10 @@ class test_xtallography_unit_cell_symmetry_UnitCellSymmetry(unittest.TestCase):
 
         # equal UnitCellSymmetry objects
         centering = Centering.FACE
-        symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+        symmetry_elements = [
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        ]
         unit_cell_symmetry = UnitCellSymmetry(centering, symmetry_elements)
 
         other = UnitCellSymmetry(centering, symmetry_elements)
@@ -257,7 +272,10 @@ class test_xtallography_unit_cell_symmetry_UnitCellSymmetry(unittest.TestCase):
 
         # equal UnitCellSymmetry objects
         centering = Centering.FACE
-        symmetry_elements = [GlidePlane("1,0,0", "0,1,0"), ScrewAxis("1,0,0", 3, 2)]
+        symmetry_elements = [
+            GlidePlane((1, 0, 0), (0, 1, 0)),
+            ScrewAxis(3, 2, (1, 0, 0)),
+        ]
         unit_cell_symmetry = UnitCellSymmetry(centering, symmetry_elements)
         other = UnitCellSymmetry(centering)
 
