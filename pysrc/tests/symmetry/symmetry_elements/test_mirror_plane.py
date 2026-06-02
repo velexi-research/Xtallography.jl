@@ -89,6 +89,13 @@ class test_xtallography_symmetry_symmetry_elements_MirrorPlane(unittest.TestCase
         """
         # --- normal
 
+        # normal = (0,0,0)
+        with pytest.raises(ValueError) as exception_info:
+            MirrorPlane((0, 0, 0))
+
+        expected_error = "`normal` must be a nonzero vector (normal=(0, 0, 0))"
+        assert expected_error in str(exception_info)
+
         # normal is not a 3-tuple
         with pytest.raises(ValueError) as exception_info:
             MirrorPlane((1, 2, 3, 4))
@@ -233,19 +240,19 @@ class test_xtallography_symmetry_symmetry_elements_MirrorPlane(unittest.TestCase
 
         # --- Equivalent mirror planes
 
-        # normal differ, locations same
+        # normals differ, locations same
         symmetry_element_1 = MirrorPlane((1, 0, 0), (0, 0, 0))
         symmetry_element_2 = MirrorPlane((0.5, 0, 0), (0, 0, 0))
 
         assert symmetry_element_1 == symmetry_element_2
 
-        # normal same, locations differ
+        # normals same, locations differ
         symmetry_element_1 = MirrorPlane((1, 0, 0), (0, 0, 0))
         symmetry_element_2 = MirrorPlane((1, 0, 0), (0, 0.75, 0))
 
         assert symmetry_element_1 == symmetry_element_2
 
-        # normal differ, locations differ
+        # normals differ, locations differ
         symmetry_element_1 = MirrorPlane((Fraction(2, 3), 0, 0), (0, 0, 0))
         symmetry_element_2 = MirrorPlane((1, 0, 0), (0, Fraction(3, 2), 0))
 
@@ -253,7 +260,7 @@ class test_xtallography_symmetry_symmetry_elements_MirrorPlane(unittest.TestCase
 
         # --- Inequivalent mirror planes
 
-        # normal differ
+        # normals differ
         symmetry_element_1 = MirrorPlane((1, 1, 0), (0, 0, 0))
         symmetry_element_2 = MirrorPlane((1, 0, 0), (0, 0, 0))
 

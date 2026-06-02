@@ -68,6 +68,10 @@ class MirrorPlane(SymmetryElement):
         if len(normal) != 3:
             raise ValueError(f"`normal` must be a 3-tuple (normal={normal})")
 
+        # check that `normal` is not the zero vector
+        if all(component == 0 for component in normal):
+            raise ValueError(f"`normal` must be a nonzero vector (normal={normal})")
+
         # convert `normal` to Fraction objects
         try:
             normal = tuple(Fraction(x) for x in normal)
@@ -151,7 +155,7 @@ class MirrorPlane(SymmetryElement):
         if not isinstance(other, type(self)):
             return False
 
-        # Check that normals are the same
+        # Check that normals are in the same direction
         if numpy.dot(self.normal, other.normal) ** 2 != numpy.dot(
             self.normal, self.normal
         ) * numpy.dot(other.normal, other.normal):
