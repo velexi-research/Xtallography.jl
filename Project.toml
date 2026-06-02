@@ -1,6 +1,6 @@
 name = "Xtallography"
 uuid = "795fc1aa-9caa-44e9-84db-c49cd1f148be"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Kevin Chu <kevin@velexi.com> and contributors"]
 
 [deps]

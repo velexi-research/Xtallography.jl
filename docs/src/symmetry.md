@@ -86,7 +86,34 @@ SymmetryElement
 
 ```@docs
 GlidePlane
+GlidePlane(glide::Tuple{<:Real,<:Real,<:Real},
+    normal::Tuple{<:Real,<:Real,<:Real};
+    location::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0),
+)
+InversionCenter
+MirrorPlane
+MirrorPlane(
+    normal::Tuple{<:Real,<:Real,<:Real}; location::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0)
+)
+RotationAxis
+RotationAxis(
+    n::Int,
+    direction::Tuple{<:Real,<:Real,<:Real};
+    location::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0),
+)
+RotoinversionAxis
+RotoinversionAxis(
+    n::Int,
+    direction::Tuple{<:Real,<:Real,<:Real};
+    center::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0),
+)
 ScrewAxis
+ScrewAxis(
+    n::Int,
+    m::Int,
+    direction::Tuple{<:Real,<:Real,<:Real};
+    location::Tuple{<:Real,<:Real,<:Real}=(0, 0, 0),
+)
 ```
 
 -------------------------------------------------------------------------------------------

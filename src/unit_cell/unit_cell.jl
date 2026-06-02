@@ -26,7 +26,7 @@ export lattice_constants, symmetry, centering, symmetry_elements
 export is_bravais_lattice
 export basis, volume, surface_area
 export standardize, conventional_cell
-export reduced_cell, compute_delaunay_set, prune_delaunay_set, find_reduced_basis
+export reduced_cell, _compute_delaunay_set, _prune_delaunay_set, _find_reduced_basis
 export is_equivalent, is_supercell
 export isapprox
 
@@ -732,14 +732,14 @@ function reduced_cell(unit_cell::UnitCell)
     # --- Perform Selling-Delaunay reduction
 
     # Compute Delaunay set
-    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+    delaunay_set = _compute_delaunay_set(basis_a, basis_b, basis_c)
 
     # Remove (1) zero vectors and (2) vectors that are scalar multiples of another vector
     # with shorter length.
-    delaunay_set = prune_delaunay_set(delaunay_set)
+    delaunay_set = _prune_delaunay_set(delaunay_set)
 
     # Find reduced basis (smallest sum of squared lengths with maximum surface area)
-    reduced_basis_a, reduced_basis_b, reduced_basis_c = find_reduced_basis(delaunay_set)
+    reduced_basis_a, reduced_basis_b, reduced_basis_c = _find_reduced_basis(delaunay_set)
 
     # --- Return standardized primitive unit cell defined by reduced basis
 
@@ -751,7 +751,7 @@ function reduced_cell(unit_cell::UnitCell)
 end
 
 """
-    compute_delaunay_set(
+    _compute_delaunay_set(
         basis_a::Vector{<:Real}, basis_b::Vector{<:Real}, basis_c::Vector{<:Real}
     ) -> Vector{Vector{Real}}
 
@@ -761,7 +761,7 @@ Return values
 =============
 Delaunay set
 """
-function compute_delaunay_set(
+function _compute_delaunay_set(
     basis_a::Vector{<:Real}, basis_b::Vector{<:Real}, basis_c::Vector{<:Real}
 )
 
@@ -857,7 +857,7 @@ function compute_delaunay_set(
 end
 
 """
-    prune_delaunay_set(delaunay_set::Vector{<:Vector{<:Real}})
+    _prune_delaunay_set(delaunay_set::Vector{<:Vector{<:Real}})
 
 Remove the following vectors from `delaunay_set`:
 
@@ -877,7 +877,7 @@ returned list contains NamedTuple objects with the following keys: `vector` and
 
     This function converts all vectors in `delaunay_set` to `Vector{Float64}`.
 """
-function prune_delaunay_set(delaunay_set::Vector{<:Vector{<:Real}})
+function _prune_delaunay_set(delaunay_set::Vector{<:Vector{<:Real}})
 
     # Compute squared length of each vector
     delaunay_set = [
@@ -911,7 +911,7 @@ function prune_delaunay_set(delaunay_set::Vector{<:Vector{<:Real}})
 end
 
 """
-    find_reduced_basis(
+    _find_reduced_basis(
         delaunay_set::Vector{@NamedTuple{vector::Vector{Float64}, length_sq::Float64}}
     ) -> Vector{Vector{Float64}}
 
@@ -921,7 +921,7 @@ Return values
 =============
 reduced basis vectors sorted by length (in ascending order)
 """
-function find_reduced_basis(
+function _find_reduced_basis(
     delaunay_set::Vector{@NamedTuple{vector::Vector{Float64},length_sq::Float64}}
 )
     # Check arguments

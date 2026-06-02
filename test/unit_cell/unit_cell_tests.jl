@@ -183,7 +183,7 @@ end
     @test centering(reduced_cell_) === primitive_centering
 end
 
-@testset "compute_delaunay_set(::Vector): valid arguments" begin
+@testset "_compute_delaunay_set(::Vector): valid arguments" begin
     # --- Tests
 
     # ------ dot(b_1, b_2) > 0
@@ -192,7 +192,7 @@ end
     basis_b = [1, 1, 0]
     basis_c = [-1, 0, 0]
 
-    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+    delaunay_set = _compute_delaunay_set(basis_a, basis_b, basis_c)
 
     expected_delaunay_set = [
         [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
@@ -206,7 +206,7 @@ end
     basis_b = [-1, 0, 0]
     basis_c = [1, 1, 0]
 
-    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+    delaunay_set = _compute_delaunay_set(basis_a, basis_b, basis_c)
 
     expected_delaunay_set = [
         [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
@@ -220,7 +220,7 @@ end
     basis_b = [-1, 0, 0]
     basis_c = [-2, -1, 0]
 
-    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+    delaunay_set = _compute_delaunay_set(basis_a, basis_b, basis_c)
 
     expected_delaunay_set = [
         [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
@@ -234,7 +234,7 @@ end
     basis_b = [1, 1, 0]
     basis_c = [1, 0, 0]
 
-    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+    delaunay_set = _compute_delaunay_set(basis_a, basis_b, basis_c)
 
     expected_delaunay_set = [
         [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
@@ -248,7 +248,7 @@ end
     basis_b = [1, 0, 0]
     basis_c = [-1, 1, 0]
 
-    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+    delaunay_set = _compute_delaunay_set(basis_a, basis_b, basis_c)
 
     expected_delaunay_set = [
         [-1, 0, 0], [1, 0, 0], [0, -1, 0], [0, 1, 0], [0, 0, 0], [-1, -1, 0], [1, -1, 0]
@@ -262,7 +262,7 @@ end
     basis_b = [3, 0, 0]
     basis_c = [-2, 1, 0]
 
-    delaunay_set = compute_delaunay_set(basis_a, basis_b, basis_c)
+    delaunay_set = _compute_delaunay_set(basis_a, basis_b, basis_c)
 
     expected_delaunay_set = [
         [-2, 1, 0], [1, 1, 0], [1, -2, 0], [0, 0, 0], [-1, 2, 0], [-1, -1, 0], [2, -1, 0]
@@ -271,7 +271,7 @@ end
     @test delaunay_set == expected_delaunay_set
 end
 
-@testset "compute_delaunay_set(::Vector): invalid arguments" begin
+@testset "_compute_delaunay_set(::Vector): invalid arguments" begin
     # --- Preparations
 
     # Valid basis vectors
@@ -283,30 +283,30 @@ end
 
     # length(basis_a) != 3
     expected_message = "`basis_a` must contain exactly 3 components (basis_a=[1, 2, 3, 4])"
-    @test_throws ArgumentError(expected_message) compute_delaunay_set(
+    @test_throws ArgumentError(expected_message) _compute_delaunay_set(
         [1, 2, 3, 4], basis_b, basis_c
     )
 
     # length(basis_b) != 3
     expected_message = "`basis_b` must contain exactly 3 components (basis_b=[1, 2])"
-    @test_throws ArgumentError(expected_message) compute_delaunay_set(
+    @test_throws ArgumentError(expected_message) _compute_delaunay_set(
         basis_a, [1, 2], basis_c
     )
 
     # length(basis_c) != 3
     expected_message = "`basis_c` must contain exactly 3 components (basis_c=[1, 2, 3, 4])"
-    @test_throws ArgumentError(expected_message) compute_delaunay_set(
+    @test_throws ArgumentError(expected_message) _compute_delaunay_set(
         basis_a, basis_b, [1, 2, 3, 4]
     )
 end
 
-@testset "prune_delaunay_set(::Vector): valid arguments" begin
+@testset "_prune_delaunay_set(::Vector): valid arguments" begin
     # --- Tests
 
     # delaunay_set requiring no pruning
     delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [0, 1, 1], [1, 0, 1]]
 
-    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+    pruned_delaunay_set = _prune_delaunay_set(delaunay_set)
 
     expected_delaunay_set = [
         [1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [0, 1, 1], [1, 0, 1]
@@ -333,7 +333,7 @@ end
         [0, 0, 1],
     ]
 
-    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+    pruned_delaunay_set = _prune_delaunay_set(delaunay_set)
 
     expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     expected_pruned_delaunay_set = [
@@ -351,7 +351,7 @@ end
     # scalar multiple vectors have same length
     delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 0, 0], [0, 1, 0]]
 
-    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+    pruned_delaunay_set = _prune_delaunay_set(delaunay_set)
 
     expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     expected_pruned_delaunay_set = [
@@ -367,7 +367,7 @@ end
     # shorter scalar multiple vector comes first
     delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [3, 0, 0], [0, 2, 0]]
 
-    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+    pruned_delaunay_set = _prune_delaunay_set(delaunay_set)
 
     expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     expected_pruned_delaunay_set = [
@@ -383,7 +383,7 @@ end
     # shorter scalar multiple vector comes second
     delaunay_set = [[3, 0, 0], [0, 1, 0], [0, 0, 1], [1, 0, 0], [0, 2, 0]]
 
-    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+    pruned_delaunay_set = _prune_delaunay_set(delaunay_set)
 
     expected_delaunay_set = [[0, 1, 0], [0, 0, 1], [1, 0, 0]]
     expected_pruned_delaunay_set = [
@@ -399,7 +399,7 @@ end
     # scalar multiple vectors point in opposite directions
     delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [-1, 0, 0], [0, -2, 0]]
 
-    pruned_delaunay_set = prune_delaunay_set(delaunay_set)
+    pruned_delaunay_set = _prune_delaunay_set(delaunay_set)
 
     expected_delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     expected_pruned_delaunay_set = [
@@ -413,7 +413,7 @@ end
     end
 end
 
-@testset "find_reduced_basis(::Vector): valid arguments" begin
+@testset "_find_reduced_basis(::Vector): valid arguments" begin
     # --- Tests
 
     # delaunay_set has no degenerate bases
@@ -423,7 +423,7 @@ end
         v in delaunay_set
     ]
 
-    reduced_basis = find_reduced_basis(augmented_delaunay_set)
+    reduced_basis = _find_reduced_basis(augmented_delaunay_set)
 
     expected_reduced_basis = [[1, 0, 0], [0, 1, 0], [1, 0, 1]]
     @test Set(reduced_basis) == Set(expected_reduced_basis)
@@ -435,7 +435,7 @@ end
         v in delaunay_set
     ]
 
-    reduced_basis = find_reduced_basis(augmented_delaunay_set)
+    reduced_basis = _find_reduced_basis(augmented_delaunay_set)
 
     expected_reduced_basis = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     @test Set(reduced_basis) == Set(expected_reduced_basis)
@@ -453,13 +453,13 @@ end
         v in delaunay_set
     ]
 
-    reduced_basis = find_reduced_basis(augmented_delaunay_set)
+    reduced_basis = _find_reduced_basis(augmented_delaunay_set)
 
     expected_reduced_basis = [b_1, -b_3, b_2 - b_1]
     @test Set(reduced_basis) == Set(expected_reduced_basis)
 end
 
-@testset "find_reduced_basis(::Vector): invalid arguments" begin
+@testset "_find_reduced_basis(::Vector): invalid arguments" begin
     # --- Tests
 
     # vectors in delaunay_set are not of type Vector{Float64}
@@ -468,7 +468,7 @@ end
         (vector=v, length_sq=Float64(dot(v, v))) for v in delaunay_set
     ]
 
-    @test_throws MethodError find_reduced_basis(delaunay_set)
+    @test_throws MethodError _find_reduced_basis(delaunay_set)
 
     # length_sq values delaunay_set are of type Float64
     delaunay_set = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0]]
@@ -476,7 +476,7 @@ end
         (vector=convert(Vector{Float64}, v), length_sq=dot(v, v)) for v in delaunay_set
     ]
 
-    @test_throws MethodError find_reduced_basis(augmented_delaunay_set)
+    @test_throws MethodError _find_reduced_basis(augmented_delaunay_set)
 
     # delaunay_set has fewer than 3 elements
     delaunay_set = [[1, 0, 0], [0, 1, 0]]
@@ -489,7 +489,7 @@ end
         "`delaunay_set` must contain at least 3 elements" *
         "(delaunay_set=$augmented_delaunay_set)"
 
-    @test_throws ArgumentError(error_message) find_reduced_basis(augmented_delaunay_set)
+    @test_throws ArgumentError(error_message) _find_reduced_basis(augmented_delaunay_set)
 end
 
 @testset "is_equivalent(::UnitCell): valid arguments" begin
