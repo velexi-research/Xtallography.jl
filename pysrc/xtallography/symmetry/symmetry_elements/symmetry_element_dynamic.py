@@ -19,8 +19,11 @@ Dynamic additions to SymmetryElement class
 
 # Local packages/modules
 from xtallography import _JL
-from .rotation_axis import RotationAxis
 from .glide_plane import GlidePlane
+from .inversion_center import InversionCenter
+from .mirror_plane import MirrorPlane
+from .rotation_axis import RotationAxis
+from .rotoinversion_axis import RotoinversionAxis
 from .screw_axis import ScrewAxis
 
 # --- Methods
@@ -52,6 +55,15 @@ def symmetry_element_from_julia(cls, symmetry_element_jl: _JL.SymmetryElement):
 
     if _JL.isa(symmetry_element_jl, _JL.RotationAxis):
         symmetry_element = RotationAxis.from_julia(symmetry_element_jl)
+
+    elif _JL.isa(symmetry_element_jl, _JL.MirrorPlane):
+        symmetry_element = MirrorPlane.from_julia(symmetry_element_jl)
+
+    elif _JL.isa(symmetry_element_jl, _JL.InversionCenter):
+        symmetry_element = InversionCenter.from_julia(symmetry_element_jl)
+
+    elif _JL.isa(symmetry_element_jl, _JL.RotoinversionAxis):
+        symmetry_element = RotoinversionAxis.from_julia(symmetry_element_jl)
 
     elif _JL.isa(symmetry_element_jl, _JL.GlidePlane):
         symmetry_element = GlidePlane.from_julia(symmetry_element_jl)
