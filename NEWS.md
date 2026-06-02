@@ -5,17 +5,26 @@ Xtallography Release Notes
 0.7.0 (2026-06-02)
 ==================
 **Enhancements**
-- Add point group symmetry element types.
+* Update Python interface
+  * Add reduced_cell() and conventional_cell()
+  * Add angle constraint check for TriclinicUnitCell constructor
+* Add standardize() and is_triclinic_type_I_cell() methods with lattice constant arguments
+- Add point group symmetry element
 - Redefine GlidePlane and ScrewAxis in terms of mathematical representations (instead of
   string representations)
 - Add Crystallography.md reference notes.
+* Polish docstrings
 
 **Bug Fixes**
-- Fix various bugs.
+- Fix bugs in UnitCell(::Vector,::Vector,::Vector;...) method
+- Fix various other bugs
 
 **Developer Updates**
-- Update package dependencies.
-- Update unit tests.
+- Improve reduced_cell() method implementation
+- Update unit tests
+- Update julia dependencies
+- Update package dependencies
+- Update GitHub Actions dependencies
 
 --------------------------------------------------------------------------------------------
 0.6.0 (2026-05-02)
