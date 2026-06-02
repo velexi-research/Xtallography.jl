@@ -86,6 +86,10 @@ SymmetryElement
 
 ```@docs
 GlidePlane
+InversionCenter
+MirrorPlane
+RotationAxis
+RotoinversionAxis
 ScrewAxis
 ```
 
