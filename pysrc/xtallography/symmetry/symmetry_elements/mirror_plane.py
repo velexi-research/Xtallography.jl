@@ -58,9 +58,9 @@ class MirrorPlane(SymmetryElement):
 
         Parameters
         ----------
-        `normal` (tuple): normal to mirror plane
+        `normal`: normal to mirror plane
 
-        `location` (tuple): a point on the mirror plane in unit cell fractional coordinates
+        `location`: a point on the mirror plane in unit cell fractional coordinates
         """
         # --- Check arguments
 
