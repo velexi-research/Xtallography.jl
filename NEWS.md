@@ -12,17 +12,17 @@ Xtallography Release Notes
 - Add point group symmetry element
 - Redefine GlidePlane and ScrewAxis in terms of mathematical representations (instead of
   string representations)
-- Add Crystallography.md reference notes.
-* Polish docstrings
+- Improve package documentation
+- Add Crystallography.md reference notes
 
 **Bug Fixes**
 - Fix bugs in UnitCell(::Vector,::Vector,::Vector;...) method
 - Fix various other bugs
 
 **Developer Updates**
-- Improve reduced_cell() method implementation
+- Refactor reduced_cell() method to improve testability
+* Polish docstrings
 - Update unit tests
-- Update julia dependencies
 - Update package dependencies
 - Update GitHub Actions dependencies
 
