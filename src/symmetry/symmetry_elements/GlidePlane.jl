@@ -58,7 +58,7 @@ struct GlidePlane <: SymmetryElement
         location::Tuple{<:Real,<:Real,<:Real},
     )
 
-        # Enforce constraints
+        # Check arguments
         if dot(glide, normal) != 0
             throw(
                 ArgumentError(

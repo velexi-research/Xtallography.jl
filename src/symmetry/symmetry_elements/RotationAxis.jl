@@ -49,7 +49,7 @@ struct RotationAxis <: SymmetryElement
         location::Tuple{<:Real,<:Real,<:Real},
     )
 
-        # Enforce constraints
+        # Check arguments
         if n ≤ 0
             throw(ArgumentError("`n` must be positive (n=$n)"))
         end
