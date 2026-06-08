@@ -134,7 +134,7 @@ jobs:
             matrix.julia-version == env.codecov-julia-version &&
             matrix.python-version == env.codecov-python-version
 
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: lcov.info coverage.xml
