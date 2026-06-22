@@ -2,13 +2,25 @@ Xtallography Release Notes
 ============================================================================================
 
 --------------------------------------------------------------------------------------------
+0.7.1 (2026-06-22)
+==================
+**Bug Fixes**
+- Fix version error in juliapkg.json
+
+**Developer Updates**
+- Fix Python unit tests
+- Update package dependencies
+- Update GitHub Actions dependencies
+- Polish NEWS.ms
+
+--------------------------------------------------------------------------------------------
 0.7.0 (2026-06-02)
 ==================
 **Enhancements**
-* Update Python interface
-  * Add reduced_cell() and conventional_cell()
-  * Add angle constraint check for TriclinicUnitCell constructor
-* Add standardize() and is_triclinic_type_I_cell() methods with lattice constant arguments
+- Update Python interface
+  - Add reduced_cell() and conventional_cell()
+  - Add angle constraint check for TriclinicUnitCell constructor
+- Add standardize() and is_triclinic_type_I_cell() methods with lattice constant arguments
 - Add point group symmetry element
 - Redefine GlidePlane and ScrewAxis in terms of mathematical representations (instead of
   string representations)
@@ -21,7 +33,7 @@ Xtallography Release Notes
 
 **Developer Updates**
 - Refactor reduced_cell() method to improve testability
-* Polish docstrings
+- Polish docstrings
 - Update unit tests
 - Update package dependencies
 - Update GitHub Actions dependencies
