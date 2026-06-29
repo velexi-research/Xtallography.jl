@@ -92,7 +92,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Load cached $HOME/.local
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.local
           key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ matrix.julia-version }}-python-${{ matrix.python-version }}-dotlocal-${{ hashFiles('.github/workflows/CI.yml') }}
@@ -106,7 +106,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .venv
           key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ matrix.julia-version }}-python-${{ matrix.python-version }}-venv-${{ hashFiles('**/poetry.lock') }}
@@ -173,7 +173,7 @@ jobs:
           python-version: '3.14'
 
       - name: Load cached $HOME/.local
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.local
           key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-dotlocal-${{ hashFiles('.github/workflows/CI.yml') }}
@@ -187,7 +187,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .venv
           key: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-venv-${{ hashFiles('**/poetry.lock') }}
