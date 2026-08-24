@@ -138,6 +138,7 @@ TriclinicUnitCellDelta(Δa::Real, Δb::Real, Δc::Real, Δα::Real, Δβ::Real, 
 
 ```@docs
 UnitCellSymmetry
+UnitCellSymmetry(::Centering; ::Union{Set,Vector,Nothing})
 centering(::UnitCellSymmetry)
 primitive_unit_cell_symmetry
 symmetry_elements
