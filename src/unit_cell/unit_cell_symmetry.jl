@@ -92,10 +92,7 @@ const primitive_unit_cell_symmetry = UnitCellSymmetry()
 import Base.:(==)
 
 function Base.:(==)(x::UnitCellSymmetry, y::UnitCellSymmetry)
-    return (
-        centering(x) === centering(y) &&
-        Set(symmetry_elements(x)) == Set(symmetry_elements(y))
-    )
+    return (centering(x) === centering(y) && symmetry_elements(x) == symmetry_elements(y))
 end
 
 """
