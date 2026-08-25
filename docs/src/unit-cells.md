@@ -11,6 +11,8 @@ Types and functions related to unit cells.
 
 ```@docs
 UnitCell
+UnitCell(::NamedTuple; ::Centering, ::Union{Set,Vector,Nothing})
+UnitCell(unit_cell::UnitCell)
 basis
 centering(::UnitCell)
 conventional_cell
@@ -31,23 +33,23 @@ volume
 CubicUnitCell
 CubicUnitCell(
     a::Real;
-    centering::Centering=primitive_centering,
-    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+    centering::Centering,
+    symmetry_elements::Union{Set,Vector,Nothing},
 )
 HexagonalUnitCell
 HexagonalUnitCell(
     a::Real,
     c::Real;
-    centering::Centering=primitive_centering,
-    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+    centering::Centering,
+    symmetry_elements::Union{Set,Vector,Nothing},
 )
 OrthorhombicUnitCell
 OrthorhombicUnitCell(
     a::Real,
     b::Real,
     c::Real;
-    centering::Centering=primitive_centering,
-    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+    centering::Centering,
+    symmetry_elements::Union{Set,Vector,Nothing},
 )
 MonoclinicUnitCell
 MonoclinicUnitCell(
@@ -55,22 +57,22 @@ MonoclinicUnitCell(
     b::Real,
     c::Real,
     β::Real;
-    centering::Centering=primitive_centering,
-    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+    centering::Centering,
+    symmetry_elements::Union{Set,Vector,Nothing},
 )
 RhombohedralUnitCell
 RhombohedralUnitCell(
     a::Real,
     α::Real;
-    centering::Centering=primitive_centering,
-    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+    centering::Centering,
+    symmetry_elements::Union{Set,Vector,Nothing},
 )
 TetragonalUnitCell
 TetragonalUnitCell(
     a::Real,
     c::Real;
-    centering::Centering=primitive_centering,
-    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
+    centering::Centering,
+    symmetry_elements::Union{Set,Vector,Nothing},
 )
 TriclinicUnitCell
 TriclinicUnitCell(
@@ -80,9 +82,9 @@ TriclinicUnitCell(
     α::Real,
     β::Real,
     γ::Real;
-    centering::Centering=primitive_centering,
-    symmetry_elements::Union{Set,Vector,Nothing}=nothing,
-    check_angle_constraints::Bool=true,
+    centering::Centering,
+    symmetry_elements::Union{Set,Vector,Nothing},
+    check_angle_constraints::Bool,
 )
 ```
 
